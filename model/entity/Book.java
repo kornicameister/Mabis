@@ -6,8 +6,11 @@ package model.entity;
 
 /**
  * @author kornicameister
- *
+ * 
  */
 public class Book extends Entity {
+	Book(int pk) {
+		super(pk);
+	}
 
 }
