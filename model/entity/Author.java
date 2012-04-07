@@ -5,6 +5,7 @@
 package model.entity;
 
 import model.enums.TableType;
+import exceptions.SQLForeingKeyNotFound;
 
 /**
  * @author kornicameister
@@ -47,6 +48,23 @@ public class Author extends BaseTable {
 		this.firstName = new String("");
 		this.lastName = new String("");
 		this.tableName = TableType.AUTHOR.toString();
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		this.metaData.put("idAuthor", this.getPrimaryKey().toString());
+		this.metaData.put("firstName", this.getFirstName());
+		this.metaData.put("lastName", this.getLastName());
+		try {
+			this.metaData.put("picture", this.getForeingKey("picture")
+					.getValue().toString());
+		} catch (SQLForeingKeyNotFound e) {
+			e.printStackTrace();
+		} finally {
+			this.metaData.clear();
+		}
 	}
 
 	/**

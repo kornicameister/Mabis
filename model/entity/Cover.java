@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 
 import model.enums.CoverType;
 import model.enums.TableType;
+import exceptions.SQLForeingKeyNotFound;
 
 /**
  * @author kornicameister
@@ -85,6 +86,21 @@ public class Cover extends BaseTable {
 		this.type = CoverType.UNDEFINED;
 		this.imagePath = new String("");
 		this.checkSum = new String("");
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		this.metaData.put("idCover", this.getPrimaryKey().toString());
+		this.metaData.put("hash", this.getCheckSum());
+		try {
+			this.metaData.put("image", this.getForeingKey("image").toString());
+		} catch (SQLForeingKeyNotFound e) {
+			e.printStackTrace();
+		} finally {
+			this.metaData.clear();
+		}
 	}
 
 	public String getImagePath() {

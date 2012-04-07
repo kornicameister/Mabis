@@ -5,6 +5,7 @@
 package model.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -27,6 +28,7 @@ public abstract class BaseTable implements Table {
 	private TreeMap<String, ForeignKey> foreignKeys = null;
 	protected TreeSet<TableType> constraints = null;
 	protected String tableName = "empty";
+	protected HashMap<String, String> metaData = null;
 
 	/**
 	 * Empty constructor, only initializes variables, used when new entity
@@ -105,14 +107,19 @@ public abstract class BaseTable implements Table {
 		this.covers = new ArrayList<Cover>();
 		this.foreignKeys = new TreeMap<String, ForeignKey>();
 		this.constraints = new TreeSet<TableType>();
+		this.metaData = new HashMap<String, String>();
 	}
-
 	/**
 	 * overridden by extending class, called always as triggering call is
 	 * located in {@link BaseTable} constructor takes care of initializing all
 	 * internal fields that belongs to extending classes
 	 */
 	protected abstract void initInternalFields();
+
+	/**
+	 * revalidates meta data
+	 */
+	protected abstract void reloadMetaData();
 
 	@Override
 	public void checkConstraints(ForeignKey... keys)
@@ -242,5 +249,25 @@ public abstract class BaseTable implements Table {
 			str += c.toString();
 		}
 		return str;
+	}
+
+	@Override
+	public String metaData() {
+		String a = new String();
+		for (String s : this.metaData.keySet()) {
+			a += s + ",";
+		}
+		return a.substring(0, a.length() - 1);
+	}
+
+	@Override
+	public String[] rawData() {
+		String[] raws = {this.metaData(), ""};
+		String a = new String();
+		for (String s : this.metaData.keySet()) {
+			a += s + ",";
+		}
+		raws[1] = a.substring(0, a.length() - 1);
+		return raws;
 	}
 }

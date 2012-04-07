@@ -6,6 +6,7 @@ package model.entity;
 
 import model.enums.TableType;
 import model.utilities.ForeignKey;
+import exceptions.SQLForeingKeyNotFound;
 
 /**
  * @author kornicameister
@@ -46,6 +47,29 @@ public class Book extends BaseTable {
 		this.constraints.add(TableType.AUTHOR);
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.GENRE);
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		this.metaData.put("idBook", this.getPrimaryKey().toString());
+		this.metaData.put("isbn", this.getIsbn());
+		this.metaData.put("titleOriginal", this.getOriginalTitle());
+		this.metaData.put("titleLocale", this.getLocalizedTitle());
+		this.metaData.put("pages", this.getPages().toString());
+		try {
+			this.metaData.put("genre", this.getForeingKey("genre").getValue()
+					.toString());
+			this.metaData.put("cover", this.getForeingKey("cover").getValue()
+					.toString());
+			this.metaData.put("writer", this.getForeingKey("writer").getValue()
+					.toString());
+		} catch (SQLForeingKeyNotFound e) {
+			e.printStackTrace();
+		} finally {
+			this.metaData.clear();
+		}
 	}
 
 	public String getIsbn() {

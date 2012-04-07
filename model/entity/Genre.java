@@ -60,7 +60,14 @@ public class Genre extends BaseTable {
 
 	@Override
 	protected void initInternalFields() {
-		return;
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		this.metaData.put("idGenre", this.getPrimaryKey().toString());
+		this.metaData.put("genre", this.getGenre());
 	}
 
 	@Override

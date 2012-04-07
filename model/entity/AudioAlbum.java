@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import model.enums.TableType;
 import model.utilities.ForeignKey;
+import exceptions.SQLForeingKeyNotFound;
 
 /**
  * @author kornicameister
@@ -57,18 +58,48 @@ public class AudioAlbum extends BaseTable {
 		this.totalTime = new Time(0);
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.AUTHOR);
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		try {
+			this.metaData.put("idAudio", this.getPrimaryKey().toString());
+			this.metaData.put("frontCover", this.getForeingKey("frontCover")
+					.getValue().toString());
+			this.metaData.put("backCover", this.getForeingKey("backCover")
+					.getValue().toString());
+			this.metaData.put("cdCover", this.getForeingKey("cdCover")
+					.getValue().toString());
+			this.metaData.put("tagCloud", this.getTagCloud());
+			this.metaData.put("trackList", this.getTrackList());
+			this.metaData.put("artist", this.getForeingKey("arist").getValue()
+					.toString());
+			this.metaData.put("totalTime", this.totalTime.toString());
+		} catch (SQLForeingKeyNotFound e) {
+			e.printStackTrace();
+		} finally {
+			this.metaData.clear();
+		}
 	}
 
 	/**
 	 * @return the tagCloud
 	 */
-	public ArrayList<Genre> getTagCloud() {
-		return tagCloud;
+	public String getTagCloud() {
+		String t = new String();
+		for (short i = 0; i < this.tagCloud.size(); i++) {
+			t += this.tagCloud.get(i).getGenre() + ",";
+		}
+		return t.substring(0, t.length() - 1);
 	}
 
 	/**
 	 * @param tagCloud
-	 *            the tagCloud to set
+	 *            {
+	 *            "idAudio,frontCover,backCover,cdCover,tagCloud,trackList,artist,totalTime"
+	 *            }; the tagCloud to set
 	 */
 	public void setTagCloud(ArrayList<Genre> tagCloud) {
 		this.tagCloud = tagCloud;

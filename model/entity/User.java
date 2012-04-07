@@ -4,6 +4,8 @@
  */
 package model.entity;
 
+import exceptions.SQLForeingKeyNotFound;
+
 /**
  * @author kornicameister
  * 
@@ -82,6 +84,32 @@ public class User extends Author {
 	 */
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	protected void initInternalFields() {
+		super.initInternalFields();
+		this.metaData.clear();
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		this.metaData.put("idUser", this.getPrimaryKey().toString());
+		this.metaData.put("login", this.getLogin());
+		this.metaData.put("email", this.getEmail());
+		this.metaData.put("password", this.getPassword());
+		this.metaData.put("firstName", this.getFirstName());
+		this.metaData.put("lastName", this.getLastName());
+		try {
+			this.metaData.put("avatar", this.getForeingKey("avatar").getValue()
+					.toString());
+		} catch (SQLForeingKeyNotFound e) {
+			e.printStackTrace();
+		} finally {
+			this.metaData.clear();
+		}
 	}
 
 }

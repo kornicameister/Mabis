@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import model.enums.TableType;
 import model.utilities.ForeignKey;
+import exceptions.SQLForeingKeyNotFound;
 
 /**
  * This class maps itself to Mabis.band table
@@ -60,6 +61,27 @@ public class Band extends BaseTable {
 		this.tableName = TableType.BAND.toString();
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.GENRE);
+		this.reloadMetaData();
+	}
+
+	@Override
+	protected void reloadMetaData() {
+		this.metaData.clear();
+		this.metaData.put("idBand", this.getPrimaryKey().toString());
+		this.metaData.put("name", this.getName());
+		this.metaData.put("description", this.getDescription());
+		this.metaData.put("url", this.getLastFMUrl().toString());
+		this.metaData.put("tagCloud", this.getTagCloud());
+		try {
+			this.metaData.put("picture", this.getForeingKey("picture")
+					.getValue().toString());
+			this.metaData.put("masterGenre", this.getForeingKey("masterGenre")
+					.getValue().toString());
+		} catch (SQLForeingKeyNotFound e) {
+			e.printStackTrace();
+		} finally {
+			this.metaData.clear();
+		}
 	}
 
 	public String getName() {
@@ -99,8 +121,12 @@ public class Band extends BaseTable {
 	/**
 	 * @return the tagCloud
 	 */
-	public ArrayList<Genre> getTagCloud() {
-		return tagCloud;
+	public String getTagCloud() {
+		String t = new String();
+		for (short i = 0; i < this.tagCloud.size(); i++) {
+			t += this.tagCloud.get(i).getGenre() + ",";
+		}
+		return t.substring(0, t.length() - 1);
 	}
 
 	/**
