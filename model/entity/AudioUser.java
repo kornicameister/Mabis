@@ -24,7 +24,7 @@ public class AudioUser extends ManyToManyTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idAudioUser", this.getPrimaryKey().toString());
 		this.metaData.put("idUser",

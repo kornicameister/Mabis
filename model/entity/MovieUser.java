@@ -24,7 +24,7 @@ public class MovieUser extends ManyToManyTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idMovieUser", this.getPrimaryKey().toString());
 		this.metaData.put("idUser",

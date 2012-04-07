@@ -52,7 +52,7 @@ public class Author extends BaseTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idAuthor", this.getPrimaryKey().toString());
 		this.metaData.put("firstName", this.getFirstName());

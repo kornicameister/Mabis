@@ -62,7 +62,7 @@ public class AudioAlbum extends BaseTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		try {
 			this.metaData.put("idAudio", this.getPrimaryKey().toString());

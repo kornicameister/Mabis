@@ -90,7 +90,7 @@ public class Cover extends BaseTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idCover", this.getPrimaryKey().toString());
 		this.metaData.put("hash", this.getCheckSum());

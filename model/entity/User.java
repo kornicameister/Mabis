@@ -94,7 +94,7 @@ public class User extends Author {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idUser", this.getPrimaryKey().toString());
 		this.metaData.put("login", this.getLogin());

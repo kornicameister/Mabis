@@ -65,7 +65,7 @@ public class Band extends BaseTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idBand", this.getPrimaryKey().toString());
 		this.metaData.put("name", this.getName());

@@ -51,7 +51,7 @@ public class Movie extends BaseTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idMovie", this.getPrimaryKey().toString());
 		this.metaData.put("titleOriginal", this.getOriginalTitle());

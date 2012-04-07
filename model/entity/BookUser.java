@@ -24,7 +24,7 @@ public class BookUser extends ManyToManyTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idBookUser", this.getPrimaryKey().toString());
 		this.metaData.put("idUser",

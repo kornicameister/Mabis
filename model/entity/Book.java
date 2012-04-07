@@ -51,7 +51,7 @@ public class Book extends BaseTable {
 	}
 
 	@Override
-	protected void reloadMetaData() {
+	public void reloadMetaData() {
 		this.metaData.clear();
 		this.metaData.put("idBook", this.getPrimaryKey().toString());
 		this.metaData.put("isbn", this.getIsbn());

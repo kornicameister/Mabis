@@ -119,7 +119,7 @@ public abstract class BaseTable implements Table {
 	/**
 	 * revalidates meta data
 	 */
-	protected abstract void reloadMetaData();
+	public abstract void reloadMetaData();
 
 	@Override
 	public void checkConstraints(ForeignKey... keys)
