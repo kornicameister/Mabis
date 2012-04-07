@@ -74,11 +74,12 @@ public class MySQLAccess {
 	 */
 	public boolean connect() {
 		try {
-			
-			if(!this.connectionData.isReady()){
-				throw new ConnectionDataException("Connection message invalid",this.connectionData);
+
+			if (!this.connectionData.isReady()) {
+				throw new ConnectionDataException("Connection message invalid",
+						this.connectionData);
 			}
-			
+
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			String url = new String("jdbc:mysql://!:!/!");
 			url = url.replaceFirst("!", this.connectionData.getHost());

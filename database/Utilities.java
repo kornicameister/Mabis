@@ -4,6 +4,8 @@
  */
 package database;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,8 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * <b>The Class Utilities</b> contains only static methods
- * that allows to perform database itself independent operations
+ * <b>The Class Utilities</b> contains only static methods that allows to
+ * perform database itself independent operations
  * 
  * @author kornicameister
  * @version 0.1
@@ -26,14 +28,14 @@ public abstract class Utilities {
 	 *            String for which md5sum will be calculated
 	 * @return md5sum of input
 	 * @see http://m2tec.be/blog/2010/02/03/java-md5-hex-0093
-	 */ 
+	 */
 	static public String md5sum(String input) {
 		MessageDigest m = null;
 		try {
 			m = MessageDigest.getInstance("MD5");
 			m.reset();
 			m.update(input.getBytes(Charset.forName("UTF8")));
-			
+
 			byte array[] = m.digest();
 			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < array.length; i++) {
@@ -48,8 +50,42 @@ public abstract class Utilities {
 	}
 
 	/**
-	 * <b>Query size</b> methods grabs {@link ResultSet} object
-	 * and tries to resolve rowCount without violating rs integrity
+	 * Md5sum. generates checksum from content of fis InputStream
+	 * 
+	 * @param input
+	 *            String for which md5sum will be calculated
+	 * @return md5sum of input
+	 * @see http://m2tec.be/blog/2010/02/03/java-md5-hex-0093
+	 */
+	static public String md5sum(InputStream fis) {
+		MessageDigest m = null;
+		try {
+			int numRead = 0;
+			byte[] buffer = new byte[1024];
+			m = MessageDigest.getInstance("MD5");
+			m.reset();
+			do {
+				numRead = fis.read(buffer);
+				if (numRead > 0) {
+					m.update(buffer, 0, numRead);
+				}
+			} while (numRead != -1);
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < buffer.length; i++) {
+				sb.append(Integer.toHexString((buffer[i] & 0xFF) | 0x100)
+						.substring(1, 3));
+			}
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	/**
+	 * <b>Query size</b> methods grabs {@link ResultSet} object and tries to
+	 * resolve rowCount without violating rs integrity
 	 * 
 	 * @param rs
 	 *            result set of which size it is all about
@@ -60,7 +96,7 @@ public abstract class Utilities {
 			int currentRow = rs.getRow();
 			rs.last();
 			int result = rs.getRow();
-			while(rs.getRow() != currentRow){
+			while (rs.getRow() != currentRow) {
 				rs.previous();
 			}
 			return result;

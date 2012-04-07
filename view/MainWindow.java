@@ -177,7 +177,7 @@ public class MainWindow extends JFrame {
 	 */
 	public MainWindow(String title, Dimension d) {
 		super(title);
-		
+
 		setSize(d);
 
 		initMenuBar();
@@ -192,8 +192,8 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * method goes throughout all fields of {@link MainWindow} and 
-	 * add actionListeners to every each one of them that requires it
+	 * method goes throughout all fields of {@link MainWindow} and add
+	 * actionListeners to every each one of them that requires it
 	 */
 	private void establishActionConnections() {
 	}
@@ -334,8 +334,8 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * Method initializes userList panel along with all subcomponents 
-	 * actions and buttons
+	 * Method initializes userList panel along with all subcomponents actions
+	 * and buttons
 	 */
 	private void initUserList() {
 		JPanel userListPanel = new JPanel(new BorderLayout(), true);
@@ -364,8 +364,7 @@ public class MainWindow extends JFrame {
 	}
 
 	/**
-	 * Method initialized collection view along with all
-	 * subcomponents
+	 * Method initialized collection view along with all subcomponents
 	 */
 	private void initCollectionView() {
 		collectionView = new JPanel(new BorderLayout(), true);
@@ -394,7 +393,7 @@ public class MainWindow extends JFrame {
 		toolBar.setRollover(false);
 
 		// database
-		String z[] = { "Online", "Local" };
+		String z[] = {"Online", "Local"};
 		JComboBox<String> dbContent = new JComboBox<String>(z);
 		JLabel collectionLabel = new JLabel("Collection : ");
 		collectionLabel.setLabelFor(dbContent);
@@ -402,8 +401,8 @@ public class MainWindow extends JFrame {
 		toolBar.add("Collection", dbContent);
 
 		// zoom ;-)
-		String zz[] = { "100%", "90%", "80%", "70%", "60%", "50%", "40%",
-				"30%", "20%", "10%" };
+		String zz[] = {"100%", "90%", "80%", "70%", "60%", "50%", "40%", "30%",
+				"20%", "10%"};
 		JComboBox<String> zoomContent = new JComboBox<String>(zz);
 		JLabel zoomLabel = new JLabel("Zoom : ");
 		zoomLabel.setLabelFor(zoomContent);
@@ -411,7 +410,7 @@ public class MainWindow extends JFrame {
 		toolBar.add("Zoom", zoomContent);
 
 		// view mode ;-)
-		String zzz[] = { "All", "Books", "Movies", "Music" };
+		String zzz[] = {"All", "Books", "Movies", "Music"};
 		JComboBox<String> viewModeContent = new JComboBox<String>(zzz);
 		JLabel viewModeLabel = new JLabel("View : ");
 		viewModeLabel.setLabelFor(viewModeContent);
@@ -421,10 +420,10 @@ public class MainWindow extends JFrame {
 		// group by
 		// hint -> here
 		HashMap<String, String[]> groups = new HashMap<String, String[]>();
-		String bookGroup[] = { "Author", "ISBN" };
-		String movieGroup[] = { "Director" };
-		String audioGroup[] = { "Band" };
-		String mutualGroup[] = { "No group", "Title", "Year", "Genre" };
+		String bookGroup[] = {"Author", "ISBN"};
+		String movieGroup[] = {"Director"};
+		String audioGroup[] = {"Band"};
+		String mutualGroup[] = {"No group", "Title", "Year", "Genre"};
 		groups.put("book", bookGroup);
 		groups.put("movie", movieGroup);
 		groups.put("audio", audioGroup);

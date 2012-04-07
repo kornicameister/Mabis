@@ -11,7 +11,12 @@ public class ConnectionDataException extends Exception {
 
 	/**
 	 * Field contains description of an error that is related to ConnectionData
-	 * </br><b>Note</b> that this field by default contains <pre>null string</pre>
+	 * </br><b>Note</b> that this field by default contains
+	 * 
+	 * <pre>
+	 * null string
+	 * </pre>
+	 * 
 	 * which means that ConnectionData was free of errors
 	 * 
 	 * @see {@link ConnectionDataException#setDataError(ConnectionData)}
@@ -24,8 +29,9 @@ public class ConnectionDataException extends Exception {
 	}
 
 	/**
-	 * Construct {@link ConnectionDataException} with <b>message</b> param.
-	 * This constructor wraps {@link Exception#Exception(String)} constructor
+	 * Construct {@link ConnectionDataException} with <b>message</b> param. This
+	 * constructor wraps {@link Exception#Exception(String)} constructor
+	 * 
 	 * @param message
 	 */
 	public ConnectionDataException(String message) {
@@ -62,8 +68,8 @@ public class ConnectionDataException extends Exception {
 	}
 
 	/**
-	 * <b>printDataError</> prints {@link ConnectionDataException#dataErrorStr} and
-	 * returns it
+	 * <b>printDataError</> prints {@link ConnectionDataException#dataErrorStr}
+	 * and returns it
 	 * 
 	 * @return the dataErrorStr
 	 */

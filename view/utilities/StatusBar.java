@@ -13,7 +13,9 @@ import javax.swing.JLabel;
  * This is the JLabel based class that provides status bar functionality
  * 
  * @author kornicameister
- * @see <a href=http://www.java-tips.org/java-se-tips/javax.swing/creating-a-status-bar.html>Status bar</a>
+ * @see <a
+ *      href=http://www.java-tips.org/java-se-tips/javax.swing/creating-a-status
+ *      -bar.html>Status bar</a>
  */
 public class StatusBar extends JLabel {
 
@@ -29,38 +31,40 @@ public class StatusBar extends JLabel {
 	 */
 	public StatusBar() {
 		super();
-		setMinimumSize(new Dimension(500,20));
-		setPreferredSize(new Dimension(500,20));
-		setMaximumSize(new Dimension(500,20));
+		setMinimumSize(new Dimension(500, 20));
+		setPreferredSize(new Dimension(500, 20));
+		setMaximumSize(new Dimension(500, 20));
 		setMessage("StatusBar ready");
 	}
 
 	/**
 	 * Wrapper for JLabel String,Alignment constructor
 	 * 
-	 * @param text init message
+	 * @param text
+	 *            init message
 	 * @param horizontalAlignment
 	 * @see JLabel#JLabel(String, int)
 	 */
 	public StatusBar(String text, int horizontalAlignment) {
 		super(text, horizontalAlignment);
-		setMinimumSize(new Dimension(500,20));
-		setPreferredSize(new Dimension(500,20));
-		setMaximumSize(new Dimension(500,20));
+		setMinimumSize(new Dimension(500, 20));
+		setPreferredSize(new Dimension(500, 20));
+		setMaximumSize(new Dimension(500, 20));
 		setMessage(text);
 	}
 
 	/**
 	 * Wrapper for JLabel String constructor
 	 * 
-	 * @param text init message
+	 * @param text
+	 *            init message
 	 * @see JLabel#JLabel(String)
 	 */
 	public StatusBar(String text) {
 		super(text);
-		setMinimumSize(new Dimension(500,20));
-		setPreferredSize(new Dimension(500,20));
-		setMaximumSize(new Dimension(500,20));
+		setMinimumSize(new Dimension(500, 20));
+		setPreferredSize(new Dimension(500, 20));
+		setMaximumSize(new Dimension(500, 20));
 		setMessage(text);
 	}
 
