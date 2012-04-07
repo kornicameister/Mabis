@@ -7,6 +7,7 @@ package database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import exceptions.ConnectionDataException;
@@ -248,5 +249,9 @@ public class MySQLAccess {
 		public void setPort(Short port) {
 			this.port = port;
 		}
+	}
+
+	public ResultSet executeSQL(String sql) throws SQLException {
+		return connection.prepareStatement(sql).executeQuery();
 	}
 }

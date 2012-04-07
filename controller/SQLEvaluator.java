@@ -4,15 +4,17 @@
  */
 package controller;
 
+import java.sql.SQLException;
 import java.util.TreeMap;
 
 import model.entity.BaseTable;
+import database.MySQLAccess;
 
 /**
  * @author kornicameister
  * 
  */
-public abstract class SQLEvaluator implements StatementFactory {
+public class SQLEvaluator implements StatementFactory {
 	private BaseTable target = null;
 	private SQLStamentType type;
 	private TreeMap<String, WhereClause> wheres = null;
@@ -40,6 +42,8 @@ public abstract class SQLEvaluator implements StatementFactory {
 		String sql = null;
 		String[] data = this.target.rawData();
 
+		this.target.reloadMetaData();
+
 		switch (type) {
 			case UPDATE :
 				sql = StatementFactory.updatePattern;
@@ -66,6 +70,8 @@ public abstract class SQLEvaluator implements StatementFactory {
 				// where clauses
 				sql = sql.replaceFirst("!", this.buildWhereClause());
 				break;
+		default:
+			break;
 		}
 		return sql;
 	}
@@ -82,6 +88,25 @@ public abstract class SQLEvaluator implements StatementFactory {
 		}
 		return a.substring(0, a.length() - 1);
 	}
+
+	public boolean executeSQL() {
+		String sql = this.createSQL();
+
+		MySQLAccess db = new MySQLAccess();
+		if (!db.connect()) {
+			return false;
+		}
+
+		try {
+			db.executeSQL(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		db.disconnect();
+		return false;
+	}
+
 	private class WhereClause {
 		String attribute = null;
 		String value = null;
@@ -94,6 +119,5 @@ public abstract class SQLEvaluator implements StatementFactory {
 			this.attribute = attribute;
 			this.value = value;
 		}
-
 	}
 }
