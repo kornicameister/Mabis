@@ -1,8 +1,6 @@
-
-
 import java.awt.Dimension;
 
-import view.MainWindow;
+import view.mainwindow.MainWindow;
 
 public class Mabis {
 	public static void main(String[] args) {
@@ -18,7 +16,7 @@ public class Mabis {
 			@Override
 			public void run() {
 				MainWindow mw = new MainWindow("MABIS",
-						new Dimension(1000, 600));
+						new Dimension(1000, 1000));
 				mw.setVisible(true);
 			}
 		});
