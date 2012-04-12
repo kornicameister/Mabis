@@ -7,11 +7,11 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -22,15 +22,13 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
-import controller.SQLEvaluator;
-import controller.SQLStamentType;
-
 import logger.MabisLogger;
-import model.entity.Cover;
 import model.entity.User;
 import view.imagePanel.ImageFileFilter;
 import view.imagePanel.ImageFilePreview;
 import view.imagePanel.ImagePanel;
+import controller.SQLEvaluator;
+import controller.SQLStamentType;
 
 /**
  * @author kornicameister
@@ -269,14 +267,14 @@ public class NewUserDialog extends JDialog {
 				User user = new User(fnameField.getText(), lnameField.getText());
 				user.setLogin(loginField.getText());
 				user.setEmail(mailField.getText());
-				user.addCover(new Cover(new File(imagePanel.getImagePath())));
+				user.setPicture(new ImageIcon(imagePanel.getImagePath()));
 				user.setPassword(new String(passField.getPassword()));
-				
+
 				SQLEvaluator insert = new SQLEvaluator();
 				insert.setStatementType(SQLStamentType.INSERT);
 				insert.setTargetTable(user);
 				insert.executeSQL();
-				
+
 			} else if (source == cancelButton) {
 				if (isDisplayable()) {
 					setVisible(false);
