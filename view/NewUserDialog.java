@@ -11,7 +11,6 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -267,7 +266,7 @@ public class NewUserDialog extends JDialog {
 				User user = new User(fnameField.getText(), lnameField.getText());
 				user.setLogin(loginField.getText());
 				user.setEmail(mailField.getText());
-				user.setPicture(new ImageIcon(imagePanel.getImagePath()));
+				user.setPicture(imagePanel.getImg());
 				user.setPassword(new String(passField.getPassword()));
 
 				SQLEvaluator insert = new SQLEvaluator();
@@ -285,8 +284,8 @@ public class NewUserDialog extends JDialog {
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					imagePanel.swapImage(imageChooser.getSelectedFile()
 							.getAbsolutePath());
-					if (imagePanel.getImage().getWidth(null) > 90
-							&& imagePanel.getImage().getHeight(null) > 120) {
+					if (imagePanel.getImg().getIconWidth() > 90
+							&& imagePanel.getImg().getIconHeight() > 120) {
 						JOptionPane.showMessageDialog(backReference,
 								"This image is too big");
 					}
