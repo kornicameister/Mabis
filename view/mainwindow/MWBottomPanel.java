@@ -13,7 +13,6 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 import view.AboutMabis;
@@ -31,7 +30,7 @@ import view.utilities.StatusBar;
 public class MWBottomPanel extends JPanel {
 	private static final long serialVersionUID = 7673272237316575906L;
 	private StatusBar statusBar;
-	private JPanel  actionsPanel;
+	private JPanel actionsPanel;
 	private JButton toogleConnection;
 	private JButton newItem;
 	private JButton editButton;
@@ -91,8 +90,14 @@ public class MWBottomPanel extends JPanel {
 				.createSequentialGroup()
 				.addGroup(
 						layout.createParallelGroup()
-								.addComponent(this.actionsPanel)
-								.addComponent(this.statusBar))
+								.addComponent(this.actionsPanel,
+										GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE,
+										Short.MAX_VALUE)
+								.addComponent(this.statusBar,
+										GroupLayout.DEFAULT_SIZE,
+										GroupLayout.PREFERRED_SIZE,
+										Short.MAX_VALUE))
 				.addComponent(this.publishButton, GroupLayout.DEFAULT_SIZE,
 						140, GroupLayout.PREFERRED_SIZE));
 
@@ -105,9 +110,6 @@ public class MWBottomPanel extends JPanel {
 						.addComponent(this.publishButton,
 								GroupLayout.DEFAULT_SIZE, 62,
 								GroupLayout.PREFERRED_SIZE)));
-
-		layout.linkSize(SwingConstants.HORIZONTAL, this.statusBar,
-				this.actionsPanel);
 	}
 
 	class MainWindowBottomPanelListener implements ActionListener {
@@ -123,7 +125,8 @@ public class MWBottomPanel extends JPanel {
 			} else if (s.equals(publishButton)) {
 			} else if (s.equals(toogleConnection)) {
 			}
-			MabisLogger.getLogger().log(Level.INFO,((JButton)s).getActionCommand());
+			MabisLogger.getLogger().log(Level.INFO,
+					((JButton) s).getActionCommand());
 		}
 	}
 }

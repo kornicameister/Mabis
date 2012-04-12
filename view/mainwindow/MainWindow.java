@@ -85,6 +85,8 @@ public class MainWindow extends JFrame {
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 
+		this.bottomPanel.setBorder(BorderFactory.createEtchedBorder());
+		
 		layout.setHorizontalGroup(layout
 				.createParallelGroup(Alignment.CENTER)
 				.addComponent(this.toolBar, GroupLayout.DEFAULT_SIZE,
@@ -104,7 +106,7 @@ public class MainWindow extends JFrame {
 														GroupLayout.DEFAULT_SIZE,
 														200)))
 				.addComponent(this.bottomPanel, GroupLayout.DEFAULT_SIZE,
-						getContentPane().getWidth(), Short.MAX_VALUE));
+						GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
 		layout.setVerticalGroup(layout
 				.createSequentialGroup()

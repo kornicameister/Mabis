@@ -6,11 +6,13 @@ package view.mainwindow;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.JPopupMenu.Separator;
 
 import view.NewUserDialog;
@@ -81,7 +83,11 @@ public class MWMenuBar extends JMenuBar {
 	private void initActions() {
 		file.add("Connect").addActionListener(this.listener);
 		file.add(new Separator());
-		file.add("New user").addActionListener(this.listener);
+		
+		JMenuItem newUser = file.add("New user");
+		newUser.addActionListener(this.listener);
+		newUser.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.ALT_MASK)); //ALT+N
+		
 		collection.add("Publish").addActionListener(this.listener);
 		friends.add("List").addActionListener(this.listener);
 		data.add("Action").addActionListener(this.listener);
