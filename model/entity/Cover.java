@@ -4,8 +4,12 @@
  */
 package model.entity;
 
+import java.awt.Image;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
+import javax.swing.ImageIcon;
 
 import model.enums.CoverType;
 import model.enums.TableType;
@@ -18,8 +22,9 @@ import exceptions.SQLForeingKeyNotFound;
 // TODO update commnents and make them more sql dependable
 public class Cover extends BaseTable {
 	private CoverType type = null;
-	private String imagePath = null;
 	private String checkSum = null;
+	private ImageIcon image = null;
+	private File imageFile;
 	private final static String defaultCover = "src/resources/defaultCover.png";
 
 	/**
@@ -30,15 +35,11 @@ public class Cover extends BaseTable {
 	public Cover(int pk) {
 		super(pk);
 	}
-
-	/**
-	 * @param originalTitle
-	 * @throws FileNotFoundException
-	 */
-	public Cover(String url) throws FileNotFoundException {
+	
+	public Cover(File cover){
 		super();
-		this.imagePath = url;
-		this.generateCheckSum();
+		this.imageFile = cover;
+		this.image = new ImageIcon(cover.getAbsolutePath());
 	}
 
 	/**
@@ -72,19 +73,20 @@ public class Cover extends BaseTable {
 	 * @throws FileNotFoundException
 	 */
 	public void generateCheckSum() throws FileNotFoundException {
-		String m;
-		if (this.imagePath.isEmpty()) {
-			m = this.getClass().getResource(defaultCover).toString();
+		File m;
+		if (this.image == null) {
+			m = new File(this.getClass().getResource(defaultCover).getFile());
 		} else {
-			m = this.imagePath;
+			m = this.imageFile;
 		}
 		this.checkSum = database.Utilities.md5sum(new FileInputStream(m));
 	}
+	
 	@Override
 	protected void initInternalFields() {
 		this.tableName = TableType.COVER.toString();
 		this.type = CoverType.UNDEFINED;
-		this.imagePath = new String("");
+		this.imageFile = null;
 		this.checkSum = new String("");
 		this.reloadMetaData();
 	}
@@ -102,16 +104,12 @@ public class Cover extends BaseTable {
 			this.metaData.clear();
 		}
 	}
-
-	public String getImagePath() {
-		return imagePath;
+	
+	public ImageIcon getImage(){
+		return this.image;
 	}
-
-	public void setImagePath(String imagePath) throws FileNotFoundException {
-		if (this.imagePath.equals(imagePath)) {
-			return;
-		}
-		this.imagePath = imagePath;
-		this.generateCheckSum();
+	
+	public void setImage(Image image){
+		this.image = new ImageIcon(image);
 	}
 }

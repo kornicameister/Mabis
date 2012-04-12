@@ -15,8 +15,9 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.JPopupMenu.Separator;
 
+import logger.MabisLogger;
+
 import view.NewUserDialog;
-import view.utilities.MabisLogger;
 
 /**
  * Class nicely and logically group the functionality related to menu bar that

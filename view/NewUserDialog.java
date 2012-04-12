@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -16,14 +17,20 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import controller.SQLEvaluator;
+import controller.SQLStamentType;
+
+import logger.MabisLogger;
+import model.entity.Cover;
+import model.entity.User;
 import view.imagePanel.ImageFileFilter;
 import view.imagePanel.ImageFilePreview;
 import view.imagePanel.ImagePanel;
-import view.utilities.MabisLogger;
 
 /**
  * @author kornicameister
@@ -46,6 +53,8 @@ public class NewUserDialog extends JDialog {
 	private JButton newAvatarButton = null;
 	private NewUserDialogListener listener = null;
 	private JFileChooser imageChooser = null;
+	private JLabel passLabel = null;
+	private JPasswordField passField = null;
 
 	/**
 	 * @param owner
@@ -65,8 +74,8 @@ public class NewUserDialog extends JDialog {
 
 	private void initChooser() {
 		this.imageChooser = new JFileChooser();
-//		this.imageChooser.addChoosableFileFilter(new ImageFileFilter());
-//		this.imageChooser.setAcceptAllFileFilterUsed(false);
+		// this.imageChooser.addChoosableFileFilter(new ImageFileFilter());
+		// this.imageChooser.setAcceptAllFileFilterUsed(false);
 		this.imageChooser.setFileFilter(new ImageFileFilter());
 		this.imageChooser.setAccessory(new ImageFilePreview(imageChooser));
 	}
@@ -96,6 +105,12 @@ public class NewUserDialog extends JDialog {
 																		this.mailLabel)
 																.addComponent(
 																		this.mailField))
+												.addGroup(
+														layout.createSequentialGroup()
+																.addComponent(
+																		this.passLabel)
+																.addComponent(
+																		this.passField))
 												.addComponent(
 														this.horizontalLine)
 												.addGroup(
@@ -155,6 +170,14 @@ public class NewUserDialog extends JDialog {
 																		20, 20,
 																		20))
 												.addGroup(
+														layout.createParallelGroup()
+																.addComponent(
+																		this.passLabel)
+																.addComponent(
+																		this.passField,
+																		20, 20,
+																		20))
+												.addGroup(
 														layout.createSequentialGroup()
 																.addComponent(
 																		this.horizontalLine,
@@ -200,6 +223,9 @@ public class NewUserDialog extends JDialog {
 		this.mailLabel = new JLabel("EMail: ");
 		this.mailField = new JTextField();
 
+		this.passLabel = new JLabel("Pass: ");
+		this.passField = new JPasswordField();
+
 		this.horizontalLine = new JSeparator();
 
 		this.fnameLabel = new JLabel("Name: ");
@@ -240,7 +266,17 @@ public class NewUserDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton) e.getSource();
 			if (source == okButton) {
-				// TODO handle adding new user to database
+				User user = new User(fnameField.getText(), lnameField.getText());
+				user.setLogin(loginField.getText());
+				user.setEmail(mailField.getText());
+				user.addCover(new Cover(new File(imagePanel.getImagePath())));
+				user.setPassword(new String(passField.getPassword()));
+				
+				SQLEvaluator insert = new SQLEvaluator();
+				insert.setStatementType(SQLStamentType.INSERT);
+				insert.setTargetTable(user);
+				insert.executeSQL();
+				
 			} else if (source == cancelButton) {
 				if (isDisplayable()) {
 					setVisible(false);
@@ -251,8 +287,10 @@ public class NewUserDialog extends JDialog {
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
 					imagePanel.swapImage(imageChooser.getSelectedFile()
 							.getAbsolutePath());
-					if(imagePanel.getImage().getWidth(null) > 90 && imagePanel.getImage().getHeight(null) > 120){
-						JOptionPane.showMessageDialog(backReference, "This image is too big");
+					if (imagePanel.getImage().getWidth(null) > 90
+							&& imagePanel.getImage().getHeight(null) > 120) {
+						JOptionPane.showMessageDialog(backReference,
+								"This image is too big");
 					}
 					imageChooser.setSelectedFile(null);
 				}

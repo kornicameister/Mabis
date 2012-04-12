@@ -15,8 +15,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
+import logger.MabisLogger;
+
 import view.AboutMabis;
-import view.utilities.MabisLogger;
 import view.utilities.StatusBar;
 
 /**

@@ -4,6 +4,8 @@
  */
 package model.entity;
 
+import database.Utilities;
+
 import exceptions.SQLForeingKeyNotFound;
 
 /**
@@ -83,7 +85,7 @@ public class User extends Author {
 	 *            the password to set
 	 */
 	public void setPassword(String password) {
-		this.password = password;
+		this.password = Utilities.md5sum(password);
 	}
 
 	@Override
