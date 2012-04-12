@@ -4,16 +4,22 @@
  */
 package model.entity;
 
+import javax.swing.ImageIcon;
+
 import model.enums.TableType;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
+ * This method is to represent Author table
+ * Table structure: </br>
+ * | idBand </br>
+ * | firstName </br>
+ * | lastName </br>
+ * | picture </br>
  * @author kornicameister
- * 
+ * @version 0.2
  */
 public class Author extends BaseTable {
-	private String firstName = null;
-	private String lastName = null;
+	private ImageIcon picture = null;
 
 	/**
 	 * @see BaseTable#BaseTable()
@@ -31,8 +37,8 @@ public class Author extends BaseTable {
 	 */
 	public Author(String fName, String lName) {
 		super();
-		this.firstName = fName;
-		this.lastName = lName;
+		this.setOriginalTitle(fName);
+		this.setLocalizedTitle(lName);
 	}
 
 	/**
@@ -45,33 +51,14 @@ public class Author extends BaseTable {
 
 	@Override
 	protected void initInternalFields() {
-		this.firstName = new String("");
-		this.lastName = new String("");
 		this.tableName = TableType.AUTHOR.toString();
-		this.reloadMetaData();
-	}
-
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		this.metaData.put("idAuthor", this.getPrimaryKey().toString());
-		this.metaData.put("firstName", this.getFirstName());
-		this.metaData.put("lastName", this.getLastName());
-		try {
-			this.metaData.put("picture", this.getForeingKey("picture")
-					.getValue().toString());
-		} catch (SQLForeingKeyNotFound e) {
-			e.printStackTrace();
-		} finally {
-			this.metaData.clear();
-		}
 	}
 
 	/**
 	 * @return the firstName
 	 */
 	public String getFirstName() {
-		return firstName;
+		return this.getOriginalTitle();
 	}
 
 	/**
@@ -79,13 +66,14 @@ public class Author extends BaseTable {
 	 *            the firstName to set
 	 */
 	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+		this.setOriginalTitle(firstName);
 	}
+
 	/**
 	 * @return the lastName
 	 */
 	public String getLastName() {
-		return lastName;
+		return this.getLocalizedTitle();
 	}
 
 	/**
@@ -93,6 +81,21 @@ public class Author extends BaseTable {
 	 *            the lastName to set
 	 */
 	public void setLastName(String lastName) {
-		this.lastName = lastName;
+		this.setLocalizedTitle(lastName);
+	}
+
+	/**
+	 * @return the picture
+	 */
+	public ImageIcon getPicture() {
+		return picture;
+	}
+
+	/**
+	 * @param picture
+	 *            the picture to set
+	 */
+	public void setPicture(ImageIcon picture) {
+		this.picture = picture;
 	}
 }

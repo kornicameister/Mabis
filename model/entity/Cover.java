@@ -13,16 +13,15 @@ import javax.swing.ImageIcon;
 
 import model.enums.CoverType;
 import model.enums.TableType;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
+ * This class maps itself to mabis.cover table Table structure: </br> | idCover </br> | image </br> | hash
  * @author kornicameister
  * 
  */
 // TODO update commnents and make them more sql dependable
 public class Cover extends BaseTable {
 	private CoverType type = null;
-	private String checkSum = null;
 	private ImageIcon image = null;
 	private File imageFile;
 	private final static String defaultCover = "src/resources/defaultCover.png";
@@ -61,7 +60,7 @@ public class Cover extends BaseTable {
 	 * @return the checkSum
 	 */
 	public String getCheckSum() {
-		return checkSum;
+		return this.titles[0];
 	}
 
 	/**
@@ -79,7 +78,7 @@ public class Cover extends BaseTable {
 		} else {
 			m = this.imageFile;
 		}
-		this.checkSum = database.Utilities.md5sum(new FileInputStream(m));
+		this.titles[0] = database.Utilities.md5sum(new FileInputStream(m));
 	}
 	
 	@Override
@@ -87,22 +86,6 @@ public class Cover extends BaseTable {
 		this.tableName = TableType.COVER.toString();
 		this.type = CoverType.UNDEFINED;
 		this.imageFile = null;
-		this.checkSum = new String("");
-		this.reloadMetaData();
-	}
-
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		this.metaData.put("idCover", this.getPrimaryKey().toString());
-		this.metaData.put("hash", this.getCheckSum());
-		try {
-			this.metaData.put("image", this.getForeingKey("image").toString());
-		} catch (SQLForeingKeyNotFound e) {
-			e.printStackTrace();
-		} finally {
-			this.metaData.clear();
-		}
 	}
 	
 	public ImageIcon getImage(){

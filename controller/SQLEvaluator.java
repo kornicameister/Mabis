@@ -40,9 +40,6 @@ public class SQLEvaluator implements StatementFactory {
 	@Override
 	public String createSQL() {
 		String sql = null;
-		String[] data = this.target.rawData();
-
-		this.target.reloadMetaData();
 
 		switch (type) {
 			case UPDATE :
@@ -59,9 +56,9 @@ public class SQLEvaluator implements StatementFactory {
 				// table name
 				sql = sql.replaceFirst("!", this.target.getTableName());
 				// field list
-				sql = sql.replaceFirst("!", data[0]);
-				// values
-				sql = sql.replaceFirst("!", data[1]);
+//				sql = sql.replaceFirst("!", data[0]);
+//				// values
+//				sql = sql.replaceFirst("!", data[1]);
 				break;
 			case DELETE :
 				sql = StatementFactory.updatePattern;

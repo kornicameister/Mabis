@@ -12,8 +12,11 @@ import exceptions.SQLForeingKeyException;
 import exceptions.SQLForeingKeyNotFound;
 
 /**
- * @author kornicameister
+ * Interface that every class simulating table from sql database should
+ * implement
  * 
+ * @author kornicameister
+ * @version 0.2
  */
 public interface Table {
 
@@ -65,19 +68,4 @@ public interface Table {
 	 */
 	void checkConstraints(ForeignKey... keys) throws SQLForeingKeyNotFound,
 			SQLForeingKeyException;
-
-	/**
-	 * 
-	 * @return comma separated names of column of the table
-	 */
-	String metaData();
-
-	/**
-	 * <b>Notice</b> this method is to work in cooperation with
-	 * {@link Table#metaData()} as first index contains metaData returned string
-	 * 
-	 * @return comma separated names of column of the table in first index and
-	 *         corresponding values in the second index
-	 */
-	String[] rawData();
 }

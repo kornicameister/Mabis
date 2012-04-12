@@ -10,17 +10,18 @@ import java.util.ArrayList;
 
 import model.enums.TableType;
 import model.utilities.ForeignKey;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
  * This class maps itself to Mabis.band table
+ * 
+ * Table structure: </br> | idBand </br> | name </br> | description </br> | url
+ * </br> | picture </br> | masterGenre </br> | tagCloud </br>
  * 
  * @author kornicameister
  * 
  */
 // TODO update comments
-public class Band extends BaseTable {
-	private String description = null;
+public class Band extends Author {
 	private URL lastFMUrl = null;
 	private ArrayList<Genre> tagCloud = null;
 	private Genre masterGenre = null;
@@ -35,6 +36,16 @@ public class Band extends BaseTable {
 	public Band(String bandName) {
 		super();
 		this.setOriginalTitle(bandName);
+		this.createLastFMUrl();
+	}
+
+	private void createLastFMUrl() {
+		try {
+			this.lastFMUrl = new URL(urlPattern
+					+ this.getOriginalTitle().replaceAll(" ", "+"));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -44,44 +55,19 @@ public class Band extends BaseTable {
 	 * @param keys
 	 */
 	public Band(int pk, ForeignKey... keys) {
-		super(pk, keys);
+		super(pk);
+		for (ForeignKey k : keys) {
+			this.addForeingKey(k);
+		}
 	}
 
 	@Override
 	protected void initInternalFields() {
-		this.description = new String("empty");
-		try {
-			this.lastFMUrl = new URL(urlPattern
-					+ this.getOriginalTitle().replaceAll(" ", "+"));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
 		this.tagCloud = new ArrayList<Genre>();
 		this.masterGenre = new Genre();
 		this.tableName = TableType.BAND.toString();
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.GENRE);
-		this.reloadMetaData();
-	}
-
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		this.metaData.put("idBand", this.getPrimaryKey().toString());
-		this.metaData.put("name", this.getName());
-		this.metaData.put("description", this.getDescription());
-		this.metaData.put("url", this.getLastFMUrl().toString());
-		this.metaData.put("tagCloud", this.getTagCloud());
-		try {
-			this.metaData.put("picture", this.getForeingKey("picture")
-					.getValue().toString());
-			this.metaData.put("masterGenre", this.getForeingKey("masterGenre")
-					.getValue().toString());
-		} catch (SQLForeingKeyNotFound e) {
-			e.printStackTrace();
-		} finally {
-			this.metaData.clear();
-		}
 	}
 
 	public String getName() {
@@ -92,7 +78,7 @@ public class Band extends BaseTable {
 	 * @return the description
 	 */
 	public String getDescription() {
-		return description;
+		return this.getLocalizedTitle();
 	}
 
 	/**
@@ -100,7 +86,7 @@ public class Band extends BaseTable {
 	 *            the description to set
 	 */
 	public void setDescription(String description) {
-		this.description = description;
+		this.setLocalizedTitle(description);
 	}
 
 	/**

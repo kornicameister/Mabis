@@ -6,20 +6,25 @@ package model.entity;
 
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
+import model.enums.CoverType;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
- * @author kornicameister
+ * This class represents table of AudioAlbum from Mabis database. Table
+ * structure: </br> | idAudio </br> | frontCover</br> | backCover</br> |
+ * cdCover</br> | tagCloud</br> | trackList</br> | artist</br> | totalTime
  * 
+ * @author kornicameister
+ * @version 0.2
  */
 public class AudioAlbum extends BaseTable {
 	private ArrayList<Genre> tagCloud = null;
-	private String trackList = null;
+	private TreeMap<CoverType, Cover> covers = null; // map of covers
 	private Time totalTime = null;
-	private String description = null;
+	private Band band = null;
 
 	/**
 	 * Construct audioAlbum with following title and tracklist
@@ -29,8 +34,8 @@ public class AudioAlbum extends BaseTable {
 	 */
 	public AudioAlbum(String title, String trackList) {
 		super();
-		this.setOriginalTitle(title);
-		this.trackList = trackList;
+		this.titles[0] = title;
+		this.titles[1] = trackList;
 	}
 
 	/**
@@ -54,39 +59,11 @@ public class AudioAlbum extends BaseTable {
 	protected void initInternalFields() {
 		this.tableName = TableType.AUDIO_ALBUM.toString();
 		this.tagCloud = new ArrayList<Genre>();
-		this.trackList = new String();
 		this.totalTime = new Time(0);
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.AUTHOR);
-		this.reloadMetaData();
 	}
 
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		try {
-			this.metaData.put("idAudio", this.getPrimaryKey().toString());
-			this.metaData.put("frontCover", this.getForeingKey("frontCover")
-					.getValue().toString());
-			this.metaData.put("backCover", this.getForeingKey("backCover")
-					.getValue().toString());
-			this.metaData.put("cdCover", this.getForeingKey("cdCover")
-					.getValue().toString());
-			this.metaData.put("tagCloud", this.getTagCloud());
-			this.metaData.put("trackList", this.getTrackList());
-			this.metaData.put("artist", this.getForeingKey("arist").getValue()
-					.toString());
-			this.metaData.put("totalTime", this.totalTime.toString());
-		} catch (SQLForeingKeyNotFound e) {
-			e.printStackTrace();
-		} finally {
-			this.metaData.clear();
-		}
-	}
-
-	/**
-	 * @return the tagCloud
-	 */
 	public String getTagCloud() {
 		String t = new String();
 		for (short i = 0; i < this.tagCloud.size(); i++) {
@@ -95,59 +72,64 @@ public class AudioAlbum extends BaseTable {
 		return t.substring(0, t.length() - 1);
 	}
 
-	/**
-	 * @param tagCloud
-	 *            {
-	 *            "idAudio,frontCover,backCover,cdCover,tagCloud,trackList,artist,totalTime"
-	 *            }; the tagCloud to set
-	 */
 	public void setTagCloud(ArrayList<Genre> tagCloud) {
 		this.tagCloud = tagCloud;
 	}
 
-	/**
-	 * @return the trackList
-	 */
 	public String getTrackList() {
-		return trackList;
+		return this.getLocalizedTitle();
 	}
 
-	/**
-	 * @param trackList
-	 *            the trackList to set
-	 */
 	public void setTrackList(String trackList) {
-		this.trackList = trackList;
+		this.setLocalizedTitle(trackList);
 	}
 
-	/**
-	 * @return the totalTime
-	 */
 	public Time getTotalTime() {
 		return totalTime;
 	}
 
-	/**
-	 * @param totalTime
-	 *            the totalTime to set
-	 */
 	public void setTotalTime(Time totalTime) {
 		this.totalTime = totalTime;
 	}
 
-	/**
-	 * @return the description
-	 */
 	public String getDescription() {
-		return description;
+		return this.titles[2];
 	}
 
-	/**
-	 * @param description
-	 *            the description to set
-	 */
 	public void setDescription(String description) {
-		this.description = description;
+		this.titles[2] = description;
+	}
+
+	public Band getBand() {
+		return band;
+	}
+
+	public void setBand(Band band) {
+		this.band = band;
+	}
+
+	public void setFrontCover(Cover fc) {
+		this.covers.put(CoverType.FRONT_COVER, fc);
+	}
+
+	public void setBackCover(Cover fc) {
+		this.covers.put(CoverType.BACK_COVER, fc);
+	}
+
+	public Cover getFrontCover() {
+		return this.covers.get(CoverType.FRONT_COVER);
+	}
+
+	public Cover getBackCover() {
+		return this.covers.get(CoverType.BACK_COVER);
+	}
+
+	public Cover getCDCover() {
+		return this.covers.get(CoverType.CD_COVER);
+	}
+
+	public void setCDCover(Cover fc) {
+		this.covers.put(CoverType.CD_COVER, fc);
 	}
 
 }

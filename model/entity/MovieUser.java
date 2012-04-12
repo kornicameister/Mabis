@@ -20,18 +20,5 @@ public class MovieUser extends ManyToManyTable {
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();
-		this.reloadMetaData();
-	}
-
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		this.metaData.put("idMovieUser", this.getPrimaryKey().toString());
-		this.metaData.put("idUser",
-				this.getMultiForeing(this.getPrimaryKey()).f1.getValue()
-						.toString());
-		this.metaData.put("idMovie",
-				this.getMultiForeing(this.getPrimaryKey()).f2.getValue()
-						.toString());
 	}
 }

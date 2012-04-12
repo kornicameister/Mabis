@@ -4,8 +4,6 @@
  */
 package model.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -16,19 +14,18 @@ import exceptions.SQLForeingKeyException;
 import exceptions.SQLForeingKeyNotFound;
 
 /**
- * @author kornicameister
+ * This class represents most basic version of table in sql database
  * 
+ * @author kornicameister
+ * @version 0.2
  */
 public abstract class BaseTable implements Table {
-	// TODO: comment this bullshit
+	// common fields for every class
 	private Integer primaryKey = null;
-	private String titleOriginal = null;
-	private String titleLocale = null;
-	private ArrayList<Cover> covers = null;
-	private TreeMap<String, ForeignKey> foreignKeys = null;
+	protected String[] titles = null;
 	protected TreeSet<TableType> constraints = null;
+	protected TreeMap<String, ForeignKey> foreignKeys;
 	protected String tableName = "empty";
-	protected HashMap<String, String> metaData = null;
 
 	/**
 	 * Empty constructor, only initializes variables, used when new entity
@@ -47,7 +44,7 @@ public abstract class BaseTable implements Table {
 	public BaseTable(String originalTitle) {
 		this.initFields();
 		this.initInternalFields();
-		this.titleOriginal = originalTitle;
+		this.titles[0] = originalTitle;
 	}
 
 	/**
@@ -63,6 +60,7 @@ public abstract class BaseTable implements Table {
 		this.initInternalFields();
 		this.primaryKey = pk;
 	}
+
 	/**
 	 * 
 	 * @param pk
@@ -86,15 +84,6 @@ public abstract class BaseTable implements Table {
 	public BaseTable(int pk, ForeignKey... keys) {
 		this.initFields();
 		this.initInternalFields();
-		try {
-			this.checkConstraints(keys);
-		} catch (SQLForeingKeyNotFound e) {
-			e.printStackTrace();
-		} catch (SQLForeingKeyException e) {
-			e.printStackTrace();
-		} finally {
-			this.constraints.clear();
-		}
 	}
 
 	/**
@@ -102,13 +91,11 @@ public abstract class BaseTable implements Table {
 	 */
 	private void initFields() {
 		this.primaryKey = new Integer(-1);
-		this.titleLocale = new String("");
-		this.titleOriginal = new String("");
-		this.covers = new ArrayList<Cover>();
-		this.foreignKeys = new TreeMap<String, ForeignKey>();
+		this.titles = new String[4];
 		this.constraints = new TreeSet<TableType>();
-		this.metaData = new HashMap<String, String>();
+		this.foreignKeys = new TreeMap<String, ForeignKey>();
 	}
+
 	/**
 	 * overridden by extending class, called always as triggering call is
 	 * located in {@link BaseTable} constructor takes care of initializing all
@@ -117,9 +104,82 @@ public abstract class BaseTable implements Table {
 	protected abstract void initInternalFields();
 
 	/**
-	 * revalidates meta data
+	 * @return title of a table
 	 */
-	public abstract void reloadMetaData();
+	public String getTableName() {
+		return tableName;
+	}
+
+	/**
+	 * @return an array of titles with indexed identified further by
+	 *         {@link TitleType}
+	 */
+	public String[] getTitles() {
+		String t[] = new String[2];
+		t[0] = this.titles[0];
+		t[1] = this.titles[1];
+		return t;
+	}
+
+	/**
+	 * set original title
+	 * 
+	 * @param t
+	 */
+	public void setOriginalTitle(String t) {
+		this.titles[0] = t;
+	}
+
+	/**
+	 * set localized title
+	 * 
+	 * @param t
+	 */
+	public void setLocalizedTitle(String t) {
+		this.titles[1] = t;
+	}
+
+	/**
+	 * @return title in it's original language
+	 */
+	public String getOriginalTitle() {
+		return this.titles[0];
+	}
+
+	/**
+	 * @return title being localized (for example in user_language)
+	 */
+	public String getLocalizedTitle() {
+		return this.titles[1];
+	}
+
+	@Override
+	public Integer getPrimaryKey() {
+		return this.primaryKey;
+	}
+
+	@Override
+	public void setPrimaryKey(Integer id) {
+		this.primaryKey = id;
+	}
+
+	@Override
+	public ForeignKey getForeingKey(String name) throws SQLForeingKeyNotFound {
+		if (!this.foreignKeys.containsKey(name)) {
+			throw new SQLForeingKeyNotFound(name, this);
+		}
+		return this.foreignKeys.get(name);
+	}
+
+	@Override
+	public TreeMap<String, ForeignKey> getForeingKeys() {
+		return this.foreignKeys;
+	}
+
+	@Override
+	public void addForeingKey(ForeignKey key) {
+		this.foreignKeys.put(key.getName(), key);
+	}
 
 	@Override
 	public void checkConstraints(ForeignKey... keys)
@@ -135,101 +195,6 @@ public abstract class BaseTable implements Table {
 			}
 		}
 	}
-	/**
-	 * @return title of a table
-	 */
-	public String getTableName() {
-		return tableName;
-	}
-
-	/**
-	 * @return an array of titles with indexed identified further by
-	 *         {@link TitleType}
-	 */
-	public String[] getTitles() {
-		String t[] = new String[2];
-		t[0] = this.titleOriginal;
-		t[1] = this.titleLocale;
-		return t;
-	}
-
-	/**
-	 * set original title
-	 * 
-	 * @param t
-	 */
-	public void setOriginalTitle(String t) {
-		this.titleOriginal = t;
-	}
-
-	/**
-	 * set localized title
-	 * 
-	 * @param t
-	 */
-	public void setLocalizedTitle(String t) {
-		this.titleLocale = t;
-	}
-
-	/**
-	 * @return title in it's original language
-	 */
-	public String getOriginalTitle() {
-		return this.titleOriginal;
-	}
-
-	/**
-	 * @return title being localized (for example in user_language)
-	 */
-	public String getLocalizedTitle() {
-		return this.titleLocale;
-	}
-
-	/**
-	 * @return the covers
-	 * @see Cover
-	 */
-	public ArrayList<Cover> getCovers() {
-		return covers;
-	}
-
-	/**
-	 * adds a new cover
-	 * 
-	 * @param cover
-	 */
-	public void addCover(Cover cover) {
-		this.covers.add(cover);
-	}
-
-	@Override
-	public Integer getPrimaryKey() {
-		return this.primaryKey;
-	}
-
-	@Override
-	public void setPrimaryKey(Integer id) {
-		this.primaryKey = id;
-	}
-
-	@Override
-	public ForeignKey getForeingKey(String name) throws SQLForeingKeyNotFound {
-		if (this.foreignKeys.containsKey(name)) {
-			return this.foreignKeys.get(name);
-		} else {
-			throw new SQLForeingKeyNotFound(name, this);
-		}
-	}
-
-	@Override
-	public void addForeingKey(ForeignKey key) {
-		this.foreignKeys.put(key.getName(), key);
-	}
-
-	@Override
-	public TreeMap<String, ForeignKey> getForeingKeys() {
-		return this.foreignKeys;
-	}
 
 	@Override
 	public String toString() {
@@ -240,34 +205,10 @@ public abstract class BaseTable implements Table {
 			str += fk.toString();
 		}
 		str += "[TITLES]\n";
-		if (!this.titleOriginal.isEmpty())
-			str += "\t[ORIGINAL:" + this.titleOriginal + "]\n";
-		if (!this.titleLocale.isEmpty())
-			str += "\t[LOCALE:" + this.titleLocale + "]\n";
-		str += "[COVERS]\n";
-		for (Cover c : this.covers) {
-			str += c.toString();
-		}
+		if (!this.titles[0].isEmpty())
+			str += "\t[ORIGINAL:" + this.titles[0] + "]\n";
+		if (!this.titles[1].isEmpty())
+			str += "\t[LOCALE:" + this.titles[1] + "]\n";
 		return str;
-	}
-
-	@Override
-	public String metaData() {
-		String a = new String();
-		for (String s : this.metaData.keySet()) {
-			a += s + ",";
-		}
-		return a.substring(0, a.length() - 1);
-	}
-
-	@Override
-	public String[] rawData() {
-		String[] raws = {this.metaData(), ""};
-		String a = new String();
-		for (String s : this.metaData.keySet()) {
-			a += s + ",";
-		}
-		raws[1] = a.substring(0, a.length() - 1);
-		return raws;
 	}
 }

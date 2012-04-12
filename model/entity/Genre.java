@@ -8,7 +8,8 @@ import model.utilities.ForeignKey;
 import exceptions.SQLForeingKeyNotFound;
 
 /**
- * Class maps itself to mabis.genre table
+ * Class maps itself to mabis.genre table Table structure: </br> | idGenre </br>
+ * | genre </br> 
  * 
  * @author kornicameister
  * 
@@ -46,7 +47,7 @@ public class Genre extends BaseTable {
 	 * @param genre
 	 */
 	public void setGenre(String genre) {
-		this.setOriginalTitle(genre);
+		this.titles[0] = genre;
 	}
 
 	/**
@@ -55,24 +56,17 @@ public class Genre extends BaseTable {
 	 * @return
 	 */
 	public String getGenre() {
-		return this.getOriginalTitle();
-	}
-
-	@Override
-	protected void initInternalFields() {
-		this.reloadMetaData();
-	}
-
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		this.metaData.put("idGenre", this.getPrimaryKey().toString());
-		this.metaData.put("genre", this.getGenre());
+		return this.titles[0];
 	}
 
 	@Override
 	public void checkConstraints(ForeignKey... keys)
 			throws SQLForeingKeyNotFound {
+		return;
+	}
+
+	@Override
+	protected void initInternalFields() {
 		return;
 	}
 

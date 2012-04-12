@@ -6,78 +6,48 @@ package model.entity;
 
 import model.enums.TableType;
 import model.utilities.ForeignKey;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
- * @author kornicameister
+ * This class map itself to mabis.book Table structure: </br> | idBook </br> |
+ * isbn </br> | titleOriginal </br> | titleLocale </br> | genre </br> | pages
+ * </br> | cover </br> | writer </br>
  * 
+ * @author kornicameister
+ * @version 0.2
  */
 public class Book extends BaseTable {
-	private String isbn = null;
 	private Short pages = null;
-	private String description = null;
+	private Author writer = null; // writer is a foreign key here
+	private Cover cover = null; // cover is also a foreign key here
+	private Genre genre = null; // genre is also a foreign key here
 
-	/**
-	 * @param originalTitle
-	 */
 	public Book(String originalTitle) {
 		super(originalTitle);
 	}
 
-	/**
-	 * @param pk
-	 * @param keys
-	 */
 	public Book(int pk, ForeignKey... keys) {
 		super(pk, keys);
 	}
 
-	/**
-	 * @param pk
-	 */
 	public Book(int pk) {
 		super(pk);
 	}
 
 	@Override
 	protected void initInternalFields() {
-		this.setIsbn(new String());
 		this.setPages(new Short((short) 0));
-		this.setDescription(new String());
+
 		this.constraints.add(TableType.AUTHOR);
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.GENRE);
-		this.reloadMetaData();
-	}
-
-	@Override
-	public void reloadMetaData() {
-		this.metaData.clear();
-		this.metaData.put("idBook", this.getPrimaryKey().toString());
-		this.metaData.put("isbn", this.getIsbn());
-		this.metaData.put("titleOriginal", this.getOriginalTitle());
-		this.metaData.put("titleLocale", this.getLocalizedTitle());
-		this.metaData.put("pages", this.getPages().toString());
-		try {
-			this.metaData.put("genre", this.getForeingKey("genre").getValue()
-					.toString());
-			this.metaData.put("cover", this.getForeingKey("cover").getValue()
-					.toString());
-			this.metaData.put("writer", this.getForeingKey("writer").getValue()
-					.toString());
-		} catch (SQLForeingKeyNotFound e) {
-			e.printStackTrace();
-		} finally {
-			this.metaData.clear();
-		}
 	}
 
 	public String getIsbn() {
-		return isbn;
+		return this.titles[2];
 	}
 
 	public void setIsbn(String isbn) {
-		this.isbn = isbn;
+		this.titles[2] = isbn;
 	}
 
 	public Short getPages() {
@@ -89,10 +59,34 @@ public class Book extends BaseTable {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.titles[3];
 	}
 
 	public void setDescription(String description) {
-		this.description = description;
+		this.titles[3] = description;
+	}
+
+	public Author getWriter() {
+		return writer;
+	}
+
+	public void setWriter(Author writer) {
+		this.writer = writer;
+	}
+
+	public Cover getCover() {
+		return cover;
+	}
+
+	public void setCover(Cover cover) {
+		this.cover = cover;
+	}
+
+	public Genre getGenre() {
+		return genre;
+	}
+
+	public void setGenre(Genre genre) {
+		this.genre = genre;
 	}
 }
