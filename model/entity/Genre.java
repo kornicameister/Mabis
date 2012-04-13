@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import model.enums.TableType;
 import model.utilities.ForeignKey;
 import exceptions.SQLForeingKeyNotFound;
 
@@ -15,7 +16,6 @@ import exceptions.SQLForeingKeyNotFound;
  * 
  */
 public class Genre extends BaseTable {
-
 	/**
 	 * Construct new Genre with default empty constructor
 	 */
@@ -41,6 +41,12 @@ public class Genre extends BaseTable {
 		super(genre);
 	}
 
+	@Override
+	public String[] metaData() {
+		String tmp[] = { "idGenre", "genre"};
+		return tmp;
+	}
+	
 	/**
 	 * wraps {@link BaseTable#setOriginalTitle(String)}
 	 * 
@@ -67,7 +73,7 @@ public class Genre extends BaseTable {
 
 	@Override
 	protected void initInternalFields() {
-		return;
+		this.tableName = TableType.GENRE.toString();
 	}
 
 }

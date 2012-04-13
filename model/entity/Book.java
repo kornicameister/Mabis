@@ -34,8 +34,16 @@ public class Book extends BaseTable {
 	}
 
 	@Override
+	public String[] metaData() {
+		String tmp[] = { "idBook", "isbn", "titleOriginal", "titleLocale",
+				"genre", "pages", "cover", "writer" };
+		return tmp;
+	}
+
+	@Override
 	protected void initInternalFields() {
 		this.setPages(new Short((short) 0));
+		this.tableName = TableType.BOOK.toString();
 
 		this.constraints.add(TableType.AUTHOR);
 		this.constraints.add(TableType.COVER);

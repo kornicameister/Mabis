@@ -41,6 +41,12 @@ public class Cover extends BaseTable {
 		this.image = new ImageIcon(cover.getAbsolutePath());
 	}
 
+	@Override
+	public String[] metaData() {
+		String tmp[] = { "idCover", "image", "hash", "titleLocale",
+				"genre", "pages", "cover", "writer" };
+		return tmp;
+	}
 	/**
 	 * @return the type
 	 */
@@ -83,9 +89,9 @@ public class Cover extends BaseTable {
 	
 	@Override
 	protected void initInternalFields() {
-		this.tableName = TableType.COVER.toString();
 		this.type = CoverType.UNDEFINED;
 		this.imageFile = null;
+		this.tableName = TableType.COVER.toString();
 	}
 	
 	public ImageIcon getImage(){

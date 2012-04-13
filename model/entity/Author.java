@@ -4,22 +4,22 @@
  */
 package model.entity;
 
+import java.io.File;
+
 import javax.swing.ImageIcon;
 
 import model.enums.TableType;
 
 /**
- * This method is to represent Author table
- * Table structure: </br>
- * | idBand </br>
- * | firstName </br>
- * | lastName </br>
- * | picture </br>
+ * This method is to represent Author table Table structure: </br> | idBand
+ * </br> | firstName </br> | lastName </br> | picture </br>
+ * 
  * @author kornicameister
- * @version 0.2
+ * @version 0.3
  */
 public class Author extends BaseTable {
 	private ImageIcon picture = null;
+	private File pictureFile = null;
 
 	/**
 	 * @see BaseTable#BaseTable()
@@ -47,6 +47,12 @@ public class Author extends BaseTable {
 	 */
 	public Author(int pk) {
 		super(pk);
+	}
+
+	@Override
+	public String[] metaData() {
+		String tmp[] = { "idAuthor", "firstName", "lastName", "picture" };
+		return tmp;
 	}
 
 	@Override
@@ -95,7 +101,12 @@ public class Author extends BaseTable {
 	 * @param picture
 	 *            the picture to set
 	 */
-	public void setPicture(ImageIcon picture) {
+	public void setPicture(ImageIcon picture,String path) {
 		this.picture = picture;
+		this.pictureFile = new File(path);
+	}
+
+	public File getPictureFile() {
+		return pictureFile;
 	}
 }

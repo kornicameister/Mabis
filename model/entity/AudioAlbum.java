@@ -56,12 +56,19 @@ public class AudioAlbum extends BaseTable {
 	}
 
 	@Override
+	public String[] metaData() {
+		String tmp[] = { "idAudio", "frontCover", "backCover", "cdCover",
+				"tagCloud", "trackList", "artist", "totalTime" };
+		return tmp;
+	}
+
+	@Override
 	protected void initInternalFields() {
-		this.tableName = TableType.AUDIO_ALBUM.toString();
 		this.tagCloud = new ArrayList<Genre>();
 		this.totalTime = new Time(0);
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.AUTHOR);
+		this.tableName = TableType.AUDIO_ALBUM.toString();
 	}
 
 	public String getTagCloud() {

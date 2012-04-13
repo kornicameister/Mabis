@@ -83,7 +83,7 @@ public class ForeignKey implements Comparable<ForeignKey> {
 	public String toString() {
 		String str = "Foreign key: " + this.name + "\n";
 		str += "[Val: " + this.value + "]\n";
-		str += "[From: " + this.originTable.getTableName() + "]\n";
+		str += "[From: " + originTable.getTableName() + "]\n";
 		return str;
 	}
 }

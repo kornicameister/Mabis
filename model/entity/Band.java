@@ -39,6 +39,13 @@ public class Band extends Author {
 		this.createLastFMUrl();
 	}
 
+	@Override
+	public String[] metaData() {
+		String tmp[] = { "idBand", "name", "description", "url",
+				"picture", "masterGenre", "tagCloud"};
+		return tmp;
+	}
+	
 	private void createLastFMUrl() {
 		try {
 			this.lastFMUrl = new URL(urlPattern
@@ -65,9 +72,9 @@ public class Band extends Author {
 	protected void initInternalFields() {
 		this.tagCloud = new ArrayList<Genre>();
 		this.masterGenre = new Genre();
-		this.tableName = TableType.BAND.toString();
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.GENRE);
+		this.tableName = TableType.BAND.toString();
 	}
 
 	public String getName() {

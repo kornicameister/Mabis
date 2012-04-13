@@ -68,4 +68,10 @@ public interface Table {
 	 */
 	void checkConstraints(ForeignKey... keys) throws SQLForeingKeyNotFound,
 			SQLForeingKeyException;
+	
+	/**
+	 * method should return array of strings that stands for meta data of certain table
+	 * @return String[]
+	 */
+	String[] metaData();
 }

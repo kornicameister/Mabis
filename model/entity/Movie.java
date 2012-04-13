@@ -51,12 +51,20 @@ public class Movie extends BaseTable {
 	}
 
 	@Override
+	public String[] metaData() {
+		String tmp[] = { "idBook", "titleOriginal", "titleLocale", "duration",
+				"description", "frontCover", "backCover", "director", "genre" };
+		return tmp;
+	}
+
+	@Override
 	protected void initInternalFields() {
 		this.setDuration(new Time(0));
 
 		this.constraints.add(TableType.COVER);
 		this.constraints.add(TableType.GENRE);
 		this.constraints.add(TableType.AUTHOR);
+		this.tableName = TableType.MOVIE.toString();
 	}
 
 	public Time getDuration() {

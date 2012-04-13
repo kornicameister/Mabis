@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import model.enums.TableType;
 import database.Utilities;
 
 /**
@@ -36,6 +37,13 @@ public class User extends Author {
 		return null;
 	}
 
+	@Override
+	public String[] metaData() {
+		String tmp[] = { "idUser", "login", "email", "password",
+				"firstName", "lastName", "avatar"};
+		return tmp;
+	}
+
 	public String getLogin() {
 		return this.titles[2];
 	}
@@ -58,6 +66,12 @@ public class User extends Author {
 
 	public void setPassword(String password) {
 		this.password = Utilities.md5sum(password);
+	}
+	
+	@Override
+	protected void initInternalFields() {
+		super.initInternalFields();
+		this.tableName = TableType.USER.toString();
 	}
 
 }

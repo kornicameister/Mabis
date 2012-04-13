@@ -14,11 +14,17 @@ public class MovieUser extends ManyToManyTable {
 
 	public MovieUser() {
 		super();
-		this.tableName = TableType.MOVIE_USER.toString();
 	}
 
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();
+		this.tableName = TableType.MOVIE_USER.toString();
+	}
+
+	@Override
+	public String[] metaData() {
+		String tmp[] = { "idMovieUser", "idMovie", "idUser" };
+		return tmp;
 	}
 }
