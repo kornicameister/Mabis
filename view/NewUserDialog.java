@@ -4,7 +4,6 @@
 package view;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
@@ -26,8 +25,10 @@ import model.entity.User;
 import view.imagePanel.ImageFileFilter;
 import view.imagePanel.ImageFilePreview;
 import view.imagePanel.ImagePanel;
-import controller.SQLEvaluator;
+import view.mainwindow.MainWindow;
+import controller.InvalidBaseClass;
 import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
 
 /**
  * @author kornicameister
@@ -52,6 +53,7 @@ public class NewUserDialog extends JDialog {
 	private JFileChooser imageChooser = null;
 	private JLabel passLabel = null;
 	private JPasswordField passField = null;
+	private MainWindow mw = null;
 
 	/**
 	 * @param owner
@@ -60,8 +62,9 @@ public class NewUserDialog extends JDialog {
 	 *            when shown. If true, the modality type property is set to
 	 *            DEFAULT_MODALITY_TYPE, otherwise the dialog is modeless.
 	 */
-	public NewUserDialog(Frame owner, boolean modal) {
+	public NewUserDialog(MainWindow owner, boolean modal) {
 		super(owner, modal);
+		this.mw = owner;
 		this.listener = new NewUserDialogListener(this);
 		this.initComponents();
 		this.initMetaData();
@@ -266,14 +269,32 @@ public class NewUserDialog extends JDialog {
 				User user = new User(fnameField.getText(), lnameField.getText());
 				user.setLogin(loginField.getText());
 				user.setEmail(mailField.getText());
-				user.setPicture(imagePanel.getImg());
+				user.setPicture(imagePanel.getImg(), imagePanel.getImgPath());
 				user.setPassword(new String(passField.getPassword()));
 
-				SQLEvaluator insert = new SQLEvaluator();
-				insert.setStatementType(SQLStamentType.INSERT);
-				insert.setTargetTable(user);
-				insert.executeSQL();
-
+				UserSQLFactory factory = new UserSQLFactory();
+				factory.setStatementType(SQLStamentType.INSERT);
+				try {
+					factory.setTable(user);
+					if (factory.executeSQL()) {
+						mw.getBottomPanel()
+								.getStatusBar()
+								.setMessage("New user was successfully created");
+					} else {
+						// TODO add Error JFrame and saving to log
+						mw.getBottomPanel()
+								.getStatusBar()
+								.setMessage(
+										"Failed to create new user, see log file for details");
+					}
+				} catch (InvalidBaseClass e1) {
+					e1.printStackTrace();
+				} finally {
+					if (isDisplayable()) {
+						setVisible(false);
+						dispose();
+					}
+				}
 			} else if (source == cancelButton) {
 				if (isDisplayable()) {
 					setVisible(false);
@@ -282,12 +303,16 @@ public class NewUserDialog extends JDialog {
 			} else if (source == newAvatarButton) {
 				int returnValue = imageChooser.showOpenDialog(backReference);
 				if (returnValue == JFileChooser.APPROVE_OPTION) {
+					// TODO this part must be fixed, problem lies in loading the
+					// image without checking it's dimension
 					imagePanel.swapImage(imageChooser.getSelectedFile()
 							.getAbsolutePath());
 					if (imagePanel.getImg().getIconWidth() > 90
 							&& imagePanel.getImg().getIconHeight() > 120) {
 						JOptionPane.showMessageDialog(backReference,
 								"This image is too big");
+					} else {
+						imagePanel.repaint();
 					}
 					imageChooser.setSelectedFile(null);
 				}

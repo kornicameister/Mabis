@@ -10,8 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import exceptions.ConnectionDataException;
-
 /**
  * This class wraps for MySQL establish connection process.</br> It allows to
  * set connection information such as
@@ -39,6 +37,9 @@ public class MySQLAccess {
 	/** The Constant defaultPort. */
 	protected final static Short defaultPort = 3306;
 
+	/** The Constant defaultHost */
+	protected final static String host = "localhost";
+
 	/**
 	 * Wrapper allowing to set connection related data
 	 * 
@@ -47,7 +48,7 @@ public class MySQLAccess {
 	private final ConnectionData connectionData;
 
 	/** The connection. */
-	private Connection connection = null;
+	private static Connection connection = null;
 
 	/**
 	 * Instantiates a new my sql access.
@@ -75,21 +76,14 @@ public class MySQLAccess {
 	 */
 	public boolean connect() {
 		try {
-
-			if (!this.connectionData.isReady()) {
-				throw new ConnectionDataException("Connection message invalid",
-						this.connectionData);
-			}
-
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			String url = new String("jdbc:mysql://!:!/!");
-			url = url.replaceFirst("!", this.connectionData.getHost());
-			url = url.replaceFirst("!", this.connectionData.getPort()
-					.toString());
+			url = url.replaceFirst("!", MySQLAccess.host);
+			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
 			url = url.replaceFirst("!", MySQLAccess.databaseName);
-			this.connection = DriverManager.getConnection(url,
+			MySQLAccess.connection = DriverManager.getConnection(url,
 					MySQLAccess.userName, MySQLAccess.userPass);
-			if (!this.connection.isClosed()) {
+			if (!MySQLAccess.connection.isClosed()) {
 				System.out.println("Connection established");
 				return checkForUser();
 			} else {
@@ -103,8 +97,6 @@ public class MySQLAccess {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
-		} catch (ConnectionDataException e) {
-			e.printDataError();
 		}
 		return false;
 	}
@@ -133,10 +125,10 @@ public class MySQLAccess {
 	 * identified by {@link MySQLAccess#databaseName}
 	 */
 	public void disconnect() {
-		if (this.connection != null) {
+		if (MySQLAccess.connection != null) {
 			try {
-				this.connection.close();
-				if (this.connection.isClosed()) {
+				MySQLAccess.connection.close();
+				if (MySQLAccess.connection.isClosed()) {
 					System.out.println("Connection terminated");
 				}
 			} catch (SQLException e) {
@@ -253,5 +245,13 @@ public class MySQLAccess {
 
 	public ResultSet executeSQL(String sql) throws SQLException {
 		return connection.prepareStatement(sql).executeQuery();
+	}
+
+	public ResultSet executeSQL(PreparedStatement st) throws SQLException {
+		return st.executeQuery();
+	}
+
+	public static Connection getConnection() {
+		return connection;
 	}
 }

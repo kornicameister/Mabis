@@ -11,9 +11,12 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
+
+import database.MySQLAccess;
 
 
 /**
@@ -33,6 +36,7 @@ public class MainWindow extends JFrame {
 	private MWUserList userListPanel = null;
 	private JPanel contentPane = null;
 	private JPanel collectionView = null;
+	private MySQLAccess mysql;
 
 	/**
 	 * Constructor of the main windows, calls for all private method to
@@ -59,6 +63,17 @@ public class MainWindow extends JFrame {
 		setDefaultLookAndFeelDecorated(false);
 		setLocationRelativeTo(null); // centering on the screen
 		
+		this.initConnection();
+		
+	}
+
+	private void initConnection() {
+		this.mysql = new MySQLAccess();
+		if(!this.mysql.connect()){
+			JOptionPane.showMessageDialog(this, "Failed to connect to MABIS");
+		}else{
+			this.bottomPanel.getStatusBar().setMessage("Mabis connection established");
+		}
 	}
 
 	/**
@@ -124,5 +139,9 @@ public class MainWindow extends JFrame {
 		this.revalidate();
 		this.repaint();
 		this.pack();
+	}
+
+	public MWBottomPanel getBottomPanel() {
+		return this.bottomPanel;
 	}
 }

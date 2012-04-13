@@ -130,4 +130,8 @@ public class MWBottomPanel extends JPanel {
 					((JButton) s).getActionCommand());
 		}
 	}
+
+	public StatusBar getStatusBar() {
+		return this.statusBar;
+	}
 }
