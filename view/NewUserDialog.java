@@ -276,18 +276,14 @@ public class NewUserDialog extends JDialog {
 				factory.setStatementType(SQLStamentType.INSERT);
 				try {
 					factory.setTable(user);
-					if (factory.executeSQL()) {
-						mw.getBottomPanel()
-								.getStatusBar()
-								.setMessage("New user was successfully created");
-					} else {
-						// TODO add Error JFrame and saving to log
-						mw.getBottomPanel()
-								.getStatusBar()
-								.setMessage(
-										"Failed to create new user, see log file for details");
-					}
+					factory.executeSQL();
+					mw.getBottomPanel().getStatusBar()
+							.setMessage("New user was successfully created");
 				} catch (InvalidBaseClass e1) {
+					mw.getBottomPanel()
+							.getStatusBar()
+							.setMessage(
+									"Failed to create new user, see log file for details");
 					e1.printStackTrace();
 				} finally {
 					if (isDisplayable()) {

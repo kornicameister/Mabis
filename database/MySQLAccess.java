@@ -10,6 +10,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import model.entity.User;
+
+import controller.InvalidBaseClass;
+import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
+
 /**
  * This class wraps for MySQL establish connection process.</br> It allows to
  * set connection information such as
@@ -102,21 +108,15 @@ public class MySQLAccess {
 	 *         otherwise
 	 */
 	public boolean doWeHaveUser(String user) {
+		UserSQLFactory f = new UserSQLFactory();
 		try {
-			PreparedStatement check = null;
-			if (user != null) {
-				check = connection
-						.prepareStatement("select count(*) from user");
-			} else {
-				check = connection
-						.prepareStatement("select count(*) from user where login=?");
-				check.setString(1, user);
-			}
-			return Utilities.querySize(check.executeQuery()) > 0;
-		} catch (SQLException e) {
+			f.setTable(new User());
+			f.setStatementType(SQLStamentType.SELECT);
+			f.executeSQL();
+		} catch (InvalidBaseClass e) {
 			e.printStackTrace();
 		}
-		return false;
+		return !f.getUsers().isEmpty();
 	}
 
 	/**

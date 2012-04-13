@@ -38,7 +38,13 @@ public class User extends Author {
 
 	@Override
 	public String toString() {
-		return null;
+		String str = super.toString();
+		str += "----------\n";
+		str += "[LOGIN: " + this.getLogin() + "]\n";
+		str += "[EMAIL: " + this.getEmail() + "]\n";
+		str += "[FNAME: " + this.getFirstName() + "]\n";
+		str += "[LNAME: " + this.getLastName() + "]\n";
+		return str;
 	}
 
 	@Override

@@ -201,14 +201,9 @@ public abstract class BaseTable implements Table {
 		String str = "Table: " + tableName + "\n";
 		str += "[PK: " + this.primaryKey + "]\n]";
 		str += "[FKS]\n";
-		for (ForeignKey fk : this.foreignKeys.values()) {
+		for (ForeignKey fk : this.foreignKeys.values()){
 			str += fk.toString();
 		}
-		str += "[TITLES]\n";
-		if (!this.titles[0].isEmpty())
-			str += "\t[ORIGINAL:" + this.titles[0] + "]\n";
-		if (!this.titles[1].isEmpty())
-			str += "\t[LOCALE:" + this.titles[1] + "]\n";
 		return str;
 	}
 }
