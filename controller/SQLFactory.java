@@ -64,23 +64,11 @@ public abstract class SQLFactory implements StatementFactory {
 		this.wheres.put(attribute, new WhereClause(attribute, value));
 	}
 
-	public String createSQL(BaseTable table){
+	public String createSQL(BaseTable table) {
 		String rawQueryCopy = this.rawQuery.replaceFirst("!",
 				table.getTableName());
-		
-		if(this.type == SQLStamentType.SELECT){
-			String where = this.buildWhereChunk();
-			if(where.equals("")){
-				rawQueryCopy = rawQueryCopy.substring(0,rawQueryCopy.lastIndexOf("where")-1);
-			}else{
-				rawQueryCopy = rawQueryCopy.replaceAll("!", where);
-			}
-			return rawQueryCopy;
-		}
-		
 		String fieldList = this.buildFieldList(table);
-
-		// setting field list
+		//first pass
 		switch (this.type) {
 		case INSERT:
 			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
@@ -92,11 +80,21 @@ public abstract class SQLFactory implements StatementFactory {
 			rawQueryCopy = rawQueryCopy.replaceAll(",", " = ?, ");
 			break;
 		}
+		//second pass
 		switch (this.type) {
 		case UPDATE:
 		case DELETE:
 			rawQueryCopy = rawQueryCopy.replaceFirst("!",
 					this.buildWhereChunk());
+			break;
+		case SELECT:
+			String where = this.buildWhereChunk();
+			if (where.equals("")) {
+				rawQueryCopy = rawQueryCopy.substring(0,
+						rawQueryCopy.lastIndexOf("where") - 1);
+			} else {
+				rawQueryCopy = rawQueryCopy.replaceAll("!", where);
+			}
 			break;
 		}
 
@@ -109,12 +107,12 @@ public abstract class SQLFactory implements StatementFactory {
 		for (WhereClause where : this.wheres.values()) {
 			a += where.attribute + "=" + where.value + ",";
 		}
-		if(a.length() == 0){
+		if (a.length() == 0) {
 			return "";
 		}
 		return a.substring(0, a.length() - 1);
 	}
-	
+
 	@Override
 	public String buildFieldList(BaseTable table) {
 		String[] fieldList = table.metaData();
@@ -125,11 +123,12 @@ public abstract class SQLFactory implements StatementFactory {
 			fieldList2 += fieldList[i] + ",";
 			questionMarkFieldList += "?" + ",";
 		}
-		questionMarkFieldList = questionMarkFieldList.substring(0,questionMarkFieldList.lastIndexOf(","));
+		questionMarkFieldList = questionMarkFieldList.substring(0,
+				questionMarkFieldList.lastIndexOf(","));
 		return fieldList2.substring(0, fieldList2.lastIndexOf(","));
 	}
 
-	public abstract boolean executeSQL();
+	public abstract void executeSQL();
 
 	private class WhereClause {
 		String attribute = null;

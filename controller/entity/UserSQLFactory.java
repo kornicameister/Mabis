@@ -7,15 +7,17 @@ import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 
+import logger.MabisLogger;
 import model.entity.BaseTable;
 import model.entity.User;
 import controller.InvalidBaseClass;
 import controller.SQLFactory;
-import controller.SQLStamentType;
 import database.MySQLAccess;
 
 /**
@@ -41,51 +43,46 @@ public class UserSQLFactory extends SQLFactory {
 	}
 
 	@Override
-	public boolean executeSQL() {
-		String sql = this.createSQL(table);
-
+	public void executeSQL() {
 		try {
 			if (!MySQLAccess.getConnection().isValid(1000)) {
-				return false;
+				MabisLogger.getLogger().log(Level.SEVERE,
+						"Database connection lost");
+				return;
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
 
 		try {
-			PreparedStatement st = MySQLAccess.getConnection()
-					.prepareStatement(sql);
+			String sql = this.createSQL(table);
+			PreparedStatement st = MySQLAccess.getConnection().prepareStatement(sql,
+					Statement.RETURN_GENERATED_KEYS);
 			switch (this.type) {
 			case UPDATE:
+				break;
 			case INSERT:
 				short index = 1;
-				setImageAsBlob(st, index++);
+				setImageAsBlob(st,index++);
 				st.setString(index++, table.getLastName());
-				st.setString(index++, table.getFirstName());
+				st.setString(index++,  table.getFirstName());
 				st.setString(index++, table.getPassword());
 				st.setString(index++, table.getEmail());
 				st.setString(index++, table.getLogin());
-				// TODO polish diacritis are problem
-				// TODO no valid return statement confirming that sql was
-				// executed successfully
-				return this.parseResultSet(st.executeQuery());
+				st.execute();
+				break;
 			case SELECT:
-				return this.parseResultSet(st.executeQuery());
+				this.parseResultSet(st.executeQuery(sql));
+				break;
+			case DELETE:
 			}
-			if (this.type == SQLStamentType.UPDATE
-					|| this.type == SQLStamentType.INSERT) {
-
-			} else {
-				return MySQLAccess.getConnection().prepareStatement(sql)
-						.executeUpdate() > 0;
-			}
+			st.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
 	}
 
-	public void setImageAsBlob(PreparedStatement st, int index) {
+	public void setImageAsBlob(PreparedStatement st, short index) {
 		try {
 			FileInputStream fis = new FileInputStream(table.getPictureFile());
 			st.setBinaryStream(index, (InputStream) fis, (int) table
@@ -97,11 +94,11 @@ public class UserSQLFactory extends SQLFactory {
 		}
 	}
 
-	private boolean parseResultSet(ResultSet set) {
+	private void parseResultSet(ResultSet set) {
 		User u = null;
 		try {
-			if (this.type == SQLStamentType.SELECT) {
-				set.first();
+			switch (this.type) {
+			case SELECT:
 				while (set.next()) {
 					u = new User();
 					u.setFirstName(set.getString("firstName"));
@@ -115,12 +112,13 @@ public class UserSQLFactory extends SQLFactory {
 					u.setPrimaryKey(set.getInt("idUser"));
 					this.users.put(u.getPrimaryKey(), u);
 				}
+				break;
+			case UPDATE:
+			case DELETE:
 			}
-			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
 	}
 
 	private ImageIcon createImageFromBlob(Blob blob) {
