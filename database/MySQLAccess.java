@@ -22,6 +22,7 @@ import java.sql.SQLException;
  * @author kornicameister
  * @see <b>mysql java driver</b>
  * @see ConnectionData#setPassword(String)
+ * @version 0.2
  */
 public class MySQLAccess {
 
@@ -40,13 +41,6 @@ public class MySQLAccess {
 	/** The Constant defaultHost */
 	protected final static String host = "localhost";
 
-	/**
-	 * Wrapper allowing to set connection related data
-	 * 
-	 * @see ConnectionData
-	 * */
-	private final ConnectionData connectionData;
-
 	/** The connection. */
 	private static Connection connection = null;
 
@@ -54,7 +48,7 @@ public class MySQLAccess {
 	 * Instantiates a new my sql access.
 	 */
 	public MySQLAccess() {
-		this.connectionData = new ConnectionData();
+
 	}
 
 	/**
@@ -70,9 +64,10 @@ public class MySQLAccess {
 	 * <li> {@link ConnectionData#port}</li>
 	 * </ul>
 	 * 
-	 * @return boolean </br><b>TRUE</b> if connection had been established and
-	 *         {@link ConnectionData#login} is valid user </br> <b>FALSE</b> -
-	 *         connection was established but database is closed
+	 * @return boolean </br><b>TRUE</b> if connection had been established,
+	 *         otherwise return false
+	 * @since 0.2 method does not check for user presence in user table, this
+	 *        job was moved to main window
 	 */
 	public boolean connect() {
 		try {
@@ -85,9 +80,7 @@ public class MySQLAccess {
 					MySQLAccess.userName, MySQLAccess.userPass);
 			if (!MySQLAccess.connection.isClosed()) {
 				System.out.println("Connection established");
-				return checkForUser();
-			} else {
-				return false;
+				return true;
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -108,11 +101,17 @@ public class MySQLAccess {
 	 * @return boolean </br><b>TRUE</b> user was found</br><b>FALSE</b>
 	 *         otherwise
 	 */
-	public boolean checkForUser() {
+	public boolean doWeHaveUser(String user) {
 		try {
-			PreparedStatement check = connection
-					.prepareStatement("select count(*) from user where login=?");
-			check.setString(1, this.connectionData.getLogin());
+			PreparedStatement check = null;
+			if (user != null) {
+				check = connection
+						.prepareStatement("select count(*) from user");
+			} else {
+				check = connection
+						.prepareStatement("select count(*) from user where login=?");
+				check.setString(1, user);
+			}
 			return Utilities.querySize(check.executeQuery()) > 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -134,112 +133,6 @@ public class MySQLAccess {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		}
-	}
-
-	/**
-	 * Method returns reference to connectionData object, that itself allows to
-	 * set up future connection parameters
-	 * 
-	 * @return the connectionData
-	 * @see ConnectionData
-	 */
-	public ConnectionData getConnectionData() {
-		return connectionData;
-	}
-
-	/**
-	 * The Class ConnectionData.
-	 */
-	public class ConnectionData {
-
-		/** The host. */
-		private String login, password, host;
-
-		/** The port, by default it is equal to {@link MySQLAccess#defaultPort} */
-		private Short port;
-
-		/**
-		 * Instantiates a new connection data.
-		 */
-		public ConnectionData() {
-			this.login = new String();
-			this.password = new String();
-			this.host = new String();
-			this.port = new Short(MySQLAccess.defaultPort);
-		}
-
-		/**
-		 * Checks if is ready.
-		 * 
-		 * @return the boolean
-		 */
-		public Boolean isReady() {
-			boolean ready = false;
-			ready = !this.login.isEmpty();
-			ready = !this.password.isEmpty();
-			ready = !this.host.isEmpty();
-			return ready;
-		}
-
-		/**
-		 * @return the login
-		 */
-		public String getLogin() {
-			return login;
-		}
-
-		/**
-		 * @param login
-		 *            the login to set
-		 */
-		public void setLogin(String login) {
-			this.login = login;
-		}
-
-		/**
-		 * @return the host
-		 */
-		public String getHost() {
-			return host;
-		}
-
-		/**
-		 * @param host
-		 *            the host to set
-		 */
-		public void setHost(String host) {
-			this.host = host;
-		}
-
-		/**
-		 * @return the password
-		 */
-		public String getPassword() {
-			return password;
-		}
-
-		/**
-		 * @param password
-		 *            the password to set
-		 */
-		public void setPassword(String password) {
-			this.password = Utilities.md5sum(password);
-		}
-
-		/**
-		 * @return the port
-		 */
-		public Short getPort() {
-			return port;
-		}
-
-		/**
-		 * @param port
-		 *            the port to set
-		 */
-		public void setPort(Short port) {
-			this.port = port;
 		}
 	}
 

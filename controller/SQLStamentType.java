@@ -1,7 +1,7 @@
 package controller;
 
 public enum SQLStamentType {
-	INSERT, UPDATE, DELETE;
+	INSERT, UPDATE, DELETE, SELECT;
 
 	/**
 	 * @return lower cased {@link SQLStamentType#name()} of this enum constant

@@ -21,6 +21,10 @@ import database.Utilities;
 public class User extends Author {
 	private String password;
 
+	public User(){
+		super();
+	}
+	
 	public User(String login, String email, String password) {
 		super();
 		this.titles[2] = login;

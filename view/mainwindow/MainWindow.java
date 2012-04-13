@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
+import view.UserSelectionPanel;
 import database.MySQLAccess;
 
 
@@ -64,7 +65,16 @@ public class MainWindow extends JFrame {
 		setLocationRelativeTo(null); // centering on the screen
 		
 		this.initConnection();
-		
+		this.checkForUsers();
+	}
+
+	private void checkForUsers() {
+		//check for any user, if none print NewUserDialog
+		if(this.mysql.doWeHaveUser(null)){
+			UserSelectionPanel usp = new UserSelectionPanel(this);
+			usp.setVisible(true);
+			usp.setAlwaysOnTop(true);
+		}
 	}
 
 	private void initConnection() {

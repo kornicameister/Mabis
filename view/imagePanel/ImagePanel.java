@@ -47,6 +47,10 @@ public class ImagePanel extends JPanel {
 		this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 	}
 
+	public ImagePanel(ImageIcon picture) {
+		this.img = picture;
+	}
+
 	/**
 	 * Method sets new image path and reloads an image being displayed within
 	 * JPanel by calling loadImage and repaint method

@@ -3,8 +3,13 @@ package controller.entity;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+
+import javax.swing.ImageIcon;
 
 import model.entity.BaseTable;
 import model.entity.User;
@@ -21,38 +26,11 @@ import database.MySQLAccess;
  */
 public class UserSQLFactory extends SQLFactory {
 	private User table;
+	private HashMap<Integer, User> users;
 
 	public UserSQLFactory() {
 		super();
-	}
-
-	@Override
-	public String createSQL() {
-		String rawQueryCopy = this.rawQuery.replaceFirst("!",
-				table.getTableName());
-		String fieldList = this.buildFieldList(table);
-
-		// setting field list
-		switch (this.type) {
-		case INSERT:
-			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
-			rawQueryCopy = rawQueryCopy.replaceFirst("!",
-					this.questionMarkFieldList);
-			break;
-		case UPDATE:
-			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
-			rawQueryCopy = rawQueryCopy.replaceAll(",", " = ?, ");
-			break;
-		}
-		switch (this.type) {
-		case UPDATE:
-		case DELETE:
-			rawQueryCopy = rawQueryCopy.replaceFirst("!",
-					this.buildWhereChunk());
-			break;
-		}
-
-		return rawQueryCopy;
+		users = new HashMap<Integer, User>();
 	}
 
 	@Override
@@ -64,7 +42,7 @@ public class UserSQLFactory extends SQLFactory {
 
 	@Override
 	public boolean executeSQL() {
-		String sql = this.createSQL();
+		String sql = this.createSQL(table);
 
 		try {
 			if (!MySQLAccess.getConnection().isValid(1000)) {
@@ -74,14 +52,13 @@ public class UserSQLFactory extends SQLFactory {
 			e1.printStackTrace();
 		}
 
-		boolean status = false;
-
 		try {
-			if (this.type == SQLStamentType.UPDATE
-					|| this.type == SQLStamentType.INSERT) {
+			PreparedStatement st = MySQLAccess.getConnection()
+					.prepareStatement(sql);
+			switch (this.type) {
+			case UPDATE:
+			case INSERT:
 				short index = 1;
-				PreparedStatement st = MySQLAccess.getConnection()
-						.prepareStatement(sql);
 				setImageAsBlob(st, index++);
 				st.setString(index++, table.getLastName());
 				st.setString(index++, table.getFirstName());
@@ -91,16 +68,21 @@ public class UserSQLFactory extends SQLFactory {
 				// TODO polish diacritis are problem
 				// TODO no valid return statement confirming that sql was
 				// executed successfully
-				status = st.execute();
+				return this.parseResultSet(st.executeQuery());
+			case SELECT:
+				return this.parseResultSet(st.executeQuery());
+			}
+			if (this.type == SQLStamentType.UPDATE
+					|| this.type == SQLStamentType.INSERT) {
+
 			} else {
-				MySQLAccess.getConnection().prepareStatement(sql)
-						.executeUpdate();
+				return MySQLAccess.getConnection().prepareStatement(sql)
+						.executeUpdate() > 0;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-		return status;
+		return false;
 	}
 
 	public void setImageAsBlob(PreparedStatement st, int index) {
@@ -113,5 +95,45 @@ public class UserSQLFactory extends SQLFactory {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private boolean parseResultSet(ResultSet set) {
+		User u = null;
+		try {
+			if (this.type == SQLStamentType.SELECT) {
+				set.first();
+				while (set.next()) {
+					u = new User();
+					u.setFirstName(set.getString("firstName"));
+					u.setLastName(set.getString("lastName"));
+					u.setEmail(set.getString("email"));
+					u.setLogin(set.getString("login"));
+					u.setPassword(set.getString("password"));
+					u.setPicture(
+							this.createImageFromBlob(set.getBlob("avatar")),
+							"mabis.user.avatar");
+					u.setPrimaryKey(set.getInt("idUser"));
+					this.users.put(u.getPrimaryKey(), u);
+				}
+			}
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private ImageIcon createImageFromBlob(Blob blob) {
+		try {
+			ImageIcon i = new ImageIcon(blob.getBytes(1, (int) blob.length()));
+			return i;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public HashMap<Integer, User> getUsers() {
+		return this.users;
 	}
 }

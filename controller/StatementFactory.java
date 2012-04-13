@@ -2,7 +2,6 @@ package controller;
 
 import model.entity.BaseTable;
 
-
 public interface StatementFactory {
 	/**
 	 * ! marks, in following order, stands for:
@@ -40,7 +39,7 @@ public interface StatementFactory {
 	 * </b>
 	 * </pre>
 	 */
-	static final String updatePattern = "update ! set (!) where !=!";
+	static final String updatePattern = "update ! set (!) where !";
 
 	/**
 	 * ! marks, in following order, stands for:
@@ -65,7 +64,32 @@ public interface StatementFactory {
 	 * </b>
 	 * </pre>
 	 */
-	static final String deletePattern = "delete from ! where !=!";
+	static final String deletePattern = "delete from ! where !";
+
+	/**
+	 * ! marks, in following order, stands for:
+	 * <ol>
+	 * <li>table name</li>
+	 * <li>condition list</li>
+	 * </ol>
+	 * <b>Notice</b> that condition list has constant format of
+	 * 
+	 * <pre>
+	 * (?=![,?,?,...,?])
+	 * </pre>
+	 * 
+	 * Where question mark is abbreviation for attribute name that value is
+	 * being updated and exclamation mark is abbreviation for value of attribute
+	 * Exemplary sql statement as a result of {@link StatementFactory} can look
+	 * like this:
+	 * 
+	 * <pre>
+	 * <b>
+	 * select * from table_name where atr = atr_value;
+	 * </b>
+	 * </pre>
+	 */
+	static final String selectPattern = "select * from ! where !";
 
 	/**
 	 * This field indicates the type of sql statement being created
@@ -88,18 +112,22 @@ public interface StatementFactory {
 	 *         <em>attribute name</em> and ! stands for <em>attribute value</em>
 	 */
 	String buildWhereChunk();
-	
+
 	/**
 	 * Implementation should return valid string representation of the sql
 	 * statement If sql could not have been created null string should be
 	 * returned
 	 * 
 	 * @return string containing full valid sql statement
+	 * @param table
+	 *            the source of meta data
 	 */
-	String createSQL();
+	String createSQL(BaseTable table);
 
 	/**
-	 * This must be implemented in sql factory, as some sql statement requires field list
+	 * This must be implemented in sql factory, as some sql statement requires
+	 * field list
+	 * 
 	 * @param table
 	 * @return
 	 */

@@ -50,6 +50,9 @@ public abstract class SQLFactory implements StatementFactory {
 		case UPDATE:
 			this.rawQuery = StatementFactory.updatePattern;
 			break;
+		case SELECT:
+			this.rawQuery = StatementFactory.selectPattern;
+			break;
 		}
 	}
 
@@ -61,14 +64,53 @@ public abstract class SQLFactory implements StatementFactory {
 		this.wheres.put(attribute, new WhereClause(attribute, value));
 	}
 
-	@Override
-	public abstract String createSQL();
+	public String createSQL(BaseTable table){
+		String rawQueryCopy = this.rawQuery.replaceFirst("!",
+				table.getTableName());
+		
+		if(this.type == SQLStamentType.SELECT){
+			String where = this.buildWhereChunk();
+			if(where.equals("")){
+				rawQueryCopy = rawQueryCopy.substring(0,rawQueryCopy.lastIndexOf("where")-1);
+			}else{
+				rawQueryCopy = rawQueryCopy.replaceAll("!", where);
+			}
+			return rawQueryCopy;
+		}
+		
+		String fieldList = this.buildFieldList(table);
+
+		// setting field list
+		switch (this.type) {
+		case INSERT:
+			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
+			rawQueryCopy = rawQueryCopy.replaceFirst("!",
+					this.questionMarkFieldList);
+			break;
+		case UPDATE:
+			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
+			rawQueryCopy = rawQueryCopy.replaceAll(",", " = ?, ");
+			break;
+		}
+		switch (this.type) {
+		case UPDATE:
+		case DELETE:
+			rawQueryCopy = rawQueryCopy.replaceFirst("!",
+					this.buildWhereChunk());
+			break;
+		}
+
+		return rawQueryCopy;
+	}
 
 	@Override
 	public String buildWhereChunk() {
 		String a = new String();
 		for (WhereClause where : this.wheres.values()) {
 			a += where.attribute + "=" + where.value + ",";
+		}
+		if(a.length() == 0){
+			return "";
 		}
 		return a.substring(0, a.length() - 1);
 	}
