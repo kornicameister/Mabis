@@ -2,6 +2,7 @@ package controller;
 
 import model.entity.BaseTable;
 
+
 public interface StatementFactory {
 	/**
 	 * ! marks, in following order, stands for:
@@ -64,17 +65,7 @@ public interface StatementFactory {
 	 * </b>
 	 * </pre>
 	 */
-	static final String deletePattern = "delete from ! where !";
-
-	/**
-	 * Sets target table for all types of queries ( {@link SQLStamentType} )
-	 * This table name will be used in every kind of statement. Additionaly
-	 * <b>insert</b> statement should use BaseTable fields to create valid sql
-	 * statement
-	 * 
-	 * @param table
-	 */
-	void setTargetTable(BaseTable table);
+	static final String deletePattern = "delete from ! where !=!";
 
 	/**
 	 * This field indicates the type of sql statement being created
@@ -96,8 +87,8 @@ public interface StatementFactory {
 	 *         <b>(?=![,?=!,?=!,...,?=!])</b> where ? stands for
 	 *         <em>attribute name</em> and ! stands for <em>attribute value</em>
 	 */
-	String buildWhereClause();
-
+	String buildWhereChunk();
+	
 	/**
 	 * Implementation should return valid string representation of the sql
 	 * statement If sql could not have been created null string should be
@@ -106,4 +97,11 @@ public interface StatementFactory {
 	 * @return string containing full valid sql statement
 	 */
 	String createSQL();
+
+	/**
+	 * This must be implemented in sql factory, as some sql statement requires field list
+	 * @param table
+	 * @return
+	 */
+	String buildFieldList(BaseTable table);
 }
