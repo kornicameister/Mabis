@@ -28,7 +28,7 @@ public class MainWindow extends JFrame {
     private MySQLAccess mysql = null;
     private User connectedUser = null;
     protected final MWToolBar toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
-    private final MWBottomPanel bottomPanel = new MWBottomPanel();
+    private final MWBottomPanel bottomPanel = new MWBottomPanel(this);
     private final MWCollectionView collectionView = new MWCollectionView(new BorderLayout(), true);
     private final MWUserList userListPanel = new MWUserList(new BorderLayout(), true);
     private JPanel contentPane = null;

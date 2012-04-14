@@ -78,7 +78,7 @@ public class MySQLAccess {
 	public boolean connect() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			String url = new String("jdbc:mysql://!:!/!");
+			String url = "jdbc:mysql://!:!/!";
 			url = url.replaceFirst("!", MySQLAccess.host);
 			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
 			url = url.replaceFirst("!", MySQLAccess.databaseName);
