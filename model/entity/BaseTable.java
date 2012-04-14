@@ -19,7 +19,7 @@ import exceptions.SQLForeingKeyNotFound;
  * @author kornicameister
  * @version 0.2
  */
-public abstract class BaseTable implements Table {
+public abstract class BaseTable implements Table, Comparable<BaseTable> {
 	// common fields for every class
 	private Integer primaryKey = null;
 	protected String[] titles = null;
@@ -199,11 +199,25 @@ public abstract class BaseTable implements Table {
 	@Override
 	public String toString() {
 		String str = "Table: " + tableName + "\n";
-		str += "[PK: " + this.primaryKey + "]\n]";
+		str += "[PK: " + this.primaryKey + "]\n";
 		str += "[FKS]\n";
-		for (ForeignKey fk : this.foreignKeys.values()){
+		for (ForeignKey fk : this.foreignKeys.values()) {
 			str += fk.toString();
 		}
 		return str;
+	}
+	
+	/**
+	 * Compares table names and if tables are the same, than comparing primary keys is performed
+	 */
+	@Override
+	public int compareTo(BaseTable o) {
+		int compareValue = 0;
+		compareValue = this.getTableName().compareTo(o.getTableName());
+		if(compareValue == 0){
+			//the same table, lets check primary keys
+			compareValue = this.getPrimaryKey().compareTo(o.getPrimaryKey());
+		}
+		return compareValue;
 	}
 }

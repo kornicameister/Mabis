@@ -6,126 +6,151 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
-
-import controller.InvalidBaseClass;
-import controller.SQLStamentType;
-import controller.entity.UserSQLFactory;
 
 import logger.MabisLogger;
 import model.entity.User;
 import view.imagePanel.ImagePanel;
 import view.mainwindow.MainWindow;
+import controller.InvalidBaseClass;
+import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
 
 public class UserSelectionPanel extends JDialog {
-	private static final long serialVersionUID = -3642888588569732458L;
-	private MainWindow mw = null;
-	private JInternalFrame userList = null;
-	private JButton connectButton = null;
-	private JButton cancelButton = null;
-	private JPanel userListPanel;
-	private UserSQLFactory userFactory = null;
-	private HashMap<Integer, ImagePanel> thumbails = null;
 
-	public UserSelectionPanel(Frame owner) {
-		super(owner);
-		this.mw = (MainWindow) owner;
-		this.userFactory = new UserSQLFactory();
-		this.thumbails = new HashMap<Integer, ImagePanel>();
-		this.initComponents();
-		this.layoutComponents();
-		this.obtainUsers();
-		this.initMeta();
-	}
+    private static final long serialVersionUID = -3642888588569732458L;
+    private static final Dimension avatarSize = new Dimension(100, 100);
+    private MainWindow mw = null;
+    private JButton connectButton = null;
+    private JButton cancelButton = null;
+    private JPanel userListPanel;
+    private UserSQLFactory userFactory = null;
+    private TreeMap<User, ImagePanel> thumbails = null;
+    private HashMap<Integer, User> users = null;
+    private final UserSelectionPanelListener listener;
+    private JPanel rootListPanel = null;
+    private JScrollPane userScrollPanel = null;
 
-	private void initMeta() {
-		this.setSize(new Dimension(500, 500));
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.setTitle("Connect as...");
-	}
+    public UserSelectionPanel(Frame owner) {
+        super(owner);
+        this.mw = (MainWindow) owner;
+        this.userFactory = new UserSQLFactory();
+        this.thumbails = new TreeMap<User, ImagePanel>();
+        this.listener = new UserSelectionPanelListener();
 
-	private void obtainUsers() {
-		try {
-			this.userFactory.setTable(new User());
-			this.userFactory.setStatementType(SQLStamentType.SELECT);
-			this.userFactory.executeSQL();
-			HashMap<Integer, User> users = this.userFactory.getUsers();
-			for (User u : users.values()) {
-				thumbails
-						.put(u.getPrimaryKey(), new ImagePanel(u.getPicture()));
-			}
-		} catch (InvalidBaseClass e) {
-			e.printStackTrace();
-		}
-	}
+        this.initComponents();
+        this.layoutComponents();
 
-	public void initComponents() {
-		this.userList = new JInternalFrame("User", false, false, false, true);
-		this.connectButton = new JButton("Connect");
-		this.cancelButton = new JButton("Cancel");
+        this.obtainUsers();
+        this.initThumbailList();
+        this.initMeta();
+    }
 
-		this.userListPanel = new JPanel(new FlowLayout(), true);
-		this.userListPanel.setBorder(BorderFactory
-				.createEtchedBorder(EtchedBorder.RAISED));
-		this.userList.add(this.userListPanel);
+    private void initThumbailList() {
+        for (User u : this.users.values()) {
+            // we have user u, now lets get it's panel
+            ImagePanel i = this.thumbails.get(u);
+            i.setPreferredSize(avatarSize);
+            i.setBorder(BorderFactory.createTitledBorder(
+                    BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+                    u.getLogin()));
+            this.userListPanel.add(i);
+        }
+    }
 
-	}
+    private void initMeta() {
+        this.setSize(new Dimension(500, 280));
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setTitle("Connect as...");
+    }
 
-	public void layoutComponents() {
-		GroupLayout layout = new GroupLayout(getContentPane());
-		getContentPane().setLayout(layout);
+    private void obtainUsers() {
+        try {
+            this.userFactory.setTable(new User());
+            this.userFactory.setStatementType(SQLStamentType.SELECT);
+            this.userFactory.executeSQL();
+            users = this.userFactory.getUsers();
+            for (User u : this.users.values()) {
+                thumbails.put(u, new ImagePanel(u.getPicture(), u.getPictureFile().getPath()));
+            }
+        } catch (InvalidBaseClass e) {
+            e.printStackTrace();
+        }
+    }
 
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
+    public final void initComponents() {
+        this.rootListPanel = new JPanel(true);
 
-		layout.setHorizontalGroup(layout
-				.createSequentialGroup()
-				.addComponent(this.userList)
-				.addGroup(
-						layout.createParallelGroup()
-								.addComponent(this.connectButton)
-								.addComponent(this.cancelButton)));
-		layout.setVerticalGroup(layout
-				.createParallelGroup()
-				.addComponent(this.userList)
-				.addGroup(
-						layout.createSequentialGroup()
-								.addComponent(this.connectButton)
-								.addComponent(this.cancelButton)));
+        this.userScrollPanel = new JScrollPane(this.rootListPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.userScrollPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+                "Users"));
 
-		this.pack();
-		this.revalidate();
-		this.repaint();
-	}
+        this.userListPanel = new JPanel(true);
+        this.userListPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-	class UserSelectionPanelListener implements ActionListener {
+        this.rootListPanel.add(this.userListPanel);
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			JButton source = (JButton) e.getSource();
-			if (source.equals(connectButton)) {
-				mw.getBottomPanel().getStatusBar().setMessage("Connected as ");
-				if (isDisplayable()) {
-					setVisible(false);
-					dispose();
-				}
-			} else if (source.equals(cancelButton)) {
-				if (isDisplayable()) {
-					setVisible(false);
-					dispose();
-				}
-			}
-			MabisLogger.getLogger().log(Level.INFO, source.getActionCommand());
-		}
+        this.connectButton = new JButton("Connect");
+        this.connectButton.addActionListener(this.listener);
+        this.cancelButton = new JButton("Cancel");
+        this.cancelButton.addActionListener(this.listener);
 
-	}
+    }
 
+    public final void layoutComponents() {
+        GroupLayout layout = new GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup().addComponent(this.userScrollPanel).addGroup(layout.createSequentialGroup().
+                addComponent(this.connectButton,
+                GroupLayout.DEFAULT_SIZE,
+                GroupLayout.PREFERRED_SIZE,
+                Short.MAX_VALUE).
+                addComponent(this.cancelButton,
+                GroupLayout.DEFAULT_SIZE,
+                GroupLayout.PREFERRED_SIZE,
+                Short.MAX_VALUE)));
+        layout.setVerticalGroup(
+                layout.createSequentialGroup().addComponent(this.userScrollPanel).addGroup(layout.createParallelGroup().addComponent(this.connectButton).addComponent(this.cancelButton)));
+
+        this.pack();
+        this.repaint();
+    }
+
+    class UserSelectionPanelListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton source = (JButton) e.getSource();
+            if (source.equals(connectButton)) {
+                mw.getBottomPanel().getStatusBar().setMessage("Connected as ");
+                if (isDisplayable()) {
+                    setVisible(false);
+                    dispose();
+                }
+            } else if (source.equals(cancelButton)) {
+                if (isDisplayable()) {
+                    setVisible(false);
+                    dispose();
+                }
+            }
+            MabisLogger.getLogger().log(Level.INFO, source.getActionCommand());
+        }
+    }
 }
