@@ -25,14 +25,14 @@ import view.UserSelectionPanel;
 public class MainWindow extends JFrame {
 
     private static final long serialVersionUID = -8447166696627624367L;
-    protected MWMenuBar menuBar = null;
-    protected MWToolBar toolBar = null;
-    private MWBottomPanel bottomPanel = null;
-    private MWUserList userListPanel = null;
+    private static MySQLAccess mysql = null;
+    private static User connectedUser = null;
+    
+    protected final MWToolBar toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
+    private final MWBottomPanel bottomPanel = new MWBottomPanel();
+    private final MWCollectionView collectionView = new MWCollectionView(new BorderLayout(), true);
+    private final MWUserList userListPanel = new MWUserList(new BorderLayout(), true);
     private JPanel contentPane = null;
-    private JPanel collectionView = null;
-    private MySQLAccess mysql = null;
-    private User connectedUser = null;
 
     /**
      * Constructor of the main windows, calls for all private method to
@@ -44,12 +44,8 @@ public class MainWindow extends JFrame {
      */
     public MainWindow(String title, Dimension d) {
         super(title);
-
-        this.bottomPanel = new MWBottomPanel();
+        
         this.setJMenuBar(new MWMenuBar(this));
-        this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
-        this.collectionView = new MWCollectionView(new BorderLayout(), true);
-        this.userListPanel = new MWUserList(new BorderLayout(), true);
         layoutComponents();
 
         setSize(d);
@@ -69,7 +65,7 @@ public class MainWindow extends JFrame {
 
     private void checkForUsers() {
         // check for any user, if none print NewUserDialog
-        if (this.mysql.doWeHaveUser(null)) {
+        if (MainWindow.mysql.doWeHaveUser(null)) {
             UserSelectionPanel usp = new UserSelectionPanel(this);
             usp.setVisible(true);
             usp.setAlwaysOnTop(true);
@@ -85,8 +81,8 @@ public class MainWindow extends JFrame {
     }
 
     private void initConnection() {
-        this.mysql = new MySQLAccess();
-        if (!this.mysql.connect()) {
+        MainWindow.mysql = new MySQLAccess();
+        if (!MainWindow.mysql.connect()) {
             JOptionPane.showMessageDialog(this, "Failed to connect to MABIS");
         } else {
             this.bottomPanel.getStatusBar().setMessage(
@@ -144,6 +140,10 @@ public class MainWindow extends JFrame {
     }
 
     public void setConnectedUser(User u) {
-        this.connectedUser = u;
+        MainWindow.connectedUser = u;
+    }
+    
+    public static User getConnectedUser(){
+        return MainWindow.connectedUser;
     }
 }
