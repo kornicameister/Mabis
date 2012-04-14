@@ -1,36 +1,24 @@
 package view;
 
+import controller.InvalidBaseClass;
+import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
-
-import javax.swing.BorderFactory;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
-
 import logger.MabisLogger;
 import model.entity.User;
-import view.mainwindow.MainWindow;
-import controller.InvalidBaseClass;
-import controller.SQLStamentType;
-import controller.entity.UserSQLFactory;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.logging.Logger;
 import view.imagePanel.ChoosableImagePanel;
+import view.mainwindow.MainWindow;
 
 public class UserSelectionPanel extends JDialog implements PropertyChangeListener {
 
@@ -186,24 +174,9 @@ public class UserSelectionPanel extends JDialog implements PropertyChangeListene
         }
 
         private void connectWithUser() {
-            try {
-                User u = (User) users.values().toArray()[selectedUserIndex];
-
-                UserSQLFactory f = new UserSQLFactory();
-                f.setStatementType(SQLStamentType.SELECT);
-                f.setTable(new User());
-                f.addWhereClause("idUser", u.getPrimaryKey().toString());
-                f.executeSQL();
-                if (!f.getUsers().isEmpty()) {
-                    mw.getBottomPanel().getStatusBar().setMessage("Connected as: " + u.getLogin() + "/" + u.getEmail());
-                    mw.setConnectedUser(u);
-                } else {
-                    mw.getBottomPanel().getStatusBar().setMessage("Failed to connect using following credentials: " + u.getLogin() + "/" + u.getEmail());
-                }
-            } catch (InvalidBaseClass ex) {
-                MabisLogger.getLogger().log(Level.SEVERE, null, ex);
-            }
-
+            User u = (User) users.values().toArray()[selectedUserIndex];
+            mw.getBottomPanel().getStatusBar().setMessage("Connected as: " + u.getLogin() + "/" + u.getEmail());
+            mw.setConnectedUser(u);
         }
     }
 }
