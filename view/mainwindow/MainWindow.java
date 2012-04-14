@@ -25,9 +25,8 @@ import view.UserSelectionPanel;
 public class MainWindow extends JFrame {
 
     private static final long serialVersionUID = -8447166696627624367L;
-    private static MySQLAccess mysql = null;
-    private static User connectedUser = null;
-    
+    private MySQLAccess mysql = null;
+    private User connectedUser = null;
     protected final MWToolBar toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
     private final MWBottomPanel bottomPanel = new MWBottomPanel();
     private final MWCollectionView collectionView = new MWCollectionView(new BorderLayout(), true);
@@ -44,7 +43,7 @@ public class MainWindow extends JFrame {
      */
     public MainWindow(String title, Dimension d) {
         super(title);
-        
+
         this.setJMenuBar(new MWMenuBar(this));
         layoutComponents();
 
@@ -65,7 +64,7 @@ public class MainWindow extends JFrame {
 
     private void checkForUsers() {
         // check for any user, if none print NewUserDialog
-        if (MainWindow.mysql.doWeHaveUser(null)) {
+        if (this.mysql.doWeHaveUser(null)) {
             UserSelectionPanel usp = new UserSelectionPanel(this);
             usp.setVisible(true);
             usp.setAlwaysOnTop(true);
@@ -81,8 +80,8 @@ public class MainWindow extends JFrame {
     }
 
     private void initConnection() {
-        MainWindow.mysql = new MySQLAccess();
-        if (!MainWindow.mysql.connect()) {
+        this.mysql = new MySQLAccess();
+        if (!this.mysql.connect()) {
             JOptionPane.showMessageDialog(this, "Failed to connect to MABIS");
         } else {
             this.bottomPanel.getStatusBar().setMessage(
@@ -140,10 +139,10 @@ public class MainWindow extends JFrame {
     }
 
     public void setConnectedUser(User u) {
-        MainWindow.connectedUser = u;
+        this.connectedUser = u;
     }
-    
-    public static User getConnectedUser(){
-        return MainWindow.connectedUser;
+
+    public User getConnectedUser() {
+        return this.connectedUser;
     }
 }
