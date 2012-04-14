@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import model.entity.User;
 import view.NewUserDialog;
 import view.UserSelectionPanel;
 
@@ -30,7 +31,8 @@ public class MainWindow extends JFrame {
     private MWUserList userListPanel = null;
     private JPanel contentPane = null;
     private JPanel collectionView = null;
-    private MySQLAccess mysql;
+    private MySQLAccess mysql = null;
+    private User connectedUser = null;
 
     /**
      * Constructor of the main windows, calls for all private method to
@@ -139,5 +141,9 @@ public class MainWindow extends JFrame {
 
     public MWBottomPanel getBottomPanel() {
         return this.bottomPanel;
+    }
+
+    public void setConnectedUser(User u) {
+        this.connectedUser = u;
     }
 }

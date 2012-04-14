@@ -19,13 +19,20 @@ import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
 import model.entity.User;
-import view.imagePanel.ImagePanel;
 import view.mainwindow.MainWindow;
 import controller.InvalidBaseClass;
 import controller.SQLStamentType;
 import controller.entity.UserSQLFactory;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.logging.Logger;
+import view.imagePanel.ChoosableImagePanel;
 
-public class UserSelectionPanel extends JDialog {
+public class UserSelectionPanel extends JDialog implements PropertyChangeListener {
 
     private static final long serialVersionUID = -3642888588569732458L;
     private static final Dimension avatarSize = new Dimension(100, 100);
@@ -34,17 +41,18 @@ public class UserSelectionPanel extends JDialog {
     private JButton cancelButton = null;
     private JPanel userListPanel;
     private UserSQLFactory userFactory = null;
-    private TreeMap<User, ImagePanel> thumbails = null;
+    private TreeMap<User, ChoosableImagePanel> thumbails = null;
     private HashMap<Integer, User> users = null;
     private final UserSelectionPanelListener listener;
     private JPanel rootListPanel = null;
     private JScrollPane userScrollPanel = null;
+    private short selectedUserIndex = -1;
 
     public UserSelectionPanel(Frame owner) {
         super(owner);
         this.mw = (MainWindow) owner;
         this.userFactory = new UserSQLFactory();
-        this.thumbails = new TreeMap<User, ImagePanel>();
+        this.thumbails = new TreeMap<User, ChoosableImagePanel>();
         this.listener = new UserSelectionPanelListener();
 
         this.initComponents();
@@ -58,7 +66,7 @@ public class UserSelectionPanel extends JDialog {
     private void initThumbailList() {
         for (User u : this.users.values()) {
             // we have user u, now lets get it's panel
-            ImagePanel i = this.thumbails.get(u);
+            ChoosableImagePanel i = this.thumbails.get(u);
             i.setPreferredSize(avatarSize);
             i.setBorder(BorderFactory.createTitledBorder(
                     BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
@@ -71,6 +79,7 @@ public class UserSelectionPanel extends JDialog {
         this.setSize(new Dimension(500, 280));
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setTitle("Connect as...");
+        this.setLocationRelativeTo(null);
     }
 
     private void obtainUsers() {
@@ -80,7 +89,9 @@ public class UserSelectionPanel extends JDialog {
             this.userFactory.executeSQL();
             users = this.userFactory.getUsers();
             for (User u : this.users.values()) {
-                thumbails.put(u, new ImagePanel(u.getPicture(), u.getPictureFile().getPath()));
+                ChoosableImagePanel p = new ChoosableImagePanel(u.getPicture(), u.getPictureFile().getPath());
+                p.addPropertyChangeListener(this);
+                thumbails.put(u, p);
             }
         } catch (InvalidBaseClass e) {
             e.printStackTrace();
@@ -133,13 +144,34 @@ public class UserSelectionPanel extends JDialog {
         this.repaint();
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+        if ((Boolean) e.getNewValue() == true) {
+            ChoosableImagePanel p = (ChoosableImagePanel) e.getSource();
+            this.selectedUserIndex = -1;
+            boolean panelLocated = false;
+            for (ChoosableImagePanel pp : this.thumbails.values()) {
+                pp.demark();
+                if (!panelLocated) {
+                    if (pp.equals(p)) {
+                        panelLocated = true;
+                        pp.mark();
+                        this.selectedUserIndex += 1;
+                    } else {
+                        this.selectedUserIndex += 1;
+                    }
+                }
+            }
+        }
+    }
+
     class UserSelectionPanelListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             JButton source = (JButton) e.getSource();
             if (source.equals(connectButton)) {
-                mw.getBottomPanel().getStatusBar().setMessage("Connected as ");
+                connectWithUser();
                 if (isDisplayable()) {
                     setVisible(false);
                     dispose();
@@ -151,6 +183,27 @@ public class UserSelectionPanel extends JDialog {
                 }
             }
             MabisLogger.getLogger().log(Level.INFO, source.getActionCommand());
+        }
+
+        private void connectWithUser() {
+            try {
+                User u = (User) users.values().toArray()[selectedUserIndex];
+
+                UserSQLFactory f = new UserSQLFactory();
+                f.setStatementType(SQLStamentType.SELECT);
+                f.setTable(new User());
+                f.addWhereClause("idUser", u.getPrimaryKey().toString());
+                f.executeSQL();
+                if (!f.getUsers().isEmpty()) {
+                    mw.getBottomPanel().getStatusBar().setMessage("Connected as: " + u.getLogin() + "/" + u.getEmail());
+                    mw.setConnectedUser(u);
+                } else {
+                    mw.getBottomPanel().getStatusBar().setMessage("Failed to connect using following credentials: " + u.getLogin() + "/" + u.getEmail());
+                }
+            } catch (InvalidBaseClass ex) {
+                MabisLogger.getLogger().log(Level.SEVERE, null, ex);
+            }
+
         }
     }
 }
