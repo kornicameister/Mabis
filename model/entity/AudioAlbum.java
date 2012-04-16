@@ -139,4 +139,20 @@ public class AudioAlbum extends BaseTable {
 		this.covers.put(CoverType.CD_COVER, fc);
 	}
 
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
+		str += "[BAND: " + this.getBand() + "]\n";
+		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
+		str += "[DURATION: " + this.getTotalTime() + "]\n";
+		str += "[COVERS]\n";
+		for(Cover c : this.covers.values()){
+			str += c;
+		}
+		return str;
+	}
+
+
 }

@@ -145,4 +145,15 @@ public class Band extends Author {
 		this.masterGenre = masterGenre;
 	}
 
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[NAME: " + this.getName() + "]\n";
+		str += "[LASTFM: " + this.getLastFMUrl().toString() + "]\n";
+		str += "[GENRE: " + this.getMasterGenre() + "]\n";
+		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
+		return str;
+	}
+
 }

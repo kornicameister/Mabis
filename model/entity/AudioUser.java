@@ -7,6 +7,7 @@ package model.entity;
 import model.enums.TableType;
 
 /**
+ * This claps maps itself to mabis.audioUser many-to-maby table
  * @author kornicameister
  * 
  */

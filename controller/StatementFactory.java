@@ -1,5 +1,7 @@
 package controller;
 
+import java.sql.SQLException;
+
 import model.entity.BaseTable;
 
 public interface StatementFactory {
@@ -96,14 +98,21 @@ public interface StatementFactory {
 	 * 
 	 * @param type
 	 */
-	void setStatementType(SQLStamentType type);
+	abstract void setStatementType(SQLStamentType type);
 
 	/**
+	 * This method is undeniably required in sql factory Via this method
+	 * end-user can provide where chunks to sql factory that in further future
+	 * will be concatenated into one hue sql where clause
 	 * 
-	 * @param attribute
+	 * Due to convenience reason, all values to where chunk are provided as
+	 * strings, this forces not to use data inapplicable to where clause such as
+	 * blobs.
+	 * 
+	 * @param attributeName
 	 * @param value
 	 */
-	void addWhereClause(String attribute, String value);
+	abstract void addWhereClause(String attributeName, String value);
 
 	/**
 	 * 
@@ -111,7 +120,7 @@ public interface StatementFactory {
 	 *         <b>(?=![,?=!,?=!,...,?=!])</b> where ? stands for
 	 *         <em>attribute name</em> and ! stands for <em>attribute value</em>
 	 */
-	String buildWhereChunk();
+	abstract String buildWhereChunk();
 
 	/**
 	 * Implementation should return valid string representation of the sql
@@ -122,14 +131,28 @@ public interface StatementFactory {
 	 * @param table
 	 *            the source of meta data
 	 */
-	String createSQL(BaseTable table);
+	abstract String createSQL(BaseTable table);
 
 	/**
 	 * This must be implemented in sql factory, as some sql statement requires
-	 * field list
+	 * field list. This method should be provided with attribute list of the
+	 * table that sql factory comma concerns about.
 	 * 
-	 * @param table
-	 * @return
+	 * @param fieldList
+	 *            , an array of fields name
+	 * @return field list as single string, consecutive fields are separated
+	 *         with
 	 */
-	String buildFieldList(BaseTable table);
+	abstract String buildFieldList(String[] fieldList);
+
+	/**
+	 * Method executes sql statement If something goes wrong,
+	 * {@link SQLException} will be thrown </br> <b>Notice</b> that
+	 * implementation can use whatever algorithm user prefers to, nevertheless
+	 * it should depends on what {@link StatementFactory#createSQL(BaseTable)}
+	 * returns
+	 * 
+	 * @throws SQLException
+	 */
+	abstract void executeSQL() throws SQLException;
 }

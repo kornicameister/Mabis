@@ -40,8 +40,6 @@ public class User extends Author {
 	public String toString() {
 		String str = super.toString();
 		str += "----------\n";
-		str += "[LOGIN: " + this.getLogin() + "]\n";
-		str += "[EMAIL: " + this.getEmail() + "]\n";
 		str += "[FNAME: " + this.getFirstName() + "]\n";
 		str += "[LNAME: " + this.getLastName() + "]\n";
 		return str;

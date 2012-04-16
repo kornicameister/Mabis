@@ -7,6 +7,7 @@ package model.entity;
 import model.enums.TableType;
 
 /**
+ * This class maps itself to mabis.movieUser many-to-many table
  * @author kornicameister
  * 
  */

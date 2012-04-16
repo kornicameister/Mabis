@@ -101,4 +101,13 @@ public class Cover extends BaseTable {
 	public void setImage(Image image){
 		this.image = new ImageIcon(image);
 	}
+
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[TYPE: " + this.getType() + "]\n";
+		str += "[CHCSM: " + this.getCheckSum() + "]\n";
+		return str;
+	}
 }

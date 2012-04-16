@@ -97,4 +97,17 @@ public class Book extends BaseTable {
 	public void setGenre(Genre genre) {
 		this.genre = genre;
 	}
+
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
+		str += "[ISBN: " + this.getIsbn() + "]\n";
+		str += "[PAGES: " + this.getPages() + "]\n";
+		str += "[GENRE: " + this.getGenre() + "]\n";
+		str += "[AUTHOR:" + this.getWriter() + "]\n";
+		str += "[COVER: " + this.getCover() + "]\n";
+		return str;
+	}
 }

@@ -67,6 +67,14 @@ public class Movie extends BaseTable {
 		this.tableName = TableType.MOVIE.toString();
 	}
 
+	public void setTitle(String title){
+		this.titles[0] = title;
+	}
+	
+	public String getTitle(){
+		return this.titles[0];
+	}
+	
 	public Time getDuration() {
 		return duration;
 	}
@@ -113,6 +121,21 @@ public class Movie extends BaseTable {
 
 	public void setGenre(Genre genre) {
 		this.genre = genre;
+	}
+
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
+		str += "[DIRECTOR: " + this.getDirector() + "]\n";
+		str += "[GENRE: " + this.getGenre() + "]\n";
+		str += "[DURATION: " + this.getDuration() + "]\n";
+		str += "[COVERS]\n";
+		for(Cover c : this.covers.values()){
+			str += c;
+		}
+		return str;
 	}
 
 }

@@ -10,13 +10,16 @@ import java.util.logging.Logger;
 import java.util.logging.XMLFormatter;
 
 /**
+ * Mabis wrapper for Logger functionality.</b> This particular wrapper uses
+ * remote HDD located xml file to save Mabis logs
+ * 
  * @author kornicameister
- *
  */
 public class MabisLogger {
 	private static final Logger logger = Logger.getLogger("Mabis");
-	
+
 	public MabisLogger() {
+		// TODO support for saving logs into xml file, not supported so far
 		FileHandler h1;
 		try {
 			h1 = new FileHandler("mabisLog.xml");
@@ -29,7 +32,7 @@ public class MabisLogger {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * @return the logger
 	 */

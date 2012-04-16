@@ -76,4 +76,12 @@ public class Genre extends BaseTable {
 		this.tableName = TableType.GENRE.toString();
 	}
 
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[GENRE: " + this.getGenre() + "]\n";
+		return str;
+	}
+
 }

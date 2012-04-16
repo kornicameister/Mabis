@@ -1,8 +1,5 @@
 package view;
 
-import controller.InvalidBaseClass;
-import controller.SQLStamentType;
-import controller.entity.UserSQLFactory;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -10,15 +7,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
+
 import logger.MabisLogger;
 import model.entity.User;
 import view.imagePanel.ChoosableImagePanel;
 import view.mainwindow.MainWindow;
+import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
 
 public class UserSelectionPanel extends JDialog implements PropertyChangeListener {
 
@@ -39,7 +46,7 @@ public class UserSelectionPanel extends JDialog implements PropertyChangeListene
     public UserSelectionPanel(Frame owner) {
         super(owner);
         this.mw = (MainWindow) owner;
-        this.userFactory = new UserSQLFactory();
+        this.userFactory = new UserSQLFactory(new User());
         this.thumbails = new TreeMap<User, ChoosableImagePanel>();
         this.listener = new UserSelectionPanelListener();
 
@@ -72,7 +79,6 @@ public class UserSelectionPanel extends JDialog implements PropertyChangeListene
 
     private void obtainUsers() {
         try {
-            this.userFactory.setTable(new User());
             this.userFactory.setStatementType(SQLStamentType.SELECT);
             this.userFactory.executeSQL();
             users = this.userFactory.getUsers();
@@ -81,7 +87,7 @@ public class UserSelectionPanel extends JDialog implements PropertyChangeListene
                 p.addPropertyChangeListener(this);
                 thumbails.put(u, p);
             }
-        } catch (InvalidBaseClass e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

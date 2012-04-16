@@ -109,4 +109,13 @@ public class Author extends BaseTable {
 	public File getPictureFile() {
 		return pictureFile;
 	}
+
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += "----------\n";
+		str += "[FNAME: " + this.getFirstName() + "]\n";
+		str += "[LNAME: " + this.getLastName() + "]\n";
+		return str;
+	}
 }

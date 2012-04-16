@@ -6,13 +6,10 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import model.entity.User;
-
-import controller.InvalidBaseClass;
 import controller.SQLStamentType;
 import controller.entity.UserSQLFactory;
 
@@ -48,13 +45,15 @@ public class MySQLAccess {
 	protected final static String host = "localhost";
 
 	/** The connection. */
-	private static Connection connection = null;
+	private static Connection connection = MySQLAccess.connect();
 
 	/**
 	 * Instantiates a new my sql access.
 	 */
 	public MySQLAccess() {
-
+		if (MySQLAccess.connection == null) {
+			MySQLAccess.connect();
+		}
 	}
 
 	/**
@@ -64,30 +63,27 @@ public class MySQLAccess {
 	 * <li>{@link MySQLAccess#databaseName}</li>
 	 * <li>{@link MySQLAccess#userName}</li>
 	 * <li>{@link MySQLAccess#userPass}</li>
+	 * <li>{@link MySQLAccess#host}</li>
+	 * <li>{@link MySQLAccess#defaultPort}</li>
 	 * </ul>
-	 * and data passed to {@link ConnectionData} object
-	 * <ul>
-	 * <li> {@link ConnectionData#port}</li>
-	 * </ul>
+	 * <b>Notice that is method is both private and static, that means that it
+	 * is called even earlier that right creation of the {@link MySQLAccess},
+	 * that is dictated by need of having {@link MySQLAccess#connection}
+	 * available even without right {@link MySQLAccess} object</b>
 	 * 
-	 * @return boolean </br><b>TRUE</b> if connection had been established,
-	 *         otherwise return false
+	 * @return {@link Connection} object if succeeded, otherwise returns null
 	 * @since 0.2 method does not check for user presence in user table, this
 	 *        job was moved to main window
 	 */
-	public boolean connect() {
+	private static Connection connect() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			String url = "jdbc:mysql://!:!/!";
 			url = url.replaceFirst("!", MySQLAccess.host);
 			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
 			url = url.replaceFirst("!", MySQLAccess.databaseName);
-			MySQLAccess.connection = DriverManager.getConnection(url,
+			return connection = DriverManager.getConnection(url,
 					MySQLAccess.userName, MySQLAccess.userPass);
-			if (!MySQLAccess.connection.isClosed()) {
-				System.out.println("Connection established");
-				return true;
-			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -97,7 +93,7 @@ public class MySQLAccess {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -108,12 +104,11 @@ public class MySQLAccess {
 	 *         otherwise
 	 */
 	public boolean doWeHaveUser(String user) {
-		UserSQLFactory f = new UserSQLFactory();
+		UserSQLFactory f = new UserSQLFactory(new User());
 		try {
-			f.setTable(new User());
 			f.setStatementType(SQLStamentType.SELECT);
 			f.executeSQL();
-		} catch (InvalidBaseClass e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return !f.getUsers().isEmpty();
@@ -136,15 +131,30 @@ public class MySQLAccess {
 		}
 	}
 
+	/**
+	 * Wrapper for {@link Connection#prepareStatement(String)#executeQuery()}
+	 * 
+	 * @param sql
+	 * @return
+	 * @throws SQLException
+	 */
 	public ResultSet executeSQL(String sql) throws SQLException {
 		return connection.prepareStatement(sql).executeQuery();
 	}
 
-	public ResultSet executeSQL(PreparedStatement st) throws SQLException {
-		return st.executeQuery();
-	}
-
+	/**
+	 * Static getter for the Connection object !
+	 * 
+	 * @return
+	 */
 	public static Connection getConnection() {
 		return connection;
+	}
+
+	public boolean isConnected() throws SQLException {
+		if (MySQLAccess.connection != null) {
+			return !MySQLAccess.connection.isClosed();
+		}
+		return false;
 	}
 }
