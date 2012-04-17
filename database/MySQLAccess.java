@@ -6,16 +6,11 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import model.entity.User;
-import controller.SQLStamentType;
-import controller.entity.UserSQLFactory;
-
 /**
- * This class wraps for MySQL establish connection process.</br> It allows to
- * set connection information such as
+ * This class wraps for MySQL establish connection process.</br> It allows
+ * to set connection information such as
  * <ul>
  * <li>login</li>
  * <li>password (note that password is echoed throug md5sum)</li>
@@ -47,15 +42,42 @@ public class MySQLAccess {
 	private final static String host2 = "db4free.net";
 
 	/** The connection. */
-	private static Connection connection = MySQLAccess.connect();
+	private static Connection connection = MySQLAccess.connectLocally();
+	private static Connection connectionOnline = MySQLAccess.connectOnline();
 
 	/**
 	 * Instantiates a new my sql access.
 	 */
 	public MySQLAccess() {
 		if (MySQLAccess.connection == null) {
-			MySQLAccess.connect();
+			MySQLAccess.connectLocally();
 		}
+	}
+
+	/**
+	 * This method does the same as {@link MySQLAccess#connectLocally()} despite the fact, that
+	 * it connects to online database
+	 * @return valid connection object in case of success
+	 */
+	private static Connection connectOnline() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			String url = "jdbc:mysql://!:!/!";
+			url = url.replaceFirst("!", MySQLAccess.host2);
+			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
+			url = url.replaceFirst("!", MySQLAccess.databaseName);
+			return connection = DriverManager.getConnection(url,
+					MySQLAccess.userName2, MySQLAccess.userPass);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -77,7 +99,7 @@ public class MySQLAccess {
 	 * @since 0.2 method does not check for user presence in user table, this
 	 *        job was moved to main window
 	 */
-	private static Connection connect() {
+	private static Connection connectLocally() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			String url = "jdbc:mysql://!:!/!";
@@ -99,31 +121,14 @@ public class MySQLAccess {
 	}
 
 	/**
-	 * <b>Check for user</b> method execute simple sql query that check if user
-	 * identified by {@link ConnectionData#login} is a valid application user
-	 * 
-	 * @return boolean </br><b>TRUE</b> user was found</br><b>FALSE</b>
-	 *         otherwise
-	 */
-	public boolean doWeHaveUser(String user) {
-		UserSQLFactory f = new UserSQLFactory(new User());
-		try {
-			f.setStatementType(SQLStamentType.SELECT);
-			f.executeSQL();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return !f.getUsers().isEmpty();
-	}
-
-	/**
-	 * <b>Disconnect</b> safely closses up the existing connection to database
-	 * identified by {@link MySQLAccess#databaseName}
+	 * <b>Disconnect</b> safely closses up the existing connection to
+	 * database identified by {@link MySQLAccess#databaseName}
 	 */
 	public void disconnect() {
 		if (MySQLAccess.connection != null) {
 			try {
 				MySQLAccess.connection.close();
+				MySQLAccess.connectionOnline.close();
 				if (MySQLAccess.connection.isClosed()) {
 					System.out.println("Connection terminated");
 				}
@@ -134,17 +139,6 @@ public class MySQLAccess {
 	}
 
 	/**
-	 * Wrapper for {@link Connection#prepareStatement(String)#executeQuery()}
-	 * 
-	 * @param sql
-	 * @return
-	 * @throws SQLException
-	 */
-	public ResultSet executeSQL(String sql) throws SQLException {
-		return connection.prepareStatement(sql).executeQuery();
-	}
-
-	/**
 	 * Static getter for the Connection object !
 	 * 
 	 * @return
@@ -152,56 +146,61 @@ public class MySQLAccess {
 	public static Connection getConnection() {
 		return connection;
 	}
-	
-	//property methods
+
+	public static Connection getOnlineConnection() {
+		return connectionOnline;
+	}
+
+	// property methods
 	/**
 	 * 
 	 * @return host for localhost connections
 	 */
-	public static String getLocalhost(){
+	public static String getLocalhost() {
 		return host;
 	}
-	
+
 	/**
 	 * 
 	 * @return host name of the online mabis database
 	 */
-	public static String getOnlinehost(){
+	public static String getOnlinehost() {
 		return host2;
 	}
-	
+
 	/**
 	 * 
 	 * @return username of the local mabis database
 	 */
-	public static String getLocalUser(){
+	public static String getLocalUser() {
 		return userName;
 	}
-	
+
 	/**
 	 * 
 	 * @return username of the online mabis database
 	 */
-	public static String getOnlineUser(){
+	public static String getOnlineUser() {
 		return userName2;
 	}
-	
+
 	/**
 	 * 
 	 * @return database name
 	 */
-	public static String getDatabaseName(){
+	public static String getDatabaseName() {
 		return databaseName;
 	}
-	
+
 	/**
 	 * 
 	 * @return port via mysql connections is established
 	 */
-	public static Short getPort(){
+	public static Short getPort() {
 		return defaultPort;
 	}
-	//property methods
+
+	// property methods
 
 	public boolean isConnected() throws SQLException {
 		if (MySQLAccess.connection != null) {
@@ -210,11 +209,20 @@ public class MySQLAccess {
 		return false;
 	}
 	
+	public boolean isConnectedOnline() throws SQLException{
+		if (MySQLAccess.connection != null) {
+			return !MySQLAccess.connectionOnline.isClosed();
+		}
+		return false;
+	}
+
+	/**
+	 * Method is overriden to ensure that connections to databases will be closed
+	 */
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 		this.disconnect();
 	}
-	
-	
+
 }

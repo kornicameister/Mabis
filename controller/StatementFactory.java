@@ -123,17 +123,6 @@ public interface StatementFactory {
 	abstract String buildWhereChunk();
 
 	/**
-	 * Implementation should return valid string representation of the sql
-	 * statement If sql could not have been created null string should be
-	 * returned
-	 * 
-	 * @return string containing full valid sql statement
-	 * @param table
-	 *            the source of meta data
-	 */
-	abstract String createSQL(BaseTable table);
-
-	/**
 	 * This must be implemented in sql factory, as some sql statement requires
 	 * field list. This method should be provided with attribute list of the
 	 * table that sql factory comma concerns about.
@@ -154,5 +143,5 @@ public interface StatementFactory {
 	 * 
 	 * @throws SQLException
 	 */
-	abstract void executeSQL() throws SQLException;
+	abstract void executeSQL(boolean online) throws SQLException;
 }

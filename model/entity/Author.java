@@ -6,8 +6,6 @@ package model.entity;
 
 import java.io.File;
 
-import javax.swing.ImageIcon;
-
 import model.enums.TableType;
 
 /**
@@ -18,7 +16,6 @@ import model.enums.TableType;
  * @version 0.3
  */
 public class Author extends BaseTable {
-	private ImageIcon picture = null;
 	private File pictureFile = null;
 
 	/**
@@ -91,19 +88,11 @@ public class Author extends BaseTable {
 	}
 
 	/**
-	 * @return the picture
-	 */
-	public ImageIcon getPicture() {
-		return picture;
-	}
-
-	/**
 	 * @param picture
 	 *            the picture to set
 	 */
-	public void setPicture(ImageIcon picture,String path) {
-		this.picture = picture;
-		this.pictureFile = new File(path);
+	public void setPicture(File f) {
+		this.pictureFile = f;
 	}
 
 	public File getPictureFile() {

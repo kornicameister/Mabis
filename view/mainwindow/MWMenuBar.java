@@ -16,8 +16,8 @@ import javax.swing.JPopupMenu.Separator;
 import javax.swing.KeyStroke;
 
 import logger.MabisLogger;
-import view.NewUserDialog;
 import view.UserSelectionPanel;
+import view.newUser.NewUserDialog;
 
 /**
  * Class nicely and logically group the functionality related to menu bar that

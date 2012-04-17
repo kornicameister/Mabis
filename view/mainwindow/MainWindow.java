@@ -11,9 +11,12 @@ import java.sql.SQLException;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+
+import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
 import model.entity.User;
-import view.NewUserDialog;
 import view.UserSelectionPanel;
+import view.newUser.NewUserDialog;
 
 /**
  * This is the main window class that presented to the user in the beginning and
@@ -71,10 +74,17 @@ public class MainWindow extends JFrame {
 
 	private void checkForUsers() {
 		// check for any user, if none print NewUserDialog
-		if (this.mysql.doWeHaveUser(null)) {
-			UserSelectionPanel usp = new UserSelectionPanel(this);
+		UserSQLFactory f = new UserSQLFactory(SQLStamentType.SELECT, new User());
+		try {
+			f.executeSQL(false);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if (!f.getUsers().isEmpty()) {
+			UserSelectionPanel usp = new UserSelectionPanel(f.getUsers(), this);
 			usp.setVisible(true);
 			usp.setAlwaysOnTop(true);
+			usp = null;
 		} else {
 			int retVal = JOptionPane.showConfirmDialog(this,
 					"No users found\nWould like to create new user ?");
@@ -84,6 +94,7 @@ public class MainWindow extends JFrame {
 				this.checkForUsers();
 			}
 		}
+		System.gc();
 	}
 
 	private void initConnection() {

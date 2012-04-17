@@ -3,16 +3,12 @@ package controller.entity;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
-import java.util.logging.Level;
 
-import logger.MabisLogger;
 import model.entity.User;
 import controller.Blobber;
 import controller.SQLFactory;
 import controller.SQLStamentType;
-import database.MySQLAccess;
 
 /**
  * This is the wrapper that allows to perform database specific operation to
@@ -22,49 +18,38 @@ import database.MySQLAccess;
  * 
  */
 public class UserSQLFactory extends SQLFactory {
-	private User table;
 	private HashMap<Integer, User> users;
 
-	public UserSQLFactory(User table) {
-		super();
+	public UserSQLFactory(SQLStamentType type, User table) {
+		super(type, table);
 		users = new HashMap<Integer, User>();
-		this.table = table;
 	}
 
 	@Override
-	public void executeSQL() throws SQLException {
-		try {
-			if (!MySQLAccess.getConnection().isValid(1000)) {
-				MabisLogger.getLogger().log(Level.SEVERE,
-						"Database connection lost");
-				return;
-			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-		String sql = this.createSQL(table);
-		PreparedStatement st = MySQLAccess.getConnection().prepareStatement(
-				sql, Statement.RETURN_GENERATED_KEYS);
+	protected void executeByTableAndType(PreparedStatement st)
+			throws SQLException {
+		User u = (User) this.table;
 		switch (this.type) {
 		case UPDATE:
 			break;
 		case INSERT:
 			short index = 1;
-			Blobber.putBlobImageToStatement(st, this.table.getPictureFile(),
-					index++);
-			st.setString(index++, table.getLastName());
-			st.setString(index++, table.getFirstName());
-			st.setString(index++, table.getPassword());
-			st.setString(index++, table.getEmail());
-			st.setString(index++, table.getLogin());
+			Blobber.putBlobImageToStatement(st, u.getPictureFile(), index++);
+			st.setString(index++, u.getLastName());
+			st.setString(index++, u.getFirstName());
+			st.setString(index++, u.getPassword());
+			st.setString(index++, u.getEmail());
+			st.setString(index++, u.getLogin());
 			st.execute();
 			break;
 		case SELECT:
-			this.parseResultSet(st.executeQuery(sql));
+			this.parseResultSet(st.executeQuery());
 			break;
 		case DELETE:
+			break;
+		default:
+			break;
 		}
-		st.close();
 	}
 
 	/**
@@ -85,9 +70,7 @@ public class UserSQLFactory extends SQLFactory {
 				u.setEmail(set.getString("email"));
 				u.setLogin(set.getString("login"));
 				u.setPassword(set.getString("password"));
-				u.setPicture(
-						Blobber.createImageFromBlob(set.getBlob("avatar")),
-						"mabis.user.avatar");
+				u.setPicture(Blobber.createImageFromBlob(set.getBlob("avatar")));
 				u.setPrimaryKey(set.getInt("idUser"));
 				this.users.put(u.getPrimaryKey(), u);
 			}
@@ -95,6 +78,8 @@ public class UserSQLFactory extends SQLFactory {
 		case UPDATE:
 			break;
 		case DELETE:
+			break;
+		default:
 			break;
 		}
 	}

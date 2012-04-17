@@ -48,7 +48,7 @@ public class UserSelectionPanel extends JDialog implements
 	public UserSelectionPanel(Frame owner) {
 		super(owner);
 		this.mw = (MainWindow) owner;
-		this.userFactory = new UserSQLFactory(new User());
+		this.userFactory = new UserSQLFactory(SQLStamentType.SELECT, new User());
 		this.thumbails = new TreeMap<User, ChoosableImagePanel>();
 		this.listener = new UserSelectionPanelListener();
 
@@ -58,6 +58,37 @@ public class UserSelectionPanel extends JDialog implements
 		this.obtainUsers();
 		this.initThumbailList();
 		this.initMeta();
+	}
+
+	public UserSelectionPanel(HashMap<Integer, User> users, Frame owner) {
+		super(owner);
+		this.mw = (MainWindow) owner;
+		this.users = users;
+		this.thumbails = new TreeMap<User, ChoosableImagePanel>();
+		this.listener = new UserSelectionPanelListener();
+
+		this.initComponents();
+		this.layoutComponents();
+
+		this.parseUsers();
+		this.initThumbailList();
+		this.initMeta();
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		this.users.clear();
+		this.thumbails.clear();
+		this.userFactory = null;
+	}
+
+	private void parseUsers() {
+		for (User u : this.users.values()) {
+			ChoosableImagePanel p = new ChoosableImagePanel(u.getPictureFile());
+			p.addPropertyChangeListener(this);
+			thumbails.put(u, p);
+		}
 	}
 
 	private void initThumbailList() {
@@ -82,14 +113,9 @@ public class UserSelectionPanel extends JDialog implements
 	private void obtainUsers() {
 		try {
 			this.userFactory.setStatementType(SQLStamentType.SELECT);
-			this.userFactory.executeSQL();
-			users = this.userFactory.getUsers();
-			for (User u : this.users.values()) {
-				ChoosableImagePanel p = new ChoosableImagePanel(u.getPicture(),
-						u.getPictureFile().getPath());
-				p.addPropertyChangeListener(this);
-				thumbails.put(u, p);
-			}
+			this.userFactory.executeSQL(false);
+			this.users = this.userFactory.getUsers();
+			this.parseUsers();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

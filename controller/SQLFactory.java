@@ -4,18 +4,15 @@
  */
 package controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
-import javax.swing.ImageIcon;
-
+import logger.MabisLogger;
 import model.entity.BaseTable;
+import database.MySQLAccess;
 
 /**
  * Abstract class defining only common methods that allows to build valid SQL
@@ -28,35 +25,26 @@ import model.entity.BaseTable;
  */
 public abstract class SQLFactory implements StatementFactory {
 	protected SQLStamentType type;
-	protected String rawQuery = null;
+	protected String sqlQuery = null;
 	private TreeSet<WhereClause> wheres = null;
-	protected String questionMarkFieldList;
+	protected String questionMarkFieldList = null;
+	protected BaseTable table = null;
 
 	/**
 	 * Constructs a SQL factory
+	 * 
+	 * @param type
 	 */
-	public SQLFactory() {
-		this.type = null;
+	public SQLFactory(SQLStamentType type, BaseTable table) {
+		this.table = table;
 		this.wheres = new TreeSet<SQLFactory.WhereClause>();
+		this.setStatementType(type);
 	}
 
 	@Override
 	public void setStatementType(SQLStamentType type) {
 		this.type = type;
-		switch (this.type) {
-		case INSERT:
-			this.rawQuery = StatementFactory.insertPattern;
-			break;
-		case DELETE:
-			this.rawQuery = StatementFactory.updatePattern;
-			break;
-		case UPDATE:
-			this.rawQuery = StatementFactory.updatePattern;
-			break;
-		case SELECT:
-			this.rawQuery = StatementFactory.selectPattern;
-			break;
-		}
+		this.sqlQuery = this.createSQL();
 	}
 
 	@Override
@@ -67,10 +55,27 @@ public abstract class SQLFactory implements StatementFactory {
 		this.wheres.add(new WhereClause(attribute, value));
 	}
 
-	public String createSQL(BaseTable table) {
-		String rawQueryCopy = this.rawQuery.replaceFirst("!",
-				table.getTableName());
-		String fieldList = this.buildFieldList(table.metaData());
+	private String createSQL() {
+		String rawQueryCopy = null;
+		switch (this.type) {
+		case INSERT:
+			rawQueryCopy = StatementFactory.insertPattern;
+			break;
+		case DELETE:
+			rawQueryCopy= StatementFactory.updatePattern;
+			break;
+		case UPDATE:
+			rawQueryCopy = StatementFactory.updatePattern;
+			break;
+		case SELECT:
+			rawQueryCopy = StatementFactory.selectPattern;
+			break;
+		default:
+			break;
+		}
+		rawQueryCopy = rawQueryCopy.replaceFirst("!",
+				this.table.getTableName());
+		String fieldList = this.buildFieldList(this.table.metaData());
 		// first pass
 		switch (this.type) {
 		case INSERT:
@@ -81,6 +86,8 @@ public abstract class SQLFactory implements StatementFactory {
 		case UPDATE:
 			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
 			rawQueryCopy = rawQueryCopy.replaceAll(",", " = ?, ");
+			break;
+		default:
 			break;
 		}
 		// second pass
@@ -99,10 +106,61 @@ public abstract class SQLFactory implements StatementFactory {
 				rawQueryCopy = rawQueryCopy.replaceAll("!", where);
 			}
 			break;
+		default:
+			break;
 		}
 
 		return rawQueryCopy;
 	}
+
+	@Override
+	public void executeSQL(boolean online) throws SQLException {
+		try {
+			if (!MySQLAccess.getConnection().isValid(1000)) {
+				MabisLogger.getLogger().log(Level.SEVERE,
+						"Database connection lost");
+				return;
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+
+		PreparedStatement st = null;
+
+		if (online) {
+			st = MySQLAccess.getOnlineConnection().prepareStatement(
+					this.sqlQuery, Statement.RETURN_GENERATED_KEYS);
+		} else {
+			st = MySQLAccess.getConnection().prepareStatement(this.sqlQuery,
+					Statement.RETURN_GENERATED_KEYS);
+		}
+
+		this.executeByTableAndType(st);
+
+		st.close();
+		st = null;
+		System.gc();
+	}
+
+	/**
+	 * This method is always called by extended class. This is caused by further
+	 * inconsistency in executing sql queries, every class maps itself to
+	 * another tables that consist different attributes, therefore
+	 * {@link SQLFactory#executeByTableAndType(PreparedStatement)} method is
+	 * declared abstract to allow other factories define it's own table depended
+	 * statements processing
+	 * 
+	 * @param st
+	 *            {@link PreparedStatement} object that internal sql query is
+	 *            already defined and awaits to have it's values added and/or
+	 *            being executed
+	 * @throws SQLException
+	 *             if anything goes wrong, exception is thrown and caught in
+	 *             propagation way by upper calling method
+	 *             {@link SQLFactory#executeSQL(boolean)}
+	 */
+	protected abstract void executeByTableAndType(PreparedStatement st)
+			throws SQLException;
 
 	@Override
 	public String buildWhereChunk() {
@@ -130,27 +188,6 @@ public abstract class SQLFactory implements StatementFactory {
 		return fieldList2.substring(0, fieldList2.lastIndexOf(","));
 	}
 
-	public void setImageAsBlob(PreparedStatement st, File imageFile, short index) {
-		try {
-			FileInputStream fis = new FileInputStream(imageFile);
-			st.setBinaryStream(index, (InputStream) fis, (int) imageFile.length());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public ImageIcon createImageFromBlob(Blob blob) {
-		try {
-			ImageIcon i = new ImageIcon(blob.getBytes(1, (int) blob.length()));
-			return i;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 	/**
 	 * Private nested class of {@link SQLFactory} encapsulating
 	 * WhereClause.</br> Class consists two publicly visible fields. Using

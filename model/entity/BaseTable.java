@@ -19,7 +19,7 @@ import exceptions.SQLForeingKeyNotFound;
  * @author kornicameister
  * @version 0.2
  */
-public abstract class BaseTable implements Table, Comparable<BaseTable> {
+public abstract class BaseTable implements Table, Comparable<BaseTable>, Cloneable {
 	// common fields for every class
 	private Integer primaryKey = null;
 	protected String[] titles = null;
