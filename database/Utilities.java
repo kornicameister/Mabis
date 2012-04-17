@@ -6,7 +6,7 @@ package database;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -22,31 +22,19 @@ import java.sql.SQLException;
 public abstract class Utilities {
 
 	/**
-	 * Md5sum.
-	 * 
-	 * @param input
-	 *            String for which md5sum will be calculated
-	 * @return md5sum of input
-	 * @see http://m2tec.be/blog/2010/02/03/java-md5-hex-0093
+	 * hashes the password using sha algorithm
 	 */
-	static public String md5sum(String input) {
-		MessageDigest m = null;
+	static public String hashPassword(String password) {
+		String hashword = password;
 		try {
-			m = MessageDigest.getInstance("MD5");
-			m.reset();
-			m.update(input.getBytes(Charset.forName("UTF8")));
-
-			byte array[] = m.digest();
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < array.length; i++) {
-				sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100)
-						.substring(1, 3));
-			}
-			return sb.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			MessageDigest md5 = MessageDigest.getInstance("SHA");
+			md5.update(password.getBytes());
+			BigInteger hash = new BigInteger(1, md5.digest());
+			hashword = hash.toString(16).substring(0, 36);
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
 		}
-		return null;
+		return hashword;
 	}
 
 	/**
@@ -57,32 +45,29 @@ public abstract class Utilities {
 	 * @return md5sum of input
 	 * @see http://m2tec.be/blog/2010/02/03/java-md5-hex-0093
 	 */
-	static public String md5sum(InputStream fis) {
-		MessageDigest m = null;
+	static public String crc32(InputStream fis) {
+		String hashword = null;
 		try {
-			int numRead = 0;
-			byte[] buffer = new byte[1024];
-			m = MessageDigest.getInstance("MD5");
-			m.reset();
-			do {
-				numRead = fis.read(buffer);
-				if (numRead > 0) {
-					m.update(buffer, 0, numRead);
-				}
-			} while (numRead != -1);
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < buffer.length; i++) {
-				sb.append(Integer.toHexString((buffer[i] & 0xFF) | 0x100)
-						.substring(1, 3));
-			}
-			return sb.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			MessageDigest md5 = MessageDigest.getInstance("SHA");
+			
+			byte raw[] = new byte[2048];
+			int readData = 0;
+			do{
+				readData = fis.read(raw);
+				md5.update(raw);
+			}while(readData != -1);
+			
+			BigInteger hash = new BigInteger(1, md5.digest());
+			hashword = hash.toString(16).substring(0,36);
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return hashword;
 	}
+
 	/**
 	 * <b>Query size</b> methods grabs {@link ResultSet} object and tries to
 	 * resolve rowCount without violating rs integrity

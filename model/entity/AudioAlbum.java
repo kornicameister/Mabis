@@ -22,7 +22,7 @@ import model.utilities.ForeignKey;
  */
 public class AudioAlbum extends BaseTable {
 	private ArrayList<Genre> tagCloud = null;
-	private TreeMap<CoverType, Cover> covers = null; // map of covers
+	private TreeMap<CoverType, Picture> covers = null; // map of covers
 	private Time totalTime = null;
 	private Band band = null;
 
@@ -66,7 +66,7 @@ public class AudioAlbum extends BaseTable {
 	protected void initInternalFields() {
 		this.tagCloud = new ArrayList<Genre>();
 		this.totalTime = new Time(0);
-		this.constraints.add(TableType.COVER);
+		this.constraints.add(TableType.PICTURE);
 		this.constraints.add(TableType.AUTHOR);
 		this.tableName = TableType.AUDIO_ALBUM.toString();
 	}
@@ -115,27 +115,27 @@ public class AudioAlbum extends BaseTable {
 		this.band = band;
 	}
 
-	public void setFrontCover(Cover fc) {
+	public void setFrontCover(Picture fc) {
 		this.covers.put(CoverType.FRONT_COVER, fc);
 	}
 
-	public void setBackCover(Cover fc) {
+	public void setBackCover(Picture fc) {
 		this.covers.put(CoverType.BACK_COVER, fc);
 	}
 
-	public Cover getFrontCover() {
+	public Picture getFrontCover() {
 		return this.covers.get(CoverType.FRONT_COVER);
 	}
 
-	public Cover getBackCover() {
+	public Picture getBackCover() {
 		return this.covers.get(CoverType.BACK_COVER);
 	}
 
-	public Cover getCDCover() {
+	public Picture getCDCover() {
 		return this.covers.get(CoverType.CD_COVER);
 	}
 
-	public void setCDCover(Cover fc) {
+	public void setCDCover(Picture fc) {
 		this.covers.put(CoverType.CD_COVER, fc);
 	}
 
@@ -148,7 +148,7 @@ public class AudioAlbum extends BaseTable {
 		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
 		str += "[DURATION: " + this.getTotalTime() + "]\n";
 		str += "[COVERS]\n";
-		for(Cover c : this.covers.values()){
+		for(Picture c : this.covers.values()){
 			str += c;
 		}
 		return str;

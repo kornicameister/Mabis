@@ -4,8 +4,6 @@
  */
 package model.entity;
 
-import java.io.File;
-
 import model.enums.TableType;
 
 /**
@@ -16,7 +14,7 @@ import model.enums.TableType;
  * @version 0.3
  */
 public class Author extends BaseTable {
-	private File pictureFile = null;
+	private Picture pictureFile = null;
 
 	/**
 	 * @see BaseTable#BaseTable()
@@ -55,47 +53,31 @@ public class Author extends BaseTable {
 	@Override
 	protected void initInternalFields() {
 		this.tableName = TableType.AUTHOR.toString();
+		this.constraints.add(TableType.PICTURE);
 	}
 
-	/**
-	 * @return the firstName
-	 */
 	public String getFirstName() {
 		return this.getOriginalTitle();
 	}
 
-	/**
-	 * @param firstName
-	 *            the firstName to set
-	 */
 	public void setFirstName(String firstName) {
 		this.setOriginalTitle(firstName);
 	}
 
-	/**
-	 * @return the lastName
-	 */
+
 	public String getLastName() {
 		return this.getLocalizedTitle();
 	}
 
-	/**
-	 * @param lastName
-	 *            the lastName to set
-	 */
 	public void setLastName(String lastName) {
 		this.setLocalizedTitle(lastName);
 	}
 
-	/**
-	 * @param picture
-	 *            the picture to set
-	 */
-	public void setPicture(File f) {
+	public void setPicture(Picture f) {
 		this.pictureFile = f;
 	}
 
-	public File getPictureFile() {
+	public Picture getPictureFile() {
 		return pictureFile;
 	}
 

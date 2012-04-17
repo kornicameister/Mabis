@@ -5,6 +5,7 @@
 package controller;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.TreeSet;
@@ -29,6 +30,8 @@ public abstract class SQLFactory implements StatementFactory {
 	private TreeSet<WhereClause> wheres = null;
 	protected String questionMarkFieldList = null;
 	protected BaseTable table = null;
+	protected boolean localDatabase = false;
+	protected Integer lastAffactedId = 0;
 
 	/**
 	 * Constructs a SQL factory
@@ -44,7 +47,6 @@ public abstract class SQLFactory implements StatementFactory {
 	@Override
 	public void setStatementType(SQLStamentType type) {
 		this.type = type;
-		this.sqlQuery = this.createSQL();
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public abstract class SQLFactory implements StatementFactory {
 			rawQueryCopy = StatementFactory.insertPattern;
 			break;
 		case DELETE:
-			rawQueryCopy= StatementFactory.updatePattern;
+			rawQueryCopy = StatementFactory.updatePattern;
 			break;
 		case UPDATE:
 			rawQueryCopy = StatementFactory.updatePattern;
@@ -73,8 +75,8 @@ public abstract class SQLFactory implements StatementFactory {
 		default:
 			break;
 		}
-		rawQueryCopy = rawQueryCopy.replaceFirst("!",
-				this.table.getTableName());
+		rawQueryCopy = rawQueryCopy
+				.replaceFirst("!", this.table.getTableName());
 		String fieldList = this.buildFieldList(this.table.metaData());
 		// first pass
 		switch (this.type) {
@@ -114,32 +116,43 @@ public abstract class SQLFactory implements StatementFactory {
 	}
 
 	@Override
-	public void executeSQL(boolean online) throws SQLException {
+	public Integer executeSQL(boolean local) throws SQLException {
+		this.localDatabase = local;
 		try {
 			if (!MySQLAccess.getConnection().isValid(1000)) {
 				MabisLogger.getLogger().log(Level.SEVERE,
 						"Database connection lost");
-				return;
+				return -1;
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
 
 		PreparedStatement st = null;
-
-		if (online) {
-			st = MySQLAccess.getOnlineConnection().prepareStatement(
-					this.sqlQuery, Statement.RETURN_GENERATED_KEYS);
-		} else {
+		MySQLAccess msql = null;
+		this.sqlQuery = this.createSQL();
+		
+		if (localDatabase) {
 			st = MySQLAccess.getConnection().prepareStatement(this.sqlQuery,
 					Statement.RETURN_GENERATED_KEYS);
+		} else {
+			msql = new MySQLAccess();
+			st = msql.connectToOnlineDatabase().prepareStatement(
+					this.sqlQuery, Statement.RETURN_GENERATED_KEYS);
 		}
 
 		this.executeByTableAndType(st);
 
 		st.close();
 		st = null;
+		
+		if(msql != null){
+			msql.disconnectFromOnlineDatabase();
+			msql = null;
+		}
+		
 		System.gc();
+		return lastAffactedId;
 	}
 
 	/**
@@ -149,6 +162,9 @@ public abstract class SQLFactory implements StatementFactory {
 	 * {@link SQLFactory#executeByTableAndType(PreparedStatement)} method is
 	 * declared abstract to allow other factories define it's own table depended
 	 * statements processing
+	 * 
+	 * <b>Declared package, because it is for internal usage only of the factory
+	 * classes </b>
 	 * 
 	 * @param st
 	 *            {@link PreparedStatement} object that internal sql query is
@@ -161,6 +177,19 @@ public abstract class SQLFactory implements StatementFactory {
 	 */
 	protected abstract void executeByTableAndType(PreparedStatement st)
 			throws SQLException;
+
+	/**
+	 * This method is always called by the extended class </br> It exists to
+	 * parse data coming from database and stored in <i>set</i>
+	 * 
+	 * <b>Declared package, because it is for internal usage only of the factory
+	 * classes </b>
+	 * 
+	 * @param set
+	 *            content of sql statement
+	 * @throws SQLException
+	 */
+	protected abstract void parseResultSet(ResultSet set) throws SQLException;
 
 	@Override
 	public String buildWhereChunk() {
@@ -196,7 +225,7 @@ public abstract class SQLFactory implements StatementFactory {
 	 * @author kornicameister
 	 * 
 	 */
-	private class WhereClause {
+	private class WhereClause implements Comparable<WhereClause>{
 		String attribute = null;
 		String value = null;
 
@@ -209,6 +238,11 @@ public abstract class SQLFactory implements StatementFactory {
 		public WhereClause(String attribute, String value) {
 			this.attribute = attribute;
 			this.value = value;
+		}
+
+		@Override
+		public int compareTo(WhereClause o) {
+			return this.attribute.compareTo(o.attribute);
 		}
 	}
 }

@@ -14,7 +14,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.logging.Level;
+
 import javax.swing.ImageIcon;
+
 import logger.MabisLogger;
 
 /**

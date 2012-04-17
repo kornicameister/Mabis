@@ -5,8 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import model.entity.Picture;
 import model.entity.User;
-import controller.Blobber;
+import model.utilities.ForeignKey;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -34,13 +35,25 @@ public class UserSQLFactory extends SQLFactory {
 			break;
 		case INSERT:
 			short index = 1;
-			Blobber.putBlobImageToStatement(st, u.getPictureFile(), index++);
+			st.setInt(index++, this.insertAvatar());
 			st.setString(index++, u.getLastName());
 			st.setString(index++, u.getFirstName());
 			st.setString(index++, u.getPassword());
 			st.setString(index++, u.getEmail());
 			st.setString(index++, u.getLogin());
 			st.execute();
+
+			// getting last inserted id
+			st.clearParameters();
+			String query = "SELECT id! from mabis.! order by id! desc limit 1";
+			String tableName = String.valueOf(
+					this.table.getTableName().charAt(0)).toUpperCase()
+					+ this.table.getTableName().substring(1);
+
+			query = query.replaceFirst("!", tableName);
+			query = query.replaceFirst("!", this.table.getTableName());
+			query = query.replaceFirst("!", tableName);
+			this.parseResultSet(st.executeQuery(query));
 			break;
 		case SELECT:
 			this.parseResultSet(st.executeQuery());
@@ -52,14 +65,8 @@ public class UserSQLFactory extends SQLFactory {
 		}
 	}
 
-	/**
-	 * Methods graps {@link ResultSet} and tries to parse it accordingly to
-	 * {@link SQLStamentType} set in the class
-	 * 
-	 * @param set
-	 * @throws SQLException
-	 */
-	private void parseResultSet(ResultSet set) throws SQLException {
+	@Override
+	protected void parseResultSet(ResultSet set) throws SQLException {
 		User u = null;
 		switch (this.type) {
 		case SELECT:
@@ -70,8 +77,10 @@ public class UserSQLFactory extends SQLFactory {
 				u.setEmail(set.getString("email"));
 				u.setLogin(set.getString("login"));
 				u.setPassword(set.getString("password"));
-				u.setPicture(Blobber.createImageFromBlob(set.getBlob("avatar")));
 				u.setPrimaryKey(set.getInt("idUser"));
+				this.lastAffactedId = set.getInt("avatar");
+				u.addForeingKey(new ForeignKey("picture", "avatar", this.lastAffactedId));
+				u.setPicture(selectAvatar());
 				this.users.put(u.getPrimaryKey(), u);
 			}
 			break;
@@ -79,9 +88,33 @@ public class UserSQLFactory extends SQLFactory {
 			break;
 		case DELETE:
 			break;
+		case INSERT:
+			while (set.next()) {
+				this.lastAffactedId = set.getInt(1);
+			}
+			break;
 		default:
 			break;
 		}
+	}
+
+	private Picture selectAvatar() throws SQLException {
+		Picture avatar = null;
+		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT,
+				new Picture());
+		psf.addWhereClause("idPicture", this.lastAffactedId.toString());
+		psf.executeSQL(localDatabase);
+		for (Picture p : psf.getCovers().values()) {
+			avatar = p;
+		}
+		return avatar;
+	}
+
+	private Integer insertAvatar() throws SQLException {
+		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
+				((User) table).getPictureFile());
+		this.lastAffactedId = psf.executeSQL(localDatabase);
+		return lastAffactedId;
 	}
 
 	public HashMap<Integer, User> getUsers() {

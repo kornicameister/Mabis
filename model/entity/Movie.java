@@ -16,7 +16,7 @@ import model.utilities.ForeignKey;
  * @version 0.2
  */
 public class Movie extends BaseTable {
-	private TreeMap<CoverType, Cover> covers = null; // map of covers
+	private TreeMap<CoverType, Picture> covers = null; // map of covers
 	private Author director = null; // director is a foreing key to Author table
 	private Genre genre = null;
 	private Time duration = null;
@@ -61,7 +61,7 @@ public class Movie extends BaseTable {
 	protected void initInternalFields() {
 		this.setDuration(new Time(0));
 
-		this.constraints.add(TableType.COVER);
+		this.constraints.add(TableType.PICTURE);
 		this.constraints.add(TableType.GENRE);
 		this.constraints.add(TableType.AUTHOR);
 		this.tableName = TableType.MOVIE.toString();
@@ -91,19 +91,19 @@ public class Movie extends BaseTable {
 		this.titles[2] = description;
 	}
 
-	public void setFrontCover(Cover fc) {
+	public void setFrontCover(Picture fc) {
 		this.covers.put(CoverType.FRONT_COVER, fc);
 	}
 
-	public void setBackCover(Cover fc) {
+	public void setBackCover(Picture fc) {
 		this.covers.put(CoverType.BACK_COVER, fc);
 	}
 
-	public Cover getFrontCover() {
+	public Picture getFrontCover() {
 		return this.covers.get(CoverType.FRONT_COVER);
 	}
 
-	public Cover getBackCover() {
+	public Picture getBackCover() {
 		return this.covers.get(CoverType.BACK_COVER);
 	}
 
@@ -132,7 +132,7 @@ public class Movie extends BaseTable {
 		str += "[GENRE: " + this.getGenre() + "]\n";
 		str += "[DURATION: " + this.getDuration() + "]\n";
 		str += "[COVERS]\n";
-		for(Cover c : this.covers.values()){
+		for(Picture c : this.covers.values()){
 			str += c;
 		}
 		return str;

@@ -12,9 +12,11 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.logging.Level;
+
+import logger.MabisLogger;
 
 import settings.GlobalPaths;
-
 import database.Utilities;
 
 /**
@@ -59,10 +61,11 @@ public class Blobber {
 		FileOutputStream fos = null;
 		try {
 			is = blob.getBinaryStream();
-			String fileName = GlobalPaths.AVATAR_CACHE_PATH.toString() + Utilities.md5sum(is).substring(0, 25);
+			String fileName = GlobalPaths.AVATAR_CACHE_PATH.toString()
+					+ Utilities.crc32(is).substring(0, 35);
 			blobFile = new File(fileName);
-			
-			if(blobFile.exists()){
+
+			if (blobFile.exists()) {
 				is.close();
 				return blobFile;
 			}
@@ -70,14 +73,19 @@ public class Blobber {
 			fos = new FileOutputStream(blobFile);
 
 			fos.write(blob.getBytes(1, (int) blob.length()));
-			
+
 			is.close();
 			fos.close();
+
+			MabisLogger.getLogger().log(Level.INFO,
+					"Created new cached file at {0}", fileName);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			MabisLogger.getLogger().log(Level.SEVERE,
+					"Could not open/create cached image file");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

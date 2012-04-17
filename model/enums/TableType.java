@@ -11,7 +11,7 @@ package model.enums;
  */
 public enum TableType {
 	AUDIO_ALBUM("audioAlbum"), AUDIO_USER("audioUser"), AUTHOR("author"), BAND(
-			"band"), BOOK("book"), BOOK_USER("bookUser"), COVER("cover"), GENRE(
+			"band"), BOOK("book"), BOOK_USER("bookUser"), PICTURE("picture"), GENRE(
 			"genre"), MOVIE("movie"), MOVIE_USER("movieUser"), USER("user");
 
 	String name;

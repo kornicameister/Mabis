@@ -18,7 +18,7 @@ import model.utilities.ForeignKey;
 public class Book extends BaseTable {
 	private Short pages = null;
 	private Author writer = null; // writer is a foreign key here
-	private Cover cover = null; // cover is also a foreign key here
+	private Picture cover = null; // cover is also a foreign key here
 	private Genre genre = null; // genre is also a foreign key here
 
 	public Book(String originalTitle) {
@@ -46,7 +46,7 @@ public class Book extends BaseTable {
 		this.tableName = TableType.BOOK.toString();
 
 		this.constraints.add(TableType.AUTHOR);
-		this.constraints.add(TableType.COVER);
+		this.constraints.add(TableType.PICTURE);
 		this.constraints.add(TableType.GENRE);
 	}
 
@@ -82,11 +82,11 @@ public class Book extends BaseTable {
 		this.writer = writer;
 	}
 
-	public Cover getCover() {
+	public Picture getCover() {
 		return cover;
 	}
 
-	public void setCover(Cover cover) {
+	public void setCover(Picture cover) {
 		this.cover = cover;
 	}
 
@@ -107,7 +107,7 @@ public class Book extends BaseTable {
 		str += "[PAGES: " + this.getPages() + "]\n";
 		str += "[GENRE: " + this.getGenre() + "]\n";
 		str += "[AUTHOR:" + this.getWriter() + "]\n";
-		str += "[COVER: " + this.getCover() + "]\n";
+		str += "[PICTURE: " + this.getCover() + "]\n";
 		return str;
 	}
 }

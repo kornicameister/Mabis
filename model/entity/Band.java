@@ -72,7 +72,7 @@ public class Band extends Author {
 	protected void initInternalFields() {
 		this.tagCloud = new ArrayList<Genre>();
 		this.masterGenre = new Genre();
-		this.constraints.add(TableType.COVER);
+		this.constraints.add(TableType.PICTURE);
 		this.constraints.add(TableType.GENRE);
 		this.tableName = TableType.BAND.toString();
 	}

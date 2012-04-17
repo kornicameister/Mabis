@@ -10,12 +10,12 @@ public class NewUserRegisterer {
 
 	public static void saveToLocalDatabase(User user) throws SQLException {
 		UserSQLFactory factory = new UserSQLFactory(SQLStamentType.INSERT, user);
-		factory.executeSQL(false);
+		factory.executeSQL(true);
 	}
 
 	public static void saveToOnlineDatabase(User user) throws SQLException {
-		UserSQLFactory factory = new UserSQLFactory(SQLStamentType.INSERT, user);
-		factory.executeSQL(true);
+//		UserSQLFactory factory = new UserSQLFactory(SQLStamentType.INSERT, user);
+//		factory.executeSQL(false);
 	}
 
 }

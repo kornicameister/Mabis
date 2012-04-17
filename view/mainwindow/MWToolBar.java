@@ -5,6 +5,7 @@ package view.mainwindow;
 
 import java.awt.FlowLayout;
 import java.util.HashMap;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;

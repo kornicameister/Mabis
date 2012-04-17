@@ -74,7 +74,7 @@ public class UserSelectionPanel extends JDialog implements
 		this.initThumbailList();
 		this.initMeta();
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
@@ -85,7 +85,8 @@ public class UserSelectionPanel extends JDialog implements
 
 	private void parseUsers() {
 		for (User u : this.users.values()) {
-			ChoosableImagePanel p = new ChoosableImagePanel(u.getPictureFile());
+			ChoosableImagePanel p = new ChoosableImagePanel(u.getPictureFile()
+					.getImageFile());
 			p.addPropertyChangeListener(this);
 			thumbails.put(u, p);
 		}
@@ -113,7 +114,7 @@ public class UserSelectionPanel extends JDialog implements
 	private void obtainUsers() {
 		try {
 			this.userFactory.setStatementType(SQLStamentType.SELECT);
-			this.userFactory.executeSQL(false);
+			this.userFactory.executeSQL(true);
 			this.users = this.userFactory.getUsers();
 			this.parseUsers();
 		} catch (SQLException e) {

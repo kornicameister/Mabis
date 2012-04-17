@@ -141,7 +141,11 @@ public interface StatementFactory {
 	 * it should depends on what {@link StatementFactory#createSQL(BaseTable)}
 	 * returns
 	 * 
+	 * @param local
+	 *            if set to true than statements will be executed upon local
+	 *            database, otherwise upon online database
+	 * @return 
 	 * @throws SQLException
 	 */
-	abstract void executeSQL(boolean online) throws SQLException;
+	abstract Integer executeSQL(boolean local) throws SQLException;
 }

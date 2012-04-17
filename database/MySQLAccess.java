@@ -9,8 +9,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * This class wraps for MySQL establish connection process.</br> It allows
- * to set connection information such as
+ * This class wraps for MySQL establish connection process.</br> It allows to
+ * set connection information such as
  * <ul>
  * <li>login</li>
  * <li>password (note that password is echoed throug md5sum)</li>
@@ -43,7 +43,7 @@ public class MySQLAccess {
 
 	/** The connection. */
 	private static Connection connection = MySQLAccess.connectLocally();
-	private static Connection connectionOnline = MySQLAccess.connectOnline();
+	private Connection onlineConnection = null;
 
 	/**
 	 * Instantiates a new my sql access.
@@ -52,32 +52,6 @@ public class MySQLAccess {
 		if (MySQLAccess.connection == null) {
 			MySQLAccess.connectLocally();
 		}
-	}
-
-	/**
-	 * This method does the same as {@link MySQLAccess#connectLocally()} despite the fact, that
-	 * it connects to online database
-	 * @return valid connection object in case of success
-	 */
-	private static Connection connectOnline() {
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			String url = "jdbc:mysql://!:!/!";
-			url = url.replaceFirst("!", MySQLAccess.host2);
-			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
-			url = url.replaceFirst("!", MySQLAccess.databaseName);
-			return connection = DriverManager.getConnection(url,
-					MySQLAccess.userName2, MySQLAccess.userPass);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	/**
@@ -120,15 +94,45 @@ public class MySQLAccess {
 		return null;
 	}
 
+	public Connection connectToOnlineDatabase() {
+		Connection c = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			String url = "jdbc:mysql://!:!/!";
+			url = url.replaceFirst("!", MySQLAccess.host2);
+			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
+			url = url.replaceFirst("!", MySQLAccess.databaseName);
+			c = DriverManager.getConnection(url, MySQLAccess.userName2,
+					MySQLAccess.userPass);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return c;
+	}
+
+	public void disconnectFromOnlineDatabase() {
+		try {
+			this.onlineConnection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		this.onlineConnection = null;
+	}
+
 	/**
-	 * <b>Disconnect</b> safely closses up the existing connection to
-	 * database identified by {@link MySQLAccess#databaseName}
+	 * <b>Disconnect</b> safely closses up the existing connection to database
+	 * identified by {@link MySQLAccess#databaseName}
 	 */
 	public void disconnect() {
 		if (MySQLAccess.connection != null) {
 			try {
 				MySQLAccess.connection.close();
-				MySQLAccess.connectionOnline.close();
 				if (MySQLAccess.connection.isClosed()) {
 					System.out.println("Connection terminated");
 				}
@@ -145,10 +149,6 @@ public class MySQLAccess {
 	 */
 	public static Connection getConnection() {
 		return connection;
-	}
-
-	public static Connection getOnlineConnection() {
-		return connectionOnline;
 	}
 
 	// property methods
@@ -208,16 +208,10 @@ public class MySQLAccess {
 		}
 		return false;
 	}
-	
-	public boolean isConnectedOnline() throws SQLException{
-		if (MySQLAccess.connection != null) {
-			return !MySQLAccess.connectionOnline.isClosed();
-		}
-		return false;
-	}
 
 	/**
-	 * Method is overriden to ensure that connections to databases will be closed
+	 * Method is overriden to ensure that connections to databases will be
+	 * closed
 	 */
 	@Override
 	protected void finalize() throws Throwable {

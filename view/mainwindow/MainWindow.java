@@ -3,20 +3,25 @@
  */
 package view.mainwindow;
 
-import database.MySQLAccess;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.sql.SQLException;
 
+import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
-import controller.SQLStamentType;
-import controller.entity.UserSQLFactory;
 import model.entity.User;
 import view.UserSelectionPanel;
 import view.newUser.NewUserDialog;
+import controller.SQLStamentType;
+import controller.entity.UserSQLFactory;
+import database.MySQLAccess;
 
 /**
  * This is the main window class that presented to the user in the beginning and
@@ -76,7 +81,7 @@ public class MainWindow extends JFrame {
 		// check for any user, if none print NewUserDialog
 		UserSQLFactory f = new UserSQLFactory(SQLStamentType.SELECT, new User());
 		try {
-			f.executeSQL(false);
+			f.executeSQL(true);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +96,6 @@ public class MainWindow extends JFrame {
 			if (retVal == JOptionPane.OK_OPTION) {
 				NewUserDialog newUser = new NewUserDialog(this, true);
 				newUser.setVisible(true);
-				this.checkForUsers();
 			}
 		}
 		System.gc();

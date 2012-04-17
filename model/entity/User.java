@@ -73,7 +73,7 @@ public class User extends Author {
 	}
 
 	public void setPassword(String password) {
-		this.password = Utilities.md5sum(password);
+		this.password = Utilities.hashPassword(password);
 	}
 	
 	@Override

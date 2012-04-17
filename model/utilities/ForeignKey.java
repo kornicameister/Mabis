@@ -4,7 +4,6 @@
  */
 package model.utilities;
 
-import model.entity.BaseTable;
 
 /**
  * This class represent object-oriented implementation of sql foreign key Class
@@ -15,12 +14,12 @@ import model.entity.BaseTable;
  * @see Comparable
  */
 public class ForeignKey implements Comparable<ForeignKey> {
-	private BaseTable originTable;
+	private String originTable;
 	private String name;
 	private Integer value;
 
-	public ForeignKey(BaseTable origin, String name, Integer value) {
-		this.originTable = origin;
+	public ForeignKey(String string, String name, Integer value) {
+		this.originTable = string;
 		this.name = name;
 		this.value = value;
 	}
@@ -28,7 +27,7 @@ public class ForeignKey implements Comparable<ForeignKey> {
 	/**
 	 * @return the table object at which foreign key is defined as primary
 	 */
-	public BaseTable getOriginTable() {
+	public String getOriginTable() {
 		return originTable;
 	}
 
@@ -50,7 +49,7 @@ public class ForeignKey implements Comparable<ForeignKey> {
 	 * @param originTable
 	 *            the originTable to set
 	 */
-	public void setOriginTable(BaseTable originTable) {
+	public void setOriginTable(String originTable) {
 		this.originTable = originTable;
 	}
 
@@ -72,7 +71,10 @@ public class ForeignKey implements Comparable<ForeignKey> {
 
 	@Override
 	public int compareTo(ForeignKey o) {
-		int result = this.value.compareTo(o.getValue());
+		int result = this.originTable.compareTo(o.getOriginTable());
+		if (result == 0) {
+			result = this.value.compareTo(o.getValue());
+		}
 		if (result == 0) {
 			result = this.name.compareTo(o.getName());
 		}
@@ -83,7 +85,7 @@ public class ForeignKey implements Comparable<ForeignKey> {
 	public String toString() {
 		String str = "Foreign key: " + this.name + "\n";
 		str += "[Val: " + this.value + "]\n";
-		str += "[From: " + originTable.getTableName() + "]\n";
+		str += "[From: " + this.originTable + "]\n";
 		return str;
 	}
 }

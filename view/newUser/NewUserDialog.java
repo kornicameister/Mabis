@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -26,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
+import model.entity.Picture;
 import model.entity.User;
 import view.imagePanel.ImageFileFilter;
 import view.imagePanel.ImageFilePreview;
@@ -279,7 +281,11 @@ public class NewUserDialog extends JDialog {
 				User user = new User(fnameField.getText(), lnameField.getText());
 				user.setLogin(loginField.getText());
 				user.setEmail(mailField.getText());
-				user.setPicture(imagePanel.getImageFile());
+				try {
+					user.setPicture(new Picture(imagePanel.getImageFile()));
+				} catch (FileNotFoundException e2) {
+					e2.printStackTrace();
+				}
 				user.setPassword(new String(passField.getPassword()));
 
 				try {

@@ -4,67 +4,71 @@
  */
 package model.entity;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
-import javax.swing.ImageIcon;
 
 import model.enums.CoverType;
 import model.enums.TableType;
 
 /**
- * This class maps itself to mabis.cover table Table structure: </br> | idCover </br> | image </br> | hash
+ * This class maps itself to mabis.cover table Table structure: </br> | idCover
+ * </br> | image </br> | hash
+ * 
  * @author kornicameister
  * 
  */
 // TODO update commnents and make them more sql dependable
-public class Cover extends BaseTable {
+public class Picture extends BaseTable {
 	private CoverType type = null;
-	private ImageIcon image = null;
 	private File imageFile;
-	private final static String defaultCover = "src/resources/defaultCover.png";
 
-	/**
-	 * Constructs Cover with primary key
-	 * 
-	 * @param pk
-	 */
-	public Cover(int pk) {
+	public Picture() {
+		super();
+	}
+
+	public Picture(int pk) {
 		super(pk);
 	}
-	
-	public Cover(File cover){
+
+	/**
+	 * This constructor can produce FileNotFoundException as it creates Picture
+	 * with file picture set, and this requires having checksum of this file
+	 * calculated !!! <b>Notice that invalid file (i.e. file that does not
+	 * exist) will produce this exception
+	 * 
+	 * @param cover
+	 * @throws FileNotFoundException
+	 */
+	public Picture(File cover) throws FileNotFoundException {
 		super();
 		this.imageFile = cover;
-		this.image = new ImageIcon(cover.getAbsolutePath());
+		this.generateCheckSum();
+	}
+
+	public File getImageFile() {
+		return imageFile;
+	}
+
+	public void setImageFile(File imageFile) throws FileNotFoundException {
+		this.imageFile = imageFile;
+		this.generateCheckSum();
 	}
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idCover", "image", "hash", "titleLocale",
-				"genre", "pages", "cover", "writer" };
+		String tmp[] = { "idCover", "image", "hash" };
 		return tmp;
 	}
-	/**
-	 * @return the type
-	 */
+
 	public CoverType getType() {
 		return type;
 	}
 
-	/**
-	 * @param type
-	 *            the type to set
-	 */
 	public void setType(CoverType type) {
 		this.type = type;
 	}
 
-	/**
-	 * @return the checkSum
-	 */
 	public String getCheckSum() {
 		return this.titles[0];
 	}
@@ -77,29 +81,17 @@ public class Cover extends BaseTable {
 	 *            the checkSum to set
 	 * @throws FileNotFoundException
 	 */
-	public void generateCheckSum() throws FileNotFoundException {
-		File m;
-		if (this.image == null) {
-			m = new File(this.getClass().getResource(defaultCover).getFile());
-		} else {
-			m = this.imageFile;
-		}
-		this.titles[0] = database.Utilities.md5sum(new FileInputStream(m));
+	private void generateCheckSum() throws FileNotFoundException {
+		this.titles[0] = database.Utilities.crc32(new FileInputStream(
+				this.imageFile));
 	}
-	
+
 	@Override
 	protected void initInternalFields() {
 		this.type = CoverType.UNDEFINED;
 		this.imageFile = null;
-		this.tableName = TableType.COVER.toString();
-	}
-	
-	public ImageIcon getImage(){
-		return this.image;
-	}
-	
-	public void setImage(Image image){
-		this.image = new ImageIcon(image);
+		this.tableName = TableType.PICTURE.toString();
+		this.titles[0] = "";
 	}
 
 	@Override
