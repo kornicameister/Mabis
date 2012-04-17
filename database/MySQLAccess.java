@@ -30,21 +30,21 @@ import controller.entity.UserSQLFactory;
 public class MySQLAccess {
 
 	/** The Constant databaseName. */
-	protected final static String databaseName = "mabis";
+	private final static String databaseName = "mabis";
 
 	/** The Constant userName. */
-	protected final static String userName = "mabisUser";
-	protected final static String userName2 = "mabisuser";
+	private final static String userName = "mabisUser";
+	private final static String userName2 = "mabisuser";
 
 	/** The Constant userPass. */
-	protected final static String userPass = "f72158bc8d";
+	private final static String userPass = "f72158bc8d";
 
 	/** The Constant defaultPort. */
-	protected final static Short defaultPort = 3306;
+	private final static Short defaultPort = 3306;
 
 	/** The Constant defaultHost */
-	protected final static String host = "localhost";
-	protected final static String host2 = "db4free.net";
+	private final static String host = "localhost";
+	private final static String host2 = "db4free.net";
 
 	/** The connection. */
 	private static Connection connection = MySQLAccess.connect();
@@ -81,11 +81,11 @@ public class MySQLAccess {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			String url = "jdbc:mysql://!:!/!";
-			url = url.replaceFirst("!", MySQLAccess.host2);
+			url = url.replaceFirst("!", MySQLAccess.host);
 			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
 			url = url.replaceFirst("!", MySQLAccess.databaseName);
 			return connection = DriverManager.getConnection(url,
-					MySQLAccess.userName2, MySQLAccess.userPass);
+					MySQLAccess.userName, MySQLAccess.userPass);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -153,9 +153,55 @@ public class MySQLAccess {
 		return connection;
 	}
 	
-	public static String getHost(){
+	//property methods
+	/**
+	 * 
+	 * @return host for localhost connections
+	 */
+	public static String getLocalhost(){
+		return host;
+	}
+	
+	/**
+	 * 
+	 * @return host name of the online mabis database
+	 */
+	public static String getOnlinehost(){
 		return host2;
 	}
+	
+	/**
+	 * 
+	 * @return username of the local mabis database
+	 */
+	public static String getLocalUser(){
+		return userName;
+	}
+	
+	/**
+	 * 
+	 * @return username of the online mabis database
+	 */
+	public static String getOnlineUser(){
+		return userName2;
+	}
+	
+	/**
+	 * 
+	 * @return database name
+	 */
+	public static String getDatabaseName(){
+		return databaseName;
+	}
+	
+	/**
+	 * 
+	 * @return port via mysql connections is established
+	 */
+	public static Short getPort(){
+		return defaultPort;
+	}
+	//property methods
 
 	public boolean isConnected() throws SQLException {
 		if (MySQLAccess.connection != null) {

@@ -195,7 +195,7 @@ public class UserSelectionPanel extends JDialog implements
 					.getStatusBar()
 					.setMessage(
 							"Connected as " + u.getLogin() + " at "
-									+ MySQLAccess.getHost());
+									+ MySQLAccess.getLocalhost());
 			mw.setConnectedUser(u);
 		}
 	}
