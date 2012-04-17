@@ -34,6 +34,7 @@ public class MySQLAccess {
 
 	/** The Constant userName. */
 	protected final static String userName = "mabisUser";
+	protected final static String userName2 = "mabisuser";
 
 	/** The Constant userPass. */
 	protected final static String userPass = "f72158bc8d";
@@ -43,6 +44,7 @@ public class MySQLAccess {
 
 	/** The Constant defaultHost */
 	protected final static String host = "localhost";
+	protected final static String host2 = "db4free.net";
 
 	/** The connection. */
 	private static Connection connection = MySQLAccess.connect();
@@ -79,11 +81,11 @@ public class MySQLAccess {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			String url = "jdbc:mysql://!:!/!";
-			url = url.replaceFirst("!", MySQLAccess.host);
+			url = url.replaceFirst("!", MySQLAccess.host2);
 			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
 			url = url.replaceFirst("!", MySQLAccess.databaseName);
 			return connection = DriverManager.getConnection(url,
-					MySQLAccess.userName, MySQLAccess.userPass);
+					MySQLAccess.userName2, MySQLAccess.userPass);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -150,6 +152,10 @@ public class MySQLAccess {
 	public static Connection getConnection() {
 		return connection;
 	}
+	
+	public static String getHost(){
+		return host2;
+	}
 
 	public boolean isConnected() throws SQLException {
 		if (MySQLAccess.connection != null) {
@@ -157,4 +163,12 @@ public class MySQLAccess {
 		}
 		return false;
 	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		this.disconnect();
+	}
+	
+	
 }

@@ -12,12 +12,12 @@ import java.util.logging.Level;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 import javax.swing.JPopupMenu.Separator;
+import javax.swing.KeyStroke;
 
 import logger.MabisLogger;
-
 import view.NewUserDialog;
+import view.UserSelectionPanel;
 
 /**
  * Class nicely and logically group the functionality related to menu bar that
@@ -34,8 +34,8 @@ public class MWMenuBar extends JMenuBar {
 	private JMenu help;
 	private MainWindowMenuBarListener listener;
 	/**
-	 * this is a reference to main window allowing {@link MWMenuBar} to 
-	 * pass actions againt class to mainWindow
+	 * this is a reference to main window allowing {@link MWMenuBar} to pass
+	 * actions againt class to mainWindow
 	 */
 	private MainWindow mw;
 
@@ -80,15 +80,21 @@ public class MWMenuBar extends JMenuBar {
 	 * <li>adding listeners</li>
 	 * </ul>
 	 */
-	//TODO add missing descriptions and key bindings
+	// TODO add missing descriptions and key bindings
 	private void initActions() {
 		file.add("Connect").addActionListener(this.listener);
 		file.add(new Separator());
-		
+
 		JMenuItem newUser = file.add("New user");
 		newUser.addActionListener(this.listener);
-		newUser.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.ALT_MASK)); //ALT+N
-		
+		newUser.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+				ActionEvent.ALT_MASK)); // ALT+N
+
+		JMenuItem userList = file.add("User panel");
+		userList.addActionListener(this.listener);
+		userList.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M,
+				ActionEvent.ALT_MASK)); // ALT+M
+
 		collection.add("Publish").addActionListener(this.listener);
 		friends.add("List").addActionListener(this.listener);
 		data.add("Action").addActionListener(this.listener);
@@ -96,8 +102,8 @@ public class MWMenuBar extends JMenuBar {
 	}
 
 	/**
-	 * Listener created especially for MWMenuBar communicates with main
-	 * window by reference
+	 * Listener created especially for MWMenuBar communicates with main window
+	 * by reference
 	 * 
 	 * @author kornicameister
 	 */
@@ -110,11 +116,14 @@ public class MWMenuBar extends JMenuBar {
 			} else if (action.equals("List")) {
 			} else if (action.equals("About MABIS")) {
 			} else if (action.equals("Action")) {
-			} else if(action.equals("New user")){
-				NewUserDialog nu = new NewUserDialog(mw,true);
+			} else if (action.equals("New user")) {
+				NewUserDialog nu = new NewUserDialog(mw, true);
+				nu.setVisible(true);
+			} else if (action.equals("User panel")) {
+				UserSelectionPanel nu = new UserSelectionPanel(mw);
 				nu.setVisible(true);
 			}
-			MabisLogger.getLogger().log(Level.INFO,action);
+			MabisLogger.getLogger().log(Level.INFO, action);
 		}
 	}
 

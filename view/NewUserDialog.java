@@ -290,7 +290,7 @@ public class NewUserDialog extends JDialog {
 						imagePanel.getImagePath());
 				user.setPassword(new String(passField.getPassword()));
 
-				UserSQLFactory factory = new UserSQLFactory(new User());
+				UserSQLFactory factory = new UserSQLFactory(user);
 				factory.setStatementType(SQLStamentType.INSERT);
 				try {
 					factory.executeSQL();
