@@ -9,7 +9,6 @@ import model.enums.TableType;
 /**
  * This claps maps itself to mabis.audioUser many-to-maby table
  * @author kornicameister
- * 
  */
 public class AudioUser extends ManyToManyTable {
 

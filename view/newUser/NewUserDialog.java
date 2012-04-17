@@ -246,16 +246,17 @@ public class NewUserDialog extends JDialog {
 		this.lnameLabel = new JLabel("Last name: ");
 		this.lnameField = new JTextField();
 
-		this.imagePanel = new ImagePanel(new File("src/resources/defaultAvatar.png"));
+		this.imagePanel = new ImagePanel(new File(
+				"src/resources/defaultAvatar.png"));
 		this.imagePanel.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.LOWERED));
 
-		this.okButton = new JButton("Ok");
+		this.okButton = new JButton("Create new user");
 		this.okButton.addActionListener(this.listener);
 		this.cancelButton = new JButton("Cancel");
 		this.cancelButton.addActionListener(this.listener);
 
-		this.newAvatarButton = new JButton("Search...");
+		this.newAvatarButton = new JButton("New avatar...");
 		this.newAvatarButton.addActionListener(this.listener);
 	}
 
@@ -299,6 +300,12 @@ public class NewUserDialog extends JDialog {
 						dispose();
 					}
 				}
+
+				mw.getBottomPanel()
+						.getStatusBar()
+						.setMessage(
+								"New user " + user.getLogin() + " was created");
+
 			} else if (source == cancelButton) {
 				if (isDisplayable()) {
 					setVisible(false);
@@ -311,8 +318,8 @@ public class NewUserDialog extends JDialog {
 					// image without checking it's dimension
 					ImageIcon tmp;
 					try {
-						File newAvatar = new File(imageChooser.getSelectedFile()
-								.getAbsolutePath());
+						File newAvatar = new File(imageChooser
+								.getSelectedFile().getAbsolutePath());
 						tmp = new ImageIcon(ImageIO.read(newAvatar));
 						if (tmp.getIconHeight() > avatarDim.height
 								|| tmp.getIconWidth() > avatarDim.width) {

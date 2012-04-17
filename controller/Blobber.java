@@ -60,6 +60,7 @@ public class Blobber {
 		InputStream is = null;
 		FileOutputStream fos = null;
 		try {
+			//TODO add scalling images to internal sufficient size
 			is = blob.getBinaryStream();
 			String fileName = GlobalPaths.AVATAR_CACHE_PATH.toString()
 					+ Utilities.crc32(is).substring(0, 35);
@@ -67,6 +68,10 @@ public class Blobber {
 
 			if (blobFile.exists()) {
 				is.close();
+
+				MabisLogger.getLogger().log(Level.INFO,
+						"ImageFile found in cache at {0}", fileName);
+
 				return blobFile;
 			}
 

@@ -11,7 +11,7 @@ import model.enums.TableType;
  * </br> | firstName </br> | lastName </br> | picture </br>
  * 
  * @author kornicameister
- * @version 0.3
+ * @version 0.4
  */
 public class Author extends BaseTable {
 	private Picture pictureFile = null;
