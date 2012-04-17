@@ -5,7 +5,6 @@
 package model.entity;
 
 import model.enums.TableType;
-import database.Utilities;
 
 /**
  * 
@@ -73,7 +72,7 @@ public class User extends Author {
 	}
 
 	public void setPassword(String password) {
-		this.password = Utilities.hashPassword(password);
+		this.password = password;
 	}
 	
 	@Override

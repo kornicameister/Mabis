@@ -10,6 +10,7 @@ import model.entity.User;
 import model.utilities.ForeignKey;
 import controller.SQLFactory;
 import controller.SQLStamentType;
+import database.Utilities;
 
 /**
  * This is the wrapper that allows to perform database specific operation to
@@ -27,7 +28,7 @@ public class UserSQLFactory extends SQLFactory {
 	}
 
 	@Override
-	protected void executeByTableAndType(PreparedStatement st)
+	final protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
 		User u = (User) this.table;
 		switch (this.type) {
@@ -38,7 +39,7 @@ public class UserSQLFactory extends SQLFactory {
 			st.setInt(index++, this.insertAvatar());
 			st.setString(index++, u.getLastName());
 			st.setString(index++, u.getFirstName());
-			st.setString(index++, u.getPassword());
+			st.setString(index++, Utilities.hashPassword(u.getPassword()));
 			st.setString(index++, u.getEmail());
 			st.setString(index++, u.getLogin());
 			st.execute();
@@ -66,7 +67,7 @@ public class UserSQLFactory extends SQLFactory {
 	}
 
 	@Override
-	protected void parseResultSet(ResultSet set) throws SQLException {
+	final protected void parseResultSet(ResultSet set) throws SQLException {
 		User u = null;
 		switch (this.type) {
 		case SELECT:
@@ -79,7 +80,8 @@ public class UserSQLFactory extends SQLFactory {
 				u.setPassword(set.getString("password"));
 				u.setPrimaryKey(set.getInt("idUser"));
 				this.lastAffactedId = set.getInt("avatar");
-				u.addForeingKey(new ForeignKey("picture", "avatar", this.lastAffactedId));
+				u.addForeingKey(new ForeignKey("picture", "avatar",
+						this.lastAffactedId));
 				u.setPicture(selectAvatar());
 				this.users.put(u.getPrimaryKey(), u);
 			}
