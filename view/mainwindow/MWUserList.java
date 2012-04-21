@@ -58,5 +58,6 @@ public class MWUserList extends JPanel {
 	}
 	
 	private final void obtainUsers(){
+		return;
 	}
 }

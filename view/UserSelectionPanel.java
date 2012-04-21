@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,18 +32,18 @@ import controller.entity.UserSQLFactory;
 import database.MySQLAccess;
 
 /**
- * Klasa dziedzicz�c z JDialog jest oknem typu dialogowego (modalnego)
- * kt�re pozwala na wyb�r u�ytkownika, kt�ry b�dzie korzysta� z programu. </br>
- * U�ytkowniky pobierani s� z lokalnie zlokalizowanej bazy danych.
- * Klasa implementuje interfejs {@link PropertyChangeListener} aby umo�liwi�
- * dynamiczne pod�wietlanie wybranego u�ytkownika. Opisana funkcjonalno�� 
- * dzia�a w po��czeniu z {@link ChoosableImagePanel}.
- *
+ * Klasa dziedzicz�c z JDialog jest oknem typu dialogowego (modalnego) kt�re
+ * pozwala na wyb�r u�ytkownika, kt�ry b�dzie korzysta� z programu. </br>
+ * U�ytkowniky pobierani s� z lokalnie zlokalizowanej bazy danych. Klasa
+ * implementuje interfejs {@link PropertyChangeListener} aby umo�liwi�
+ * dynamiczne pod�wietlanie wybranego u�ytkownika. Opisana funkcjonalno�� dzia�a
+ * w po��czeniu z {@link ChoosableImagePanel}.
+ * 
  * @author kornicameister
  * @version 0.2
  * @see java.beans.PropertyChangeListener
  */
-public class UserSelectionPanel extends JDialog implements
+public class UserSelectionPanel extends JFrame implements
 		PropertyChangeListener {
 
 	private static final long serialVersionUID = -3642888588569732458L;
@@ -52,44 +52,44 @@ public class UserSelectionPanel extends JDialog implements
 	private JButton connectButton = null;
 	private JButton cancelButton = null;
 	private JPanel userListPanel;
-	private UserSQLFactory userFactory = null;
-	private TreeMap<User, ChoosableImagePanel> thumbails = null;
 	private HashMap<Integer, User> users = null;
-	private final UserSelectionPanelListener listener;
 	private JPanel rootListPanel = null;
 	private JScrollPane userScrollPanel = null;
 	private short selectedUserIndex = -1;
 
-	/**
-	 * Tworzy okno dialogowe z rodzicem. 
-	 */
-	public UserSelectionPanel(Frame owner) {
-		super(owner);
-		this.mw = (MainWindow) owner;
-		this.userFactory = new UserSQLFactory(SQLStamentType.SELECT, new User());
-		this.thumbails = new TreeMap<User, ChoosableImagePanel>();
-		this.listener = new UserSelectionPanelListener(this);
+	private final TreeMap<User, ChoosableImagePanel> thumbails = new TreeMap<User, ChoosableImagePanel>();
+	private final UserSelectionPanelListener listener = new UserSelectionPanelListener(
+			this);
+	private final UserSQLFactory userFactory = new UserSQLFactory(
+			SQLStamentType.SELECT, new User());
 
-		this.initComponents();
-		this.layoutComponents();
+	/**
+	 * Tworzy okno dialogowe z rodzicem.
+	 */
+	public UserSelectionPanel(MainWindow owner) {
+		super();
+		this.mw = (MainWindow) owner;
+		this.init();
 
 		this.obtainUsers();
 		this.initThumbailList();
-		this.initMeta();
+
 	}
 
 	public UserSelectionPanel(HashMap<Integer, User> users, Frame owner) {
 		super();
 		this.mw = (MainWindow) owner;
 		this.users = users;
-		this.thumbails = new TreeMap<User, ChoosableImagePanel>();
-		this.listener = new UserSelectionPanelListener(this);
-
-		this.initComponents();
-		this.layoutComponents();
+		this.init();
 
 		this.parseUsers();
 		this.initThumbailList();
+	}
+
+	protected void init() {
+		super.frameInit();
+		this.initComponents();
+		this.layoutComponents();
 		this.initMeta();
 	}
 
@@ -98,7 +98,6 @@ public class UserSelectionPanel extends JDialog implements
 		super.finalize();
 		this.users.clear();
 		this.thumbails.clear();
-		this.userFactory = null;
 	}
 
 	private void parseUsers() {
@@ -124,20 +123,21 @@ public class UserSelectionPanel extends JDialog implements
 
 	private void initMeta() {
 		this.setSize(new Dimension(500, 280));
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("Connect as...");
-		this.setLocationRelativeTo(null);
+		this.setLocation(this.mw.getX() + this.mw.getWidth() / 4,
+				this.mw.getY() + 25);
+		this.setAlwaysOnTop(false);
 	}
 
 	/**
-	 * Metoda zadeklarowana jako final static dlatego</br>
-	 * Dost�pna w ca�ym pakiecie poniewa� wykonuje dzia�anie niezale�ne
-	 * od klasy w kt�rej jest zdefiniowane. </br>
-	 * Metoda korzystaj�c z UserSQLFactory, ��czy si� z baz� danych online
-	 * i pobiera stamt�d wszystkich u�ytkownik�w
+	 * Metoda zadeklarowana jako final static dlatego</br> Dostępna w całym
+	 * pakiecie ponieważ wykonuje działanie niezależne od klasy w której jest
+	 * zdefiniowane. </br> Metoda korzystając z UserSQLFactory, łączy się z bazą
+	 * danych online i pobiera stamtąd wszystkich użytkowników
 	 */
-	 //TODO doda� link do UserSQLFactory
-	 //TODO przenie�� metody typu util do oddzielnego pakietu
+	// TODO dodać link do UserSQLFactory
+	// TODO przenieść metody typu util do oddzielnego pakietu
 	private void obtainUsers() {
 		try {
 			this.userFactory.setStatementType(SQLStamentType.SELECT);
@@ -229,9 +229,9 @@ public class UserSelectionPanel extends JDialog implements
 		UserSelectionPanel usp = null;
 		private PasswordDialog pd;
 
-		public UserSelectionPanelListener(UserSelectionPanel usp) {
-			this.usp = usp;
-			this.pd = new PasswordDialog(null);
+		public UserSelectionPanelListener(UserSelectionPanel userSelectionPanel) {
+			this.usp = userSelectionPanel;
+			this.pd = new PasswordDialog(userSelectionPanel);
 		}
 
 		@Override
@@ -241,6 +241,7 @@ public class UserSelectionPanel extends JDialog implements
 				User u = (User) users.values().toArray()[selectedUserIndex];
 
 				pd.setVisible(true);
+				// while(pd.isVisible());
 				String password = pd.getPassword();
 
 				if (!u.getPassword().equals(Hasher.hashPassword(password))) {
@@ -251,6 +252,10 @@ public class UserSelectionPanel extends JDialog implements
 					MabisLogger.getLogger().log(Level.INFO,
 							"Wrong credentials provided, password differs");
 				} else {
+					JOptionPane.showMessageDialog(null,
+							"Connected as " + u.getLogin(),
+							"God In Da House ;-)",
+							JOptionPane.INFORMATION_MESSAGE);
 					connectWithUser(u);
 					setVisible(false);
 					dispose();

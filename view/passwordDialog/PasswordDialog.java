@@ -15,26 +15,41 @@ import javax.swing.JPasswordField;
 
 public class PasswordDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 8470460108291440058L;
-	private JPasswordField password = new JPasswordField();
-	private JButton ok = new JButton("OK");
-	private JButton cancel = new JButton("Cancel");
-	private JLabel prompt = new JLabel("Please enter your password:");
-	
-	JPanel passPanel = new JPanel();
-	JPanel labelInput = new JPanel();
-	JPanel buttons = new JPanel();
-	
+	private JPasswordField password;
+	private JButton ok, cancel;
+	private JLabel prompt;
+	JPanel passPanel, labelInput, buttons;
+
 	private String result;
 
 	public PasswordDialog(JFrame parent) {
 		super(parent);
-	
+
 		this.setResizable(false);
-		this.setModal(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+		this.setTitle("Password:");
+		this.setAlwaysOnTop(true);
+		this.setModal(true);
+
+		this.setSize(250, 100);
+		this.setLocationRelativeTo(parent);
+
+	}
+
+	@Override
+	protected void dialogInit() {
+		super.dialogInit();
+
+		this.passPanel = new JPanel();
+		this.labelInput = new JPanel();
+		this.buttons = new JPanel();
+		this.password = new JPasswordField();
+		this.ok = new JButton("Ok");
+		this.cancel = new JButton("Cancel");
+		this.prompt = new JLabel("Please enter your password:");
+
 		passPanel.setLayout(new BorderLayout());
-		labelInput.setLayout(new GridLayout(2, 1));
+		labelInput.setLayout(new GridLayout(2, 1, 5, 5));
 		buttons.setLayout(new BorderLayout());
 
 		password.setEchoChar('*');
@@ -49,19 +64,14 @@ public class PasswordDialog extends JDialog implements ActionListener {
 		passPanel.setPreferredSize(new Dimension(200, 100));
 		passPanel.add(labelInput, BorderLayout.NORTH);
 		passPanel.add(buttons, BorderLayout.SOUTH);
-
 		this.add(passPanel);
-		this.setSize(200, 200);
-		this.setLocationRelativeTo(null);
-
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == ok) {
 			result = new String(password.getPassword());
-		} else {
-			this.dispose();
 		}
+		this.dispose();
 	}
 
 	public String getPassword() {

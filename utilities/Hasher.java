@@ -11,8 +11,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Klasa <b>Hasher</b> jest klas� abstrakcyjn�.
- * Jest to celowe dzia�anie, poniewa� klasa ta zawiera jedynie statyczne metody, 
+ * Klasa <b>Hasher</b> jest klasą abstrakcyjną.
+ * Jest to celowe działanie, ponieważ klasa ta zawiera jedynie statyczne metody, 
  * kt�re nie wymagaj� do wykonania istniej�cego obiektu klasy</br></br>
  * <b>Hasher</b> zawiera funkcje, kt�rych funkcjonalno�� mo�na opisa� najog�lniej
  * jako metody tworz� sumy kontrolne. 

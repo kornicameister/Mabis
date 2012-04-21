@@ -29,7 +29,7 @@ public class MySQLAccess {
 
 	/** The Constant userName. */
 	private final static String userName = "mabisUser";
-	private final static String userName2 = "mabisuser";
+	private final static String userName2 = "mabis";
 
 	/** The Constant userPass. */
 	private final static String userPass = "f72158bc8d";
@@ -39,7 +39,7 @@ public class MySQLAccess {
 
 	/** The Constant defaultHost */
 	private final static String host = "localhost";
-	private final static String host2 = "db4free.net";
+	private final static String host2 = "SQL09.FREEMYSQL.NET";
 
 	/** The connection. */
 	private static Connection connection = MySQLAccess.connectLocally();
