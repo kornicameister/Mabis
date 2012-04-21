@@ -17,7 +17,7 @@ public enum TableType {
 	String name;
 	TableType(String s) {
 		this.name = s;
-	}
+	}	
 
 	/**
 	 * @return returns string representation of table name

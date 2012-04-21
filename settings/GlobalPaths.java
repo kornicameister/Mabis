@@ -7,8 +7,8 @@ package settings;
  * 
  */
 public enum GlobalPaths {
-	AVATAR_CACHE_PATH("./cache/avatars/"), DEFAULT_COVER_PATH(
-			"src/resources/defaultCover.png");
+	AVATAR_CACHE_PATH("./cache/avatars/"), 
+	DEFAULT_COVER_PATH("src/resources/defaultCover.png");
 
 	private final String path;
 

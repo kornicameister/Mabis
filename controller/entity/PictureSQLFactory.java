@@ -58,6 +58,8 @@ public class PictureSQLFactory extends SQLFactory {
 		case SELECT:
 			this.parseResultSet(st.executeQuery());
 			break;
+		default:
+			break;
 		}
 	}
 
@@ -91,6 +93,8 @@ public class PictureSQLFactory extends SQLFactory {
 				}
 				this.covers.put(p.getPrimaryKey(), p);
 			}
+			break;
+		default:
 			break;
 		}
 	}

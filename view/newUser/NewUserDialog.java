@@ -328,7 +328,8 @@ public class NewUserDialog extends JDialog {
 									"Avatar size error",
 									JOptionPane.ERROR_MESSAGE);
 							MabisLogger.getLogger().log(
-									Level.WARNING,
+									Level.WARNING
+									,
 									"Too big avatar attempt, avatar size = ["
 											+ tmp.getIconWidth() + ";"
 											+ tmp.getIconHeight() + "]");

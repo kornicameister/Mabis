@@ -64,7 +64,7 @@ public abstract class SQLFactory implements StatementFactory {
 			rawQueryCopy = StatementFactory.insertPattern;
 			break;
 		case DELETE:
-			rawQueryCopy = StatementFactory.updatePattern;
+			rawQueryCopy = StatementFactory.deletePattern;
 			break;
 		case UPDATE:
 			rawQueryCopy = StatementFactory.updatePattern;

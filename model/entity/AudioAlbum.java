@@ -13,8 +13,8 @@ import model.enums.TableType;
 import model.utilities.ForeignKey;
 
 /**
- * This class represents table of AudioAlbum from Mabis database. Table
- * structure: </br> | idAudio </br> | frontCover</br> | backCover</br> |
+ * Klasa jest obiektową reprezentacją tabeli audioAlbum z bazy danych mabis.
+ * Posiada następujące atrybuty: </br> | idAudio </br> | frontCover</br> | backCover</br> |
  * cdCover</br> | tagCloud</br> | trackList</br> | artist</br> | totalTime
  * 
  * @author kornicameister
@@ -68,6 +68,7 @@ public class AudioAlbum extends BaseTable {
 		this.totalTime = new Time(0);
 		this.constraints.add(TableType.PICTURE);
 		this.constraints.add(TableType.AUTHOR);
+		this.constraints.add(TableType.GENRE);
 		this.tableName = TableType.AUDIO_ALBUM.toString();
 	}
 

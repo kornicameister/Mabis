@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
@@ -24,10 +25,24 @@ import logger.MabisLogger;
 import model.entity.User;
 import view.imagePanel.ChoosableImagePanel;
 import view.mainwindow.MainWindow;
+import view.passwordDialog.PasswordDialog;
 import controller.SQLStamentType;
 import controller.entity.UserSQLFactory;
 import database.MySQLAccess;
+import database.Utilities;
 
+/**
+ * Klasa dziedzicz¹c z JDialog jest oknem typu dialogowego (modalnego)
+ * które pozwala na wybór u¿ytkownika, który bêdzie korzysta³ z programu. </br>
+ * U¿ytkowniky pobierani s¹ z lokalnie zlokalizowanej bazy danych.
+ * Klasa implementuje interfejs {@link PropertyChangeListener} aby umo¿liwiæ
+ * dynamiczne podœwietlanie wybranego u¿ytkownika. Opisana funkcjonalnoœæ 
+ * dzia³a w po³¹czeniu z {@link ChoosableImagePanel}.
+ *
+ * @author kornicameister
+ * @version 0.2
+ * @see java.beans.PropertyChangeListener
+ */
 public class UserSelectionPanel extends JDialog implements
 		PropertyChangeListener {
 
@@ -45,12 +60,15 @@ public class UserSelectionPanel extends JDialog implements
 	private JScrollPane userScrollPanel = null;
 	private short selectedUserIndex = -1;
 
+	/**
+	 * Tworzy okno dialogowe z rodzicem. 
+	 */
 	public UserSelectionPanel(Frame owner) {
 		super(owner);
 		this.mw = (MainWindow) owner;
 		this.userFactory = new UserSQLFactory(SQLStamentType.SELECT, new User());
 		this.thumbails = new TreeMap<User, ChoosableImagePanel>();
-		this.listener = new UserSelectionPanelListener();
+		this.listener = new UserSelectionPanelListener(this);
 
 		this.initComponents();
 		this.layoutComponents();
@@ -61,11 +79,11 @@ public class UserSelectionPanel extends JDialog implements
 	}
 
 	public UserSelectionPanel(HashMap<Integer, User> users, Frame owner) {
-		super(owner);
+		super();
 		this.mw = (MainWindow) owner;
 		this.users = users;
 		this.thumbails = new TreeMap<User, ChoosableImagePanel>();
-		this.listener = new UserSelectionPanelListener();
+		this.listener = new UserSelectionPanelListener(this);
 
 		this.initComponents();
 		this.layoutComponents();
@@ -111,6 +129,15 @@ public class UserSelectionPanel extends JDialog implements
 		this.setLocationRelativeTo(null);
 	}
 
+	/**
+	 * Metoda zadeklarowana jako final static dlatego</br>
+	 * Dostêpna w ca³ym pakiecie poniewa¿ wykonuje dzia³anie niezale¿ne
+	 * od klasy w której jest zdefiniowane. </br>
+	 * Metoda korzystaj¹c z UserSQLFactory, ³¹czy siê z baz¹ danych online
+	 * i pobiera stamt¹d wszystkich u¿ytkowników
+	 */
+	 //TODO dodaæ link do UserSQLFactory
+	 //TODO przenieœæ metody typu util do oddzielnego pakietu
 	private void obtainUsers() {
 		try {
 			this.userFactory.setStatementType(SQLStamentType.SELECT);
@@ -199,14 +226,35 @@ public class UserSelectionPanel extends JDialog implements
 	}
 
 	class UserSelectionPanelListener implements ActionListener {
+		UserSelectionPanel usp = null;
+		private PasswordDialog pd;
+
+		public UserSelectionPanelListener(UserSelectionPanel usp) {
+			this.usp = usp;
+			this.pd = new PasswordDialog(null);
+		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton) e.getSource();
 			if (source.equals(connectButton)) {
-				connectWithUser();
-				setVisible(false);
-				dispose();
+				User u = (User) users.values().toArray()[selectedUserIndex];
+
+				pd.setVisible(true);
+				String password = pd.getPassword();
+
+				if (!u.getPassword().equals(Utilities.hashPassword(password))) {
+					JOptionPane.showMessageDialog(null,
+							"This is not valid password of " + u.getLogin()
+									+ " user", "Wrong password",
+							JOptionPane.ERROR_MESSAGE);
+					MabisLogger.getLogger().log(Level.INFO,
+							"Wrong credentials provided, password differs");
+				} else {
+					connectWithUser(u);
+					setVisible(false);
+					dispose();
+				}
 			} else if (source.equals(cancelButton)) {
 				if (isDisplayable()) {
 					setVisible(false);
@@ -216,8 +264,7 @@ public class UserSelectionPanel extends JDialog implements
 			MabisLogger.getLogger().log(Level.INFO, source.getActionCommand());
 		}
 
-		private void connectWithUser() {
-			User u = (User) users.values().toArray()[selectedUserIndex];
+		private void connectWithUser(User u) {
 			mw.getBottomPanel()
 					.getStatusBar()
 					.setMessage(

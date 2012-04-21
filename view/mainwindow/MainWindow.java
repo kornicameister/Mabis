@@ -42,8 +42,7 @@ public class MainWindow extends JFrame {
 	private final MWBottomPanel bottomPanel = new MWBottomPanel(this);
 	private final MWCollectionView collectionView = new MWCollectionView(
 			new BorderLayout(), true);
-	private final MWUserList userListPanel = new MWUserList(new BorderLayout(),
-			true);
+	private final MWUserList userListPanel = new MWUserList();
 	private JPanel contentPane = null;
 
 	/**

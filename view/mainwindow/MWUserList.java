@@ -3,6 +3,7 @@
  */
 package view.mainwindow;
 
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 
 import javax.swing.BorderFactory;
@@ -15,6 +16,10 @@ import javax.swing.JTable;
 import javax.swing.border.EtchedBorder;
 
 /**
+ * Klase {@link MWUserList} dziedziczy z JPanel i jest agregatem
+ * gdzie zlokalizowana jest lista użytkowników w formie tabeli. 
+ * Użytkownicy pobierani są z bazy danych zlokalizowanych online !
+ * 
  * @author kornicameister
  * 
  */
@@ -22,36 +27,9 @@ public class MWUserList extends JPanel {
 	private static final long serialVersionUID = -4998076655395481258L;
 	private JScrollPane userList;
 
-	/**
-	 * 
-	 */
 	public MWUserList() {
-		super();
-		this.initComponents();
-	}
-
-	/**
-	 * @param layout
-	 */
-	public MWUserList(LayoutManager layout) {
-		super(layout);
-		this.initComponents();
-	}
-
-	/**
-	 * @param isDoubleBuffered
-	 */
-	public MWUserList(boolean isDoubleBuffered) {
-		super(isDoubleBuffered);
-		this.initComponents();
-	}
-
-	/**
-	 * @param layout
-	 * @param isDoubleBuffered
-	 */
-	public MWUserList(LayoutManager layout, boolean isDoubleBuffered) {
-		super(layout, isDoubleBuffered);
+		super(true);
+		this.setLayout(new FlowLayout());
 		this.initComponents();
 	}
 
@@ -78,5 +56,8 @@ public class MWUserList extends JPanel {
 		// setting up to hierarchy
 		this.add(userTable);
 		this.setComponentPopupMenu(userMenu);
+	}
+	
+	private final void obtainUsers(){
 	}
 }
