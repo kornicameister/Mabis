@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import utilities.Hasher;
+
 import model.enums.CoverType;
 import model.enums.TableType;
 
@@ -82,7 +84,7 @@ public class Picture extends BaseTable {
 	 * @throws FileNotFoundException
 	 */
 	private void generateCheckSum() throws FileNotFoundException {
-		this.titles[0] = database.Utilities.crc32(new FileInputStream(
+		this.titles[0] = Hasher.hashStream(new FileInputStream(
 				this.imageFile));
 	}
 

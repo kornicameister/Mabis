@@ -8,9 +8,9 @@ import java.util.HashMap;
 import model.entity.Picture;
 import model.entity.User;
 import model.utilities.ForeignKey;
+import utilities.Hasher;
 import controller.SQLFactory;
 import controller.SQLStamentType;
-import database.Utilities;
 
 /**
  * This is the wrapper that allows to perform database specific operation to
@@ -39,7 +39,7 @@ public class UserSQLFactory extends SQLFactory {
 			st.setInt(index++, this.insertAvatar());
 			st.setString(index++, u.getLastName());
 			st.setString(index++, u.getFirstName());
-			st.setString(index++, Utilities.hashPassword(u.getPassword()));
+			st.setString(index++, Hasher.hashPassword(u.getPassword()));
 			st.setString(index++, u.getEmail());
 			st.setString(index++, u.getLogin());
 			st.execute();

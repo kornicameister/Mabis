@@ -15,9 +15,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
-
 import settings.GlobalPaths;
-import database.Utilities;
+import utilities.Hasher;
 
 /**
  * Blobber class is a simple utility that sets into stream an image or returns
@@ -63,7 +62,7 @@ public class Blobber {
 			//TODO add scalling images to internal sufficient size
 			is = blob.getBinaryStream();
 			String fileName = GlobalPaths.AVATAR_CACHE_PATH.toString()
-					+ Utilities.crc32(is).substring(0, 35);
+					+ Hasher.hashStream(is).substring(0, 35);
 			blobFile = new File(fileName);
 
 			if (blobFile.exists()) {

@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,21 +23,21 @@ import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
 import model.entity.User;
+import utilities.Hasher;
 import view.imagePanel.ChoosableImagePanel;
 import view.mainwindow.MainWindow;
 import view.passwordDialog.PasswordDialog;
 import controller.SQLStamentType;
 import controller.entity.UserSQLFactory;
 import database.MySQLAccess;
-import database.Utilities;
 
 /**
- * Klasa dziedzicz¹c z JDialog jest oknem typu dialogowego (modalnego)
- * które pozwala na wybór u¿ytkownika, który bêdzie korzysta³ z programu. </br>
- * U¿ytkowniky pobierani s¹ z lokalnie zlokalizowanej bazy danych.
- * Klasa implementuje interfejs {@link PropertyChangeListener} aby umo¿liwiæ
- * dynamiczne podœwietlanie wybranego u¿ytkownika. Opisana funkcjonalnoœæ 
- * dzia³a w po³¹czeniu z {@link ChoosableImagePanel}.
+ * Klasa dziedziczï¿½c z JDialog jest oknem typu dialogowego (modalnego)
+ * ktï¿½re pozwala na wybï¿½r uï¿½ytkownika, ktï¿½ry bï¿½dzie korzystaï¿½ z programu. </br>
+ * Uï¿½ytkowniky pobierani sï¿½ z lokalnie zlokalizowanej bazy danych.
+ * Klasa implementuje interfejs {@link PropertyChangeListener} aby umoï¿½liwiï¿½
+ * dynamiczne podï¿½wietlanie wybranego uï¿½ytkownika. Opisana funkcjonalnoï¿½ï¿½ 
+ * dziaï¿½a w poï¿½ï¿½czeniu z {@link ChoosableImagePanel}.
  *
  * @author kornicameister
  * @version 0.2
@@ -131,13 +131,13 @@ public class UserSelectionPanel extends JDialog implements
 
 	/**
 	 * Metoda zadeklarowana jako final static dlatego</br>
-	 * Dostêpna w ca³ym pakiecie poniewa¿ wykonuje dzia³anie niezale¿ne
-	 * od klasy w której jest zdefiniowane. </br>
-	 * Metoda korzystaj¹c z UserSQLFactory, ³¹czy siê z baz¹ danych online
-	 * i pobiera stamt¹d wszystkich u¿ytkowników
+	 * Dostï¿½pna w caï¿½ym pakiecie poniewaï¿½ wykonuje dziaï¿½anie niezaleï¿½ne
+	 * od klasy w ktï¿½rej jest zdefiniowane. </br>
+	 * Metoda korzystajï¿½c z UserSQLFactory, ï¿½ï¿½czy siï¿½ z bazï¿½ danych online
+	 * i pobiera stamtï¿½d wszystkich uï¿½ytkownikï¿½w
 	 */
-	 //TODO dodaæ link do UserSQLFactory
-	 //TODO przenieœæ metody typu util do oddzielnego pakietu
+	 //TODO dodaï¿½ link do UserSQLFactory
+	 //TODO przenieï¿½ï¿½ metody typu util do oddzielnego pakietu
 	private void obtainUsers() {
 		try {
 			this.userFactory.setStatementType(SQLStamentType.SELECT);
@@ -243,7 +243,7 @@ public class UserSelectionPanel extends JDialog implements
 				pd.setVisible(true);
 				String password = pd.getPassword();
 
-				if (!u.getPassword().equals(Utilities.hashPassword(password))) {
+				if (!u.getPassword().equals(Hasher.hashPassword(password))) {
 					JOptionPane.showMessageDialog(null,
 							"This is not valid password of " + u.getLogin()
 									+ " user", "Wrong password",
