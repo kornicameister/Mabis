@@ -34,7 +34,6 @@ public class PictureSQLFactory extends SQLFactory {
 	public PictureSQLFactory(SQLStamentType type, Picture table) {
 		super(type, table);
 		covers = new HashMap<Integer, Picture>();
-		this.movePictureToCache();
 	}
 
 	private void movePictureToCache() {
@@ -89,6 +88,7 @@ public class PictureSQLFactory extends SQLFactory {
 		Picture p = (Picture) this.table;
 		switch (this.type) {
 		case INSERT:
+			this.movePictureToCache();
 			short index = 1;
 			st.setString(index++, p.getCheckSum());
 			st.setString(index++, p.getImagePath());
