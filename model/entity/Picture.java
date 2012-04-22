@@ -77,6 +77,11 @@ public class Picture extends BaseTable {
 		this.imageFile = imageFile.getCanonicalPath();
 		this.generateCheckSum(imageFile);
 	}
+	
+	public void setImageFile(String f,String checksum) throws IOException{
+		this.imageFile = f;
+		this.titles[0] = checksum;
+	}
 
 	@Override
 	public String[] metaData() {

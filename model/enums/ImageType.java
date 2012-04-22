@@ -7,5 +7,5 @@ package model.enums;
  * @author kornicameister
  */
 public enum ImageType {
-	FRONT_COVER, BACK_COVER, CD_COVER, UNDEFINED, AVATAR
+	UNDEFINED, AVATAR, AUTHOR, BAND, FRONT_COVER, BACK_COVER, CD_COVER;
 }

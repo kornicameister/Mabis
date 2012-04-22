@@ -3,12 +3,20 @@
  */
 package controller.entity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
+
+import settings.GlobalPaths;
 
 import logger.MabisLogger;
 import model.entity.Picture;
@@ -26,6 +34,53 @@ public class PictureSQLFactory extends SQLFactory {
 	public PictureSQLFactory(SQLStamentType type, Picture table) {
 		super(type, table);
 		covers = new HashMap<Integer, Picture>();
+		this.movePictureToCache();
+	}
+
+	private void movePictureToCache() {
+		Picture pp = ((Picture) this.table);
+		File oldPicture = pp.getImageFile();
+
+		File newPicture = null;
+		switch (pp.getType()) {
+		case AVATAR:
+			newPicture = new File(GlobalPaths.AVATAR_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		case AUTHOR:
+			newPicture = new File(GlobalPaths.AUTHOR_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		case BAND:
+			newPicture = new File(GlobalPaths.BAND_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		default:
+			newPicture = new File(GlobalPaths.MEDIA_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		}
+
+		InputStream in;
+		try {
+			in = new FileInputStream(oldPicture);
+			OutputStream out = new FileOutputStream(newPicture);
+
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+
+			pp.setImageFile(newPicture.getCanonicalPath(), pp.getCheckSum());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
