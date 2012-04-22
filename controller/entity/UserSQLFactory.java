@@ -1,5 +1,6 @@
 package controller.entity;
 
+import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 
 import model.entity.Picture;
 import model.entity.User;
+import model.enums.ImageType;
 import model.utilities.ForeignKey;
 import utilities.Hasher;
 import controller.SQLFactory;
@@ -21,6 +23,7 @@ import controller.SQLStamentType;
  */
 public class UserSQLFactory extends SQLFactory {
 	private HashMap<Integer, User> users;
+	private final String selectFromView = "SELECT * FROM mabis.UserListView";
 
 	public UserSQLFactory(SQLStamentType type, User table) {
 		super(type, table);
@@ -57,7 +60,7 @@ public class UserSQLFactory extends SQLFactory {
 			this.parseResultSet(st.executeQuery(query));
 			break;
 		case SELECT:
-			this.parseResultSet(st.executeQuery());
+			this.parseResultSet(st.executeQuery(this.selectFromView));
 			break;
 		case DELETE:
 			break;
@@ -79,10 +82,13 @@ public class UserSQLFactory extends SQLFactory {
 				u.setLogin(set.getString("login"));
 				u.setPassword(set.getString("password"));
 				u.setPrimaryKey(set.getInt("idUser"));
-				this.lastAffactedId = set.getInt("avatar");
 				u.addForeingKey(new ForeignKey("picture", "avatar",
-						this.lastAffactedId));
-				u.setPicture(selectAvatar());
+						set.getInt("idPicture")));
+				try {
+					u.setPicture(new Picture(set.getString("image"),ImageType.AVATAR));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
 				this.users.put(u.getPrimaryKey(), u);
 			}
 			break;
@@ -100,17 +106,17 @@ public class UserSQLFactory extends SQLFactory {
 		}
 	}
 
-	private Picture selectAvatar() throws SQLException {
-		Picture avatar = null;
-		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT,
-				new Picture());
-		psf.addWhereClause("idPicture", this.lastAffactedId.toString());
-		psf.executeSQL(localDatabase);
-		for (Picture p : psf.getCovers().values()) {
-			avatar = p;
-		}
-		return avatar;
-	}
+//	private Picture selectAvatar() throws SQLException {
+//		Picture avatar = null;
+//		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT,
+//				new Picture());
+//		psf.addWhereClause("idPicture", this.lastAffactedId.toString());
+//		psf.executeSQL(localDatabase);
+//		for (Picture p : psf.getCovers().values()) {
+//			avatar = p;
+//		}
+//		return avatar;
+//	}
 
 	private Integer insertAvatar() throws SQLException {
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
