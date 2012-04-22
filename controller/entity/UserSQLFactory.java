@@ -5,11 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.logging.Level;
 
+import logger.MabisLogger;
 import model.entity.Picture;
 import model.entity.User;
 import model.enums.ImageType;
 import model.utilities.ForeignKey;
+import settings.GlobalPaths;
 import utilities.Hasher;
 import controller.SQLFactory;
 import controller.SQLStamentType;
@@ -82,13 +85,10 @@ public class UserSQLFactory extends SQLFactory {
 				u.setLogin(set.getString("login"));
 				u.setPassword(set.getString("password"));
 				u.setPrimaryKey(set.getInt("idUser"));
-				u.addForeingKey(new ForeignKey("picture", "avatar",
-						set.getInt("idPicture")));
-				try {
-					u.setPicture(new Picture(set.getString("image"),ImageType.AVATAR));
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
+				u.setPicture(this.selectAvatar(set.getString("image"),
+						set.getString("hash")));
+				u.addForeingKey(new ForeignKey("picture", "avatar", set
+						.getInt("idPicture")));
 				this.users.put(u.getPrimaryKey(), u);
 			}
 			break;
@@ -106,17 +106,23 @@ public class UserSQLFactory extends SQLFactory {
 		}
 	}
 
-//	private Picture selectAvatar() throws SQLException {
-//		Picture avatar = null;
-//		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT,
-//				new Picture());
-//		psf.addWhereClause("idPicture", this.lastAffactedId.toString());
-//		psf.executeSQL(localDatabase);
-//		for (Picture p : psf.getCovers().values()) {
-//			avatar = p;
-//		}
-//		return avatar;
-//	}
+	private Picture selectAvatar(String path, String checkSum) {
+		Picture p = null;
+		try {
+			p = new Picture(path, ImageType.AVATAR);
+			if (p.getCheckSum().equals(checkSum)) {
+				return p;
+			} else {
+				MabisLogger.getLogger().log(Level.WARNING,
+						"Checksum of images does not match");
+				p = new Picture(GlobalPaths.DEFAULT_COVER_PATH.toString(),
+						ImageType.UNDEFINED);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return p;
+	}
 
 	private Integer insertAvatar() throws SQLException {
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
