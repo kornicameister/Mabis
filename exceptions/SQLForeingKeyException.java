@@ -4,7 +4,7 @@
  */
 package exceptions;
 
-import model.entity.BaseTable;
+import model.BaseTable;
 import model.utilities.ForeignKeyPair;
 
 /**

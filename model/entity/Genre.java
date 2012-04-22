@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import model.BaseTable;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
 import exceptions.SQLForeingKeyNotFound;

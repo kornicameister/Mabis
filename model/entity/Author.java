@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import model.BaseTable;
 import model.enums.TableType;
 
 /**
@@ -46,7 +47,7 @@ public class Author extends BaseTable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAuthor", "firstName", "lastName", "picture" };
+		String tmp[] = { "idAuthor", "firstName", "lastName", "avatar" };
 		return tmp;
 	}
 

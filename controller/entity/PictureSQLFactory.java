@@ -3,7 +3,7 @@
  */
 package controller.entity;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +12,7 @@ import java.util.logging.Level;
 
 import logger.MabisLogger;
 import model.entity.Picture;
-import controller.Blobber;
+import model.enums.ImageType;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -36,7 +36,7 @@ public class PictureSQLFactory extends SQLFactory {
 		case INSERT:
 			short index = 1;
 			st.setString(index++, p.getCheckSum());
-			Blobber.putBlobImageToStatement(st, p.getImageFile(), index++);
+			st.setString(index++, p.getImagePath());
 			st.execute();
 
 			// getting last inserted id
@@ -79,15 +79,13 @@ public class PictureSQLFactory extends SQLFactory {
 			break;
 		case SELECT:
 			while (set.next()) {
-				p = new Picture(set.getInt("idPicture"));
+				p = new Picture(set.getInt("idPicture"), ImageType.UNDEFINED);
 				try {
-					p.setImageFile(Blobber.createImageFromBlob(set
-							.getBlob("image")));
-				} catch (FileNotFoundException e) {
+					p.setImageFile(set.getString("image"));
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				String hash = set.getString("hash");
-				if (!hash.equals(p.getCheckSum())) {
+				if (!set.getString("hash").equals(p.getCheckSum())) {
 					MabisLogger.getLogger().log(Level.WARNING,
 							"Loaded image checksum != calculated checksum");
 				}

@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import model.entity.BaseTable;
+import model.BaseTable;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 

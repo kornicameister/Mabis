@@ -2,7 +2,7 @@ package controller;
 
 import java.sql.SQLException;
 
-import model.entity.BaseTable;
+import model.BaseTable;
 
 public interface StatementFactory {
 	/**

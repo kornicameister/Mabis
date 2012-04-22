@@ -7,10 +7,12 @@ package model.entity;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import utilities.Hasher;
 
-import model.enums.CoverType;
+import model.BaseTable;
+import model.enums.ImageType;
 import model.enums.TableType;
 
 /**
@@ -22,15 +24,17 @@ import model.enums.TableType;
  */
 // TODO update commnents and make them more sql dependable
 public class Picture extends BaseTable {
-	private CoverType type = null;
-	private File imageFile;
+	private final ImageType type;;
+	private String imageFile = null;
 
 	public Picture() {
 		super();
+		this.type = ImageType.UNDEFINED;
 	}
 
-	public Picture(int pk) {
+	public Picture(int pk, ImageType t) {
 		super(pk);
+		this.type = t;
 	}
 
 	/**
@@ -42,19 +46,36 @@ public class Picture extends BaseTable {
 	 * @param cover
 	 * @throws FileNotFoundException
 	 */
-	public Picture(File cover) throws FileNotFoundException {
+	public Picture(String cover, ImageType t) throws FileNotFoundException {
 		super();
 		this.imageFile = cover;
-		this.generateCheckSum();
+		this.generateCheckSum(new File(cover));
+		this.type = t;
+	}	
+	
+	public Picture(File cover, ImageType t) throws IOException {
+		super();
+		this.imageFile = cover.getCanonicalPath();
+		this.generateCheckSum(cover);
+		this.type = t;
 	}
 
-	public File getImageFile() {
-		return imageFile;
+	public String getImagePath(){
+		return this.imageFile;
+	}
+	
+	public final File getImageFile() {
+		return new File(this.imageFile);
 	}
 
-	public void setImageFile(File imageFile) throws FileNotFoundException {
-		this.imageFile = imageFile;
-		this.generateCheckSum();
+	public void setImageFile(String imagePath) throws IOException {
+		this.imageFile = imagePath;
+		this.generateCheckSum(new File(this.imageFile));
+	}
+
+	public void setImageFile(File imageFile) throws IOException {
+		this.imageFile = imageFile.getCanonicalPath();
+		this.generateCheckSum(imageFile);
 	}
 
 	@Override
@@ -63,12 +84,8 @@ public class Picture extends BaseTable {
 		return tmp;
 	}
 
-	public CoverType getType() {
+	public ImageType getType() {
 		return type;
-	}
-
-	public void setType(CoverType type) {
-		this.type = type;
 	}
 
 	public String getCheckSum() {
@@ -83,14 +100,12 @@ public class Picture extends BaseTable {
 	 *            the checkSum to set
 	 * @throws FileNotFoundException
 	 */
-	private void generateCheckSum() throws FileNotFoundException {
-		this.titles[0] = Hasher.hashStream(new FileInputStream(
-				this.imageFile));
+	private void generateCheckSum(File f) throws FileNotFoundException {
+		this.titles[0] = Hasher.hashStream(new FileInputStream(f));
 	}
 
 	@Override
 	protected void initInternalFields() {
-		this.type = CoverType.UNDEFINED;
 		this.imageFile = null;
 		this.tableName = TableType.PICTURE.toString();
 		this.titles[0] = "";

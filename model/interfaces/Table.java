@@ -6,7 +6,7 @@ package model.interfaces;
 
 import java.util.TreeMap;
 
-import model.entity.BaseTable;
+import model.BaseTable;
 import model.utilities.ForeignKey;
 import exceptions.SQLForeingKeyException;
 import exceptions.SQLForeingKeyNotFound;

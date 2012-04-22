@@ -2,7 +2,7 @@
  * package model.entity in MABIS
  * by kornicameister
  */
-package model.entity;
+package model;
 
 import java.util.Map.Entry;
 import java.util.TreeMap;

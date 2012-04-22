@@ -6,6 +6,6 @@ package model.enums;
  * 
  * @author kornicameister
  */
-public enum CoverType {
+public enum ImageType {
 	FRONT_COVER, BACK_COVER, CD_COVER, UNDEFINED, AVATAR
 }

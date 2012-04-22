@@ -1,6 +1,6 @@
 package controller;
 
-import model.entity.BaseTable;
+import model.BaseTable;
 
 /**
  * This exception is used to protect against using certain xSQLFactory with the type

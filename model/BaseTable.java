@@ -2,11 +2,14 @@
  * package model.entity in MABIS
  * by kornicameister
  */
-package model.entity;
+package model;
 
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import model.entity.AudioAlbum;
+import model.entity.Book;
+import model.entity.Movie;
 import model.enums.TableType;
 import model.interfaces.Table;
 import model.utilities.ForeignKey;

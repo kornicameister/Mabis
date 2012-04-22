@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import model.ManyToManyTable;
 import model.enums.TableType;
 
 /**

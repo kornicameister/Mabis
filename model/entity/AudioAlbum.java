@@ -8,7 +8,8 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import model.enums.CoverType;
+import model.BaseTable;
+import model.enums.ImageType;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
 
@@ -22,7 +23,7 @@ import model.utilities.ForeignKey;
  */
 public class AudioAlbum extends BaseTable {
 	private ArrayList<Genre> tagCloud = null;
-	private TreeMap<CoverType, Picture> covers = null; // map of covers
+	private TreeMap<ImageType, Picture> covers = null; // map of covers
 	private Time totalTime = null;
 	private Band band = null;
 
@@ -117,27 +118,27 @@ public class AudioAlbum extends BaseTable {
 	}
 
 	public void setFrontCover(Picture fc) {
-		this.covers.put(CoverType.FRONT_COVER, fc);
+		this.covers.put(ImageType.FRONT_COVER, fc);
 	}
 
 	public void setBackCover(Picture fc) {
-		this.covers.put(CoverType.BACK_COVER, fc);
+		this.covers.put(ImageType.BACK_COVER, fc);
 	}
 
 	public Picture getFrontCover() {
-		return this.covers.get(CoverType.FRONT_COVER);
+		return this.covers.get(ImageType.FRONT_COVER);
 	}
 
 	public Picture getBackCover() {
-		return this.covers.get(CoverType.BACK_COVER);
+		return this.covers.get(ImageType.BACK_COVER);
 	}
 
 	public Picture getCDCover() {
-		return this.covers.get(CoverType.CD_COVER);
+		return this.covers.get(ImageType.CD_COVER);
 	}
 
 	public void setCDCover(Picture fc) {
-		this.covers.put(CoverType.CD_COVER, fc);
+		this.covers.put(ImageType.CD_COVER, fc);
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
-import model.entity.BaseTable;
+import model.BaseTable;
 import database.MySQLAccess;
 
 /**

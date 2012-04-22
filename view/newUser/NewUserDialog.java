@@ -29,6 +29,7 @@ import javax.swing.border.EtchedBorder;
 import logger.MabisLogger;
 import model.entity.Picture;
 import model.entity.User;
+import model.enums.ImageType;
 import view.imagePanel.ImageFileFilter;
 import view.imagePanel.ImageFilePreview;
 import view.imagePanel.ImagePanel;
@@ -283,9 +284,12 @@ public class NewUserDialog extends JDialog {
 				user.setLogin(loginField.getText());
 				user.setEmail(mailField.getText());
 				try {
-					user.setPicture(new Picture(imagePanel.getImageFile()));
+					user.setPicture(new Picture(imagePanel.getImageFile(),
+							ImageType.AVATAR));
 				} catch (FileNotFoundException e2) {
 					e2.printStackTrace();
+				} catch (IOException e3) {
+					e3.printStackTrace();
 				}
 				user.setPassword(new String(passField.getPassword()));
 
@@ -328,8 +332,7 @@ public class NewUserDialog extends JDialog {
 									"Avatar size error",
 									JOptionPane.ERROR_MESSAGE);
 							MabisLogger.getLogger().log(
-									Level.WARNING
-									,
+									Level.WARNING,
 									"Too big avatar attempt, avatar size = ["
 											+ tmp.getIconWidth() + ";"
 											+ tmp.getIconHeight() + "]");
