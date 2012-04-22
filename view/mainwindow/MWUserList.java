@@ -56,8 +56,4 @@ public class MWUserList extends JPanel {
 		this.add(userTable);
 		this.setComponentPopupMenu(userMenu);
 	}
-	
-	private final void obtainUsers(){
-		return;
-	}
 }
