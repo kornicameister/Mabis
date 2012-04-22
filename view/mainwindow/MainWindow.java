@@ -72,13 +72,9 @@ public class MainWindow extends JFrame {
 			@Override
 			public void run() {
 				checkForUsers();
-				loadLocalCollection();
+				collectionView.loadLocalCollection();
 			}
 		});
-	}
-
-	protected final void loadLocalCollection() {
-		
 	}
 
 	private void checkForUsers() {

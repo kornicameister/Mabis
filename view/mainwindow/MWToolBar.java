@@ -60,7 +60,8 @@ public class MWToolBar extends JToolBar {
 		this.setRollover(false);
 
 		// database
-		String z[] = { "Online", "Local" };
+		// TODO add online support !!!
+		String z[] = { "Local" };
 		JComboBox<String> dbContent = new JComboBox<String>(z);
 		JLabel collectionLabel = new JLabel("Collection : ");
 		collectionLabel.setLabelFor(dbContent);
