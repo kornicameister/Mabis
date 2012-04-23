@@ -32,6 +32,7 @@ public abstract class SQLFactory implements StatementFactory {
 	protected BaseTable table = null;
 	protected boolean localDatabase = false;
 	protected Integer lastAffactedId = 0;
+	protected String fetchFromView = null;
 
 	/**
 	 * Constructs a SQL factory
@@ -57,7 +58,7 @@ public abstract class SQLFactory implements StatementFactory {
 		this.wheres.add(new WhereClause(attribute, value));
 	}
 
-	private String createSQL() {
+	protected String createSQL() {
 		String rawQueryCopy = null;
 		switch (this.type) {
 		case INSERT:
@@ -72,12 +73,17 @@ public abstract class SQLFactory implements StatementFactory {
 		case SELECT:
 			rawQueryCopy = StatementFactory.selectPattern;
 			break;
+		case FETCH_ALL:
+			rawQueryCopy = this.fetchFromView;
 		default:
 			break;
 		}
-		rawQueryCopy = rawQueryCopy
-				.replaceFirst("!", this.table.getTableName());
-		String fieldList = this.buildFieldList(this.table.metaData());
+		String fieldList = null;
+		if (this.type != SQLStamentType.FETCH_ALL) {
+			rawQueryCopy = rawQueryCopy.replaceFirst("!",
+					this.table.getTableName());
+			fieldList = this.buildFieldList(this.table.metaData());
+		}
 		// first pass
 		switch (this.type) {
 		case INSERT:
@@ -100,6 +106,7 @@ public abstract class SQLFactory implements StatementFactory {
 					this.buildWhereChunk());
 			break;
 		case SELECT:
+		case FETCH_ALL:
 			String where = this.buildWhereChunk();
 			if (where.equals("")) {
 				rawQueryCopy = rawQueryCopy.substring(0,
@@ -131,26 +138,26 @@ public abstract class SQLFactory implements StatementFactory {
 		PreparedStatement st = null;
 		MySQLAccess msql = null;
 		this.sqlQuery = this.createSQL();
-		
+
 		if (localDatabase) {
 			st = MySQLAccess.getConnection().prepareStatement(this.sqlQuery,
 					Statement.RETURN_GENERATED_KEYS);
 		} else {
 			msql = new MySQLAccess();
-			st = msql.connectToOnlineDatabase().prepareStatement(
-					this.sqlQuery, Statement.RETURN_GENERATED_KEYS);
+			st = msql.connectToOnlineDatabase().prepareStatement(this.sqlQuery,
+					Statement.RETURN_GENERATED_KEYS);
 		}
 
 		this.executeByTableAndType(st);
 
 		st.close();
 		st = null;
-		
-		if(msql != null){
+
+		if (msql != null) {
 			msql.disconnectFromOnlineDatabase();
 			msql = null;
 		}
-		
+
 		System.gc();
 		return lastAffactedId;
 	}
@@ -225,7 +232,7 @@ public abstract class SQLFactory implements StatementFactory {
 	 * @author kornicameister
 	 * 
 	 */
-	private class WhereClause implements Comparable<WhereClause>{
+	private class WhereClause implements Comparable<WhereClause> {
 		String attribute = null;
 		String value = null;
 

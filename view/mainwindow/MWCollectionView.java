@@ -12,6 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
+import controller.SQLStamentType;
+import controller.entity.AudioAlbumSQLFactory;
+import controller.entity.BookSQLFactory;
+import controller.entity.MovieSQLFactory;
+
 import model.entity.AudioAlbum;
 import model.entity.Book;
 import model.entity.Movie;
@@ -60,6 +65,12 @@ public class MWCollectionView extends JPanel {
 	 * @version 0.1
 	 */
 	private final class CollectionMediator {
+		private final MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.SELECT, new Movie());  
+		private final BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.SELECT, new Book());
+		private final AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.SELECT, new AudioAlbum());
 		
+		public CollectionMediator() {
+			
+		}
 	}
 }

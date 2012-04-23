@@ -26,11 +26,11 @@ import controller.SQLStamentType;
  */
 public class UserSQLFactory extends SQLFactory {
 	private HashMap<Integer, User> users;
-	private final String selectFromView = "SELECT * FROM mabis.UserListView";
 
 	public UserSQLFactory(SQLStamentType type, User table) {
 		super(type, table);
 		users = new HashMap<Integer, User>();
+		this.fetchFromView = "SELECT * FROM mabis.UserListView where !";
 	}
 
 	@Override
@@ -63,7 +63,8 @@ public class UserSQLFactory extends SQLFactory {
 			this.parseResultSet(st.executeQuery(query));
 			break;
 		case SELECT:
-			this.parseResultSet(st.executeQuery(this.selectFromView));
+		case FETCH_ALL:
+			this.parseResultSet(st.executeQuery());
 			break;
 		case DELETE:
 			break;
@@ -77,6 +78,7 @@ public class UserSQLFactory extends SQLFactory {
 		User u = null;
 		switch (this.type) {
 		case SELECT:
+		case FETCH_ALL:
 			while (set.next()) {
 				u = new User();
 				u.setFirstName(set.getString("firstName"));

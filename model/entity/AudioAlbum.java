@@ -56,6 +56,10 @@ public class AudioAlbum extends BaseTable {
 		super(pk);
 	}
 
+	public AudioAlbum() {
+		super();
+	}
+
 	@Override
 	public String[] metaData() {
 		String tmp[] = { "idAudio", "frontCover", "backCover", "cdCover",

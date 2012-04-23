@@ -211,7 +211,8 @@ public abstract class BaseTable implements Table, Comparable<BaseTable> {
 	}
 	
 	/**
-	 * Compares table names and if tables are the same, than comparing primary keys is performed
+	 * Domyślny komparator, który porównuje po nazwie tabeli.
+	 * Jeśli tabele są identyczne, sprawdza klucze główne.
 	 */
 	@Override
 	public int compareTo(BaseTable o) {

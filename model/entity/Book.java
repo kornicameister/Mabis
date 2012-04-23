@@ -22,6 +22,10 @@ public class Book extends BaseTable {
 	private Picture cover = null; // cover is also a foreign key here
 	private Genre genre = null; // genre is also a foreign key here
 
+	public Book(){
+		super();
+	}
+	
 	public Book(String originalTitle) {
 		super(originalTitle);
 	}
