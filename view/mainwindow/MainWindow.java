@@ -5,6 +5,8 @@ package view.mainwindow;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -37,12 +39,10 @@ public class MainWindow extends JFrame {
 	private static final long serialVersionUID = -8447166696627624367L;
 	private MySQLAccess mysql = null;
 	private User connectedUser = null;
-	protected final MWToolBar toolBar = new MWToolBar("Mabis toolbar",
-			JToolBar.HORIZONTAL);
-	private final MWBottomPanel bottomPanel = new MWBottomPanel(this);
-	private final MWCollectionView collectionView = new MWCollectionView(
-			new BorderLayout(), true);
-	private final MWUserList userListPanel = new MWUserList();
+	private MWToolBar toolBar;
+	private MWBottomPanel bottomPanel;
+	private MWCollectionView collectionView;
+	private MWUserList userListPanel;
 	private JPanel contentPane = null;
 
 	/**
@@ -59,6 +59,11 @@ public class MainWindow extends JFrame {
 		super(title);
 
 		this.setJMenuBar(new MWMenuBar(this));
+		this.bottomPanel = new MWBottomPanel(this);
+		this.collectionView = new MWCollectionView(new BorderLayout(), true);
+		this.userListPanel = new MWUserList();
+		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
+		this.toolBar.addPropertyChangeListener(this.collectionView);
 		layoutComponents();
 
 		setSize(d);
@@ -79,7 +84,8 @@ public class MainWindow extends JFrame {
 
 	private void checkForUsers() {
 		// check for any user, if none print NewUserDialog
-		UserSQLFactory f = new UserSQLFactory(SQLStamentType.FETCH_ALL, new User());
+		UserSQLFactory f = new UserSQLFactory(SQLStamentType.FETCH_ALL,
+				new User());
 		try {
 			f.executeSQL(true);
 		} catch (SQLException e) {
@@ -191,5 +197,12 @@ public class MainWindow extends JFrame {
 
 	public User getConnectedUser() {
 		return this.connectedUser;
+	}
+
+	class MWToolBarListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+		}
+
 	}
 }
