@@ -15,16 +15,18 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
-import controller.SQLStamentType;
-import controller.entity.AudioAlbumSQLFactory;
-import controller.entity.BookSQLFactory;
-import controller.entity.MovieSQLFactory;
-
 import logger.MabisLogger;
 import model.entity.AudioAlbum;
+import model.entity.AudioUser;
 import model.entity.Book;
+import model.entity.BookUser;
 import model.entity.Movie;
+import model.entity.MovieUser;
 import model.enums.TableType;
+import controller.SQLStamentType;
+import controller.entity.AudioUserSQLFactory;
+import controller.entity.BookUserSQLFactory;
+import controller.entity.MovieUserSQLFactory;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
@@ -71,12 +73,12 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	 * @version 0.1
 	 */
 	private final class CollectionMediator {
-		private final MovieSQLFactory msf = new MovieSQLFactory(
-				SQLStamentType.FETCH_ALL, new Movie());
-		private final BookSQLFactory bsf = new BookSQLFactory(
-				SQLStamentType.FETCH_ALL, new Book());
-		private final AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
-				SQLStamentType.FETCH_ALL, new AudioAlbum());
+		private final MovieUserSQLFactory musf = new MovieUserSQLFactory(
+				SQLStamentType.FETCH_ALL, new MovieUser());
+		private final BookUserSQLFactory busf = new BookUserSQLFactory(
+				SQLStamentType.FETCH_ALL, new BookUser());
+		private final AudioUserSQLFactory ausf = new AudioUserSQLFactory(
+				SQLStamentType.FETCH_ALL, new AudioUser());
 
 		private String currentView, currentGroup;
 
