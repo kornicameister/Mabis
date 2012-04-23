@@ -149,7 +149,7 @@ public class UserSelectionPanel extends JFrame implements
 		}
 	}
 
-	public final void initComponents() {
+	private final void initComponents() {
 		this.rootListPanel = new JPanel(true);
 
 		this.userScrollPanel = new JScrollPane(this.rootListPanel,

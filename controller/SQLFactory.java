@@ -32,7 +32,7 @@ public abstract class SQLFactory implements StatementFactory {
 	protected BaseTable table = null;
 	protected boolean localDatabase = false;
 	protected Integer lastAffactedId = 0;
-	protected String fetchFromView = null;
+	protected String fetchAll = null;
 
 	/**
 	 * Constructs a SQL factory
@@ -74,7 +74,7 @@ public abstract class SQLFactory implements StatementFactory {
 			rawQueryCopy = StatementFactory.selectPattern;
 			break;
 		case FETCH_ALL:
-			rawQueryCopy = this.fetchFromView;
+			rawQueryCopy = this.fetchAll;
 		default:
 			break;
 		}

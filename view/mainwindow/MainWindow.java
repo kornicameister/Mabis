@@ -5,8 +5,6 @@ package view.mainwindow;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -63,9 +61,18 @@ public class MainWindow extends JFrame {
 		this.collectionView = new MWCollectionView(new BorderLayout(), true);
 		this.userListPanel = new MWUserList();
 		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
-		this.toolBar.addPropertyChangeListener(this.collectionView);
+		
 		layoutComponents();
 
+		this.toolBar.setEnabled(false);
+		this.collectionView.setEnabled(false);
+		this.bottomPanel.setEnabled(false);
+		this.userListPanel.setEnabled(false);
+
+		this.toolBar.addPropertyChangeListener(this.collectionView);
+		this.addPropertyChangeListener("connectedUser", this.collectionView);
+		
+		
 		setSize(d);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setDefaultLookAndFeelDecorated(false);
@@ -77,9 +84,9 @@ public class MainWindow extends JFrame {
 			@Override
 			public void run() {
 				checkForUsers();
-				collectionView.loadLocalCollection();
 			}
 		});
+		
 	}
 
 	private void checkForUsers() {
@@ -191,18 +198,31 @@ public class MainWindow extends JFrame {
 		return this.bottomPanel;
 	}
 
-	public void setConnectedUser(User u) {
-		this.connectedUser = u;
+	public void setConnectedUser(User newUser) {
+		if (newUser.equals(this.getConnectedUser())) {
+			return;
+		}
+		User oldUser = this.getConnectedUser();
+		this.connectedUser = newUser;
+		this.firePropertyChange("connectedUser", oldUser, this.connectedUser);
+		java.awt.EventQueue.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					collectionView.loadCollection();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		this.toolBar.setEnabled(true);
+		this.collectionView.setEnabled(true);
+		this.bottomPanel.setEnabled(true);
+		this.userListPanel.setEnabled(true);
 	}
 
 	public User getConnectedUser() {
 		return this.connectedUser;
-	}
-
-	class MWToolBarListener implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-		}
-
 	}
 }

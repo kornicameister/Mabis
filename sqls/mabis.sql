@@ -256,7 +256,9 @@ create algorithm=temptable definer=root@localhost sql security definer view Movi
         a.idAuthor,
         a.firstName as authorFirstName,
         a.lastName as authorLastName,
-        a.avatar as authorAvatar
+        (select p.idPicture from mabis.picture p where p.idPicture = a.avatar) as authorImageID,
+        (select p.image from mabis.picture p where p.idPicture = a.avatar) as authorImageFile,
+        (select p.hash from mabis.picture p where p.idPicture = a.avatar) as authorImageHash
         FROM mabis.movie as m    inner join mabis.genre as g on m.genre=g.idGenre 
                                 inner join mabis.picture p on m.cover=p.idPicture 
                                 inner join mabis.author a on m.director = a.idAUthor

@@ -37,6 +37,8 @@ public enum CollectionView {
 			case MOVIE:
 			case AUDIO_ALBUM:
 				return tt.toString();
+			default:
+				break;
 			}
 		}
 		return "all";

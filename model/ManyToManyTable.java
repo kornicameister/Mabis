@@ -35,11 +35,13 @@ public abstract class ManyToManyTable extends BaseTable implements MMTable {
 		str += "[PK: " + this.getPrimaryKey() + "]\n";
 		str += "[FKS]\n";
 		for (Entry<Integer, ForeignKeyPair> fff : this.mapOfKeys.entrySet()) {
-			str += "[Entry_" + fff.getKey() + ": " + fff.getValue().f1.toString() + ";" + fff.getValue().f2.toString() + "]\n";
+			str += "[Entry_" + fff.getKey() + ": "
+					+ fff.getValue().getFirstKey().toString() + ";"
+					+ fff.getValue().getSecondKey().toString() + "]\n";
 		}
 		return str;
 	}
-	
+
 	public void addMultiForeignKey(Integer id, ForeignKey f1, ForeignKey f2) {
 		this.mapOfKeys.put(id, new ForeignKeyPair(f1, f2));
 	}

@@ -4,6 +4,7 @@
  */
 package model.utilities;
 
+import model.BaseTable;
 
 /**
  * This class represent object-oriented implementation of sql foreign key Class
@@ -18,9 +19,35 @@ public class ForeignKey implements Comparable<ForeignKey> {
 	private String name;
 	private Integer value;
 
-	public ForeignKey(String string, String name, Integer value) {
-		this.originTable = string;
-		this.name = name;
+	/**
+	 * Konstruktor {@link ForeignKey}
+	 * 
+	 * @param targetTable
+	 *            tabela do której odwołuje się klucz obcy
+	 * @param keyName
+	 *            nazwa klucza obcego, najlepiej nazwa atrybutu
+	 * @param value
+	 *            wartość klucza obcego
+	 */
+	public ForeignKey(BaseTable tableTarget, String keyName, Integer value) {
+		this.originTable = tableTarget.getTableName();
+		this.name = keyName;
+		this.value = value;
+	}
+
+	/**
+	 * Konstruktor {@link ForeignKey}
+	 * 
+	 * @param targetTable
+	 *            tabela do której odwołuje się klucz obcy
+	 * @param keyName
+	 *            nazwa klucza obcego, najlepiej nazwa atrybutu
+	 * @param value
+	 *            wartość klucza obcego
+	 */
+	public ForeignKey(String tableTarget, String keyName, Integer value) {
+		this.originTable = tableTarget;
+		this.name = keyName;
 		this.value = value;
 	}
 

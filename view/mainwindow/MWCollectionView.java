@@ -3,40 +3,44 @@
  */
 package view.mainwindow;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
+import java.sql.SQLException;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
-import model.entity.AudioAlbum;
-import model.entity.AudioUser;
-import model.entity.Book;
-import model.entity.BookUser;
 import model.entity.Movie;
 import model.entity.MovieUser;
+import model.entity.User;
 import model.enums.TableType;
+import model.utilities.ForeignKeyPair;
+import view.imagePanel.ChoosableImagePanel;
 import controller.SQLStamentType;
-import controller.entity.AudioUserSQLFactory;
-import controller.entity.BookUserSQLFactory;
+import controller.entity.MovieSQLFactory;
 import controller.entity.MovieUserSQLFactory;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
+	private static final Dimension THUMBAILSIZE = new Dimension(100, 100);
 	private static final long serialVersionUID = 4037649477948033295L;
-	private JPopupMenu collectionMenu;
-
-	private final HashMap<Integer, Movie> collectedMovies = new HashMap<Integer, Movie>();
-	private final HashMap<Integer, Book> collectedBook = new HashMap<Integer, Book>();
-	private final HashMap<Integer, AudioAlbum> collectedAudioAlbums = new HashMap<Integer, AudioAlbum>();
 	private final CollectionMediator mediator = new CollectionMediator();
+	private JPopupMenu collectionMenu;
+	private User connectedUserReference;
+	private final TreeMap<Movie, ChoosableImagePanel> movieThumbs = new TreeMap<Movie, ChoosableImagePanel>();
+	private JPanel thumbailsPanel = null;
+	private JScrollPane scrollPanel = null;
 
 	public MWCollectionView(LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
@@ -47,6 +51,13 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
 				"Collection"));
+
+		this.thumbailsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		this.scrollPanel = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		this.scrollPanel.add(this.thumbailsPanel);
+		this.add(this.scrollPanel);
 		initPopupMenu();
 	}
 
@@ -59,8 +70,19 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		collectionMenu.setSelected(this);
 	}
 
-	void loadLocalCollection() {
-
+	private void reprintCollection() {
+		for (ChoosableImagePanel thumb : this.movieThumbs.values()) {
+			
+			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
+			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
+			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+			
+			thumb.setBorder(BorderFactory.createTitledBorder(
+					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+					"LOL"));
+			this.thumbailsPanel.add(thumb);
+		}
+		this.repaint();
 	}
 
 	/**
@@ -73,13 +95,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	 * @version 0.1
 	 */
 	private final class CollectionMediator {
-		private final MovieUserSQLFactory musf = new MovieUserSQLFactory(
-				SQLStamentType.FETCH_ALL, new MovieUser());
-		private final BookUserSQLFactory busf = new BookUserSQLFactory(
-				SQLStamentType.FETCH_ALL, new BookUser());
-		private final AudioUserSQLFactory ausf = new AudioUserSQLFactory(
-				SQLStamentType.FETCH_ALL, new AudioUser());
-
 		private String currentView, currentGroup;
 
 		public CollectionMediator() {
@@ -87,42 +102,66 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.currentGroup = new String();
 		}
 
-		void loadSelected(String display) {
-
+		void loadSelected(String display) throws SQLException {
 			if (display.equals(this.currentView)) {
-				// THIS IS ALREADY BEING DISPLAYED
-				return;
+				return;// THIS IS ALREADY BEING DISPLAYED
+			} else if (display != null) {
+				this.currentView = display;
 			}
-			this.currentView = display;
-			if (display.equals(TableType.BOOK.toString())) {
-				// load and print books only
-				this.loadBooks();
-			} else if (display.equals(TableType.AUDIO_ALBUM.toString())) {
-				// load and print audio albums only
-				this.loadAudios();
-			} else if (display.equals(TableType.MOVIE.toString())) {
-				// load and print movies only
-				this.loadMovies();
-			} else if (display.equals("all")) {
-				// oooooooo print every item you can find in db, hell yeah
+
+			if (this.currentView.equals(TableType.BOOK.toString())) {
+				this.loadBooks(); // load and print books only
+			} else if (this.currentView
+					.equals(TableType.AUDIO_ALBUM.toString())) {
+				this.loadAudios();// load and print audio albums only
+			} else if (this.currentView.equals(TableType.MOVIE.toString())) {
+				this.loadMovies(); // load and print movies only
+			} else if (this.currentView.equals("all")) {
 				this.loadAll();
 			}
+
+			// and finally reprinting collection
+			reprintCollection();
 		}
 
-		public void regroupView(String viewValue) {
+		public void groupViewBy(String viewValue) {
 			if (this.currentGroup.equals(viewValue)) {
 				return;
 			}
 		}
 
-		private void loadAll() {
+		private void loadAll() throws SQLException {
 			this.loadBooks();
 			this.loadAudios();
 			this.loadMovies();
 		}
 
-		private void loadMovies() {
+		private void loadMovies() throws SQLException {
+			MovieUserSQLFactory musf = new MovieUserSQLFactory(
+					SQLStamentType.SELECT, new MovieUser());
+			musf.addWhereClause("idUser", connectedUserReference
+					.getPrimaryKey().toString());
+			musf.executeSQL(true); // have all pair of keys from movieUser
+			TreeSet<ForeignKeyPair> keys = musf.getMovieUserKeys();
+			if (keys.isEmpty()) {
+				return;
+			}
+			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.FETCH_ALL,
+					new Movie());
+			for (ForeignKeyPair fkp : keys) {
+				msf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
+						.toString());
 
+			}
+			msf.executeSQL(true);
+			TreeSet<Movie> movies = msf.getValues();
+			MabisLogger.getLogger().log(Level.INFO,
+					"Succesffuly obtained {0} movies for collection view",
+					movies.size());
+			for (Movie movie : movies) {
+				movieThumbs.put(movie, new ChoosableImagePanel(movie
+						.getFrontCover().getImageFile()));
+			}
 		}
 
 		private void loadAudios() {
@@ -139,12 +178,28 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent arg0) {
 		String group = null;
 		String value = null;
+
+		if (arg0.getPropertyName().equals("connectedUser")) {
+			this.connectedUserReference = (User) arg0.getNewValue();
+			MabisLogger
+					.getLogger()
+					.log(Level.INFO,
+							this.getClass().getName()
+									+ ": updating connected user info, connected user login:"
+									+ this.connectedUserReference.getLogin());
+			return;
+		}
+
 		if (arg0.getNewValue() instanceof String
 				&& arg0.getPropertyName() instanceof String) {
 			value = (String) arg0.getNewValue();
 			group = (String) arg0.getPropertyName();
 			if (group.equals("viewAs")) {
-				this.mediator.loadSelected(value);
+				try {
+					this.mediator.loadSelected(value);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 				MabisLogger
 						.getLogger()
 						.log(Level.INFO,
@@ -152,7 +207,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 										+ ": updating collection view, current view set to {0}",
 								value);
 			} else {
-				this.mediator.regroupView(value);
+				this.mediator.groupViewBy(value);
 				MabisLogger
 						.getLogger()
 						.log(Level.INFO,
@@ -161,5 +216,21 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 								value);
 			}
 		}
+	}
+
+	/**
+	 * Metoda ładuje lokalną kolecję na widok kolekcji. Pobiera dane do widoku
+	 * kolekcji poprzez mediatora ( {@link CollectionMediator} ). <b>Ważne: </b>
+	 * Metoda do poprawnego działania wymaga połączenie z bazą danych oraz
+	 * zweryfikowanego użytkownika, który jest zalogowany w aplikacji. Metoda
+	 * wywoływana powinna być tylko raz, zaraz po nawiązaniu połączenia i
+	 * zalogowaniu się przez użytownika do programu.
+	 * 
+	 * @throws SQLException
+	 */
+	// TODO dodać ładowania według predefiniowanych ustawień !!!
+	public void loadCollection() throws SQLException {
+		this.mediator.loadSelected("all");
+		this.mediator.groupViewBy(null);
 	}
 }

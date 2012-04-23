@@ -1,10 +1,8 @@
 package model.entity;
 
 import java.sql.Time;
-import java.util.TreeMap;
 
 import model.BaseTable;
-import model.enums.ImageType;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
 
@@ -17,7 +15,7 @@ import model.utilities.ForeignKey;
  * @version 0.2
  */
 public class Movie extends BaseTable {
-	private TreeMap<ImageType, Picture> covers = null; // map of covers
+	private Picture frontCover = null; // map of covers
 	private Author director = null; // director is a foreing key to Author table
 	private Genre genre = null;
 	private Time duration = null;
@@ -68,14 +66,14 @@ public class Movie extends BaseTable {
 		this.tableName = TableType.MOVIE.toString();
 	}
 
-	public void setTitle(String title){
+	public void setTitle(String title) {
 		this.titles[0] = title;
 	}
-	
-	public String getTitle(){
+
+	public String getTitle() {
 		return this.titles[0];
 	}
-	
+
 	public Time getDuration() {
 		return duration;
 	}
@@ -93,19 +91,11 @@ public class Movie extends BaseTable {
 	}
 
 	public void setFrontCover(Picture fc) {
-		this.covers.put(ImageType.FRONT_COVER, fc);
-	}
-
-	public void setBackCover(Picture fc) {
-		this.covers.put(ImageType.BACK_COVER, fc);
+		this.frontCover = fc;
 	}
 
 	public Picture getFrontCover() {
-		return this.covers.get(ImageType.FRONT_COVER);
-	}
-
-	public Picture getBackCover() {
-		return this.covers.get(ImageType.BACK_COVER);
+		return this.frontCover;
 	}
 
 	public Author getDirector() {
@@ -132,10 +122,7 @@ public class Movie extends BaseTable {
 		str += "[DIRECTOR: " + this.getDirector() + "]\n";
 		str += "[GENRE: " + this.getGenre() + "]\n";
 		str += "[DURATION: " + this.getDuration() + "]\n";
-		str += "[COVERS]\n";
-		for(Picture c : this.covers.values()){
-			str += c;
-		}
+		str += "[COVER :" + this.frontCover.toString() + "]\n";
 		return str;
 	}
 

@@ -30,7 +30,7 @@ public class UserSQLFactory extends SQLFactory {
 	public UserSQLFactory(SQLStamentType type, User table) {
 		super(type, table);
 		users = new HashMap<Integer, User>();
-		this.fetchFromView = "SELECT * FROM mabis.UserListView where !";
+		this.fetchAll = "SELECT * FROM mabis.UserListView where !";
 	}
 
 	@Override
@@ -89,8 +89,8 @@ public class UserSQLFactory extends SQLFactory {
 				u.setPrimaryKey(set.getInt("idUser"));
 				u.setPicture(this.selectAvatar(set.getString("image"),
 						set.getString("hash")));
-				u.addForeingKey(new ForeignKey("picture", "avatar", set
-						.getInt("idPicture")));
+				u.addForeingKey(new ForeignKey(u.getPictureFile(), "avatar",
+						set.getInt("idPicture")));
 				this.users.put(u.getPrimaryKey(), u);
 			}
 			break;
