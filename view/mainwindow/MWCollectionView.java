@@ -21,6 +21,10 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
+import model.entity.AudioAlbum;
+import model.entity.AudioUser;
+import model.entity.Book;
+import model.entity.BookUser;
 import model.entity.Movie;
 import model.entity.MovieUser;
 import model.entity.User;
@@ -28,17 +32,23 @@ import model.enums.TableType;
 import model.utilities.ForeignKeyPair;
 import view.imagePanel.ChoosableImagePanel;
 import controller.SQLStamentType;
+import controller.entity.AudioAlbumSQLFactory;
+import controller.entity.AudioUserSQLFactory;
+import controller.entity.BookSQLFactory;
+import controller.entity.BookUserSQLFactory;
 import controller.entity.MovieSQLFactory;
 import controller.entity.MovieUserSQLFactory;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
-	private static final Dimension THUMBAILSIZE = new Dimension(150,200);
+	private static final Dimension THUMBAILSIZE = new Dimension(150, 200);
 	private static final long serialVersionUID = 4037649477948033295L;
 	private final CollectionMediator mediator = new CollectionMediator();
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
 	private final TreeMap<Movie, ChoosableImagePanel> movieThumbs = new TreeMap<Movie, ChoosableImagePanel>();
+	private final TreeMap<AudioAlbum, ChoosableImagePanel> audioThumbs = new TreeMap<AudioAlbum, ChoosableImagePanel>();
+	private final TreeMap<Book, ChoosableImagePanel> bookThumbs = new TreeMap<Book, ChoosableImagePanel>();
 	private JPanel thumbailsPanel = null;
 	private JScrollPane scrollPanel = null;
 
@@ -52,8 +62,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
 				"Collection"));
 
-		this.thumbailsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
-				10, 10));
+		this.thumbailsPanel = new JPanel(
+				new FlowLayout(FlowLayout.LEFT, 10, 10));
 		this.scrollPanel = new JScrollPane(this.thumbailsPanel,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -72,6 +82,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	}
 
 	private void reprintCollection() {
+		this.thumbailsPanel.removeAll();
 		for (ChoosableImagePanel thumb : this.movieThumbs.values()) {
 
 			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
@@ -109,6 +120,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			} else if (display != null) {
 				this.currentView = display;
 			}
+			
+			audioThumbs.clear();
+			movieThumbs.clear();
+			bookThumbs.clear();
 
 			if (this.currentView.equals(TableType.BOOK.toString())) {
 				this.loadBooks(); // load and print books only
@@ -165,12 +180,59 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}
 		}
 
-		private void loadAudios() {
+		private void loadAudios() throws SQLException {
+			AudioUserSQLFactory ausf = new AudioUserSQLFactory(
+					SQLStamentType.SELECT, new AudioUser());
+			ausf.addWhereClause("idUser", connectedUserReference
+					.getPrimaryKey().toString());
+			ausf.executeSQL(true); // have all pair of keys from movieUser
+			TreeSet<ForeignKeyPair> keys = ausf.getAudioUserKeys();
+			if (keys.isEmpty()) {
+				return;
+			}
+			AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
+					SQLStamentType.FETCH_ALL, new AudioAlbum());
+			for (ForeignKeyPair fkp : keys) {
+				aasf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
+						.toString());
 
+			}
+			aasf.executeSQL(true);
+			TreeSet<AudioAlbum> audios = aasf.getValues();
+			MabisLogger.getLogger().log(Level.INFO,
+					"Succesffuly obtained {0} audio albums for collection view",
+					audios.size());
+			for (AudioAlbum album : audios) {
+				audioThumbs.put(album, new ChoosableImagePanel(album
+						.getFrontCover().getImageFile()));
+			}
 		}
 
-		private void loadBooks() {
+		private void loadBooks() throws SQLException {
+			BookUserSQLFactory ausf = new BookUserSQLFactory(
+					SQLStamentType.SELECT, new BookUser());
+			ausf.addWhereClause("idUser", connectedUserReference
+					.getPrimaryKey().toString());
+			ausf.executeSQL(true); // have all pair of keys from movieUser
+			TreeSet<ForeignKeyPair> keys = ausf.getBookUserKeys();
+			if (keys.isEmpty()) {
+				return;
+			}
+			BookSQLFactory aasf = new BookSQLFactory(SQLStamentType.FETCH_ALL,
+					new Book());
+			for (ForeignKeyPair fkp : keys) {
+				aasf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
+						.toString());
 
+			}
+			aasf.executeSQL(true);
+			TreeSet<Book> books = aasf.getValues();
+			MabisLogger.getLogger().log(Level.INFO,
+					"Succesffuly obtained {0} books for collection view",
+					books.size());
+			for (Book b : books) {
+				bookThumbs.put(b, new ChoosableImagePanel(b.getCover().getImageFile()));
+			}
 		}
 
 	}
