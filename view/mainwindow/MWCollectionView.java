@@ -33,7 +33,7 @@ import controller.entity.MovieUserSQLFactory;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
-	private static final Dimension THUMBAILSIZE = new Dimension(100, 100);
+	private static final Dimension THUMBAILSIZE = new Dimension(150,200);
 	private static final long serialVersionUID = 4037649477948033295L;
 	private final CollectionMediator mediator = new CollectionMediator();
 	private JPopupMenu collectionMenu;
@@ -52,11 +52,12 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
 				"Collection"));
 
-		this.thumbailsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		this.scrollPanel = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		this.thumbailsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
+				10, 10));
+		this.scrollPanel = new JScrollPane(this.thumbailsPanel,
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		this.scrollPanel.add(this.thumbailsPanel);
 		this.add(this.scrollPanel);
 		initPopupMenu();
 	}
@@ -72,17 +73,17 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 	private void reprintCollection() {
 		for (ChoosableImagePanel thumb : this.movieThumbs.values()) {
-			
+
 			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-			
+
 			thumb.setBorder(BorderFactory.createTitledBorder(
 					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 					"LOL"));
 			this.thumbailsPanel.add(thumb);
 		}
-		this.repaint();
+		this.thumbailsPanel.validate();
 	}
 
 	/**
