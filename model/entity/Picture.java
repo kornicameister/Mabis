@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serializable;
 
 import utilities.Hasher;
 
@@ -23,7 +24,8 @@ import model.enums.TableType;
  * 
  */
 // TODO update commnents and make them more sql dependable
-public class Picture extends BaseTable {
+public class Picture extends BaseTable implements Serializable {
+	private static final long serialVersionUID = -1350787093697204874L;
 	private final ImageType type;;
 	private String imageFile = null;
 
@@ -51,8 +53,8 @@ public class Picture extends BaseTable {
 		this.imageFile = cover;
 		this.generateCheckSum(new File(cover));
 		this.type = t;
-	}	
-	
+	}
+
 	public Picture(File cover, ImageType t) throws IOException {
 		super();
 		this.imageFile = cover.getCanonicalPath();
@@ -60,10 +62,10 @@ public class Picture extends BaseTable {
 		this.type = t;
 	}
 
-	public String getImagePath(){
+	public String getImagePath() {
 		return this.imageFile;
 	}
-	
+
 	public final File getImageFile() {
 		return new File(this.imageFile);
 	}
@@ -77,8 +79,8 @@ public class Picture extends BaseTable {
 		this.imageFile = imageFile.getCanonicalPath();
 		this.generateCheckSum(imageFile);
 	}
-	
-	public void setImageFile(String f,String checksum) throws IOException{
+
+	public void setImageFile(String f, String checksum) throws IOException {
 		this.imageFile = f;
 		this.titles[0] = checksum;
 	}

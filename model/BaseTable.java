@@ -4,6 +4,7 @@
  */
 package model;
 
+import java.io.Serializable;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -22,8 +23,9 @@ import exceptions.SQLForeingKeyNotFound;
  * @author kornicameister
  * @version 0.2
  */
-public abstract class BaseTable implements Table, Comparable<BaseTable> {
-	// common fields for every class
+public abstract class BaseTable implements Table, Comparable<BaseTable>,
+		Serializable {
+	private static final long serialVersionUID = 8934017748567797527L;
 	private Integer primaryKey = null;
 	protected String[] titles = null;
 	protected TreeSet<TableType> constraints = null;

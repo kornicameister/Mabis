@@ -4,6 +4,8 @@
  */
 package model.entity;
 
+import java.io.Serializable;
+
 import model.BaseTable;
 import model.enums.TableType;
 
@@ -14,7 +16,8 @@ import model.enums.TableType;
  * @author kornicameister
  * @version 0.4
  */
-public class Author extends BaseTable {
+public class Author extends BaseTable implements Serializable {
+	private static final long serialVersionUID = 7692599340459728530L;
 	private Picture pictureFile = null;
 
 	/**
@@ -64,7 +67,6 @@ public class Author extends BaseTable {
 	public void setFirstName(String firstName) {
 		this.setOriginalTitle(firstName);
 	}
-
 
 	public String getLastName() {
 		return this.getLocalizedTitle();

@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -15,13 +16,15 @@ import model.utilities.ForeignKey;
 
 /**
  * Klasa jest obiektową reprezentacją tabeli audioAlbum z bazy danych mabis.
- * Posiada następujące atrybuty: </br> | idAudio </br> | frontCover</br> | backCover</br> |
- * cdCover</br> | tagCloud</br> | trackList</br> | artist</br> | totalTime
+ * Posiada następujące atrybuty: </br> | idAudio </br> | frontCover</br> |
+ * backCover</br> | cdCover</br> | tagCloud</br> | trackList</br> | artist</br>
+ * | totalTime
  * 
  * @author kornicameister
  * @version 0.2
  */
-public class AudioAlbum extends BaseTable {
+public class AudioAlbum extends BaseTable implements Serializable {
+	private static final long serialVersionUID = -6884151728501220580L;
 	private ArrayList<Genre> tagCloud = null;
 	private TreeMap<ImageType, Picture> covers = null; // map of covers
 	private Time totalTime = null;
@@ -154,11 +157,10 @@ public class AudioAlbum extends BaseTable {
 		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
 		str += "[DURATION: " + this.getTotalTime() + "]\n";
 		str += "[COVERS]\n";
-		for(Picture c : this.covers.values()){
+		for (Picture c : this.covers.values()) {
 			str += c;
 		}
 		return str;
 	}
-
 
 }

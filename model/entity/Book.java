@@ -4,6 +4,8 @@
  */
 package model.entity;
 
+import java.io.Serializable;
+
 import model.BaseTable;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
@@ -16,16 +18,17 @@ import model.utilities.ForeignKey;
  * @author kornicameister
  * @version 0.2
  */
-public class Book extends BaseTable {
+public class Book extends BaseTable implements Serializable {
+	private static final long serialVersionUID = -3111018571540665182L;
 	private Short pages = null;
 	private Author writer = null; // writer is a foreign key here
 	private Picture cover = null; // cover is also a foreign key here
 	private Genre genre = null; // genre is also a foreign key here
 
-	public Book(){
+	public Book() {
 		super();
 	}
-	
+
 	public Book(String originalTitle) {
 		super(originalTitle);
 	}

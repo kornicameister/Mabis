@@ -4,6 +4,7 @@
  */
 package model.entity;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,7 +22,8 @@ import model.utilities.ForeignKey;
  * 
  */
 // TODO update comments
-public class Band extends Author {
+public class Band extends Author implements Serializable {
+	private static final long serialVersionUID = -7352842615967671155L;
 	private URL lastFMUrl = null;
 	private ArrayList<Genre> tagCloud = null;
 	private Genre masterGenre = null;
@@ -41,11 +43,11 @@ public class Band extends Author {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBand", "name", "description", "url",
-				"picture", "masterGenre", "tagCloud"};
+		String tmp[] = { "idBand", "name", "description", "url", "picture",
+				"masterGenre", "tagCloud" };
 		return tmp;
 	}
-	
+
 	private void createLastFMUrl() {
 		try {
 			this.lastFMUrl = new URL(urlPattern

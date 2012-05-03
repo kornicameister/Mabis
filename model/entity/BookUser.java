@@ -4,15 +4,19 @@
  */
 package model.entity;
 
+import java.io.Serializable;
+
 import model.ManyToManyTable;
 import model.enums.TableType;
 
 /**
  * This class maps itself to mabis.bookUser many to many table
+ * 
  * @author kornicameister
  * 
  */
-public class BookUser extends ManyToManyTable {
+public class BookUser extends ManyToManyTable implements Serializable {
+	private static final long serialVersionUID = -4928344550589522311L;
 
 	public BookUser() {
 		super();

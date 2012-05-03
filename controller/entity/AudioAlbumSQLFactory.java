@@ -32,7 +32,6 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
-		short index = 1;
 		switch (this.type) {
 		case UPDATE:
 			break;

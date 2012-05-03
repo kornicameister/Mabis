@@ -1,5 +1,6 @@
 package model.entity;
 
+import java.io.Serializable;
 import java.sql.Time;
 
 import model.BaseTable;
@@ -14,7 +15,8 @@ import model.utilities.ForeignKey;
  * @author kornicameister
  * @version 0.2
  */
-public class Movie extends BaseTable {
+public class Movie extends BaseTable implements Serializable {
+	private static final long serialVersionUID = 2787293119303350654L;
 	private Picture frontCover = null; // map of covers
 	private Author director = null; // director is a foreing key to Author table
 	private Genre genre = null;

@@ -4,6 +4,8 @@
  */
 package model.entity;
 
+import java.io.Serializable;
+
 import model.enums.TableType;
 
 /**
@@ -17,7 +19,8 @@ import model.enums.TableType;
 
 // TODO comments
 
-public class User extends Author {
+public class User extends Author implements Serializable {
+	private static final long serialVersionUID = 7165099983429863760L;
 	private String password;
 
 	public User(){

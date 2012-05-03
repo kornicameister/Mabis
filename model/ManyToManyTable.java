@@ -4,6 +4,7 @@
  */
 package model;
 
+import java.io.Serializable;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -17,7 +18,9 @@ import model.utilities.ForeignKeyPair;
  * 
  * @author kornicameister
  */
-public abstract class ManyToManyTable extends BaseTable implements MMTable {
+public abstract class ManyToManyTable extends BaseTable implements MMTable,
+		Serializable {
+	private static final long serialVersionUID = -3084535642990380335L;
 	private TreeMap<Integer, ForeignKeyPair> mapOfKeys;
 
 	/**

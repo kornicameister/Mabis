@@ -4,6 +4,8 @@
  */
 package model.entity;
 
+import java.io.Serializable;
+
 import model.BaseTable;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
@@ -11,12 +13,14 @@ import exceptions.SQLForeingKeyNotFound;
 
 /**
  * Class maps itself to mabis.genre table Table structure: </br> | idGenre </br>
- * | genre </br> 
+ * | genre </br>
  * 
  * @author kornicameister
  * 
  */
-public class Genre extends BaseTable {
+public class Genre extends BaseTable implements Serializable {
+	private static final long serialVersionUID = 3862214016426775417L;
+
 	/**
 	 * Construct new Genre with default empty constructor
 	 */
@@ -44,10 +48,10 @@ public class Genre extends BaseTable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idGenre", "genre"};
+		String tmp[] = { "idGenre", "genre" };
 		return tmp;
 	}
-	
+
 	/**
 	 * wraps {@link BaseTable#setOriginalTitle(String)}
 	 * 
