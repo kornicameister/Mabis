@@ -3,12 +3,14 @@
  */
 package controller.entity;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +20,6 @@ import java.util.logging.Level;
 
 import logger.MabisLogger;
 import model.entity.Picture;
-import model.enums.ImageType;
 import settings.GlobalPaths;
 import utilities.Utilities;
 import controller.PictureCacheException;
@@ -30,11 +31,11 @@ import controller.SQLStamentType;
  * 
  */
 public class PictureSQLFactory extends SQLFactory {
-	private HashMap<Integer, Picture> covers;
+	private HashMap<Integer, Picture> pictures;
 
 	public PictureSQLFactory(SQLStamentType type, Picture table) {
 		super(type, table);
-		covers = new HashMap<Integer, Picture>();
+		pictures = new HashMap<Integer, Picture>();
 	}
 
 	private void movePictureToCache() {
@@ -130,7 +131,7 @@ public class PictureSQLFactory extends SQLFactory {
 
 	@Override
 	protected void parseResultSet(ResultSet set) throws SQLException {
-		Picture p = null;
+		Picture picture = null;
 		switch (this.type) {
 		case DELETE:
 			break;
@@ -138,17 +139,20 @@ public class PictureSQLFactory extends SQLFactory {
 			break;
 		case SELECT:
 			while (set.next()) {
-				p = new Picture(set.getInt("idPicture"), ImageType.UNDEFINED);
-				try {
-					p.setImageFile(set.getString("image"));
-				} catch (IOException e) {
-					e.printStackTrace();
+				byte[] buf = set.getBytes("object");
+				if (buf != null) {
+					try {
+						ObjectInputStream objectIn = new ObjectInputStream(
+								new ByteArrayInputStream(buf));
+						picture = (Picture) objectIn.readObject();
+						this.pictures.put(picture.getPrimaryKey(), picture);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
 				}
-				if (!set.getString("hash").equals(p.getCheckSum())) {
-					MabisLogger.getLogger().log(Level.WARNING,
-							"Loaded image checksum != calculated checksum");
-				}
-				this.covers.put(p.getPrimaryKey(), p);
+				picture = null;
 			}
 			break;
 		default:
@@ -157,7 +161,7 @@ public class PictureSQLFactory extends SQLFactory {
 	}
 
 	public HashMap<Integer, Picture> getCovers() {
-		return covers;
+		return pictures;
 	}
 
 }
