@@ -232,12 +232,17 @@ create algorithm=temptable definer=root@localhost sql security definer view Book
         b.titleOriginal,
         b.titleLocale,
         b.pages,
+        g.idGenre,
         g.genre,
+        p.idPicture,
         p.image,
+        p.hash,
         a.idAuthor,
         a.firstName,
         a.lastName,
-        a.avatar
+        (select p.idPicture from mabis.picture p where p.idPicture = a.avatar) as authorImageID,
+        (select p.image from mabis.picture p where p.idPicture = a.avatar) as authorImageFile,
+        (select p.hash from mabis.picture p where p.idPicture = a.avatar) as authorImageHash
         FROM mabis.book as b    inner join mabis.genre as g on b.genre=g.idGenre 
                                 inner join mabis.picture p on b.cover=p.idPicture 
                                 inner join mabis.author a on b.writer = a.idAUthor
