@@ -29,7 +29,6 @@ public class UserSQLFactory extends SQLFactory {
 
 	public UserSQLFactory(SQLStamentType type, User table) {
 		super(type, table);
-		this.fetchAll = "SELECT * FROM mabis.UserListView where !";
 	}
 
 	@Override
@@ -62,7 +61,6 @@ public class UserSQLFactory extends SQLFactory {
 			this.parseResultSet(st.executeQuery(query));
 			break;
 		case SELECT:
-		case FETCH_ALL:
 			this.parseResultSet(st.executeQuery());
 			break;
 		case DELETE:
@@ -77,7 +75,6 @@ public class UserSQLFactory extends SQLFactory {
 		User u = null;
 		switch (this.type) {
 		case SELECT:
-		case FETCH_ALL:
 			while (set.next()) {
 				u = new User();
 				u.setFirstName(set.getString("firstName"));

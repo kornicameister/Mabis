@@ -32,7 +32,6 @@ public abstract class SQLFactory implements StatementFactory {
 	protected BaseTable table = null;
 	protected boolean localDatabase = false;
 	protected Integer lastAffactedId = 0;
-	protected String fetchAll = null;
 
 	/**
 	 * Constructs a SQL factory
@@ -73,17 +72,10 @@ public abstract class SQLFactory implements StatementFactory {
 		case SELECT:
 			rawQueryCopy = StatementFactory.selectPattern;
 			break;
-		case FETCH_ALL:
-			rawQueryCopy = this.fetchAll;
 		default:
 			break;
 		}
 		String fieldList = null;
-		if (this.type != SQLStamentType.FETCH_ALL) {
-			rawQueryCopy = rawQueryCopy.replaceFirst("!",
-					this.table.getTableName());
-			fieldList = this.buildFieldList(this.table.metaData());
-		}
 		// first pass
 		switch (this.type) {
 		case INSERT:
@@ -106,7 +98,6 @@ public abstract class SQLFactory implements StatementFactory {
 					this.buildWhereChunk());
 			break;
 		case SELECT:
-		case FETCH_ALL:
 			String where = this.buildWhereChunk();
 			if (where.equals("")) {
 				rawQueryCopy = rawQueryCopy.substring(0,
@@ -197,6 +188,27 @@ public abstract class SQLFactory implements StatementFactory {
 	 * @throws SQLException
 	 */
 	protected abstract void parseResultSet(ResultSet set) throws SQLException;
+
+	/**
+	 * Metoda zapewnia odbiera ilość usuniętych krotek z tabeli identyfikowanej
+	 * przez {@link SQLFactory#table} i zapewnia zapisanie nowej pozycji w
+	 * logach aplikacji
+	 * 
+	 * @param executeUpdate
+	 *            ilość usuniętych krotek
+	 */
+	protected void parseDeleteSet(int executeUpdate) {
+		if (executeUpdate > 0) {
+			Object params[] = { executeUpdate, this.table.getTableName() };
+			MabisLogger.getLogger().log(Level.INFO,
+					"Successfully deleted {0} rows from {1}", params);
+		} else {
+			MabisLogger.getLogger()
+					.log(Level.SEVERE, "Failed to delete rows from {0}",
+							this.table.getTableName());
+			// TODO dodać wyjątek
+		}
+	}
 
 	@Override
 	public String buildWhereChunk() {

@@ -26,7 +26,6 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 
 	public AudioAlbumSQLFactory(SQLStamentType type, BaseTable table) {
 		super(type, table);
-		this.fetchAll = "SELECT * FROM mabis.AudioAlbumListView where !";
 	}
 
 	@Override
@@ -39,7 +38,6 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 			break;
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			this.parseResultSet(st.executeQuery());
 			break;
 		default:
@@ -54,7 +52,6 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 		case INSERT:
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			while (set.next()) {
 				a = new AudioAlbum(set.getInt("idAudio"));
 				a.setOriginalTitle(set.getString("title"));

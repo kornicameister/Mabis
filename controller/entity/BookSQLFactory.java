@@ -22,7 +22,6 @@ public class BookSQLFactory extends SQLFactory {
 
 	public BookSQLFactory(SQLStamentType type, BaseTable table) {
 		super(type, table);
-		this.fetchAll = "select * mabis.BookListView where !";
 	}
 
 	@Override
@@ -32,7 +31,6 @@ public class BookSQLFactory extends SQLFactory {
 		case INSERT:
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			this.parseResultSet(st.executeQuery());
 			break;
 		default:
@@ -46,7 +44,6 @@ public class BookSQLFactory extends SQLFactory {
 		case INSERT:
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			while (set.next()) {
 				// creating genre
 				Genre genre = new Genre(set.getInt("idGenre"));

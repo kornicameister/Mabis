@@ -41,7 +41,6 @@ public class AudioUserSQLFactory extends SQLFactory {
 		case SELECT:
 			this.parseResultSet(st.executeQuery());
 			break;
-		case FETCH_ALL:
 		default:
 			break;
 		}
@@ -62,7 +61,6 @@ public class AudioUserSQLFactory extends SQLFactory {
 				this.values.add(new ForeignKeyPair(key_1, key_2));
 			}
 			break;
-		case FETCH_ALL:
 		default:
 			break;
 		}

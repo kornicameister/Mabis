@@ -22,7 +22,6 @@ public class MovieSQLFactory extends SQLFactory {
 
 	public MovieSQLFactory(SQLStamentType type, BaseTable table) {
 		super(type, table);
-		this.fetchAll = "SELECT * FROM mabis.MovieListView where !";
 	}
 
 	@Override
@@ -32,7 +31,6 @@ public class MovieSQLFactory extends SQLFactory {
 		case INSERT:
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			this.parseResultSet(st.executeQuery());
 			break;
 		default:
@@ -46,7 +44,6 @@ public class MovieSQLFactory extends SQLFactory {
 		case INSERT:
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			while (set.next()) {
 				// creating genre
 				Genre g = new Genre(set.getInt("idGenre"));

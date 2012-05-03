@@ -27,7 +27,6 @@ public class BookUserSQLFactory extends SQLFactory {
 		case INSERT:
 		case DELETE:
 		case SELECT:
-		case FETCH_ALL:
 			this.parseResultSet(st.executeQuery());
 			break;
 		default:
@@ -50,7 +49,6 @@ public class BookUserSQLFactory extends SQLFactory {
 				this.values.add(new ForeignKeyPair(key_1, key_2));
 			}
 			break;
-		case FETCH_ALL:
 		default:
 			break;
 		}

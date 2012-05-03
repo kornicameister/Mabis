@@ -16,11 +16,12 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import settings.GlobalPaths;
-
 import logger.MabisLogger;
 import model.entity.Picture;
 import model.enums.ImageType;
+import settings.GlobalPaths;
+import utilities.Utilities;
+import controller.PictureCacheException;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -82,6 +83,15 @@ public class PictureSQLFactory extends SQLFactory {
 
 	}
 
+	private void deletePictureFromCache() throws PictureCacheException{
+		Picture pp = ((Picture) this.table);
+		File oldPicture = pp.getImageFile();
+		if(!oldPicture.delete()){
+			MabisLogger.getLogger().log(Level.WARNING,"Couldn't delete {0} cached picture",pp.getImagePath());
+			throw new PictureCacheException(pp, "couldn't be deleted");
+		}
+	}
+	
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
@@ -89,26 +99,21 @@ public class PictureSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			this.movePictureToCache();
-			short index = 1;
-			st.setString(index++, p.getCheckSum());
-			st.setString(index++, p.getImagePath());
+			st.setObject(1, p);
 			st.execute();
-
-			// getting last inserted id
+			//getting last inserted it
 			st.clearParameters();
-			String query = "SELECT id! from mabis.! order by id! desc limit 1";
-			String tableName = String.valueOf(
-					this.table.getTableName().charAt(0)).toUpperCase()
-					+ this.table.getTableName().substring(1);
-
-			query = query.replaceFirst("!", tableName);
-			query = query.replaceFirst("!", this.table.getTableName());
-			query = query.replaceFirst("!", tableName);
-
-			this.parseResultSet(st.executeQuery(query));
-
+			this.lastAffactedId = Utilities.lastInsertedId(p, st);
 			break;
 		case DELETE:
+			try {
+				this.deletePictureFromCache();
+			} catch (PictureCacheException e) {
+				e.printStackTrace();
+			}
+			st.setInt(1, p.getPrimaryKey());
+			this.parseDeleteSet(st.executeUpdate());
+			break;
 		case UPDATE:
 		case SELECT:
 			this.parseResultSet(st.executeQuery());
@@ -123,10 +128,6 @@ public class PictureSQLFactory extends SQLFactory {
 		Picture p = null;
 		switch (this.type) {
 		case INSERT:
-			// getting last inserted id !!!
-			while (set.next()) {
-				this.lastAffactedId = set.getInt(1);
-			}
 			break;
 		case DELETE:
 			break;
