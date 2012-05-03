@@ -53,12 +53,7 @@ create table if not exists mabis.band (
     idBand int(11) auto_increment,
     object longblob not null,
     avatarFK int(11) null default '0' comment 'references to idPicture',
-    genreFK  int(11) null default '0' comment 'references to idGenre',
     primary key (idBand),
-    key bandGenreRef (genreFK) using btree,
-    constraint bandGenreRef foreign key (genreFK)
-        references genre (idGenre)
-        on delete set null,
     key avatarBandKey (avatarFK) using btree,
     constraint avatarBandRef foreign key (avatarFK)
         references picture (idPicture)
