@@ -99,12 +99,8 @@ public class Band extends Author implements Serializable {
 	/**
 	 * @return the tagCloud
 	 */
-	public String getTagCloud() {
-		String t = new String();
-		for (short i = 0; i < this.tagCloud.size(); i++) {
-			t += this.tagCloud.get(i).getGenre() + ",";
-		}
-		return t.substring(0, t.length() - 1);
+	public ArrayList<Genre> getTagCloud() {
+		return this.tagCloud;
 	}
 
 	/**
