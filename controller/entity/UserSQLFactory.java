@@ -67,6 +67,7 @@ public class UserSQLFactory extends SQLFactory {
 						ObjectInputStream objectIn = new ObjectInputStream(
 								new ByteArrayInputStream(buf));
 						user = (User) objectIn.readObject();
+						user.setPrimaryKey(set.getInt("idUser"));
 						this.users.put(user.getPrimaryKey(), user);
 					} catch (IOException e) {
 						e.printStackTrace();
