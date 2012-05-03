@@ -140,7 +140,7 @@ public class UserSelectionPanel extends JFrame implements
 	// TODO przenieść metody typu util do oddzielnego pakietu
 	private void obtainUsers() {
 		try {
-			this.userFactory.setStatementType(SQLStamentType.FETCH_ALL);
+			this.userFactory.setStatementType(SQLStamentType.SELECT);
 			this.userFactory.executeSQL(true);
 			this.users = this.userFactory.getUsers();
 			this.parseUsers();

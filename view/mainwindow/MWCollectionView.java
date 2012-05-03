@@ -162,7 +162,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			if (keys.isEmpty()) {
 				return;
 			}
-			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.FETCH_ALL,
+			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.SELECT,
 					new Movie());
 			for (ForeignKeyPair fkp : keys) {
 				msf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
@@ -191,7 +191,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				return;
 			}
 			AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
-					SQLStamentType.FETCH_ALL, new AudioAlbum());
+					SQLStamentType.SELECT, new AudioAlbum());
 			for (ForeignKeyPair fkp : keys) {
 				aasf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
 						.toString());
@@ -218,7 +218,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			if (keys.isEmpty()) {
 				return;
 			}
-			BookSQLFactory aasf = new BookSQLFactory(SQLStamentType.FETCH_ALL,
+			BookSQLFactory aasf = new BookSQLFactory(SQLStamentType.SELECT,
 					new Book());
 			for (ForeignKeyPair fkp : keys) {
 				aasf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()

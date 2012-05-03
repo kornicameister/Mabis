@@ -91,7 +91,7 @@ public class MainWindow extends JFrame {
 
 	private void checkForUsers() {
 		// check for any user, if none print NewUserDialog
-		UserSQLFactory f = new UserSQLFactory(SQLStamentType.FETCH_ALL,
+		UserSQLFactory f = new UserSQLFactory(SQLStamentType.SELECT,
 				new User());
 		try {
 			f.executeSQL(true);
