@@ -133,8 +133,6 @@ public class PictureSQLFactory extends SQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		Picture picture = null;
 		switch (this.type) {
-		case DELETE:
-			break;
 		case UPDATE:
 			break;
 		case SELECT:
