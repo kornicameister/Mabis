@@ -12,8 +12,6 @@ import model.entity.Genre;
 import model.entity.Movie;
 import model.entity.Picture;
 import model.enums.ImageType;
-import model.enums.TableType;
-import model.utilities.ForeignKey;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -58,7 +56,7 @@ public class MovieSQLFactory extends SQLFactory {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
+
 				// creating authorAvatar
 				Picture pp = new Picture(set.getInt("authorImageId"),
 						ImageType.AVATAR);
@@ -68,16 +66,12 @@ public class MovieSQLFactory extends SQLFactory {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
+
 				// creating director
 				Author a = new Author(set.getInt("idAuthor"));
 				a.setFirstName(set.getString("authorFirstName"));
 				a.setLastName(set.getString("authorLastName"));
-				a.addForeingKey(new ForeignKey(TableType.PICTURE.toString(),
-						"avatar", set.getInt("authorImageId")));
 				a.setPicture(pp);
-
-
 
 				// creating movie
 				Movie m = new Movie(set.getInt("idMovie"));
@@ -94,7 +88,7 @@ public class MovieSQLFactory extends SQLFactory {
 			break;
 		}
 	}
-	
+
 	public TreeSet<Movie> getValues() {
 		return values;
 	}

@@ -61,6 +61,10 @@ public class PictureSQLFactory extends SQLFactory {
 			break;
 		}
 
+		if (newPicture.exists()) {
+			return;
+		}
+
 		InputStream in;
 		try {
 			in = new FileInputStream(oldPicture);
@@ -83,15 +87,16 @@ public class PictureSQLFactory extends SQLFactory {
 
 	}
 
-	private void deletePictureFromCache() throws PictureCacheException{
+	private void deletePictureFromCache() throws PictureCacheException {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
-		if(!oldPicture.delete()){
-			MabisLogger.getLogger().log(Level.WARNING,"Couldn't delete {0} cached picture",pp.getImagePath());
+		if (!oldPicture.delete()) {
+			MabisLogger.getLogger().log(Level.WARNING,
+					"Couldn't delete {0} cached picture", pp.getImagePath());
 			throw new PictureCacheException(pp, "couldn't be deleted");
 		}
 	}
-	
+
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
@@ -101,7 +106,7 @@ public class PictureSQLFactory extends SQLFactory {
 			this.movePictureToCache();
 			st.setObject(1, p);
 			st.execute();
-			//getting last inserted it
+			// getting last inserted it
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(p, st);
 			break;
@@ -127,8 +132,6 @@ public class PictureSQLFactory extends SQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		Picture p = null;
 		switch (this.type) {
-		case INSERT:
-			break;
 		case DELETE:
 			break;
 		case UPDATE:

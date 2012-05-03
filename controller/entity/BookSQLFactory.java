@@ -12,8 +12,6 @@ import model.entity.Book;
 import model.entity.Genre;
 import model.entity.Picture;
 import model.enums.ImageType;
-import model.enums.TableType;
-import model.utilities.ForeignKey;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -78,14 +76,8 @@ public class BookSQLFactory extends SQLFactory {
 				b.setLocalizedTitle("titleLocale");
 				b.setPages(set.getShort("pages"));
 				b.setCover(bookCover);
-				b.addForeingKey(new ForeignKey(TableType.PICTURE.toString(),
-						"cover", bookCover.getPrimaryKey()));
 				b.setWriter(author);
-				b.addForeingKey(new ForeignKey(TableType.AUTHOR.toString(),
-						"writer", author.getPrimaryKey()));
 				b.setGenre(genre);
-				b.addForeingKey(new ForeignKey(TableType.GENRE.toString(),
-						"genre", genre.getPrimaryKey()));
 			}
 			break;
 		default:

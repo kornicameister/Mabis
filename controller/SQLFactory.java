@@ -76,6 +76,9 @@ public abstract class SQLFactory implements StatementFactory {
 			break;
 		}
 		String fieldList = null;
+		rawQueryCopy = rawQueryCopy.replaceFirst("!",
+				this.table.getTableName());
+				fieldList = this.buildFieldList(this.table.metaData());
 		// first pass
 		switch (this.type) {
 		case INSERT:

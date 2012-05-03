@@ -1,5 +1,8 @@
 package controller.entity;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,8 +35,10 @@ public class UserSQLFactory extends SQLFactory {
 		case UPDATE:
 			break;
 		case INSERT:
-			st.setObject(1, u);
-			st.setInt(2, this.insertAvatar());
+			int picturePK = this.insertAvatar();
+			u.getPictureFile().setPrimaryKey(picturePK);
+			st.setInt(1, picturePK);
+			st.setObject(2, u);
 			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(u, st);
@@ -56,11 +61,20 @@ public class UserSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case SELECT:
 			while (set.next()) {
-				Object oo = set.getObject("object");
-				if (oo instanceof User) {
-					user = (User) oo;
-					this.users.put(user.getPrimaryKey(), user);
+				byte[] buf = set.getBytes("object");
+				if (buf != null) {
+					try {
+						ObjectInputStream objectIn = new ObjectInputStream(
+								new ByteArrayInputStream(buf));
+						user = (User) objectIn.readObject();
+						this.users.put(user.getPrimaryKey(), user);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
 				}
+				user = null;
 			}
 			break;
 		case UPDATE:
