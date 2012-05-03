@@ -9,18 +9,20 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import model.entity.User;
-import utilities.Utilities;
-import controller.SQLFactory;
 import controller.SQLStamentType;
 
 /**
- * This is the wrapper that allows to perform database specific operation to
- * User table content
+ * Klasa jest wrapperem, który zawiera metody pozwalające na wykonywanie
+ * operacji (insert,delete,update,select) z tabeli User znajdującej się w bazie
+ * danych mabis. Klasa dziedziczy z {@link UserSQLFactory} ponieważ operacja
+ * typu INSERT jest identyczna dla obu z tych klas. Ponadto klasa User
+ * dziedziczy z klasy Update, więc dziedziczenie wrapperów jest tym bardziej
+ * uzasadnione.
  * 
  * @author kornicameister
  * 
  */
-public class UserSQLFactory extends SQLFactory {
+public class UserSQLFactory extends AuthorSQLFactory {
 	private final HashMap<Integer, User> users = new HashMap<Integer, User>();
 
 	public UserSQLFactory(SQLStamentType type, User table) {
@@ -30,24 +32,18 @@ public class UserSQLFactory extends SQLFactory {
 	@Override
 	final protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
-		User u = (User) this.table;
+		User user = (User) this.table;
 		switch (this.type) {
 		case UPDATE:
 			break;
 		case INSERT:
-			int picturePK = this.insertAvatar();
-			u.getPictureFile().setPrimaryKey(picturePK);
-			st.setInt(1, picturePK);
-			st.setObject(2, u);
-			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(u, st);
+			this.insertEntity(user, st);
 			break;
 		case SELECT:
 			this.parseResultSet(st.executeQuery());
 			break;
 		case DELETE:
-			st.setInt(1, u.getPrimaryKey());
+			st.setInt(1, user.getPrimaryKey());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		default:
@@ -83,13 +79,6 @@ public class UserSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
-	}
-
-	private Integer insertAvatar() throws SQLException {
-		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
-				((User) table).getPictureFile());
-		this.lastAffactedId = psf.executeSQL(localDatabase);
-		return lastAffactedId;
 	}
 
 	public HashMap<Integer, User> getUsers() {
