@@ -10,7 +10,6 @@ import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
-import model.entity.Movie;
 import model.entity.Picture;
 import model.enums.ImageType;
 import model.enums.TableType;
@@ -50,18 +49,30 @@ public class BookSQLFactory extends SQLFactory {
 		case FETCH_ALL:
 			while (set.next()) {
 				// creating genre
-				Genre g = new Genre(set.getInt("idGenre"));
-				g.setGenre(set.getString("genre"));
+				Genre genre = new Genre(set.getInt("idGenre"));
+				genre.setGenre(set.getString("genre"));
 
 				// creating book cover
 				Picture bookCover = new Picture(set.getInt("idPicture"),
 						ImageType.FRONT_COVER);
+				// creating author image
+				Picture authorPicture = new Picture(
+						set.getInt("authorImageId"), ImageType.AUTHOR);
 				try {
 					bookCover.setImageFile(set.getString("image"),
 							set.getString("hash"));
+					authorPicture.setImageFile(
+							set.getString("authorImageFile"),
+							set.getString("authorImageHash"));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+
+				// creating author
+				Author author = new Author(set.getInt("idAuthor"));
+				author.setFirstName(set.getString("firstName"));
+				author.setLastName(set.getString("lastName"));
+				author.setPicture(authorPicture);
 
 				// creating book
 				Book b = new Book(set.getInt("idBook"));
@@ -72,6 +83,12 @@ public class BookSQLFactory extends SQLFactory {
 				b.setCover(bookCover);
 				b.addForeingKey(new ForeignKey(TableType.PICTURE.toString(),
 						"cover", bookCover.getPrimaryKey()));
+				b.setWriter(author);
+				b.addForeingKey(new ForeignKey(TableType.AUTHOR.toString(),
+						"writer", author.getPrimaryKey()));
+				b.setGenre(genre);
+				b.addForeingKey(new ForeignKey(TableType.GENRE.toString(),
+						"genre", genre.getPrimaryKey()));
 			}
 			break;
 		default:
