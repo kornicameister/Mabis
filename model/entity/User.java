@@ -9,12 +9,13 @@ import java.io.Serializable;
 import model.enums.TableType;
 
 /**
- * 
- * Table structure: </br> | idUser </br> | login </br> | email </br> | password
- * </br> | firstName </br> | lastName </br> | avatar </br>
+ * Klasa {@link User} jest obiektową wersją tabeli bazy danych o następującej </br> |
+ * idUser </br> | login </br> | email </br> | password </br> | firstName </br> |
+ * lastName </br> | avatar </br>
  * 
  * @author kornicameister
- * @version 0.2
+ * @version 0.3
+ * @see Author
  */
 
 // TODO comments
@@ -23,10 +24,10 @@ public class User extends Author implements Serializable {
 	private static final long serialVersionUID = 7165099983429863760L;
 	private String password;
 
-	public User(){
+	public User() {
 		super();
 	}
-	
+
 	public User(String login, String email, String password) {
 		super();
 		this.titles[2] = login;
@@ -49,8 +50,8 @@ public class User extends Author implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idUser", "login", "email", "password",
-				"firstName", "lastName", "avatar"};
+		String tmp[] = { "idUser", "login", "email", "password", "firstName",
+				"lastName", "avatar" };
 		return tmp;
 	}
 
@@ -77,7 +78,7 @@ public class User extends Author implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();

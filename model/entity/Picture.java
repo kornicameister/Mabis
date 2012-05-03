@@ -10,15 +10,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 
-import utilities.Hasher;
-
 import model.BaseTable;
 import model.enums.ImageType;
 import model.enums.TableType;
+import utilities.Hasher;
 
 /**
- * This class maps itself to mabis.cover table Table structure: </br> | idCover
- * </br> | image </br> | hash
+ * Klasa Picture jest obiektową wersją tabeli bazy danych o następującej
+ * strukturze </br> | idCover </br> | image </br> | hash
  * 
  * @author kornicameister
  * 
@@ -26,7 +25,7 @@ import model.enums.TableType;
 // TODO update commnents and make them more sql dependable
 public class Picture extends BaseTable implements Serializable {
 	private static final long serialVersionUID = -1350787093697204874L;
-	private final ImageType type;;
+	private final ImageType type;
 	private String imageFile = null;
 
 	public Picture() {

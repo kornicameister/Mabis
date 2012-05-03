@@ -9,7 +9,7 @@ package model.enums;
  * 
  * @author kornicameister
  */
-public enum TableType {
+public enum TableType{
 	AUDIO_ALBUM("audioAlbum"), AUDIO_USER("audioUser"), AUTHOR("author"), BAND(
 			"band"), BOOK("book"), BOOK_USER("bookUser"), PICTURE("picture"), GENRE(
 			"genre"), MOVIE("movie"), MOVIE_USER("movieUser"), USER("user");

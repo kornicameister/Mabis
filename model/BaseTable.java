@@ -18,10 +18,14 @@ import exceptions.SQLForeingKeyException;
 import exceptions.SQLForeingKeyNotFound;
 
 /**
- * This class represents most basic version of table in sql database
+ * Klasa {@link BaseTable} będąc klasą abstrakcyjną dostarcza podstawową
+ * funkcjonalność jaką powinna reprezentować tabela relacyjnej bazy danych.
+ * Implementując interfejs {@link Serializable} daje możliwość zapisu obiektów
+ * do bazy danych bez konieczności rozbijania operacji na operacje elementarne
+ * na poszczególnych atrybutach danej tabeli.
  * 
  * @author kornicameister
- * @version 0.2
+ * @version 0.3
  */
 public abstract class BaseTable implements Table, Comparable<BaseTable>,
 		Serializable {
@@ -211,17 +215,17 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 		}
 		return str;
 	}
-	
+
 	/**
-	 * Domyślny komparator, który porównuje po nazwie tabeli.
-	 * Jeśli tabele są identyczne, sprawdza klucze główne.
+	 * Domyślny komparator, który porównuje po nazwie tabeli. Jeśli tabele są
+	 * identyczne, sprawdza klucze główne.
 	 */
 	@Override
 	public int compareTo(BaseTable o) {
 		int compareValue = 0;
 		compareValue = this.getTableName().compareTo(o.getTableName());
-		if(compareValue == 0){
-			//the same table, lets check primary keys
+		if (compareValue == 0) {
+			// the same table, lets check primary keys
 			compareValue = this.getPrimaryKey().compareTo(o.getPrimaryKey());
 		}
 		return compareValue;

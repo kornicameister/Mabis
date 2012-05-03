@@ -10,8 +10,8 @@ import model.BaseTable;
 import model.enums.TableType;
 
 /**
- * This method is to represent Author table Table structure: </br> | idBand
- * </br> | firstName </br> | lastName </br> | picture </br>
+ * Klasa {@link Author} jest obiektową wersją tabeli bazy danych o następującej
+ * </br> | idBand </br> | firstName </br> | lastName </br> | picture </br>
  * 
  * @author kornicameister
  * @version 0.4
@@ -21,7 +21,7 @@ public class Author extends BaseTable implements Serializable {
 	private Picture pictureFile = null;
 
 	/**
-	 * @see BaseTable#BaseTable()
+	 * Domyślny pusty konstruktor dla klasy {@link Author}
 	 */
 	public Author() {
 		super();
