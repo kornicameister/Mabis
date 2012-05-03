@@ -25,11 +25,10 @@ import controller.SQLStamentType;
  * 
  */
 public class UserSQLFactory extends SQLFactory {
-	private HashMap<Integer, User> users;
+	private final HashMap<Integer, User> users = new HashMap<Integer, User>();
 
 	public UserSQLFactory(SQLStamentType type, User table) {
 		super(type, table);
-		users = new HashMap<Integer, User>();
 		this.fetchAll = "SELECT * FROM mabis.UserListView where !";
 	}
 
