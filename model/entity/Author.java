@@ -50,14 +50,13 @@ public class Author extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAuthor", "firstName", "lastName", "avatar" };
+		String tmp[] = { "idAuthor", "object", "avatarFK" };
 		return tmp;
 	}
 
 	@Override
 	protected void initInternalFields() {
 		this.tableName = TableType.AUTHOR.toString();
-		this.constraints.add(TableType.PICTURE);
 	}
 
 	public String getFirstName() {

@@ -1,5 +1,7 @@
 package model.utilities;
 
+import java.io.Serializable;
+
 import model.interfaces.MMTable;
 
 /**
@@ -9,7 +11,8 @@ import model.interfaces.MMTable;
  * @author kornicameister
  * @see MMTable
  */
-public class ForeignKeyPair implements Comparable<ForeignKeyPair> {
+public class ForeignKeyPair implements Comparable<ForeignKeyPair>,Serializable {
+	private static final long serialVersionUID = -6158282006256210527L;
 	private final ForeignKey f1, f2;
 
 	public ForeignKeyPair(ForeignKey f1, ForeignKey f2) {

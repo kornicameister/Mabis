@@ -65,8 +65,8 @@ public class AudioAlbum extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAudio", "frontCover", "backCover", "cdCover",
-				"tagCloud", "trackList", "artist", "totalTime" };
+		String tmp[] = { "idAudio", "object", "frontCoverFK", "backCoverFK",
+				"cdCoverFK", "artistFK" };
 		return tmp;
 	}
 
@@ -74,9 +74,6 @@ public class AudioAlbum extends BaseTable implements Serializable {
 	protected void initInternalFields() {
 		this.tagCloud = new ArrayList<Genre>();
 		this.totalTime = new Time(0);
-		this.constraints.add(TableType.PICTURE);
-		this.constraints.add(TableType.AUTHOR);
-		this.constraints.add(TableType.GENRE);
 		this.tableName = TableType.AUDIO_ALBUM.toString();
 	}
 

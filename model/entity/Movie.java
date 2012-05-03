@@ -53,18 +53,13 @@ public class Movie extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBook", "titleOriginal", "titleLocale", "duration",
-				"description", "frontCover", "backCover", "director", "genre" };
+		String tmp[] = { "idBook", "object", "coverFK", "directorFK", "genreFK" };
 		return tmp;
 	}
 
 	@Override
 	protected void initInternalFields() {
 		this.setDuration(new Time(0));
-
-		this.constraints.add(TableType.PICTURE);
-		this.constraints.add(TableType.GENRE);
-		this.constraints.add(TableType.AUTHOR);
 		this.tableName = TableType.MOVIE.toString();
 	}
 

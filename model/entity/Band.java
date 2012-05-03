@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import model.enums.TableType;
-import model.utilities.ForeignKey;
 
 /**
  * This class maps itself to Mabis.band table
@@ -43,8 +42,7 @@ public class Band extends Author implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBand", "name", "description", "url", "picture",
-				"masterGenre", "tagCloud" };
+		String tmp[] = { "idBand", "object", "avatarFK", "genreFK" };
 		return tmp;
 	}
 
@@ -57,25 +55,10 @@ public class Band extends Author implements Serializable {
 		}
 	}
 
-	/**
-	 * Construct Band class with primary key and set of foreing keys
-	 * 
-	 * @param pk
-	 * @param keys
-	 */
-	public Band(int pk, ForeignKey... keys) {
-		super(pk);
-		for (ForeignKey k : keys) {
-			this.addForeingKey(k);
-		}
-	}
-
 	@Override
 	protected void initInternalFields() {
 		this.tagCloud = new ArrayList<Genre>();
 		this.masterGenre = new Genre();
-		this.constraints.add(TableType.PICTURE);
-		this.constraints.add(TableType.GENRE);
 		this.tableName = TableType.BAND.toString();
 	}
 

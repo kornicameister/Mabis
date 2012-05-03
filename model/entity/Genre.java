@@ -8,8 +8,6 @@ import java.io.Serializable;
 
 import model.BaseTable;
 import model.enums.TableType;
-import model.utilities.ForeignKey;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
  * Class maps itself to mabis.genre table Table structure: </br> | idGenre </br>
@@ -48,7 +46,7 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idGenre", "genre" };
+		String tmp[] = { "idGenre", "object" };
 		return tmp;
 	}
 
@@ -68,12 +66,6 @@ public class Genre extends BaseTable implements Serializable {
 	 */
 	public String getGenre() {
 		return this.titles[0];
-	}
-
-	@Override
-	public void checkConstraints(ForeignKey... keys)
-			throws SQLForeingKeyNotFound {
-		return;
 	}
 
 	@Override

@@ -43,8 +43,7 @@ public class Book extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBook", "isbn", "titleOriginal", "titleLocale",
-				"genre", "pages", "cover", "writer" };
+		String tmp[] = { "idBook", "object", "genreFK", "coverFK", "writerFK" };
 		return tmp;
 	}
 
@@ -52,10 +51,6 @@ public class Book extends BaseTable implements Serializable {
 	protected void initInternalFields() {
 		this.setPages(new Short((short) 0));
 		this.tableName = TableType.BOOK.toString();
-
-		this.constraints.add(TableType.AUTHOR);
-		this.constraints.add(TableType.PICTURE);
-		this.constraints.add(TableType.GENRE);
 	}
 
 	public String getIsbn() {

@@ -4,6 +4,8 @@
  */
 package model.utilities;
 
+import java.io.Serializable;
+
 import model.BaseTable;
 
 /**
@@ -14,7 +16,8 @@ import model.BaseTable;
  * @author kornicameister
  * @see Comparable
  */
-public class ForeignKey implements Comparable<ForeignKey> {
+public class ForeignKey implements Comparable<ForeignKey>, Serializable{
+	private static final long serialVersionUID = -839442478641269523L;
 	private String originTable;
 	private String name;
 	private Integer value;

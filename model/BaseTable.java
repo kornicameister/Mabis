@@ -5,17 +5,12 @@
 package model;
 
 import java.io.Serializable;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import model.entity.AudioAlbum;
 import model.entity.Book;
 import model.entity.Movie;
-import model.enums.TableType;
 import model.interfaces.Table;
 import model.utilities.ForeignKey;
-import exceptions.SQLForeingKeyException;
-import exceptions.SQLForeingKeyNotFound;
 
 /**
  * Klasa {@link BaseTable} będąc klasą abstrakcyjną dostarcza podstawową
@@ -32,8 +27,6 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private static final long serialVersionUID = 8934017748567797527L;
 	private Integer primaryKey = null;
 	protected String[] titles = null;
-	protected TreeSet<TableType> constraints = null;
-	protected TreeMap<String, ForeignKey> foreignKeys;
 	protected String tableName = "empty";
 
 	/**
@@ -101,8 +94,6 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private void initFields() {
 		this.primaryKey = new Integer(-1);
 		this.titles = new String[4];
-		this.constraints = new TreeSet<TableType>();
-		this.foreignKeys = new TreeMap<String, ForeignKey>();
 	}
 
 	/**
@@ -173,46 +164,9 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	}
 
 	@Override
-	public ForeignKey getForeingKey(String name) throws SQLForeingKeyNotFound {
-		if (!this.foreignKeys.containsKey(name)) {
-			throw new SQLForeingKeyNotFound(name, this);
-		}
-		return this.foreignKeys.get(name);
-	}
-
-	@Override
-	public TreeMap<String, ForeignKey> getForeingKeys() {
-		return this.foreignKeys;
-	}
-
-	@Override
-	public void addForeingKey(ForeignKey key) {
-		this.foreignKeys.put(key.getName(), key);
-	}
-
-	@Override
-	public void checkConstraints(ForeignKey... keys)
-			throws SQLForeingKeyNotFound, SQLForeingKeyException {
-		if (keys.length > this.constraints.size()) {
-			throw new SQLForeingKeyException(keys.length, 3);
-		}
-		for (ForeignKey foreignKey : keys) {
-			if (constraints.contains(foreignKey)) {
-				this.addForeingKey(foreignKey);
-			} else {
-				throw new SQLForeingKeyNotFound(foreignKey.getName(), this);
-			}
-		}
-	}
-
-	@Override
 	public String toString() {
 		String str = "Table: " + tableName + "\n";
 		str += "[PK: " + this.primaryKey + "]\n";
-		str += "[FKS]\n";
-		for (ForeignKey fk : this.foreignKeys.values()) {
-			str += fk.toString();
-		}
 		return str;
 	}
 

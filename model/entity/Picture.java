@@ -86,7 +86,7 @@ public class Picture extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idCover", "image", "hash" };
+		String tmp[] = { "idCover", "object" };
 		return tmp;
 	}
 
