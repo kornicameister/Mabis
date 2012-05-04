@@ -28,7 +28,7 @@ public class BookSQLFactory extends MovieSQLFactory {
 		case INSERT:
 			short parameterIndex = 1;
 			// TODO add transactions
-			st.setInt(parameterIndex++, this.insertDirector(book.getWriter()));
+			st.setInt(parameterIndex++, this.insertDirector(book.getAuthor()));
 			st.setInt(parameterIndex++, this.insertGenre(book.getGenre()));
 			st.setInt(parameterIndex++, this.insertCover(book.getCover()));
 			st.setObject(parameterIndex++, book);

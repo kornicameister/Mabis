@@ -58,9 +58,7 @@ public abstract class Utilities {
 	static public Integer lastInsertedId(BaseTable table, PreparedStatement st)
 			throws SQLException {
 		long res = 0;
-
 		String query = Utilities.LAST_ID_PATTERN;
-
 		String tableName = String.valueOf(table.getTableName().charAt(0))
 				.toUpperCase() + table.getTableName().substring(1);
 
@@ -72,7 +70,7 @@ public abstract class Utilities {
 		while (set.next()) {
 			res = set.getInt(1);
 		}
-
+		set.close();
 		return (int) res;
 	}
 

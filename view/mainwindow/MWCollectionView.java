@@ -120,7 +120,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			} else if (display != null) {
 				this.currentView = display;
 			}
-			
+
 			audioThumbs.clear();
 			movieThumbs.clear();
 			bookThumbs.clear();
@@ -170,13 +170,13 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 			}
 			msf.executeSQL(true);
-			TreeSet<Movie> movies = msf.getValues();
+			TreeSet<Movie> movies = msf.getMovies();
 			MabisLogger.getLogger().log(Level.INFO,
 					"Succesffuly obtained {0} movies for collection view",
 					movies.size());
 			for (Movie movie : movies) {
-				movieThumbs.put(movie, new ChoosableImagePanel(movie
-						.getFrontCover().getImageFile()));
+				movieThumbs.put(movie, new ChoosableImagePanel(movie.getCover()
+						.getImageFile()));
 			}
 		}
 
@@ -199,9 +199,11 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}
 			aasf.executeSQL(true);
 			TreeSet<AudioAlbum> audios = aasf.getValues();
-			MabisLogger.getLogger().log(Level.INFO,
-					"Succesffuly obtained {0} audio albums for collection view",
-					audios.size());
+			MabisLogger
+					.getLogger()
+					.log(Level.INFO,
+							"Succesffuly obtained {0} audio albums for collection view",
+							audios.size());
 			for (AudioAlbum album : audios) {
 				audioThumbs.put(album, new ChoosableImagePanel(album
 						.getFrontCover().getImageFile()));
@@ -226,12 +228,13 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 			}
 			aasf.executeSQL(true);
-			TreeSet<Book> books = aasf.getValues();
+			TreeSet<Book> books = aasf.getBooks();
 			MabisLogger.getLogger().log(Level.INFO,
 					"Succesffuly obtained {0} books for collection view",
 					books.size());
 			for (Book b : books) {
-				bookThumbs.put(b, new ChoosableImagePanel(b.getCover().getImageFile()));
+				bookThumbs.put(b, new ChoosableImagePanel(b.getCover()
+						.getImageFile()));
 			}
 		}
 

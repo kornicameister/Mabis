@@ -76,9 +76,9 @@ public abstract class SQLFactory implements StatementFactory {
 			break;
 		}
 		String fieldList = null;
-		rawQueryCopy = rawQueryCopy.replaceFirst("!",
-				this.table.getTableName());
-				fieldList = this.buildFieldList(this.table.metaData());
+		rawQueryCopy = rawQueryCopy
+				.replaceFirst("!", this.table.getTableName());
+		fieldList = this.buildFieldList(this.table.metaData());
 		// first pass
 		switch (this.type) {
 		case INSERT:
@@ -237,6 +237,24 @@ public abstract class SQLFactory implements StatementFactory {
 		questionMarkFieldList = questionMarkFieldList.substring(0,
 				questionMarkFieldList.lastIndexOf(","));
 		return fieldList2.substring(0, fieldList2.lastIndexOf(","));
+	}
+
+	/**
+	 * Metoda ustawia referencję do tabeli {@link SQLFactory#table} na null. W
+	 * dalszym ciągu blokuje to możliwość wykonywania operacji bazodanowych.
+	 */
+	public void reset() {
+		this.table = null;
+		this.wheres.clear();
+	}
+
+	/**
+	 * Ustawię tabelę, która następnie używana jest w operacjach bazodanowych
+	 * 
+	 * @param table
+	 */
+	public void setTable(BaseTable table) {
+		this.table = table;
 	}
 
 	/**
