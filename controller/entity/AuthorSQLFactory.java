@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 import model.BaseTable;
 import model.entity.Author;
-import model.entity.User;
+import model.entity.Picture;
 import utilities.Utilities;
 import controller.SQLFactory;
 import controller.SQLStamentType;
@@ -81,6 +81,7 @@ public class AuthorSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 
 	/**
@@ -97,9 +98,7 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	protected void insertEntity(Author entity, PreparedStatement st)
 			throws SQLException {
-		int picturePK = this.insertAvatar();
-		entity.getPictureFile().setPrimaryKey(picturePK);
-		st.setInt(1, picturePK);
+		st.setInt(1, this.insertAvatar(entity.getPictureFile()));
 		st.setObject(2, entity);
 		st.execute();
 		st.clearParameters();
@@ -109,13 +108,24 @@ public class AuthorSQLFactory extends SQLFactory {
 	/**
 	 * Metoda umieszcza w bazie danych informacje o avatarze danego autora
 	 * 
+	 * @param picture
 	 * @return
 	 * @throws SQLException
 	 */
-	private Integer insertAvatar() throws SQLException {
+	private Integer insertAvatar(Picture picture) throws SQLException {
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
-				((User) table).getPictureFile());
+				picture);
 		this.lastAffactedId = psf.executeSQL(localDatabase);
+		picture.setPrimaryKey(this.lastAffactedId);
 		return lastAffactedId;
+	}
+
+	/**
+	 * Zwraca pobranych autorów
+	 * 
+	 * @return {@link TreeSet} z pobranymi aktorami
+	 */
+	public TreeSet<Author> getAuthors() {
+		return this.authors;
 	}
 }

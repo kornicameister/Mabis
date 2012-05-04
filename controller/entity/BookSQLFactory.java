@@ -1,21 +1,19 @@
 package controller.entity;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.TreeSet;
 
 import model.BaseTable;
-import model.entity.Author;
 import model.entity.Book;
-import model.entity.Genre;
-import model.entity.Picture;
-import model.enums.ImageType;
-import controller.SQLFactory;
+import utilities.Utilities;
 import controller.SQLStamentType;
 
-public class BookSQLFactory extends SQLFactory {
+public class BookSQLFactory extends MovieSQLFactory {
 	private final TreeSet<Book> books = new TreeSet<Book>();
 
 	public BookSQLFactory(SQLStamentType type, BaseTable table) {
@@ -25,9 +23,23 @@ public class BookSQLFactory extends SQLFactory {
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
+		Book book = (Book) this.table;
 		switch (this.type) {
 		case INSERT:
+			short parameterIndex = 1;
+			// TODO add transactions
+			st.setInt(parameterIndex++, this.insertDirector(book.getWriter()));
+			st.setInt(parameterIndex++, this.insertGenre(book.getGenre()));
+			st.setInt(parameterIndex++, this.insertCover(book.getCover()));
+			st.setObject(parameterIndex++, book);
+			st.execute();
+			st.clearParameters();
+			this.lastAffactedId = Utilities.lastInsertedId(book, st);
+			break;
 		case DELETE:
+			st.setInt(1, book.getPrimaryKey());
+			this.parseDeleteSet(st.executeUpdate());
+			break;
 		case SELECT:
 			this.parseResultSet(st.executeQuery());
 			break;
@@ -38,54 +50,34 @@ public class BookSQLFactory extends SQLFactory {
 
 	@Override
 	protected void parseResultSet(ResultSet set) throws SQLException {
+		Book book = null;
 		switch (this.type) {
-		case INSERT:
-		case DELETE:
 		case SELECT:
 			while (set.next()) {
-				// creating genre
-				Genre genre = new Genre(set.getInt("idGenre"));
-				genre.setGenre(set.getString("genre"));
-
-				// creating book cover
-				Picture bookCover = new Picture(set.getInt("idPicture"),
-						ImageType.FRONT_COVER);
-				// creating author image
-				Picture authorPicture = new Picture(
-						set.getInt("authorImageId"), ImageType.AUTHOR);
-				try {
-					bookCover.setImageFile(set.getString("image"),
-							set.getString("hash"));
-					authorPicture.setImageFile(
-							set.getString("authorImageFile"),
-							set.getString("authorImageHash"));
-				} catch (IOException e) {
-					e.printStackTrace();
+				byte[] buf = set.getBytes("object");
+				if (buf != null) {
+					try {
+						ObjectInputStream objectIn = new ObjectInputStream(
+								new ByteArrayInputStream(buf));
+						book = (Book) objectIn.readObject();
+						book.setPrimaryKey(set.getInt(("idBook")));
+						this.books.add(book);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
 				}
-
-				// creating author
-				Author author = new Author(set.getInt("idAuthor"));
-				author.setFirstName(set.getString("firstName"));
-				author.setLastName(set.getString("lastName"));
-				author.setPicture(authorPicture);
-
-				// creating book
-				Book b = new Book(set.getInt("idBook"));
-				b.setIsbn(set.getString("isbn"));
-				b.setOriginalTitle("titleOriginal");
-				b.setLocalizedTitle("titleLocale");
-				b.setPages(set.getShort("pages"));
-				b.setCover(bookCover);
-				b.setWriter(author);
-				b.setGenre(genre);
+				book = null;
 			}
 			break;
 		default:
 			break;
 		}
+		set.close();
 	}
 
-	public TreeSet<Book> getValues() {
+	public TreeSet<Book> getBooks() {
 		return this.books;
 	}
 

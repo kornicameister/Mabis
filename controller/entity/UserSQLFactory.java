@@ -79,6 +79,7 @@ public class UserSQLFactory extends AuthorSQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 
 	public HashMap<Integer, User> getUsers() {

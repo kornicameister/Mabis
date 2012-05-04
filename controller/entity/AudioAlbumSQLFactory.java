@@ -131,6 +131,7 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 
 	public TreeSet<AudioAlbum> getValues() {

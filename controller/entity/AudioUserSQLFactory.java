@@ -64,6 +64,7 @@ public class AudioUserSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 
 	public TreeSet<ForeignKeyPair> getAudioUserKeys() {

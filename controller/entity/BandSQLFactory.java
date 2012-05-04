@@ -56,7 +56,7 @@ public class BandSQLFactory extends AuthorSQLFactory {
 				genres.get(0));
 		gsf.reset();
 		for (Genre genre : genres) {
-			gsf.setGenre(genre);
+			gsf.setTable(genre);
 			gsf.addWhereClause("idGenre", genre.getPrimaryKey().toString());
 			gsf.executeSQL(true);
 			if (gsf.getGenres().isEmpty()) {
@@ -94,6 +94,7 @@ public class BandSQLFactory extends AuthorSQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 
 	/**

@@ -52,6 +52,7 @@ public class BookUserSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 
 	public TreeSet<ForeignKeyPair> getBookUserKeys() {

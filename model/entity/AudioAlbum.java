@@ -16,7 +16,7 @@ import model.utilities.ForeignKey;
 
 /**
  * Klasa jest obiektową reprezentacją tabeli audioAlbum z bazy danych mabis.
- * Posiada następujące atrybuty: </br> | idAudio </br> | frontCover</br> |
+ * Posiada następujące atrybuty: </br> | idAudio </br> | cover</br> |
  * backCover</br> | cdCover</br> | tagCloud</br> | trackList</br> | artist</br>
  * | totalTime
  * 

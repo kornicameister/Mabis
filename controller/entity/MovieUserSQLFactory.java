@@ -51,6 +51,7 @@ public class MovieUserSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+		set.close();
 	}
 	
 	public TreeSet<ForeignKeyPair> getMovieUserKeys() {

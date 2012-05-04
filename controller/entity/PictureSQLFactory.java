@@ -22,23 +22,22 @@ import logger.MabisLogger;
 import model.entity.Picture;
 import settings.GlobalPaths;
 import utilities.Utilities;
-import controller.PictureCacheException;
 import controller.SQLFactory;
 import controller.SQLStamentType;
+import controller.exceptions.PictureCacheException;
 
 /**
  * @author kornicameister
  * 
  */
 public class PictureSQLFactory extends SQLFactory {
-	private HashMap<Integer, Picture> pictures;
+	private final HashMap<Integer, Picture> pictures = new HashMap<Integer, Picture>();
 
 	public PictureSQLFactory(SQLStamentType type, Picture table) {
 		super(type, table);
-		pictures = new HashMap<Integer, Picture>();
 	}
 
-	private void movePictureToCache() {
+	private Boolean movePictureToCache() {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
 
@@ -63,7 +62,7 @@ public class PictureSQLFactory extends SQLFactory {
 		}
 
 		if (newPicture.exists()) {
-			return;
+			return false; // that means that cover was found in cache !!!
 		}
 
 		InputStream in;
@@ -85,7 +84,7 @@ public class PictureSQLFactory extends SQLFactory {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		return true;
 	}
 
 	private void deletePictureFromCache() throws PictureCacheException {
@@ -104,7 +103,11 @@ public class PictureSQLFactory extends SQLFactory {
 		Picture p = (Picture) this.table;
 		switch (this.type) {
 		case INSERT:
-			this.movePictureToCache();
+			if (!this.movePictureToCache()) {
+				// picture found in cache, internally changing the plan
+				this.syncCacheToDB();
+				return;
+			}
 			st.setObject(1, p);
 			st.execute();
 			// getting last inserted it
@@ -127,6 +130,32 @@ public class PictureSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * Metoda pobiera wszystkie grafiki z bazy danych i następnie porównuje ich
+	 * sumy kontrolne z sumą kontrolną problematycznej grafiki. W wypadku
+	 * trafienia, zapisywany jest klucz główny znalezionej grafiki do grafiki
+	 * problematycznej i działanie algorytmu jest zakończone.
+	 * 
+	 * @throws SQLException
+	 */
+	private void syncCacheToDB() throws SQLException {
+		this.reset();
+		Picture problematic = (Picture) this.table;
+		// 1. fetch all pictures
+		this.type = SQLStamentType.SELECT;
+		this.executeSQL(true);
+		for (Picture p : this.pictures.values()) {
+			if (problematic.getCheckSum().equals(p.getCheckSum())) {
+				// located picture
+				problematic.setPrimaryKey(p.getPrimaryKey());
+			} else {
+				p = null;
+			}
+		}
+		this.reset();
+		this.lastAffactedId = problematic.getPrimaryKey();
 	}
 
 	@Override
@@ -156,6 +185,13 @@ public class PictureSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+		set.close();
+	}
+
+	@Override
+	public void reset() {
+		super.reset();
+		this.pictures.clear();
 	}
 
 	public HashMap<Integer, Picture> getCovers() {

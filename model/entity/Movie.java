@@ -9,17 +9,17 @@ import model.utilities.ForeignKey;
 
 /**
  * Table structure: </br> | idMovie </br> | titleOriginal </br> | titleLocale
- * </br> | duration </br> | description </br> | frontCover </br> | backCover
- * </br> | director </br> | genre </br>
+ * </br> | duration </br> | description </br> | cover </br> | backCover </br> |
+ * director </br> | genre </br>
  * 
  * @author kornicameister
- * @version 0.2
+ * @version 0.3
  */
 public class Movie extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 2787293119303350654L;
-	private Picture frontCover = null; // map of covers
-	private Author director = null; // director is a foreing key to Author table
-	private Genre genre = null;
+	protected Picture cover = null;
+	protected Author director = null;
+	protected Genre genre = null;
 	private Time duration = null;
 
 	/**
@@ -87,19 +87,19 @@ public class Movie extends BaseTable implements Serializable {
 		this.titles[2] = description;
 	}
 
-	public void setFrontCover(Picture fc) {
-		this.frontCover = fc;
+	public void setCover(Picture fc) {
+		this.cover = fc;
 	}
 
-	public Picture getFrontCover() {
-		return this.frontCover;
+	public Picture getCover() {
+		return this.cover;
 	}
 
-	public Author getDirector() {
+	public Author getAuthor() {
 		return director;
 	}
 
-	public void setDirector(Author director) {
+	public void setAuthor(Author director) {
 		this.director = director;
 	}
 
@@ -116,10 +116,10 @@ public class Movie extends BaseTable implements Serializable {
 		String str = super.toString();
 		str += "----------\n";
 		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
-		str += "[DIRECTOR: " + this.getDirector() + "]\n";
+		str += "[DIRECTOR: " + this.getAuthor() + "]\n";
 		str += "[GENRE: " + this.getGenre() + "]\n";
 		str += "[DURATION: " + this.getDuration() + "]\n";
-		str += "[COVER :" + this.frontCover.toString() + "]\n";
+		str += "[COVER :" + this.cover.toString() + "]\n";
 		return str;
 	}
 
