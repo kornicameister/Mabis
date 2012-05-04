@@ -21,7 +21,7 @@ create table if not exists mabis.user (
     key avatarUserKey (avatarFK) using btree,
     constraint avatarUserRef foreign key (avatarFK)
         references picture (idPicture)
-        on delete set null
+        on delete cascade
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_polish_ci comment='table available in offline and online database';
 /**
  * genre table, can be used by audio, movies and cds at the same time
