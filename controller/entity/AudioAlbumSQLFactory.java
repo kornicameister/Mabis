@@ -40,15 +40,11 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 		case INSERT:
 			short parameterIndex = 1;
 			// inserting covers
-			int frontCover = this.insertCover(am.getFrontCover());
-			int backCover = this.insertCover(am.getBackCover());
-			int cdCover = this.insertCover(am.getCDCover());
+			int cover = this.insertCover(am.getCover());
 			// setting band
 			int band = this.setBand(am.getBand());
 			st.setObject(parameterIndex++, am);
-			st.setInt(parameterIndex++, frontCover);
-			st.setInt(parameterIndex++, backCover);
-			st.setInt(parameterIndex++, cdCover);
+			st.setInt(parameterIndex++, cover);
 			st.setInt(parameterIndex++, band);
 			st.execute();
 			st.clearParameters();

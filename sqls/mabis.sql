@@ -151,25 +151,15 @@ create table if not exists mabis.bookUser (
 create table if not exists mabis.audioAlbum (
     idAudio int(11) auto_increment,
     object longblob not null,
-    frontCoverFK int(11) null default '0' comment 'references to idPicture',
-    backCoverFK  int(11) null default '0' comment 'references to idPicture',
-    cdCoverFK    int(11) null default '0' comment 'references to idPicture',
+    coverFK int(11) null default '0' comment 'references to idPicture',
     artistFK     int(11) null default '0' comment 'references to idBand',
     primary key (idAudio),
-    key audioFrontCoverRef (frontCoverFK) using btree,
-    key audioBackCoverRef (backCoverFK) using btree,
+    key audioCoverRef (coverFK) using btree,
     key audioBandRef (artistFK) using btree,
-    key audioCdCover (cdCoverFK) using btree,
     constraint audioBandRef foreign key (artistFK)
         references band (idBand)
         on delete set null on update restrict,
-    constraint audioFrontCoverRef foreign key (frontCoverFK)
-        references picture (idPicture)
-        on delete set null on update cascade,
-    constraint audioBackCoverRef foreign key (backCoverFK)
-        references picture (idPicture)
-        on delete set null on update cascade,
-    constraint audioCdCover foreign key (cdCoverFK)
+    constraint audioCoverRef foreign key (coverFK)
         references picture (idPicture)
         on delete set null on update cascade
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_polish_ci;

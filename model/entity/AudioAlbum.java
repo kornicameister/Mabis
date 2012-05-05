@@ -7,10 +7,8 @@ package model.entity;
 import java.io.Serializable;
 import java.sql.Time;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 import model.BaseTable;
-import model.enums.ImageType;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
 
@@ -26,7 +24,7 @@ import model.utilities.ForeignKey;
 public class AudioAlbum extends BaseTable implements Serializable {
 	private static final long serialVersionUID = -6884151728501220580L;
 	private ArrayList<Genre> tagCloud = null;
-	private TreeMap<ImageType, Picture> covers = null; // map of covers
+	private Picture cover;
 	private Time totalTime = null;
 	private Band band = null;
 
@@ -65,8 +63,7 @@ public class AudioAlbum extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAudio", "object", "frontCoverFK", "backCoverFK",
-				"cdCoverFK", "artistFK" };
+		String tmp[] = { "idAudio", "object", "coverFK", "artistFK" };
 		return tmp;
 	}
 
@@ -121,28 +118,12 @@ public class AudioAlbum extends BaseTable implements Serializable {
 		this.band = band;
 	}
 
-	public void setFrontCover(Picture fc) {
-		this.covers.put(ImageType.FRONT_COVER, fc);
+	public Picture getCover() {
+		return this.cover;
 	}
 
-	public void setBackCover(Picture fc) {
-		this.covers.put(ImageType.BACK_COVER, fc);
-	}
-
-	public Picture getFrontCover() {
-		return this.covers.get(ImageType.FRONT_COVER);
-	}
-
-	public Picture getBackCover() {
-		return this.covers.get(ImageType.BACK_COVER);
-	}
-
-	public Picture getCDCover() {
-		return this.covers.get(ImageType.CD_COVER);
-	}
-
-	public void setCDCover(Picture fc) {
-		this.covers.put(ImageType.CD_COVER, fc);
+	public void setCover(Picture c) {
+		this.cover = c;
 	}
 
 	@Override
@@ -153,10 +134,7 @@ public class AudioAlbum extends BaseTable implements Serializable {
 		str += "[BAND: " + this.getBand() + "]\n";
 		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
 		str += "[DURATION: " + this.getTotalTime() + "]\n";
-		str += "[COVERS]\n";
-		for (Picture c : this.covers.values()) {
-			str += c;
-		}
+		str += "[COVER:" + this.getCover() + "]\n";
 		return str;
 	}
 
