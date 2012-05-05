@@ -40,7 +40,7 @@ public class MainWindow extends JFrame {
 	private MWToolBar toolBar;
 	private MWBottomPanel bottomPanel;
 	private MWCollectionView collectionView;
-	private MWUserList userListPanel;
+	private MWItemButtons userListPanel;
 	private JPanel contentPane = null;
 
 	/**
@@ -59,7 +59,7 @@ public class MainWindow extends JFrame {
 		this.setJMenuBar(new MWMenuBar(this));
 		this.bottomPanel = new MWBottomPanel(this);
 		this.collectionView = new MWCollectionView(new BorderLayout(), true);
-		this.userListPanel = new MWUserList();
+		this.userListPanel = new MWItemButtons();
 		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
 		
 		layoutComponents();
