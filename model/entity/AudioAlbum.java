@@ -90,28 +90,12 @@ public class AudioAlbum extends Movie implements Serializable {
 		this.setLocalizedTitle(trackList);
 	}
 
-	public String getDescription() {
-		return this.titles[2];
-	}
-
-	public void setDescription(String description) {
-		this.titles[2] = description;
-	}
-
 	public Band getBand() {
 		return (Band) this.director;
 	}
 
 	public void setBand(Band band) {
 		this.director = band;
-	}
-
-	public Picture getCover() {
-		return this.cover;
-	}
-
-	public void setCover(Picture c) {
-		this.cover = c;
 	}
 
 	@Override
