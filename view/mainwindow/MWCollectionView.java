@@ -205,8 +205,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 							"Succesffuly obtained {0} audio albums for collection view",
 							audios.size());
 			for (AudioAlbum album : audios) {
-				audioThumbs.put(album, new ChoosableImagePanel(album
-						.getFrontCover().getImageFile()));
+				audioThumbs.put(album, new ChoosableImagePanel(album.getCover()
+						.getImageFile()));
 			}
 		}
 
