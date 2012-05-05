@@ -5,7 +5,6 @@
 package model.entity;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.ArrayList;
 
 import model.BaseTable;
@@ -21,12 +20,9 @@ import model.utilities.ForeignKey;
  * @author kornicameister
  * @version 0.2
  */
-public class AudioAlbum extends BaseTable implements Serializable {
+public class AudioAlbum extends Movie implements Serializable {
 	private static final long serialVersionUID = -6884151728501220580L;
 	private ArrayList<Genre> tagCloud = null;
-	private Picture cover;
-	private Time totalTime = null;
-	private Band band = null;
 
 	/**
 	 * Construct audioAlbum with following title and tracklist
@@ -69,21 +65,21 @@ public class AudioAlbum extends BaseTable implements Serializable {
 
 	@Override
 	protected void initInternalFields() {
+		super.initInternalFields();
 		this.tagCloud = new ArrayList<Genre>();
-		this.totalTime = new Time(0);
 		this.tableName = TableType.AUDIO_ALBUM.toString();
 	}
 
-	public String getTagCloud() {
-		String t = new String();
-		for (short i = 0; i < this.tagCloud.size(); i++) {
-			t += this.tagCloud.get(i).getGenre() + ",";
-		}
-		return t.substring(0, t.length() - 1);
+	public ArrayList<Genre> getTagCloud() {
+		return this.tagCloud;
 	}
 
 	public void setTagCloud(ArrayList<Genre> tagCloud) {
 		this.tagCloud = tagCloud;
+	}
+
+	public void addTag(Genre genre) {
+		this.tagCloud.add(genre);
 	}
 
 	public String getTrackList() {
@@ -92,14 +88,6 @@ public class AudioAlbum extends BaseTable implements Serializable {
 
 	public void setTrackList(String trackList) {
 		this.setLocalizedTitle(trackList);
-	}
-
-	public Time getTotalTime() {
-		return totalTime;
-	}
-
-	public void setTotalTime(Time totalTime) {
-		this.totalTime = totalTime;
 	}
 
 	public String getDescription() {
@@ -111,11 +99,11 @@ public class AudioAlbum extends BaseTable implements Serializable {
 	}
 
 	public Band getBand() {
-		return band;
+		return (Band) this.director;
 	}
 
 	public void setBand(Band band) {
-		this.band = band;
+		this.director = band;
 	}
 
 	public Picture getCover() {
@@ -128,12 +116,12 @@ public class AudioAlbum extends BaseTable implements Serializable {
 
 	@Override
 	public String toString() {
-		String str = super.toString();
+		String str = BaseTable.class.toString();
 		str += "----------\n";
 		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
 		str += "[BAND: " + this.getBand() + "]\n";
 		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
-		str += "[DURATION: " + this.getTotalTime() + "]\n";
+		str += "[DURATION: " + this.getDuration() + "]\n";
 		str += "[COVER:" + this.getCover() + "]\n";
 		return str;
 	}
