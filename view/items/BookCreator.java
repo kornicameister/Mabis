@@ -18,6 +18,7 @@ import javax.swing.border.EtchedBorder;
 import model.entity.Author;
 import model.entity.Genre;
 import view.imagePanel.ChoosableImagePanel;
+import view.imagePanel.ImagePanel;
 
 /**
  * @author kornicameister
@@ -30,7 +31,7 @@ public class BookCreator extends ItemCreator {
 	 * {@link ChoosableImagePanel} z okładką danej książki. Użytkownik może
 	 * wybrać okładkę sam lub zostanie ona pobrana z internetu.
 	 */
-	private ChoosableImagePanel coverPanel;
+	private ImagePanel coverPanel;
 	/**
 	 * {@link JTextArea} w której będzie widoczny opis książki.
 	 */
@@ -55,7 +56,7 @@ public class BookCreator extends ItemCreator {
 			CreatorContentNullPointerException {
 		super(title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
-				.getMinimumSize().getHeight() - 100);
+				.getMinimumSize().getHeight() - 70);
 	}
 
 	@Override
@@ -71,8 +72,7 @@ public class BookCreator extends ItemCreator {
 
 		tp = new TitlesPanel(true);
 		dip = new DetailedInformationPanel(true);
-		coverPanel = new ChoosableImagePanel(new File(
-				"src/resources/defaultAvatar.png"));
+		coverPanel = new ImagePanel(new File("src/resources/defaultAvatar.png"));
 		coverPanel
 				.setBorder(BorderFactory.createTitledBorder(
 						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
@@ -96,13 +96,22 @@ public class BookCreator extends ItemCreator {
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-								.addComponent(this.coverPanel)
+								.addComponent(this.coverPanel,
+										GroupLayout.DEFAULT_SIZE, 200, 220)
 								.addGroup(
 										gl.createSequentialGroup()
-												.addComponent(this.tp)
-												.addComponent(this.dip)))
+												.addComponent(
+														this.tp,
+														GroupLayout.DEFAULT_SIZE,
+														60, 80)
+												.addComponent(
+														this.dip,
+														GroupLayout.DEFAULT_SIZE,
+														100, 120)))
 				.addComponent(this.descriptionArea));
 
+		this.revalidate();
+		this.pack();
 		return p;
 	}
 
@@ -118,11 +127,11 @@ public class BookCreator extends ItemCreator {
 		/**
 		 * pole tekstowe dla tytułu w oryginalnym języku
 		 */
-		private final JTextField titleOriginal = new JTextField("...");
+		private final JTextField titleOriginal = new JTextField();
 		/**
 		 * pole tekstowe dla tytułu, który jest przetłumaczony
 		 */
-		private final JTextField titleLocale = new JTextField("...");
+		private final JTextField titleLocale = new JTextField();
 
 		/**
 		 * Tworzy panel dla tytułów
@@ -173,11 +182,11 @@ public class BookCreator extends ItemCreator {
 		 * odpowiedni walidator, który nie pozwala na wprowadzenie numeru o złym
 		 * formacie
 		 */
-		private final JTextField isbnField = new JTextField("");
+		private final JTextField isbnField = new JTextField();
 		/**
 		 * pole tekstowe dla ilości stron danej ksiązki
 		 */
-		private final JTextField pages = new JTextField("0");
+		private final JTextField pages = new JTextField();
 		/**
 		 * {@link JComboBox} z gatunkami. Użytkownik wybiera z tego pola jeden
 		 * gatunek który najlepiej będzie opisywał daną książkę.
