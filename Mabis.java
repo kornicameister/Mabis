@@ -1,5 +1,6 @@
 import java.awt.Dimension;
 
+import view.items.BookCreator;
 import view.mainwindow.MainWindow;
 
 public class Mabis {
@@ -7,8 +8,10 @@ public class Mabis {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				MainWindow mw = new MainWindow("MABIS",
-						new Dimension(1000, 1000));
+//				MainWindow mw = new MainWindow("MABIS",
+//						new Dimension(1000, 1000));
+//				mw.setVisible(true);
+				BookCreator mw = new BookCreator("New book");
 				mw.setVisible(true);
 			}
 		});

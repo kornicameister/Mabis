@@ -4,6 +4,7 @@
 package view.items;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.HeadlessException;
 
 import javax.swing.BorderFactory;
@@ -31,26 +32,16 @@ public abstract class ItemCreator extends JFrame {
 	 * dla danego obiektu
 	 */
 	private JProgressBar progressBar = null;
-	/**
-	 * Przycisk, który wyzwala akcję powodującą umieszczenie danego obiektu w
-	 * bazie danych
-	 */
-	private JButton createButton;
-	/**
-	 * Przycisk powoduje wyczyszczenie wszystkich pól danego contentu
-	 * 
-	 * @see ItemCreator#contentPanel
-	 */
-	private JButton clearButton;
-	/**
-	 * Przycisk powoduje zakończenie działania kreatora
-	 */
-	private JButton cancelButton;
+
 	/**
 	 * Panel dla {@link GroupLayout}, aby ustawić miejsce, gdzie będzie
 	 * definiownay layout
 	 */
 	private JPanel contentPane;
+	/**
+	 * referencja do panelu agregującego przyciski
+	 */
+	private ICButtonPanel buttonPanel;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -93,22 +84,18 @@ public abstract class ItemCreator extends JFrame {
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-								.addComponent(this.contentPanel).addGap(10)
+								.addComponent(this.contentPanel)
 								.addComponent(this.progressBar))
 				.addGroup(
-						gl.createSequentialGroup()
-								.addComponent(this.createButton)
-								.addComponent(this.clearButton)
-								.addComponent(this.cancelButton)));
+						gl.createSequentialGroup().addComponent(
+								this.buttonPanel)));
 		gl.setVerticalGroup(gl.createSequentialGroup().addGroup(
 				gl.createParallelGroup()
 						.addComponent(this.contentPanel)
 						.addComponent(this.progressBar)
 						.addGroup(
-								gl.createParallelGroup()
-										.addComponent(this.createButton)
-										.addComponent(this.clearButton)
-										.addComponent(this.cancelButton))));
+								gl.createParallelGroup().addComponent(
+										this.buttonPanel))));
 		this.revalidate();
 		this.pack();
 		this.repaint();
@@ -121,9 +108,8 @@ public abstract class ItemCreator extends JFrame {
 					"Content not initialized");
 		}
 		this.progressBar = new JProgressBar(JProgressBar.VERTICAL);
-		this.createButton = new JButton("Create");
-		this.clearButton = new JButton("Clear");
-		this.cancelButton = new JButton("Cancel");
+		this.buttonPanel = new ICButtonPanel();
+		this.buttonPanel.setSize()
 	}
 
 	/**
@@ -135,5 +121,36 @@ public abstract class ItemCreator extends JFrame {
 	 *         aby utworzyć konkretny obiekt kolekcji.
 	 */
 	public abstract JPanel initContent();
+
+	private class ICButtonPanel extends JPanel {
+		private static final long serialVersionUID = -169864232599710877L;
+		/**
+		 * Przycisk, który wyzwala akcję powodującą umieszczenie danego obiektu
+		 * w bazie danych
+		 */
+		private JButton createButton;
+		/**
+		 * Przycisk powoduje wyczyszczenie wszystkich pól danego contentu
+		 * 
+		 * @see ItemCreator#contentPanel
+		 */
+		private JButton clearButton;
+		/**
+		 * Przycisk powoduje zakończenie działania kreatora
+		 */
+		private JButton cancelButton;
+
+		public ICButtonPanel() {
+			this.createButton = new JButton("Create");
+			this.clearButton = new JButton("Clear");
+			this.cancelButton = new JButton("Cancel");
+
+			this.setLayout(new GridLayout(1, 0));
+
+			this.add(this.createButton);
+			this.add(this.clearButton);
+			this.add(this.cancelButton);
+		}
+	}
 
 }

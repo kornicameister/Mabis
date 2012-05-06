@@ -5,6 +5,7 @@ package view.items;
 
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -53,6 +54,8 @@ public class BookCreator extends ItemCreator {
 	public BookCreator(String title) throws HeadlessException,
 			CreatorContentNullPointerException {
 		super(title);
+		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
+				.getMinimumSize().getHeight() - 100);
 	}
 
 	@Override
@@ -68,8 +71,16 @@ public class BookCreator extends ItemCreator {
 
 		tp = new TitlesPanel(true);
 		dip = new DetailedInformationPanel(true);
-		coverPanel = new ChoosableImagePanel(null);
+		coverPanel = new ChoosableImagePanel(new File(
+				"src/resources/defaultAvatar.png"));
+		coverPanel
+				.setBorder(BorderFactory.createTitledBorder(
+						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+						"Cover"));
 		descriptionArea = new JTextArea();
+		descriptionArea.setBorder(BorderFactory.createTitledBorder(
+				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+				"Descripion"));
 
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
