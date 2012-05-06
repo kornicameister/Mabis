@@ -337,7 +337,7 @@ public class NewUserDialog extends JDialog {
 											+ tmp.getIconWidth() + ";"
 											+ tmp.getIconHeight() + "]");
 						} else {
-							imagePanel.setImg(newAvatar);
+							imagePanel.setImage(newAvatar);
 							imagePanel.repaint();
 						}
 					} catch (IOException e1) {
