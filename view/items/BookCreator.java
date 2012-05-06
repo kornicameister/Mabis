@@ -115,6 +115,22 @@ public class BookCreator extends ItemCreator {
 		return p;
 	}
 
+	@Override
+	protected void clearContentFields() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	protected Boolean createItem() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void scanWebForInfo() {
+		// TODO Auto-generated method stub
+	}
+
 	/**
 	 * Panel agregujący. Umieszczone są nim pola, służące do wprowadzania
 	 * tytułów

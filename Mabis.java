@@ -1,7 +1,4 @@
-import java.awt.Dimension;
-
 import view.items.BookCreator;
-import view.mainwindow.MainWindow;
 
 public class Mabis {
 	public static void main(String[] args) {

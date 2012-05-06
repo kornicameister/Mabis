@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EtchedBorder;
@@ -129,7 +130,35 @@ public abstract class ItemCreator extends JFrame {
 	 * @return JPanel na którym odłożone zostały wszystkie elementy potrzebne
 	 *         aby utworzyć konkretny obiekt kolekcji.
 	 */
-	public abstract JPanel initContent();
+	protected abstract JPanel initContent();
+
+	/**
+	 * Metoda wywoływana po naciśnięciu {@link ICButtonPanel#clearButton}.
+	 * Efektem jej wywołania powinno być wyczyszczenie wszystkich kretora,
+	 * łącznie z ustawieniem okładki na okładkę domyślną
+	 * 
+	 * @see ICButtonPanel
+	 */
+	protected abstract void clearContentFields();
+
+	/**
+	 * Metoda wywoływana po kliknięciu {@link ICButtonPanel#createButton}.
+	 * Powoduje pobranie danych z pól danego kreatora, utworzenie adekwatnego
+	 * obiektu i podjęcie próby umieszczenia go w bazie danych.
+	 * 
+	 * @return true - jeśli item kolekcji został utworzony, false w innym
+	 *         wypadku
+	 */
+	protected abstract Boolean createItem();
+	
+	/**
+	 * Metoda wywoływana po kliknięciu na {@link ICButtonPanel#getFromNetButton}.
+	 * Po wywołeniu akcji, podejmowana jest próba pobrania informacji o danym obiekcie
+	 * kolekcji przez publiczne API.
+	 * 
+	 * 
+	 */
+	protected abstract void scanWebForInfo();
 
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
@@ -185,11 +214,16 @@ public abstract class ItemCreator extends JFrame {
 				setVisible(false);
 				dispose();
 			} else if (source.equals(buttonPanel.clearButton)) {
-
+				clearContentFields();
 			} else if (source.equals(buttonPanel.createButton)) {
-
+				if (!createItem()) {
+					JOptionPane.showMessageDialog(getParent(),
+							"Failed to create new item",
+							"Creation miracle failed",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			} else if (source.equals(buttonPanel.getFromNetButton)) {
-
+				
 			}
 			MabisLogger.getLogger().log(Level.INFO,
 					"ItemCreator action called :: {0}",
