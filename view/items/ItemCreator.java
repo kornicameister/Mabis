@@ -150,11 +150,11 @@ public abstract class ItemCreator extends JFrame {
 	 *         wypadku
 	 */
 	protected abstract Boolean createItem();
-	
+
 	/**
-	 * Metoda wywoływana po kliknięciu na {@link ICButtonPanel#getFromNetButton}.
-	 * Po wywołeniu akcji, podejmowana jest próba pobrania informacji o danym obiekcie
-	 * kolekcji przez publiczne API.
+	 * Metoda wywoływana po kliknięciu na {@link ICButtonPanel#getFromNetButton}
+	 * . Po wywołeniu akcji, podejmowana jest próba pobrania informacji o danym
+	 * obiekcie kolekcji przez publiczne API.
 	 * 
 	 * 
 	 */
@@ -223,7 +223,7 @@ public abstract class ItemCreator extends JFrame {
 							JOptionPane.ERROR_MESSAGE);
 				}
 			} else if (source.equals(buttonPanel.getFromNetButton)) {
-				
+				scanWebForInfo();
 			}
 			MabisLogger.getLogger().log(Level.INFO,
 					"ItemCreator action called :: {0}",

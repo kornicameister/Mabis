@@ -36,7 +36,7 @@ public class ImagePanel extends JPanel {
 		super.setSize(w, h);
 	}
 
-	public void setImg(File f) {
+	public void setImage(File f) {
 		this.imageFile = f;
 	}
 

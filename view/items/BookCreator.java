@@ -17,6 +17,7 @@ import javax.swing.border.EtchedBorder;
 
 import model.entity.Author;
 import model.entity.Genre;
+import settings.GlobalPaths;
 import view.imagePanel.ChoosableImagePanel;
 import view.imagePanel.ImagePanel;
 
@@ -72,7 +73,8 @@ public class BookCreator extends ItemCreator {
 
 		tp = new TitlesPanel(true);
 		dip = new DetailedInformationPanel(true);
-		coverPanel = new ImagePanel(new File("src/resources/defaultAvatar.png"));
+		coverPanel = new ImagePanel(new File(
+				GlobalPaths.DEFAULT_COVER_PATH.toString()));
 		coverPanel
 				.setBorder(BorderFactory.createTitledBorder(
 						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
@@ -117,7 +119,11 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected void clearContentFields() {
-		// TODO Auto-generated method stub
+		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+				.toString()));
+		this.descriptionArea.setText("");
+		this.tp.clear();
+		this.dip.clear();
 	}
 
 	@Override
@@ -164,6 +170,17 @@ public class BookCreator extends ItemCreator {
 					"Titles"));
 		}
 
+		/**
+		 * Czyści tekst, który był widoczny w {@link JTextField} dla tytułów
+		 */
+		protected void clear() {
+			this.titleLocale.setText("");
+			this.titleOriginal.setText("");
+		}
+
+		/**
+		 * 
+		 */
 		private void layoutComponents() {
 			this.setLayout(new GridLayout(2, 1, 5, 5));
 			this.add(this.titleOriginal);
@@ -220,6 +237,20 @@ public class BookCreator extends ItemCreator {
 			this.setBorder(BorderFactory.createTitledBorder(
 					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 					"Details"));
+		}
+
+		/**
+		 * Zawartość pól {@link DetailedInformationPanel#isbnField} oraz
+		 * {@link DetailedInformationPanel#pages} zostaje wyciszczone. Indeksy
+		 * list {@link DetailedInformationPanel#authorCombobox} oraz
+		 * {@link DetailedInformationPanel#genreCombobox} zostaję ustawione na
+		 * początkowe pozycje.
+		 */
+		public void clear() {
+			this.isbnField.setText("");
+			this.pages.setText("");
+			this.genreCombobox.setSelectedIndex(0);
+			this.authorCombobox.setSelectedIndex(0);
 		}
 
 		private void layoutComponents() {
