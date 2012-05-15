@@ -6,6 +6,8 @@ package view.items;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.io.File;
+import java.io.IOException;
+import java.util.TreeMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -20,6 +22,7 @@ import model.entity.Genre;
 import settings.GlobalPaths;
 import view.imagePanel.ChoosableImagePanel;
 import view.imagePanel.ImagePanel;
+import controller.api.GoogleBookApi;
 
 /**
  * @author kornicameister
@@ -128,13 +131,20 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected Boolean createItem() {
-		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override
-	protected void scanWebForInfo() {
-		// TODO Auto-generated method stub
+	protected void fetchFromAPI() {
+		GoogleBookApi gba = new GoogleBookApi();
+		try {
+			TreeMap<String, String> params = new TreeMap<String, String>();
+			params.put("inauthor:", "Stephen King");
+			gba.query("Carrie", params);
+			collectedItems = gba.getResult();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -20,6 +21,7 @@ import javax.swing.JProgressBar;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
+import model.BaseTable;
 
 /**
  * Klasa bazowa kreatora nowego obiektu dla kolekcji. Definiuje podstawową
@@ -54,6 +56,11 @@ public abstract class ItemCreator extends JFrame {
 	private ICActionListener listener;
 
 	/**
+	 * Lista pobranych elementów kolekcji
+	 */
+	protected TreeSet<BaseTable> collectedItems;
+
+	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
 	 * 
 	 * @param title
@@ -77,6 +84,9 @@ public abstract class ItemCreator extends JFrame {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 	}
 
+	/**
+	 * Ułóż elementy w oknie
+	 */
 	private void layoutComponents() {
 		this.contentPane = new JPanel(true);
 		this.contentPane.setBorder(BorderFactory
@@ -111,6 +121,11 @@ public abstract class ItemCreator extends JFrame {
 		this.repaint();
 	}
 
+	/**
+	 * Inicjalizuje komponenty tego kreatora
+	 * 
+	 * @throws CreatorContentNullPointerException
+	 */
 	private void initComponents() throws CreatorContentNullPointerException {
 		this.listener = new ICActionListener();
 		this.contentPanel = this.initContent();
@@ -158,7 +173,7 @@ public abstract class ItemCreator extends JFrame {
 	 * 
 	 * 
 	 */
-	protected abstract void scanWebForInfo();
+	protected abstract void fetchFromAPI();
 
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
@@ -223,7 +238,7 @@ public abstract class ItemCreator extends JFrame {
 							JOptionPane.ERROR_MESSAGE);
 				}
 			} else if (source.equals(buttonPanel.getFromNetButton)) {
-				scanWebForInfo();
+				fetchFromAPI();
 			}
 			MabisLogger.getLogger().log(Level.INFO,
 					"ItemCreator action called :: {0}",
