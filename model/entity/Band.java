@@ -36,7 +36,7 @@ public class Band extends Author implements Serializable {
 	 */
 	public Band(String bandName) {
 		super();
-		this.setOriginalTitle(bandName);
+		this.setTitle(bandName);
 		this.createLastFMUrl();
 	}
 
@@ -78,7 +78,7 @@ public class Band extends Author implements Serializable {
 	 *            the description to set
 	 */
 	public void setDescription(String description) {
-		this.setLocalizedTitle(description);
+		this.setSubTitle(description);
 	}
 
 	/**

@@ -111,8 +111,8 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	}
 
 	/**
-	 * @return an array of titles with indexed identified further by
-	 *         {@link TitleType}
+	 * @return an array of titles, first title is originalTitle, the second one
+	 *         referes to translated title
 	 */
 	public String[] getTitles() {
 		String t[] = new String[2];
@@ -126,7 +126,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	 * 
 	 * @param t
 	 */
-	public void setOriginalTitle(String t) {
+	public void setTitle(String t) {
 		this.titles[0] = t;
 	}
 
@@ -135,7 +135,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	 * 
 	 * @param t
 	 */
-	public void setLocalizedTitle(String t) {
+	public void setSubTitle(String t) {
 		this.titles[1] = t;
 	}
 

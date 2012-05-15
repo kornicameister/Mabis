@@ -7,12 +7,17 @@ package model.entity;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URL;
+import java.net.URLConnection;
 
 import model.BaseTable;
 import model.enums.ImageType;
 import model.enums.TableType;
+import settings.GlobalPaths;
 import utilities.Hasher;
 
 /**
@@ -59,6 +64,52 @@ public class Picture extends BaseTable implements Serializable {
 		this.imageFile = cover.getCanonicalPath();
 		this.generateCheckSum(cover);
 		this.type = t;
+	}
+
+	public Picture(URL url, ImageType t) throws IOException {
+		super();
+		saveImageFromGoogleUrl(url);
+		this.type = t;
+	}
+
+	/**
+	 * Metoda pobiera zdjęcie ze wskazanego url, w domyśle ma działać z linkami
+	 * z GoogleBookApi.
+	 * 
+	 * @param url
+	 *            adres zdjęcia
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	private void saveImageFromGoogleUrl(URL url) throws IOException,
+			FileNotFoundException {
+		this.saveHash(url);
+		URLConnection urlConn = url.openConnection();
+		urlConn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		urlConn.connect();
+		
+		//saving file
+		InputStream is = urlConn.getInputStream();
+
+		File output = new File(GlobalPaths.TMP + this.titles[0]);
+
+		FileOutputStream fos = new FileOutputStream(output);
+		byte[] b = new byte[2048];
+		int length;
+		while ((length = is.read(b)) != -1) {
+			fos.write(b, 0, length);
+		}
+		fos.close();
+		is.close();
+	}
+
+	private void saveHash(URL imageUrl) throws IOException {
+		URLConnection conn = imageUrl.openConnection();
+		conn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		conn.connect();
+		this.titles[0] = Hasher.hashStream(conn.getInputStream());
 	}
 
 	public String getImagePath() {

@@ -51,7 +51,7 @@ public class Genre extends BaseTable implements Serializable {
 	}
 
 	/**
-	 * wraps {@link BaseTable#setOriginalTitle(String)}
+	 * wraps {@link BaseTable#setTitle(String)}
 	 * 
 	 * @param genre
 	 */
@@ -62,7 +62,7 @@ public class Genre extends BaseTable implements Serializable {
 	/**
 	 * wraps {@link BaseTable#getOriginalTitle()}
 	 * 
-	 * @return
+	 * @return nazwę gatunku
 	 */
 	public String getGenre() {
 		return this.titles[0];

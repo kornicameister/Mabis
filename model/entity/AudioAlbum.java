@@ -87,15 +87,16 @@ public class AudioAlbum extends Movie implements Serializable {
 	}
 
 	public void setTrackList(String trackList) {
-		this.setLocalizedTitle(trackList);
+		this.setSubTitle(trackList);
 	}
 
 	public Band getBand() {
-		return (Band) this.director;
+		return (Band) this.directors.first();
 	}
 
 	public void setBand(Band band) {
-		this.director = band;
+		this.directors.clear();
+		this.directors.add(band);
 	}
 
 	@Override

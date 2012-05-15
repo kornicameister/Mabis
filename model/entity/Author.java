@@ -36,8 +36,8 @@ public class Author extends BaseTable implements Serializable {
 	 */
 	public Author(String fName, String lName) {
 		super();
-		this.setOriginalTitle(fName);
-		this.setLocalizedTitle(lName);
+		this.setTitle(fName);
+		this.setSubTitle(lName);
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class Author extends BaseTable implements Serializable {
 	}
 
 	public void setFirstName(String firstName) {
-		this.setOriginalTitle(firstName);
+		this.setTitle(firstName);
 	}
 
 	public String getLastName() {
@@ -72,7 +72,7 @@ public class Author extends BaseTable implements Serializable {
 	}
 
 	public void setLastName(String lastName) {
-		this.setLocalizedTitle(lastName);
+		this.setSubTitle(lastName);
 	}
 
 	public void setPicture(Picture f) {

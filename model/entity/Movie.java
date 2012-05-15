@@ -2,6 +2,7 @@ package model.entity;
 
 import java.io.Serializable;
 import java.sql.Time;
+import java.util.TreeSet;
 
 import model.BaseTable;
 import model.enums.TableType;
@@ -17,10 +18,11 @@ import model.utilities.ForeignKey;
  */
 public class Movie extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 2787293119303350654L;
-	protected Picture cover = null;
-	protected Author director = null;
-	protected Genre genre = null;
-	private Time duration = null;
+	protected Picture cover;
+	protected TreeSet<Author> directors;
+	protected Genre genre;
+	private Time duration;
+	protected Double rating;
 
 	/**
 	 * Construct Movie using default constructor
@@ -61,14 +63,8 @@ public class Movie extends BaseTable implements Serializable {
 	protected void initInternalFields() {
 		this.setDuration(new Time(0));
 		this.tableName = TableType.MOVIE.toString();
-	}
-
-	public void setTitle(String title) {
-		this.titles[0] = title;
-	}
-
-	public String getTitle() {
-		return this.titles[0];
+		this.rating = new Double(0.0);
+		this.directors = new TreeSet<Author>();
 	}
 
 	public Time getDuration() {
@@ -95,12 +91,14 @@ public class Movie extends BaseTable implements Serializable {
 		return this.cover;
 	}
 
-	public Author getAuthor() {
-		return director;
+	public TreeSet<Author> getAuthors() {
+		return directors;
 	}
 
-	public void setAuthor(Author director) {
-		this.director = director;
+	public void addAuthor(Author author) {
+		if (!this.directors.contains(author)) {
+			this.directors.add(author);
+		}
 	}
 
 	public Genre getGenre() {
@@ -111,13 +109,25 @@ public class Movie extends BaseTable implements Serializable {
 		this.genre = genre;
 	}
 
+	public void setRating(Double averageRating) {
+		this.rating = new Double(averageRating);
+	}
+	
+	public Double getRating(){
+		return this.rating;
+	}
+
 	@Override
 	public String toString() {
 		String str = super.toString();
 		str += "----------\n";
 		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
-		str += "[DIRECTOR: " + this.getAuthor() + "]\n";
+		str += "[DIRECTORS]\n";
+		for (Author a : this.directors) {
+			str += "\t" + a.toString() + "\n";
+		}
 		str += "[GENRE: " + this.getGenre() + "]\n";
+		str += "[RATING: " + this.getRating() + "]\n";
 		str += "[DURATION: " + this.getDuration() + "]\n";
 		str += "[COVER :" + this.cover.toString() + "]\n";
 		return str;
