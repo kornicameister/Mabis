@@ -13,9 +13,8 @@ import javax.swing.JLabel;
  * This is the JLabel based class that provides status bar functionality
  * 
  * @author kornicameister
- * @see <a
- *      href=http://www.java-tips.org/java-se-tips/javax.swing/creating-a-status
- *      -bar.html>Status bar</a>
+ * @see http
+ *      ://www.java-tips.org/java-se-tips/javax.swing/creating-a-status-bar.html
  */
 public class StatusBar extends JLabel {
 

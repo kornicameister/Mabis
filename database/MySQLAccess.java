@@ -18,7 +18,7 @@ import java.sql.SQLException;
  * </ul>
  * 
  * @author kornicameister
- * @see <b>mysql java driver</b>
+ * @see mysql java driver
  * @see ConnectionData#setPassword(String)
  * @version 0.2
  */
@@ -145,7 +145,7 @@ public class MySQLAccess {
 	/**
 	 * Static getter for the Connection object !
 	 * 
-	 * @return
+	 * @return referencję do obiektu tego połączenia
 	 */
 	public static Connection getConnection() {
 		return connection;
