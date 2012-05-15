@@ -144,7 +144,7 @@ public interface StatementFactory {
 	 * @param local
 	 *            if set to true than statements will be executed upon local
 	 *            database, otherwise upon online database
-	 * @return 
+	 * @return numer ostatnio wrzuconej pozycji
 	 * @throws SQLException
 	 */
 	abstract Integer executeSQL(boolean local) throws SQLException;

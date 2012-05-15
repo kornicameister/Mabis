@@ -1,9 +1,14 @@
 package controller.api;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.TreeMap;
+
 /**
  * 
  * @author kornicameister
- *
+ * 
  */
 public class MovieAPI extends ApiAccess {
 
@@ -13,4 +18,14 @@ public class MovieAPI extends ApiAccess {
 	public MovieAPI() {
 	}
 
+	@Override
+	protected ArrayList<URL> setApiAccessPointList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void query(String question, TreeMap<String, String> params)
+			throws IOException {
+	}
 }
