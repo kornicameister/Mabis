@@ -11,7 +11,7 @@ public enum GlobalPaths {
 			"src/resources/defaultCover.png"), DEFAULT_AVATAR_PATH(
 			"src/resources/defaultAvatar.png"), BAND_CACHE_PATH(
 			"./cache/bands/"), AUTHOR_CACHE_PATH("./cache/authors/"), MEDIA_CACHE_PATH(
-			"./cache/media/");
+			"./cache/media/"), TMP(System.getProperty("java.io.tmpdir")+"/");
 
 	private final String path;
 
