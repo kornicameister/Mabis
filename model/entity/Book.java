@@ -102,12 +102,26 @@ public class Book extends Movie implements Serializable {
 	}
 
 	@Override
+	public int compareTo(BaseTable o) {
+		int result = super.compareTo(o);
+		Book other = (Book) o;
+		if (result == 0) {
+			result = this.getOriginalTitle().compareTo(other.getOriginalTitle());
+		}
+		if (result == 0) {
+			result = this.getDescription().compareTo(other.getDescription());
+		}
+		return result;
+	}
+
+	@Override
 	public Object[] toColumnIdentifiers() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.set(4, "Pages");
+		data.set(5, "Writer");
 		data.add(5, "Identifier number");
 		return data.toArray();
 	}
@@ -115,7 +129,7 @@ public class Book extends Movie implements Serializable {
 	@Override
 	public Object[] toRowData() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toRowData()) {
 			data.add(d);
 		}
 		data.set(4, this.getPages());

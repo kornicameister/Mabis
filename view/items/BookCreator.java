@@ -132,14 +132,15 @@ public class BookCreator extends ItemCreator {
 		try {
 			TreeMap<String, String> params = new TreeMap<String, String>();
 			params.put("inauthor:", "Stephen King");
-			gba.query("Carrie", params);
+			gba.query("Dark Tower", params);
 			collectedItems = gba.getResult();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		// init panel with obtained collection items so as to allow
 		// user to choose one selected
-
+		ItemsPreview ip = new ItemsPreview("Collected books", this.collectedItems);
+		ip.setVisible(true);
 	}
 
 	/**

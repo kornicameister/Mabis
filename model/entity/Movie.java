@@ -154,14 +154,14 @@ public class Movie extends BaseTable implements Serializable {
 	@Override
 	public Object[] toRowData() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for(Object d : super.toRowData()){
 			data.add(d);
 		}
 		data.add(this.getOriginalTitle());
 		data.add(this.getLocalizedTitle());
-		data.add(this.getGenre().toString());
+		data.add(this.getGenre().getGenre());
 		data.add(this.getDuration().toString());
-		data.add(this.getAuthors().toArray());
+		data.add(this.getAuthors());
 		data.add(new ImageIcon(this.getCover().getImagePath()));
 		return data.toArray();
 	}

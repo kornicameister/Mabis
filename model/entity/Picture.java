@@ -96,6 +96,7 @@ public class Picture extends BaseTable implements Serializable {
 		InputStream is = urlConn.getInputStream();
 
 		File output = new File(GlobalPaths.TMP + this.titles[0]);
+		this.imageFilePath = output.getAbsolutePath();
 
 		FileOutputStream fos = new FileOutputStream(output);
 		byte[] b = new byte[2048];
@@ -105,6 +106,7 @@ public class Picture extends BaseTable implements Serializable {
 		}
 		fos.close();
 		is.close();
+		this.imageFilePath = output.getAbsolutePath();
 	}
 
 	private void saveHash(URL imageUrl) throws IOException {

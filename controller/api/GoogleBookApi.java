@@ -32,7 +32,7 @@ public class GoogleBookApi extends ApiAccess {
 
 	public GoogleBookApi() {
 		super();
-		this.result = new TreeSet<>();
+		this.result = new TreeSet<BaseTable>();
 	}
 
 	@Override
@@ -76,15 +76,16 @@ public class GoogleBookApi extends ApiAccess {
 		}
 
 		ArrayList<Volume> foundBooks = (ArrayList<Volume>) volumes.getItems();
+		Book book = null;
 
-		for (Volume book : foundBooks) {
-			VolumeInfo vi = book.getVolumeInfo();
+		for (Volume volume : foundBooks) {
+			VolumeInfo vi = volume.getVolumeInfo();
 
 			// setting book title
-			Book b = new Book();
-			b.setTitle(vi.getTitle());
+			book = new Book();
+			book.setTitle(vi.getTitle());
 			if (vi.getSubtitle() != null) {
-				b.setSubTitle(vi.getSubtitle());
+				book.setSubTitle(vi.getSubtitle());
 			}
 
 			// adding identifiers
@@ -92,7 +93,7 @@ public class GoogleBookApi extends ApiAccess {
 					.getIndustryIdentifiers();
 			if (ii != null && !ii.isEmpty()) {
 				for (IndustryIdentifiers identifier : ii) {
-					b.addIdentifier(BookIndustryIdentifier.findType(identifier
+					book.addIdentifier(BookIndustryIdentifier.findType(identifier
 							.getType()), identifier.getIdentifier());
 				}
 			}
@@ -111,40 +112,47 @@ public class GoogleBookApi extends ApiAccess {
 							lastName += names[j];
 						}
 					}
-					b.addAuthor(new Author(firstName, lastName));
+					book.addAuthor(new Author(firstName, lastName));
 					// TODO add searching for author's face !
 				}
+			}else{
+				book.addAuthor(new Author());
 			}
 
 			// Description (if any).
 			if (vi.getDescription() != null && vi.getDescription().length() > 0) {
-				b.setDescription(vi.getDescription());
+				book.setDescription(vi.getDescription());
 			}
 
 			// Ratings (if any).
 			if (vi.getAverageRating() != null) {
-				b.setRating(vi.getAverageRating());
+				book.setRating(vi.getAverageRating());
 			}
 
 			// cover
 			ImageLinks il = vi.getImageLinks();
 			if (il != null) {
 				if (il.getThumbnail() != null) {
-					b.setCover(new Picture(new URL(il.getThumbnail()),
-							ImageType.FRONT_COVER));
+					book.setCover(new Picture(new URL(il.getThumbnail()),ImageType.FRONT_COVER));
 				}
 			}
-
-			// genre, category
-			if (vi.getMainCategory() != null) {
-				b.setGenre(new Genre(vi.getMainCategory()));
+			
+			//genre
+			if(vi.getCategories() != null && !vi.getCategories().isEmpty()){
+				book.setGenre(new Genre(vi.getCategories().get(0)));
+			}else{
+				book.setGenre(new Genre("null"));
 			}
 
 			// pages
-			b.setPages(vi.getPageCount());
+			if(vi.getPageCount() != null){
+				book.setPages(vi.getPageCount());
+			}else{
+				book.setPages(0);
+			}
 
 			// saving found book
-			this.result.add(b);
+			this.result.add(book);
 		}
 	}
 

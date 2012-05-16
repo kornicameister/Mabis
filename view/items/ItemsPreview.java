@@ -1,8 +1,10 @@
 package view.items;
 
+import java.awt.Dimension;
 import java.util.TreeSet;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -19,12 +21,15 @@ public class ItemsPreview extends JFrame {
 	private static final long serialVersionUID = -5983748388561797286L;
 	private final TreeSet<BaseTable> elements;
 	private JTable table;
-	private DefaultTableModel tableModel;
+	private JScrollPane scrollPane;
 
 	public ItemsPreview(String title, TreeSet<BaseTable> elements) {
 		super(title);
 		this.elements = elements;
 
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setSize(new Dimension(600,400));
+		
 		// init of Preview dialog
 		this.initComponents();
 		this.layoutComponents();
@@ -41,14 +46,26 @@ public class ItemsPreview extends JFrame {
 	 * Inicjalizacja składowych tego okienka, tj. {@link ItemsPreview}
 	 */
 	private void initComponents() {
-		Object columnIDS[] = ((BaseTable) this.elements.toArray()[0]).toColumnIdentifiers();
-		this.tableModel = new DefaultTableModel();
-		this.tableModel.setColumnIdentifiers(columnIDS);
-		for (BaseTable bt : this.elements) {
-			this.tableModel.addRow(bt.toRowData());
-		}
+		this.table = new JTable(initTableModel());
+		this.scrollPane = new JScrollPane(this.table);
+		this.add(this.scrollPane);
+	}
 
-		this.table = new JTable(this.tableModel);
+	/**
+	 * Inicjalizuje TableModel dla {@link ItemsPreview#table}
+	 * 
+	 * @return gotowy table model zawierający dane
+	 */
+	private DefaultTableModel initTableModel() {
+		DefaultTableModel tableModel = new DefaultTableModel();
+		Object columnIDS[] = ((BaseTable) this.elements.toArray()[0])
+				.toColumnIdentifiers();
+		tableModel = new DefaultTableModel();
+		tableModel.setColumnIdentifiers(columnIDS);
+		for (BaseTable bt : this.elements) {
+			tableModel.addRow(bt.toRowData());
+		}
+		return tableModel;
 	}
 
 	/**
