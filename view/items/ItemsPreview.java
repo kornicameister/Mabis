@@ -28,8 +28,8 @@ public class ItemsPreview extends JFrame {
 		this.elements = elements;
 
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.setSize(new Dimension(600,400));
-		
+		this.setSize(new Dimension(600, 400));
+
 		// init of Preview dialog
 		this.initComponents();
 		this.layoutComponents();
@@ -46,7 +46,14 @@ public class ItemsPreview extends JFrame {
 	 * Inicjalizacja składowych tego okienka, tj. {@link ItemsPreview}
 	 */
 	private void initComponents() {
-		this.table = new JTable(initTableModel());
+		JTable table = new JTable(initTableModel()) {
+			private static final long serialVersionUID = 1L;
+			public Class getColumnClass(int column) {
+				return getValueAt(0, column).getClass();
+			}
+		};
+		this.table = table;
+
 		this.scrollPane = new JScrollPane(this.table);
 		this.add(this.scrollPane);
 	}
@@ -62,8 +69,10 @@ public class ItemsPreview extends JFrame {
 				.toColumnIdentifiers();
 		tableModel = new DefaultTableModel();
 		tableModel.setColumnIdentifiers(columnIDS);
+		Object[] dataRow = null;
 		for (BaseTable bt : this.elements) {
-			tableModel.addRow(bt.toRowData());
+			dataRow = bt.toRowData();
+			tableModel.addRow(dataRow);
 		}
 		return tableModel;
 	}
