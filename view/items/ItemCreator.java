@@ -17,7 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
@@ -34,30 +33,10 @@ import model.BaseTable;
  */
 public abstract class ItemCreator extends JFrame {
 	private static final long serialVersionUID = -2333519518489232774L;
-	private JPanel contentPanel = null;
-	/**
-	 * {@link JProgressBar}, który obrazuje postęp w wypełnianiu wymaganych pól
-	 * dla danego obiektu
-	 */
-	private JProgressBar progressBar = null;
-
-	/**
-	 * Panel dla {@link GroupLayout}, aby ustawić miejsce, gdzie będzie
-	 * definiownay layout
-	 */
+	protected JPanel contentPanel;
 	private JPanel contentPane;
-	/**
-	 * referencja do panelu agregującego przyciski
-	 */
 	private ICButtonPanel buttonPanel;
-	/**
-	 * referencja do listenera dla ItemCreatora
-	 */
 	private ICActionListener listener;
-
-	/**
-	 * Lista pobranych elementów kolekcji
-	 */
 	protected TreeSet<BaseTable> collectedItems;
 
 	/**
@@ -74,11 +53,8 @@ public abstract class ItemCreator extends JFrame {
 		this.initComponents();
 		this.layoutComponents();
 
-		/**
-		 * setting size, look and feel, minimum size
-		 */
 		setDefaultLookAndFeelDecorated(true);
-		this.setMinimumSize(new Dimension(300, 500));
+		this.setMinimumSize(new Dimension(300, 600));
 		this.setLocationRelativeTo(null);
 		this.setSize(this.getMinimumSize());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -87,7 +63,7 @@ public abstract class ItemCreator extends JFrame {
 	/**
 	 * Ułóż elementy w oknie
 	 */
-	private void layoutComponents() {
+	protected void layoutComponents() {
 		this.contentPane = new JPanel(true);
 		this.contentPane.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.RAISED));
@@ -103,16 +79,14 @@ public abstract class ItemCreator extends JFrame {
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addGroup(
-						gl.createSequentialGroup()
-								.addComponent(this.contentPanel)
-								.addComponent(this.progressBar))
+						gl.createSequentialGroup().addComponent(
+								this.contentPanel))
 				.addComponent(this.buttonPanel));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-								.addComponent(this.contentPanel)
-								.addComponent(this.progressBar))
+								.addComponent(this.contentPanel))
 				.addComponent(this.buttonPanel, GroupLayout.DEFAULT_SIZE, 30,
 						30));
 
@@ -126,26 +100,10 @@ public abstract class ItemCreator extends JFrame {
 	 * 
 	 * @throws CreatorContentNullPointerException
 	 */
-	private void initComponents() throws CreatorContentNullPointerException {
+	protected void initComponents() throws CreatorContentNullPointerException {
 		this.listener = new ICActionListener();
-		this.contentPanel = this.initContent();
-		if (this.contentPanel == null) {
-			throw new CreatorContentNullPointerException(
-					"Content not initialized");
-		}
-		this.progressBar = new JProgressBar(JProgressBar.VERTICAL);
 		this.buttonPanel = new ICButtonPanel();
 	}
-
-	/**
-	 * Metoda abstrakcyjna, wywoływana zawsze w konstruktorze klasy
-	 * {@link ItemCreator} aby zapewnić, że klasa dziedzicząca z ItemCreator
-	 * będzie miała ustawiony odpowiedni content
-	 * 
-	 * @return JPanel na którym odłożone zostały wszystkie elementy potrzebne
-	 *         aby utworzyć konkretny obiekt kolekcji.
-	 */
-	protected abstract JPanel initContent();
 
 	/**
 	 * Metoda wywoływana po naciśnięciu {@link ICButtonPanel#clearButton}.

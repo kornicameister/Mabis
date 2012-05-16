@@ -13,6 +13,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -20,7 +21,6 @@ import javax.swing.border.EtchedBorder;
 import model.entity.Author;
 import model.entity.Genre;
 import settings.GlobalPaths;
-import view.imagePanel.ChoosableImagePanel;
 import view.imagePanel.ImagePanel;
 import controller.api.GoogleBookApi;
 
@@ -31,23 +31,12 @@ import controller.api.GoogleBookApi;
 public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
 
-	/**
-	 * {@link ChoosableImagePanel} z okładką danej książki. Użytkownik może
-	 * wybrać okładkę sam lub zostanie ona pobrana z internetu.
-	 */
 	private ImagePanel coverPanel;
-	/**
-	 * {@link JTextArea} w której będzie widoczny opis książki.
-	 */
 	private JTextArea descriptionArea;
-	/**
-	 * referencje do {@link TitlesPanel}
-	 */
-	private TitlesPanel tp;
-	/**
-	 * referencja do {@link DetailedInformationPanel}
-	 */
-	private DetailedInformationPanel dip;
+	private TitlesPanel titlesPanel;
+	private DetailedInformationPanel detailedInfoPanel;
+
+	private JScrollPane descriptionScrollPane;
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -63,30 +52,17 @@ public class BookCreator extends ItemCreator {
 				.getMinimumSize().getHeight() - 70);
 	}
 
+	
 	@Override
-	public JPanel initContent() {
-		JPanel p = new JPanel(true);
-		p.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+	protected void layoutComponents() {
+		super.layoutComponents();
 
-		GroupLayout gl = new GroupLayout(p);
-		p.setLayout(gl);
+		GroupLayout gl = new GroupLayout(this.contentPanel);
+		this.contentPanel.setLayout(gl);
 
 		gl.setAutoCreateGaps(true);
 		gl.setAutoCreateContainerGaps(true);
-
-		tp = new TitlesPanel(true);
-		dip = new DetailedInformationPanel(true);
-		coverPanel = new ImagePanel(new File(
-				GlobalPaths.DEFAULT_COVER_PATH.toString()));
-		coverPanel
-				.setBorder(BorderFactory.createTitledBorder(
-						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-						"Cover"));
-		descriptionArea = new JTextArea();
-		descriptionArea.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-				"Descripion"));
-
+		
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addGroup(
@@ -94,9 +70,9 @@ public class BookCreator extends ItemCreator {
 								.addComponent(this.coverPanel)
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.tp)
-												.addComponent(this.dip)))
-				.addComponent(this.descriptionArea));
+												.addComponent(this.titlesPanel)
+												.addComponent(this.detailedInfoPanel)))
+				.addComponent(descriptionScrollPane));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
 				.addGroup(
@@ -106,27 +82,43 @@ public class BookCreator extends ItemCreator {
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(
-														this.tp,
+														this.titlesPanel,
 														GroupLayout.DEFAULT_SIZE,
 														60, 80)
 												.addComponent(
-														this.dip,
+														this.detailedInfoPanel,
 														GroupLayout.DEFAULT_SIZE,
 														100, 120)))
-				.addComponent(this.descriptionArea));
+				.addComponent(descriptionScrollPane));
 
 		this.revalidate();
 		this.pack();
-		return p;
+	}
+
+
+	@Override
+	public void initComponents() {
+		super.initComponents();
+		contentPanel = new JPanel(true);
+		contentPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		
+		titlesPanel = new TitlesPanel(true);
+		detailedInfoPanel = new DetailedInformationPanel(true);
+		coverPanel = new ImagePanel(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
+		coverPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Cover"));
+
+		descriptionArea = new JTextArea();		
+		descriptionScrollPane = new JScrollPane(this.descriptionArea);
+		descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Descripion"));
+		descriptionScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 	}
 
 	@Override
 	protected void clearContentFields() {
-		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-				.toString()));
+		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
 		this.descriptionArea.setText("");
-		this.tp.clear();
-		this.dip.clear();
+		this.titlesPanel.clear();
+		this.detailedInfoPanel.clear();
 	}
 
 	@Override
@@ -145,6 +137,9 @@ public class BookCreator extends ItemCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		// init panel with obtained collection items so as to allow
+		// user to choose one selected
+
 	}
 
 	/**
@@ -163,7 +158,7 @@ public class BookCreator extends ItemCreator {
 		/**
 		 * pole tekstowe dla tytułu, który jest przetłumaczony
 		 */
-		private final JTextField titleLocale = new JTextField();
+		private final JTextField subTitle = new JTextField();
 
 		/**
 		 * Tworzy panel dla tytułów
@@ -175,40 +170,28 @@ public class BookCreator extends ItemCreator {
 		public TitlesPanel(boolean isDoubleBuffered) {
 			super(isDoubleBuffered);
 			this.layoutComponents();
-			this.setBorder(BorderFactory.createTitledBorder(
-					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-					"Titles"));
+			this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Titles"));
+			this.subTitle.setBorder(BorderFactory.createTitledBorder("Subtitle"));
+			this.titleOriginal.setBorder(BorderFactory.createTitledBorder("Title"));
 		}
 
-		/**
-		 * Czyści tekst, który był widoczny w {@link JTextField} dla tytułów
-		 */
 		protected void clear() {
-			this.titleLocale.setText("");
+			this.subTitle.setText("");
 			this.titleOriginal.setText("");
 		}
 
-		/**
-		 * 
-		 */
 		private void layoutComponents() {
 			this.setLayout(new GridLayout(2, 1, 5, 5));
 			this.add(this.titleOriginal);
-			this.add(this.titleLocale);
+			this.add(this.subTitle);
 		}
 
-		/**
-		 * @return pole tekstowe dla oryginalnego tytułu
-		 */
 		public JTextField getTitleOriginal() {
 			return titleOriginal;
 		}
 
-		/**
-		 * @return pole tekstowe dla tytułu przetłumaczonego
-		 */
 		public JTextField getTitleLocale() {
-			return titleLocale;
+			return subTitle;
 		}
 	}
 
@@ -247,6 +230,11 @@ public class BookCreator extends ItemCreator {
 			this.setBorder(BorderFactory.createTitledBorder(
 					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 					"Details"));
+
+			this.isbnField.setBorder(BorderFactory.createTitledBorder("ISBN"));
+			this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
+			this.genreCombobox.setBorder(BorderFactory.createTitledBorder("Genre"));
+			this.authorCombobox.setBorder(BorderFactory.createTitledBorder("Author"));
 		}
 
 		/**
