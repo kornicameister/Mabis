@@ -5,6 +5,9 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+
+import javax.swing.ImageIcon;
 
 import model.BaseTable;
 import model.enums.TableType;
@@ -90,5 +93,29 @@ public class Author extends BaseTable implements Serializable {
 		str += "[FNAME: " + this.getFirstName() + "]\n";
 		str += "[LNAME: " + this.getLastName() + "]\n";
 		return str;
+	}
+
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add("First name");
+		data.add("Last name");
+		data.add("Avatar");
+		return data.toArray();
+	}
+
+	@Override
+	public Object[] toRowData() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add(this.getFirstName());
+		data.add(this.getLastName());
+		data.add(new ImageIcon(this.getPictureFile().getImagePath()));
+		return data.toArray();
 	}
 }

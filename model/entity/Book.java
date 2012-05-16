@@ -5,6 +5,7 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -66,6 +67,10 @@ public class Book extends Movie implements Serializable {
 		this.identifiers.put(bii, val);
 	}
 
+	private TreeMap<BookIndustryIdentifier, String> getIdentifiers() {
+		return this.identifiers;
+	}
+
 	public Integer getPages() {
 		return pages;
 	}
@@ -94,5 +99,27 @@ public class Book extends Movie implements Serializable {
 		}
 		str += "[PICTURE: " + this.getCover() + "]\n";
 		return str;
+	}
+
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.set(4, "Pages");
+		data.add(5, "Identifier number");
+		return data.toArray();
+	}
+
+	@Override
+	public Object[] toRowData() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.set(4, this.getPages());
+		data.add(5, this.getIdentifiers());
+		return data.toArray();
 	}
 }

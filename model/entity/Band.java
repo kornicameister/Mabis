@@ -137,4 +137,26 @@ public class Band extends Author implements Serializable {
 		return str;
 	}
 
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for (Object d : super.toColumnIdentifiers()) {
+			data.add(d);
+		}
+		data.set(1, "Name");
+		data.set(2, "Genre");
+		return data.toArray();
+	}
+
+	@Override
+	public Object[] toRowData() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for (Object d : super.toColumnIdentifiers()) {
+			data.add(d);
+		}
+		data.set(1, this.getName());
+		data.set(2, this.getMasterGenre());
+		return data.toArray();
+	}
+
 }

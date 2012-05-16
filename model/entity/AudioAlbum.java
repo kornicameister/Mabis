@@ -111,4 +111,14 @@ public class AudioAlbum extends Movie implements Serializable {
 		return str;
 	}
 
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for (Object d : super.toColumnIdentifiers()) {
+			data.add(d);
+		}
+		data.set(6, "Band");
+		return data.toArray();
+	}
+
 }

@@ -171,6 +171,27 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	}
 
 	/**
+	 * Metoda zwraca wektor opisujący kolumny w tabeli danych
+	 * 
+	 * @return wektor z opisem kolumn
+	 */
+	public Object[] toColumnIdentifiers(){
+		Object data[] = {"ID"};
+		return data;
+	}
+
+	/**
+	 * zwraca tablicę obiektów klasy Object, który stanowi opis elementu
+	 * kolekcji do wykorzystania w tabeli danych JTable
+	 * 
+	 * @return tablicę danych Object
+	 */
+	public Object[] toRowData(){
+		Object data[] = {this.primaryKey};
+		return data;
+	}
+
+	/**
 	 * Domyślny komparator, który porównuje po nazwie tabeli. Jeśli tabele są
 	 * identyczne, sprawdza klucze główne.
 	 */

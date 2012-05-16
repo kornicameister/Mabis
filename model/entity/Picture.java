@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+
+import javax.swing.ImageIcon;
 
 import model.BaseTable;
 import model.enums.ImageType;
@@ -31,7 +34,7 @@ import utilities.Hasher;
 public class Picture extends BaseTable implements Serializable {
 	private static final long serialVersionUID = -1350787093697204874L;
 	private final ImageType type;
-	private String imageFile = null;
+	private String imageFilePath = null;
 
 	public Picture() {
 		super();
@@ -54,14 +57,14 @@ public class Picture extends BaseTable implements Serializable {
 	 */
 	public Picture(String cover, ImageType t) throws FileNotFoundException {
 		super();
-		this.imageFile = cover;
+		this.imageFilePath = cover;
 		this.generateCheckSum(new File(cover));
 		this.type = t;
 	}
 
 	public Picture(File cover, ImageType t) throws IOException {
 		super();
-		this.imageFile = cover.getCanonicalPath();
+		this.imageFilePath = cover.getCanonicalPath();
 		this.generateCheckSum(cover);
 		this.type = t;
 	}
@@ -88,8 +91,8 @@ public class Picture extends BaseTable implements Serializable {
 		urlConn.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		urlConn.connect();
-		
-		//saving file
+
+		// saving file
 		InputStream is = urlConn.getInputStream();
 
 		File output = new File(GlobalPaths.TMP + this.titles[0]);
@@ -113,25 +116,25 @@ public class Picture extends BaseTable implements Serializable {
 	}
 
 	public String getImagePath() {
-		return this.imageFile;
+		return this.imageFilePath;
 	}
 
 	public final File getImageFile() {
-		return new File(this.imageFile);
+		return new File(this.imageFilePath);
 	}
 
 	public void setImageFile(String imagePath) throws IOException {
-		this.imageFile = imagePath;
-		this.generateCheckSum(new File(this.imageFile));
+		this.imageFilePath = imagePath;
+		this.generateCheckSum(new File(this.imageFilePath));
 	}
 
 	public void setImageFile(File imageFile) throws IOException {
-		this.imageFile = imageFile.getCanonicalPath();
+		this.imageFilePath = imageFile.getCanonicalPath();
 		this.generateCheckSum(imageFile);
 	}
 
 	public void setImageFile(String f, String checksum) throws IOException {
-		this.imageFile = f;
+		this.imageFilePath = f;
 		this.titles[0] = checksum;
 	}
 
@@ -163,7 +166,7 @@ public class Picture extends BaseTable implements Serializable {
 
 	@Override
 	protected void initInternalFields() {
-		this.imageFile = null;
+		this.imageFilePath = null;
 		this.tableName = TableType.PICTURE.toString();
 		this.titles[0] = "";
 	}
@@ -175,5 +178,29 @@ public class Picture extends BaseTable implements Serializable {
 		str += "[TYPE: " + this.getType() + "]\n";
 		str += "[CHCSM: " + this.getCheckSum() + "]\n";
 		return str;
+	}
+
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add("Picture");
+		data.add("Hash");
+		data.add("Path");
+		return data.toArray();
+	}
+
+	@Override
+	public Object[] toRowData() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add(new ImageIcon(this.imageFilePath));
+		data.add(this.titles[0]);
+		data.add(this.imageFilePath);
+		return data.toArray();
 	}
 }

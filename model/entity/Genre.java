@@ -5,6 +5,7 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import model.BaseTable;
 import model.enums.TableType;
@@ -79,6 +80,26 @@ public class Genre extends BaseTable implements Serializable {
 		str += "----------\n";
 		str += "[GENRE: " + this.getGenre() + "]\n";
 		return str;
+	}
+
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add("Genre");
+		return data.toArray();
+	}
+
+	@Override
+	public Object[] toRowData() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add(this.getGenre());
+		return data.toArray();
 	}
 
 }

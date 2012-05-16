@@ -2,7 +2,10 @@ package model.entity;
 
 import java.io.Serializable;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.TreeSet;
+
+import javax.swing.ImageIcon;
 
 import model.BaseTable;
 import model.enums.TableType;
@@ -131,6 +134,36 @@ public class Movie extends BaseTable implements Serializable {
 		str += "[DURATION: " + this.getDuration() + "]\n";
 		str += "[COVER :" + this.cover.toString() + "]\n";
 		return str;
+	}
+
+	@Override
+	public Object[] toColumnIdentifiers() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add("Title");
+		data.add("Subtitle");
+		data.add("Genre");
+		data.add("Lenght");
+		data.add("Author");
+		data.add("Cover");
+		return data.toArray();
+	}
+
+	@Override
+	public Object[] toRowData() {
+		ArrayList<Object> data = new ArrayList<Object>();
+		for(Object d : super.toColumnIdentifiers()){
+			data.add(d);
+		}
+		data.add(this.getOriginalTitle());
+		data.add(this.getLocalizedTitle());
+		data.add(this.getGenre().toString());
+		data.add(this.getDuration().toString());
+		data.add(this.getAuthors().toArray());
+		data.add(new ImageIcon(this.getCover().getImagePath()));
+		return data.toArray();
 	}
 
 }
