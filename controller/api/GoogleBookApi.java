@@ -132,9 +132,17 @@ public class GoogleBookApi extends ApiAccess {
 			// cover
 			ImageLinks il = vi.getImageLinks();
 			if (il != null) {
-				if (il.getThumbnail() != null) {
-					book.setCover(new Picture(new URL(il.getThumbnail()),ImageType.FRONT_COVER));
+				String image = null;
+				if (il.getLarge() != null){
+					image = il.getLarge();
 				}
+				if (il.getMedium() != null && image == null){
+					image = il.getMedium();
+				}
+				if (il.getThumbnail() != null && image == null) {
+					image = il.getThumbnail();
+				}
+				book.setCover(new Picture(new URL(image),ImageType.FRONT_COVER));
 			}
 			
 			//genre
