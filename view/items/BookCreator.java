@@ -22,6 +22,7 @@ import model.entity.Author;
 import model.entity.Genre;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
+import view.items.itemsprieview.BooksPreview;
 import controller.api.GoogleBookApi;
 
 /**
@@ -139,7 +140,7 @@ public class BookCreator extends ItemCreator {
 		}
 		// init panel with obtained collection items so as to allow
 		// user to choose one selected
-		ItemsPreview ip = new ItemsPreview("Collected books", this.collectedItems);
+		BooksPreview ip = new BooksPreview("Collected books", this.collectedItems);
 		ip.setVisible(true);
 	}
 
