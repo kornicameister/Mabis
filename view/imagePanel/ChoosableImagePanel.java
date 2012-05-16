@@ -84,7 +84,7 @@ public class ChoosableImagePanel extends ImagePanel {
 		if (this.marked) {
 			g.setColor(Color.gray.brighter().brighter());
 			g.fill3DRect(0, 0, scaledImage.getIconWidth(),
-					scaledImage.getIconHeight(), false);
+					scaledImage.getIconHeight() + padding, false);
 		} else {
 			g.setColor(this.defaultColor);
 			g.clearRect(0, 0, scaledImage.getIconWidth(),

@@ -65,15 +65,15 @@ public class ImagePanel extends JPanel {
 		ImageIcon f = new ImageIcon(filePath);
 
 		return new ImageIcon(f.getImage().getScaledInstance(
-				this.getWidth() - padding, this.getHeight() - padding, 0));
+				this.getWidth(), this.getHeight() - padding, 0));
 	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		ImageIcon i = rescaleImage();
-		int topLeftX = getWidth() / 10;
-		int topLeftY = getWidth() / 7;
+		int topLeftX = padding / 2;
+		int topLeftY = padding;
 		g.drawImage(i.getImage(), topLeftX, topLeftY, i.getIconWidth()
 				- padding, i.getIconHeight() - padding, null);
 	}
