@@ -1,12 +1,14 @@
 package view.items.itemsprieview;
 
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.util.TreeSet;
 
+import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.border.EtchedBorder;
 
 import model.BaseTable;
 
@@ -17,31 +19,51 @@ import model.BaseTable;
  * @author kornicameister
  * 
  */
-public abstract class ItemsPreview extends JFrame {
+public abstract class ItemsPreview extends JFrame{
 	private static final long serialVersionUID = -5983748388561797286L;
 	protected final TreeSet<BaseTable> elements;
-	private JScrollPane scrollPane;
-	protected JPanel contentPanel;
+	protected JTabbedPane tabbedPanel;
+	private JPanel contentPane;
 
 	public ItemsPreview(String title, TreeSet<BaseTable> elements) {
 		super(title);
 		this.elements = elements;
 
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.setSize(new Dimension(630, 400));
-
-		// init of Preview dialog
+		setDefaultLookAndFeelDecorated(true);
+		this.setLocationRelativeTo(null);
+		this.setSize(this.getMinimumSize());
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
 		this.initComponents();
+		this.layoutComponents();
+		
+		this.setMinimumSize(new Dimension(450,450));
+		this.setSize(new Dimension(450,450));
+	}
+
+	private void layoutComponents() {
+		GroupLayout gl = new GroupLayout(getContentPane());
+		getContentPane().setLayout(gl);
+
+		gl.setAutoCreateGaps(true);
+		gl.setAutoCreateContainerGaps(true);
+		
+		gl.setHorizontalGroup(gl.createParallelGroup().addComponent(this.tabbedPanel,400,400,400));
+		gl.setVerticalGroup(gl.createSequentialGroup().addComponent(this.tabbedPanel,400,400,400));
+		this.pack();
 	}
 
 	/**
 	 * Inicjalizacja składowych tego okienka, tj. {@link ItemsPreview}
 	 */
 	protected void initComponents() {
-		this.contentPanel = new JPanel(true);
-		this.contentPanel.setLayout(new GridLayout(0, 3));
-		this.scrollPane = new JScrollPane(this.contentPanel);
-		this.add(this.scrollPane);
+		this.contentPane = new JPanel(true);
+		this.contentPane.setBorder(BorderFactory
+				.createEtchedBorder(EtchedBorder.RAISED));
+		this.setContentPane(this.contentPane);
+		
+		this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+		this.tabbedPanel.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
 
 	/**

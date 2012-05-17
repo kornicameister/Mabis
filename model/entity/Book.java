@@ -4,7 +4,14 @@
  */
 package model.entity;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -14,6 +21,7 @@ import model.BaseTable;
 import model.enums.BookIndustryIdentifier;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
+import settings.GlobalPaths;
 
 /**
  * Klasa {@link Book} jest obiektową wersją tabeli bazy danych <b>mabis.book</b>
@@ -135,5 +143,52 @@ public class Book extends Movie implements Serializable {
 		data.set(4, this.getPages());
 		data.add(5, this.getIdentifiers());
 		return data.toArray();
+	}
+
+	public URL toDescription() {
+		String str = new String();
+		str += "<html>";
+		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
+		str += "<p><b>Title:</b>" + this.getOriginalTitle() + "</p>";
+		if(this.getLocalizedTitle() != null && !this.getLocalizedTitle().isEmpty()){
+			str += "<b><i>Subtitle:</i></b>" + this.getLocalizedTitle() + "</p>";
+		}
+		str += "<p><b>Pages:</b>" + this.getPages() + "</p>";
+		if(this.getAuthors() != null && !this.getAuthors().isEmpty()){
+			str += "<b>Authors:</b>";
+			str += "<ul>";
+			for (Author author : this.getAuthors()) {
+				str += "<li>" + author.getFirstName() + " " + author.getLastName() + "</li>";
+			}
+			str += "</ul>";
+		}
+		str += "</html>";
+		
+		DataOutputStream dos = null;
+		String path = GlobalPaths.TMP + String.valueOf(Math.random());
+		try {
+			dos = new DataOutputStream(new FileOutputStream(new File(path)));
+			dos.writeBytes(str);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally{
+			if(dos != null){
+				try {
+					dos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		try {
+			URL ulr = new URL("file:///" + path);
+			return ulr;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
