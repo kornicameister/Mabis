@@ -31,12 +31,10 @@ import controller.api.GoogleBookApi;
  */
 public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
-
 	private ImagePanel coverPanel;
 	private JTextArea descriptionArea;
 	private TitlesPanel titlesPanel;
 	private DetailedInformationPanel detailedInfoPanel;
-
 	private JScrollPane descriptionScrollPane;
 
 	/**
@@ -101,7 +99,7 @@ public class BookCreator extends ItemCreator {
 	public void initComponents() {
 		super.initComponents();
 		contentPanel = new JPanel(true);
-		contentPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		contentPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),"Creator"));
 		
 		titlesPanel = new TitlesPanel(true);
 		detailedInfoPanel = new DetailedInformationPanel(true);
