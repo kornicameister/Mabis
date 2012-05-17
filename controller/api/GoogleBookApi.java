@@ -80,10 +80,12 @@ public class GoogleBookApi extends ApiAccess {
 
 		for (Volume volume : foundBooks) {
 			VolumeInfo vi = volume.getVolumeInfo();
+			if(vi.getTitle() == null){ //no empty title
+				break;
+			}
 
 			// setting book title
-			book = new Book();
-			book.setTitle(vi.getTitle());
+			book = new Book(vi.getTitle());
 			if (vi.getSubtitle() != null) {
 				book.setSubTitle(vi.getSubtitle());
 			}
