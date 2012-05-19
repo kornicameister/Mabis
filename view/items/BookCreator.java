@@ -136,7 +136,7 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected void fetchFromAPI() {
-		if(this.collectedItems != null && !this.collectedItems.isEmpty()){
+		if (this.collectedItems != null) {
 			this.collectedItems.clear();
 		}
 		GoogleBookApi gba = new GoogleBookApi();
