@@ -19,6 +19,7 @@ public abstract class ItemsPreview extends JDialog {
 	private static final long serialVersionUID = -5983748388561797286L;
 	protected final TreeSet<BaseTable> elements;
 	protected JTabbedPane tabbedPanel;
+	private static Dimension dim = new Dimension(550,450);
 	
 	public ItemsPreview(String title, TreeSet<BaseTable> elements) {
 		super();
@@ -30,8 +31,8 @@ public abstract class ItemsPreview extends JDialog {
 		this.initComponents();
 		this.layoutComponents();
 		
-		this.setMinimumSize(new Dimension(450,450));
-		this.setSize(new Dimension(450,450));
+		this.setMinimumSize(dim);
+		this.setSize(dim);
 	}
 
 	private void layoutComponents() {
@@ -43,7 +44,6 @@ public abstract class ItemsPreview extends JDialog {
 	 */
 	protected void initComponents() {
 		this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
-		this.tabbedPanel.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
 
 	/**

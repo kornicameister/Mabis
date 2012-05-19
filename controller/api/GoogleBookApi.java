@@ -38,9 +38,7 @@ public class GoogleBookApi extends ApiAccess {
 	@Override
 	protected ArrayList<URL> setApiAccessPointList()
 			throws MalformedURLException {
-		ArrayList<URL> tmp = new ArrayList<URL>();
-		tmp.add(new URL("https://www.googleapis.com/books/v1/volumes?q="));
-		return tmp;
+		return null;
 	}
 
 	/**
@@ -80,89 +78,90 @@ public class GoogleBookApi extends ApiAccess {
 
 		for (Volume volume : foundBooks) {
 			VolumeInfo vi = volume.getVolumeInfo();
-			if(vi.getTitle() == null){ //no empty title
-				break;
-			}
-
-			// setting book title
-			book = new Book(vi.getTitle());
-			if (vi.getSubtitle() != null) {
-				book.setSubTitle(vi.getSubtitle());
-			}
-
-			// adding identifiers
-			ArrayList<IndustryIdentifiers> ii = (ArrayList<IndustryIdentifiers>) vi
-					.getIndustryIdentifiers();
-			if (ii != null && !ii.isEmpty()) {
-				for (IndustryIdentifiers identifier : ii) {
-					book.addIdentifier(BookIndustryIdentifier.findType(identifier
-							.getType()), identifier.getIdentifier());
+			if (vi.getTitle() != null && !vi.getTitle().isEmpty()) {
+				// setting book title
+				book = new Book(vi.getTitle());
+				if (vi.getSubtitle() != null) {
+					book.setSubTitle(vi.getSubtitle());
 				}
-			}
 
-			// authors
-			java.util.List<String> authors = vi.getAuthors();
-			if (authors != null && !authors.isEmpty()) {
-				for (int i = 0; i < authors.size(); ++i) {
-					String names[] = authors.get(i).split(" ");
-					String firstName = new String();
-					String lastName = new String();
-					for (int j = 0; j < names.length; j++) {
-						if (j < names.length - 1) {
-							firstName += names[j] + " ";
-						} else {
-							lastName += names[j];
-						}
+				// adding identifiers
+				ArrayList<IndustryIdentifiers> ii = (ArrayList<IndustryIdentifiers>) vi
+						.getIndustryIdentifiers();
+				if (ii != null && !ii.isEmpty()) {
+					for (IndustryIdentifiers identifier : ii) {
+						book.addIdentifier(BookIndustryIdentifier
+								.findType(identifier.getType()), identifier
+								.getIdentifier());
 					}
-					book.addAuthor(new Author(firstName, lastName));
-					// TODO add searching for author's face !
 				}
-			}else{
-				book.addAuthor(new Author());
-			}
 
-			// Description (if any).
-			if (vi.getDescription() != null && vi.getDescription().length() > 0) {
-				book.setDescription(vi.getDescription());
-			}
-
-			// Ratings (if any).
-			if (vi.getAverageRating() != null) {
-				book.setRating(vi.getAverageRating());
-			}
-
-			// cover
-			ImageLinks il = vi.getImageLinks();
-			if (il != null) {
-				String image = null;
-				if (il.getLarge() != null){
-					image = il.getLarge();
+				// authors
+				java.util.List<String> authors = vi.getAuthors();
+				if (authors != null && !authors.isEmpty()) {
+					for (int i = 0; i < authors.size(); ++i) {
+						String names[] = authors.get(i).split(" ");
+						String firstName = new String();
+						String lastName = new String();
+						for (int j = 0; j < names.length; j++) {
+							if (j < names.length - 1) {
+								firstName += names[j] + " ";
+							} else {
+								lastName += names[j];
+							}
+						}
+						book.addAuthor(new Author(firstName, lastName));
+						// TODO add searching for author's face !
+					}
+				} else {
+					book.addAuthor(new Author());
 				}
-				if (il.getMedium() != null && image == null){
-					image = il.getMedium();
-				}
-				if (il.getThumbnail() != null && image == null) {
-					image = il.getThumbnail();
-				}
-				book.setCover(new Picture(new URL(image),ImageType.FRONT_COVER));
-			}
-			
-			//genre
-			if(vi.getCategories() != null && !vi.getCategories().isEmpty()){
-				book.setGenre(new Genre(vi.getCategories().get(0)));
-			}else{
-				book.setGenre(new Genre("null"));
-			}
 
-			// pages
-			if(vi.getPageCount() != null){
-				book.setPages(vi.getPageCount());
-			}else{
-				book.setPages(0);
-			}
+				// Description (if any).
+				if (vi.getDescription() != null
+						&& vi.getDescription().length() > 0) {
+					book.setDescription(vi.getDescription());
+				}
 
-			// saving found book
-			this.result.add(book);
+				// Ratings (if any).
+				if (vi.getAverageRating() != null) {
+					book.setRating(vi.getAverageRating());
+				}
+
+				// cover
+				ImageLinks il = vi.getImageLinks();
+				if (il != null) {
+					String image = null;
+					if (il.getLarge() != null) {
+						image = il.getLarge();
+					}
+					if (il.getMedium() != null && image == null) {
+						image = il.getMedium();
+					}
+					if (il.getThumbnail() != null && image == null) {
+						image = il.getThumbnail();
+					}
+					book.setCover(new Picture(new URL(image),
+							ImageType.FRONT_COVER));
+				}
+
+				// genre
+				if (vi.getCategories() != null && !vi.getCategories().isEmpty()) {
+					book.setGenre(new Genre(vi.getCategories().get(0)));
+				} else {
+					book.setGenre(new Genre("null"));
+				}
+
+				// pages
+				if (vi.getPageCount() != null) {
+					book.setPages(vi.getPageCount());
+				} else {
+					book.setPages(0);
+				}
+
+				// saving found book
+				this.result.add(book);
+			}
 		}
 	}
 
