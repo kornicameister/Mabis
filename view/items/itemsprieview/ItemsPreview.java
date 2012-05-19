@@ -93,12 +93,15 @@ public class ItemsPreview extends JDialog implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton source = (JButton) e.getSource();
-		if (source.equals(this.cancelButton)) {
-			this.setVisible(false);
-			this.dispose();
-		} else {
-
+		if (source.equals(this.acceptSelectedButton)) {
+			this.firePropertyChange("selectedItem", null,
+					((PreviewChunk) this.tabbedPanel.getSelectedComponent())
+							.getPreviedItem());
 		}
+		// no matter which one from two buttons was clicked, closing preview
+		// anyway
+		this.setVisible(false);
+		this.dispose();
 		MabisLogger.getLogger().log(Level.INFO,
 				this.getClass().getSimpleName() + " action called :: {0}",
 				source.getActionCommand());

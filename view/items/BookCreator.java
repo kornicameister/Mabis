@@ -5,6 +5,8 @@ package view.items;
 
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.TreeMap;
@@ -18,7 +20,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import model.BaseTable;
 import model.entity.Author;
+import model.entity.Book;
 import model.entity.Genre;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
@@ -36,6 +40,7 @@ public class BookCreator extends ItemCreator {
 	private TitlesPanel titlesPanel;
 	private DetailedInformationPanel detailedInfoPanel;
 	private JScrollPane descriptionScrollPane;
+	private Book selectedBook;
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -152,7 +157,25 @@ public class BookCreator extends ItemCreator {
 		// user to choose one selected
 		ItemsPreview ip = new ItemsPreview("Collected books",
 				this.collectedItems);
+		ip.addPropertyChangeListener("selectedItem",
+				new PropertyChangeListener() {
+
+					@Override
+					public void propertyChange(PropertyChangeEvent e) {
+						fillWithResult((BaseTable) e.getNewValue());
+					}
+				});
 		ip.setVisible(true);
+	}
+
+	@Override
+	protected void fillWithResult(BaseTable table) {
+		this.selectedBook = (Book) table;
+		this.titlesPanel.titleOriginal.setText(this.selectedBook.getTitle());
+		this.titlesPanel.subTitle.setText(this.selectedBook.getSubtitle());
+		this.coverPanel.setImage(this.selectedBook.getCover().getImageFile());
+		this.descriptionArea.setText(this.selectedBook.getDescription());
+		this.detailedInfoPanel.pages.setText(this.selectedBook.getPages().toString());
 	}
 
 	/**

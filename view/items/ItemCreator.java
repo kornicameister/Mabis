@@ -133,6 +133,15 @@ public abstract class ItemCreator extends JFrame {
 	 */
 	protected abstract void fetchFromAPI();
 
+	/**
+	 * Metoda powinna zostać wywołana po wybraniu przez użytkownika elementu
+	 * zwróconego za pomocą dowolnego api
+	 * 
+	 * @param table
+	 *            tabela z danymi
+	 */
+	protected abstract void fillWithResult(BaseTable table);
+
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
 		/**

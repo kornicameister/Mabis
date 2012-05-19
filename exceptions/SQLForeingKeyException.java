@@ -23,7 +23,7 @@ public class SQLForeingKeyException extends Exception {
 
 	public SQLForeingKeyException(ForeignKeyPair pair, BaseTable target) {
 		super(message_2.replaceFirst("!", pair.toString()).replaceFirst("!!",
-				target.getTableName()));
+				target.getTableType().toString()));
 	}
 
 	public SQLForeingKeyException(int count, int wanted) {

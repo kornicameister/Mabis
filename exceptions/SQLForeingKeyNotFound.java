@@ -17,6 +17,6 @@ public class SQLForeingKeyNotFound extends Exception {
 	private static final String message = "Following key: ! was not found in table: !";
 	public SQLForeingKeyNotFound(String wantedKey, BaseTable table) {
 		super(message.replaceFirst("!", wantedKey).replaceFirst("!",
-				table.getTableName()));
+				table.getTableType().toString()));
 	}
 }

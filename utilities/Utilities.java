@@ -59,11 +59,11 @@ public abstract class Utilities {
 			throws SQLException {
 		long res = 0;
 		String query = Utilities.LAST_ID_PATTERN;
-		String tableName = String.valueOf(table.getTableName().charAt(0))
-				.toUpperCase() + table.getTableName().substring(1);
+		String tableName = String.valueOf(table.getTableType().toString().charAt(0))
+				.toUpperCase() + table.getTableType().toString().substring(1);
 
 		query = query.replaceFirst("!", tableName);
-		query = query.replaceFirst("!", table.getTableName());
+		query = query.replaceFirst("!", table.getTableType().toString());
 		query = query.replaceFirst("!", tableName);
 
 		ResultSet set = st.executeQuery(query);
