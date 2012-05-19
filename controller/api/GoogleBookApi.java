@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
+import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
@@ -145,11 +147,13 @@ public class GoogleBookApi extends ApiAccess {
 							ImageType.FRONT_COVER));
 				}
 
-				// genre
+				// genres
 				if (vi.getCategories() != null && !vi.getCategories().isEmpty()) {
-					book.setGenre(new Genre(vi.getCategories().get(0)));
+					for(String genre : vi.getCategories()){
+						book.addGenre(new Genre(genre));
+					}
 				} else {
-					book.setGenre(new Genre("null"));
+					book.addGenre(new Genre("null"));
 				}
 
 				// pages
@@ -162,6 +166,7 @@ public class GoogleBookApi extends ApiAccess {
 				// saving found book
 				this.result.add(book);
 			}
+			MabisLogger.getLogger().log(Level.FINE,"Loaded {0} books from GoogleBook API",this.result.size());
 		}
 	}
 
