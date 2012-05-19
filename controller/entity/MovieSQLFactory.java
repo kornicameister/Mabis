@@ -107,7 +107,7 @@ public class MovieSQLFactory extends SQLFactory {
 	 * dany gatunek jest już w bazie danych, wtedy pobierany jest jego numer
 	 * identyfikacyjny
 	 * 
-	 * @param genre
+	 * @param genres
 	 *            gatunek filmu
 	 * @return numer identyfikacynyjny gatunku
 	 * @throws SQLException
@@ -118,7 +118,7 @@ public class MovieSQLFactory extends SQLFactory {
 		gsf.addWhereClause("idGenre", genre.getPrimaryKey().toString());
 		gsf.executeSQL(true);
 		if (gsf.getGenres().isEmpty()) {
-			// no such genre, inserting
+			// no such genres, inserting
 			gsf.setStatementType(SQLStamentType.INSERT);
 			this.lastAffactedId = gsf.executeSQL(true);
 			genre.setPrimaryKey(this.lastAffactedId);
