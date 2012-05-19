@@ -150,10 +150,8 @@ public class NewUserDialog extends JDialog {
 																		this.newAvatarButton)))
 								.addGroup(
 										layout.createParallelGroup()
-												.addComponent(
-														this.imagePanel,
-														GroupLayout.DEFAULT_SIZE,
-														135, 135))));
+												.addComponent(this.imagePanel,
+														135, 135, 135))));
 		layout.setVerticalGroup(layout
 				.createSequentialGroup()
 				.addGroup(
@@ -221,10 +219,8 @@ public class NewUserDialog extends JDialog {
 																		this.newAvatarButton)))
 								.addGroup(
 										layout.createSequentialGroup()
-												.addComponent(
-														this.imagePanel,
-														GroupLayout.DEFAULT_SIZE,
-														135, 135))));
+												.addComponent(this.imagePanel,
+														135, 135, 135))));
 		this.repaint();
 		this.pack();
 	}

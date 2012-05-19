@@ -47,7 +47,7 @@ public class UserSelectionPanel extends JFrame implements
 		PropertyChangeListener {
 
 	private static final long serialVersionUID = -3642888588569732458L;
-	private static final Dimension avatarSize = new Dimension(100, 100);
+	private static final Dimension avatarSize = new Dimension(150, 150);
 	private MainWindow mw = null;
 	private JButton connectButton = null;
 	private JButton cancelButton = null;
@@ -103,7 +103,7 @@ public class UserSelectionPanel extends JFrame implements
 	private void parseUsers() {
 		for (User u : this.users.values()) {
 			ChoosableImagePanel p = new ChoosableImagePanel(u.getPictureFile()
-					.getImageFile());
+					.getImageFile(), avatarSize);
 			p.addPropertyChangeListener(this);
 			thumbails.put(u, p);
 		}

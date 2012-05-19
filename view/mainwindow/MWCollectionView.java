@@ -176,7 +176,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					movies.size());
 			for (Movie movie : movies) {
 				movieThumbs.put(movie, new ChoosableImagePanel(movie.getCover()
-						.getImageFile()));
+						.getImageFile(), MWCollectionView.THUMBAILSIZE));
 			}
 		}
 
@@ -206,7 +206,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 							audios.size());
 			for (AudioAlbum album : audios) {
 				audioThumbs.put(album, new ChoosableImagePanel(album.getCover()
-						.getImageFile()));
+						.getImageFile(), MWCollectionView.THUMBAILSIZE));
 			}
 		}
 
@@ -234,7 +234,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					books.size());
 			for (Book b : books) {
 				bookThumbs.put(b, new ChoosableImagePanel(b.getCover()
-						.getImageFile()));
+						.getImageFile(), MWCollectionView.THUMBAILSIZE));
 			}
 		}
 
