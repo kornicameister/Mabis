@@ -1,7 +1,7 @@
 package view.imagePanel;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -13,6 +13,7 @@ import java.util.logging.Level;
 
 import javax.accessibility.Accessible;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import logger.MabisLogger;
@@ -30,18 +31,20 @@ public class ImagePanel extends JPanel implements Accessible {
 	private static final long serialVersionUID = 8841755218083931060L;
 	protected static final Integer padding = 10;
 	private File imageFile = null;
+	private JLabel contentLabel;
 
 	public ImagePanel(File f) {
 		super(true);
 		this.imageFile = f;
 		this.addFocusListener(new ImagePanelFocusListener(this));
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
-		try {
-			this.setMinimumSize(new Dimension(new ImageIcon(f.getCanonicalPath()).getIconWidth(),
-					new ImageIcon(f.getCanonicalPath()).getIconHeight()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		this.contentLabel = new JLabel();
+//		this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
+		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		this.contentLabel.setLayout(new GridLayout());
+		this.contentLabel.setIcon(new ImageIcon(f.getAbsolutePath()));
+		this.add(contentLabel);
 	}
 
 	@Override
@@ -64,38 +67,6 @@ public class ImagePanel extends JPanel implements Accessible {
 
 	public File getImageFile() {
 		return imageFile;
-	}
-
-	/**
-	 * Method rescales internal image to adjust it to panel size <b>Notice</b>
-	 * that image size in certain dimension will be always set to smaller in
-	 * following comparision:
-	 * <ul>
-	 * <li>imageSize.width vs imagePanel.width -> smaller will be chosen</li>
-	 * <li>imageSize.height vs imagePanel.height -> smaller will be chosen</li>
-	 * </ul>
-	 * 
-	 * @param d
-	 * @see ImagePanel#imageSize
-	 */
-	protected ImageIcon rescaleImage() {
-		String filePath = this.imageFile.getAbsoluteFile().getAbsolutePath();
-		ImageIcon f = new ImageIcon(filePath);
-
-		int width = (this.getWidth() > f.getIconWidth() ? this.getWidth() : f.getIconWidth());
-		int height = (this.getHeight() > f.getIconHeight() ? this.getHeight() : f.getIconHeight());
-		
-		return new ImageIcon(f.getImage().getScaledInstance(width, height, 0));
-	}
-
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		ImageIcon i = rescaleImage();
-		int topLeftX = padding / 2;
-		int topLeftY = padding;
-		g.drawImage(i.getImage(), topLeftX, topLeftY, i.getIconWidth()
-				- padding, i.getIconHeight() - padding, null);
 	}
 
 	@Override

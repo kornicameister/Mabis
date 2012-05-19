@@ -15,8 +15,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.logging.Level;
 
-import javax.swing.ImageIcon;
-
 import logger.MabisLogger;
 
 /**
@@ -77,22 +75,14 @@ public class ChoosableImagePanel extends ImagePanel {
 
 	@Override
 	protected void paintComponent(Graphics g) {
-		int topLeftX = getWidth() / 10;
-		int topLeftY = getWidth() / 7;
-		ImageIcon scaledImage = rescaleImage();
-
 		if (this.marked) {
 			g.setColor(Color.gray.brighter().brighter());
-			g.fill3DRect(0, 0, scaledImage.getIconWidth(),
-					scaledImage.getIconHeight() + padding, false);
+			g.fill3DRect(0, 0, this.getWidth(), this.getHeight() + padding,
+					false);
 		} else {
 			g.setColor(this.defaultColor);
-			g.clearRect(0, 0, scaledImage.getIconWidth(),
-					scaledImage.getIconHeight());
+			g.clearRect(0, 0, this.getWidth(), this.getHeight());
 		}
-		g.drawImage(scaledImage.getImage(), topLeftX, topLeftY,
-				scaledImage.getIconWidth() - padding,
-				scaledImage.getIconHeight() - padding, null);
 	}
 
 	/**
