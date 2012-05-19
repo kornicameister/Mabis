@@ -76,8 +76,8 @@ public abstract class SQLFactory implements StatementFactory {
 			break;
 		}
 		String fieldList = null;
-		rawQueryCopy = rawQueryCopy
-				.replaceFirst("!", this.table.getTableName());
+		rawQueryCopy = rawQueryCopy.replaceFirst("!", this.table.getTableType()
+				.toString());
 		fieldList = this.buildFieldList(this.table.metaData());
 		// first pass
 		switch (this.type) {
@@ -202,13 +202,13 @@ public abstract class SQLFactory implements StatementFactory {
 	 */
 	protected void parseDeleteSet(int executeUpdate) {
 		if (executeUpdate > 0) {
-			Object params[] = { executeUpdate, this.table.getTableName() };
+			Object params[] = { executeUpdate, this.table.getTableType() };
 			MabisLogger.getLogger().log(Level.INFO,
 					"Successfully deleted {0} rows from {1}", params);
 		} else {
 			MabisLogger.getLogger()
 					.log(Level.SEVERE, "Failed to delete rows from {0}",
-							this.table.getTableName());
+							this.table.getTableType());
 			// TODO dodać wyjątek
 		}
 	}

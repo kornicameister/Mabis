@@ -15,7 +15,7 @@ public class InvalidBaseClass extends Exception {
 	}
 
 	public InvalidBaseClass(String wanted,BaseTable invalid) {
-		super("Table: " + invalid.getTableName() + " can not be used in " + wanted + "SQLFactory");
+		super("Table: " + invalid.getTableType() + " can not be used in " + wanted + "SQLFactory");
 	}
 
 }

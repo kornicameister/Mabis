@@ -41,9 +41,9 @@ public class MovieUserSQLFactory extends SQLFactory {
 		case DELETE:
 		case SELECT:
 			while (set.next()) {
-				key_1 = new ForeignKey(TableType.MOVIE.toString(),
+				key_1 = new ForeignKey(TableType.MOVIE,
 						"idMovie", set.getInt("idMovie"));
-				key_2 = new ForeignKey(TableType.USER.toString(), "idUser",
+				key_2 = new ForeignKey(TableType.USER, "idUser",
 						set.getInt("idUser"));
 				this.values.add(new ForeignKeyPair(key_1, key_2));
 			}

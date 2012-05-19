@@ -42,9 +42,9 @@ public class BookUserSQLFactory extends SQLFactory {
 		case DELETE:
 		case SELECT:
 			while (set.next()) {
-				key_1 = new ForeignKey(TableType.BOOK.toString(), "idBook",
+				key_1 = new ForeignKey(TableType.BOOK, "idBook",
 						set.getInt("idBook"));
-				key_2 = new ForeignKey(TableType.USER.toString(), "idUser",
+				key_2 = new ForeignKey(TableType.USER, "idUser",
 						set.getInt("idUser"));
 				this.values.add(new ForeignKeyPair(key_1, key_2));
 			}

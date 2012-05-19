@@ -54,9 +54,9 @@ public class AudioUserSQLFactory extends SQLFactory {
 		case DELETE:
 		case SELECT:
 			while (set.next()) {
-				key_1 = new ForeignKey(TableType.AUDIO_ALBUM.toString(),
+				key_1 = new ForeignKey(TableType.AUDIO_ALBUM,
 						"idAudio", set.getInt("idAudio"));
-				key_2 = new ForeignKey(TableType.USER.toString(), "idUser",
+				key_2 = new ForeignKey(TableType.USER, "idUser",
 						set.getInt("idUser"));
 				this.values.add(new ForeignKeyPair(key_1, key_2));
 			}
