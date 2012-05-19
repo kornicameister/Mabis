@@ -68,7 +68,7 @@ public class AudioAlbum extends Movie implements Serializable {
 	protected void initInternalFields() {
 		super.initInternalFields();
 		this.tagCloud = new ArrayList<Genre>();
-		this.tableName = TableType.AUDIO_ALBUM.toString();
+		this.tableType = TableType.AUDIO_ALBUM;
 	}
 
 	public ArrayList<Genre> getTagCloud() {

@@ -71,7 +71,7 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	protected void initInternalFields() {
-		this.tableName = TableType.GENRE.toString();
+		this.tableType = TableType.GENRE;
 	}
 
 	@Override

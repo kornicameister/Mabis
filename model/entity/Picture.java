@@ -168,7 +168,7 @@ public class Picture extends BaseTable implements Serializable {
 	@Override
 	protected void initInternalFields() {
 		this.imageFilePath = null;
-		this.tableName = TableType.PICTURE.toString();
+		this.tableType = TableType.PICTURE;
 		this.titles[0] = "";
 	}
 

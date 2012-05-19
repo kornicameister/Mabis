@@ -7,6 +7,7 @@ package model.utilities;
 import java.io.Serializable;
 
 import model.BaseTable;
+import model.enums.TableType;
 
 /**
  * This class represent object-oriented implementation of sql foreign key Class
@@ -18,7 +19,7 @@ import model.BaseTable;
  */
 public class ForeignKey implements Comparable<ForeignKey>, Serializable{
 	private static final long serialVersionUID = -839442478641269523L;
-	private String originTable;
+	private TableType originTable;
 	private String name;
 	private Integer value;
 
@@ -33,22 +34,12 @@ public class ForeignKey implements Comparable<ForeignKey>, Serializable{
 	 *            wartość klucza obcego
 	 */
 	public ForeignKey(BaseTable tableTarget, String keyName, Integer value) {
-		this.originTable = tableTarget.getTableName();
+		this.originTable = tableTarget.getTableType();
 		this.name = keyName;
 		this.value = value;
 	}
 
-	/**
-	 * Konstruktor {@link ForeignKey}
-	 * 
-	 * @param targetTable
-	 *            tabela do której odwołuje się klucz obcy
-	 * @param keyName
-	 *            nazwa klucza obcego, najlepiej nazwa atrybutu
-	 * @param value
-	 *            wartość klucza obcego
-	 */
-	public ForeignKey(String tableTarget, String keyName, Integer value) {
+	public ForeignKey(TableType tableTarget, String keyName, int value) {
 		this.originTable = tableTarget;
 		this.name = keyName;
 		this.value = value;
@@ -57,7 +48,7 @@ public class ForeignKey implements Comparable<ForeignKey>, Serializable{
 	/**
 	 * @return the table object at which foreign key is defined as primary
 	 */
-	public String getOriginTable() {
+	public TableType getOriginTable() {
 		return originTable;
 	}
 
@@ -79,7 +70,7 @@ public class ForeignKey implements Comparable<ForeignKey>, Serializable{
 	 * @param originTable
 	 *            the originTable to set
 	 */
-	public void setOriginTable(String originTable) {
+	public void setOriginTable(TableType originTable) {
 		this.originTable = originTable;
 	}
 

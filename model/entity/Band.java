@@ -59,7 +59,7 @@ public class Band extends Author implements Serializable {
 	protected void initInternalFields() {
 		this.tagCloud = new ArrayList<Genre>();
 		this.masterGenre = new Genre();
-		this.tableName = TableType.BAND.toString();
+		this.tableType = TableType.BAND;
 	}
 
 	public String getName() {

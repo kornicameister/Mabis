@@ -9,6 +9,7 @@ import java.io.Serializable;
 import model.entity.AudioAlbum;
 import model.entity.Book;
 import model.entity.Movie;
+import model.enums.TableType;
 import model.interfaces.Table;
 import model.utilities.ForeignKey;
 
@@ -27,7 +28,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private static final long serialVersionUID = 8934017748567797527L;
 	private Integer primaryKey = null;
 	protected String[] titles = null;
-	protected String tableName = "empty";
+	protected TableType tableType;
 
 	/**
 	 * Empty constructor, only initializes variables, used when new entity
@@ -94,6 +95,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private void initFields() {
 		this.primaryKey = new Integer(-1);
 		this.titles = new String[4];
+		this.tableType = TableType.UNDEFINED;
 	}
 
 	/**
@@ -106,8 +108,8 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	/**
 	 * @return title of a table
 	 */
-	public String getTableName() {
-		return tableName;
+	public TableType getTableType() {
+		return tableType;
 	}
 
 	/**
@@ -165,7 +167,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 
 	@Override
 	public String toString() {
-		String str = "Table: " + tableName + "\n";
+		String str = "Table: " + tableType + "\n";
 		str += "[PK: " + this.primaryKey + "]\n";
 		return str;
 	}
@@ -198,7 +200,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	@Override
 	public int compareTo(BaseTable o) {
 		int compareValue = 0;
-		compareValue = this.getTableName().compareTo(o.getTableName());
+		compareValue = this.getTableType().compareTo(o.getTableType());
 		if (compareValue == 0) {
 			// the same table, lets check primary keys
 			compareValue = this.getPrimaryKey().compareTo(o.getPrimaryKey());

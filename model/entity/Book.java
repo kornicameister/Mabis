@@ -63,7 +63,7 @@ public class Book extends Movie implements Serializable {
 	protected void initInternalFields() {
 		super.initInternalFields();
 		this.setPages(0);
-		this.tableName = TableType.BOOK.toString();
+		this.tableType = TableType.BOOK;
 		this.identifiers = new TreeMap<BookIndustryIdentifier, String>();
 	}
 

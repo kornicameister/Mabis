@@ -25,7 +25,7 @@ public class BookUser extends ManyToManyTable implements Serializable {
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();
-		this.tableName = TableType.BOOK_USER.toString();
+		this.tableType = TableType.BOOK_USER;
 	}
 
 	@Override

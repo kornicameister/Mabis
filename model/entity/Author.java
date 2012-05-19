@@ -21,7 +21,7 @@ import model.enums.TableType;
  */
 public class Author extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 7692599340459728530L;
-	private Picture pictureFile = null;
+	private Picture pictureFile;
 
 	/**
 	 * Domyślny pusty konstruktor dla klasy {@link Author}
@@ -59,7 +59,7 @@ public class Author extends BaseTable implements Serializable {
 
 	@Override
 	protected void initInternalFields() {
-		this.tableName = TableType.AUTHOR.toString();
+		this.tableType = TableType.AUTHOR;
 	}
 
 	public String getFirstName() {

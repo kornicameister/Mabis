@@ -80,7 +80,7 @@ public class User extends Author implements Serializable {
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();
-		this.tableName = TableType.USER.toString();
+		this.tableType = TableType.USER;
 	}
 	
 	@Override

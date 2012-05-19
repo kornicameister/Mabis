@@ -12,9 +12,9 @@ package model.enums;
 public enum TableType{
 	AUDIO_ALBUM("audioAlbum"), AUDIO_USER("audioUser"), AUTHOR("author"), BAND(
 			"band"), BOOK("book"), BOOK_USER("bookUser"), PICTURE("picture"), GENRE(
-			"genre"), MOVIE("movie"), MOVIE_USER("movieUser"), USER("user");
+			"genre"), MOVIE("movie"), MOVIE_USER("movieUser"), USER("user"), UNDEFINED("undefined");
 
-	String name;
+	private String name;
 	TableType(String s) {
 		this.name = s;
 	}	

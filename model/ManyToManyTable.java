@@ -24,9 +24,9 @@ public abstract class ManyToManyTable extends BaseTable implements MMTable,
 	private TreeMap<Integer, ForeignKeyPair> mapOfKeys;
 
 	/**
-	 * Construct new MM table using tableName as it's name
+	 * Construct new MM table using tableType as it's name
 	 * 
-	 * @param tableName
+	 * @param tableType
 	 */
 	public ManyToManyTable() {
 		super();
@@ -34,7 +34,7 @@ public abstract class ManyToManyTable extends BaseTable implements MMTable,
 
 	@Override
 	public String toString() {
-		String str = "Table: " + tableName + "\n";
+		String str = "Table: " + tableType + "\n";
 		str += "[PK: " + this.getPrimaryKey() + "]\n";
 		str += "[FKS]\n";
 		for (Entry<Integer, ForeignKeyPair> fff : this.mapOfKeys.entrySet()) {

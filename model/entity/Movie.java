@@ -68,7 +68,7 @@ public class Movie extends BaseTable implements Serializable {
 	@Override
 	protected void initInternalFields() {
 		this.setDuration(new Time(0));
-		this.tableName = TableType.MOVIE.toString();
+		this.tableType = TableType.MOVIE;
 		this.rating = new Double(0.0);
 		this.directors = new TreeSet<>();
 		this.genres = new TreeSet<>();

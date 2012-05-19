@@ -25,7 +25,7 @@ public class MovieUser extends ManyToManyTable implements Serializable {
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();
-		this.tableName = TableType.MOVIE_USER.toString();
+		this.tableType = TableType.MOVIE_USER;
 	}
 
 	@Override

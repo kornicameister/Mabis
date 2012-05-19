@@ -24,7 +24,7 @@ public class AudioUser extends ManyToManyTable implements Serializable {
 	@Override
 	protected void initInternalFields() {
 		super.initInternalFields();
-		this.tableName = TableType.AUDIO_USER.toString();
+		this.tableType = TableType.AUDIO_USER;
 	}
 
 	@Override
