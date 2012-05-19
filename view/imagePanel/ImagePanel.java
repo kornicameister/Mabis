@@ -2,6 +2,7 @@ package view.imagePanel;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
@@ -59,6 +60,9 @@ public class ImagePanel extends JPanel implements Accessible {
 
 	public void setImage(File f) {
 		this.imageFile = f;
+		ImageIcon tmp = new ImageIcon(f.getAbsolutePath());
+		Image tmp2 = tmp.getImage().getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_FAST);
+		this.contentLabel.setIcon(new ImageIcon(tmp2));
 	}
 
 	public ImageIcon getImage() {
