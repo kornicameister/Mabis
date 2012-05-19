@@ -136,6 +136,9 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected void fetchFromAPI() {
+		if(this.collectedItems != null && !this.collectedItems.isEmpty()){
+			this.collectedItems.clear();
+		}
 		GoogleBookApi gba = new GoogleBookApi();
 		try {
 			TreeMap<String, String> params = new TreeMap<String, String>();

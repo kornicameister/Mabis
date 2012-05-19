@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -12,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Book;
 
@@ -28,7 +30,7 @@ public class ItemsPreview extends JDialog implements ActionListener {
 	protected JTabbedPane tabbedPanel;
 	private JButton acceptSelectedButton;
 	private JButton cancelButton;
-	private static Dimension dim = new Dimension(550, 470);
+	private static Dimension dim = new Dimension(620, 470);
 
 	public ItemsPreview(String title, TreeSet<BaseTable> elements) {
 		super();
@@ -50,9 +52,11 @@ public class ItemsPreview extends JDialog implements ActionListener {
 		this.tabbedPanel
 				.setPreferredSize(new Dimension(Integer.MAX_VALUE, 380));
 		this.add(this.tabbedPanel, BorderLayout.PAGE_START);
-		this.acceptSelectedButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2, 30));
+		this.acceptSelectedButton.setPreferredSize(new Dimension(
+				Integer.MAX_VALUE / 2, 30));
 		this.add(this.acceptSelectedButton, BorderLayout.CENTER);
-		this.cancelButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2,30));
+		this.cancelButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2,
+				30));
 		this.add(this.cancelButton, BorderLayout.PAGE_END);
 	}
 
@@ -88,11 +92,15 @@ public class ItemsPreview extends JDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource().equals(this.cancelButton)) {
+		JButton source = (JButton) e.getSource();
+		if (source.equals(this.cancelButton)) {
 			this.setVisible(false);
 			this.dispose();
 		} else {
 
 		}
+		MabisLogger.getLogger().log(Level.INFO,
+				this.getClass().getSimpleName() + " action called :: {0}",
+				source.getActionCommand());
 	}
 }
