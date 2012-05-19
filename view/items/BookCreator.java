@@ -22,7 +22,7 @@ import model.entity.Author;
 import model.entity.Genre;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
-import view.items.itemsprieview.BooksPreview;
+import view.items.itemsprieview.ItemsPreview;
 import controller.api.GoogleBookApi;
 
 /**
@@ -51,7 +51,6 @@ public class BookCreator extends ItemCreator {
 				.getMinimumSize().getHeight() - 70);
 	}
 
-	
 	@Override
 	protected void layoutComponents() {
 		super.layoutComponents();
@@ -61,7 +60,7 @@ public class BookCreator extends ItemCreator {
 
 		gl.setAutoCreateGaps(true);
 		gl.setAutoCreateContainerGaps(true);
-		
+
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addGroup(
@@ -70,7 +69,8 @@ public class BookCreator extends ItemCreator {
 								.addGroup(
 										gl.createParallelGroup()
 												.addComponent(this.titlesPanel)
-												.addComponent(this.detailedInfoPanel)))
+												.addComponent(
+														this.detailedInfoPanel)))
 				.addComponent(descriptionScrollPane));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
@@ -94,27 +94,36 @@ public class BookCreator extends ItemCreator {
 		this.pack();
 	}
 
-
 	@Override
 	public void initComponents() {
 		super.initComponents();
 		contentPanel = new JPanel(true);
-		contentPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),"Creator"));
-		
+		contentPanel.setBorder(BorderFactory.createTitledBorder(
+				BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+				"Creator"));
+
 		titlesPanel = new TitlesPanel(true);
 		detailedInfoPanel = new DetailedInformationPanel(true);
-		coverPanel = new ImagePanel(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
-		coverPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Cover"));
+		coverPanel = new ImagePanel(new File(
+				GlobalPaths.DEFAULT_COVER_PATH.toString()));
+		coverPanel
+				.setBorder(BorderFactory.createTitledBorder(
+						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+						"Cover"));
 
-		descriptionArea = new JTextArea();		
+		descriptionArea = new JTextArea();
 		descriptionScrollPane = new JScrollPane(this.descriptionArea);
-		descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Descripion"));
-		descriptionScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
+				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+				"Descripion"));
+		descriptionScrollPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 	}
 
 	@Override
 	protected void clearContentFields() {
-		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
+		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+				.toString()));
 		this.descriptionArea.setText("");
 		this.titlesPanel.clear();
 		this.detailedInfoPanel.clear();
@@ -138,7 +147,8 @@ public class BookCreator extends ItemCreator {
 		}
 		// init panel with obtained collection items so as to allow
 		// user to choose one selected
-		BooksPreview ip = new BooksPreview("Collected books", this.collectedItems);
+		ItemsPreview ip = new ItemsPreview("Collected books",
+				this.collectedItems);
 		ip.setVisible(true);
 	}
 
@@ -170,9 +180,13 @@ public class BookCreator extends ItemCreator {
 		public TitlesPanel(boolean isDoubleBuffered) {
 			super(isDoubleBuffered);
 			this.layoutComponents();
-			this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Titles"));
-			this.subTitle.setBorder(BorderFactory.createTitledBorder("Subtitle"));
-			this.titleOriginal.setBorder(BorderFactory.createTitledBorder("Title"));
+			this.setBorder(BorderFactory.createTitledBorder(
+					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
+					"Titles"));
+			this.subTitle.setBorder(BorderFactory
+					.createTitledBorder("Subtitle"));
+			this.titleOriginal.setBorder(BorderFactory
+					.createTitledBorder("Title"));
 		}
 
 		protected void clear() {
@@ -233,8 +247,10 @@ public class BookCreator extends ItemCreator {
 
 			this.isbnField.setBorder(BorderFactory.createTitledBorder("ISBN"));
 			this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
-			this.genreCombobox.setBorder(BorderFactory.createTitledBorder("Genre"));
-			this.authorCombobox.setBorder(BorderFactory.createTitledBorder("Author"));
+			this.genreCombobox.setBorder(BorderFactory
+					.createTitledBorder("Genre"));
+			this.authorCombobox.setBorder(BorderFactory
+					.createTitledBorder("Author"));
 		}
 
 		/**
