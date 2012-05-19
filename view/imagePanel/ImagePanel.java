@@ -31,8 +31,8 @@ import logger.MabisLogger;
 public class ImagePanel extends JPanel implements Accessible {
 	private static final long serialVersionUID = 8841755218083931060L;
 	protected static final Integer padding = 10;
-	private File imageFile = null;
-	private JLabel contentLabel;
+	protected File imageFile;
+	protected JLabel contentLabel;
 
 	public ImagePanel(File f) {
 		super(true);
@@ -45,6 +45,18 @@ public class ImagePanel extends JPanel implements Accessible {
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		this.contentLabel.setLayout(new GridLayout());
 		this.contentLabel.setIcon(new ImageIcon(f.getAbsolutePath()));
+		this.add(contentLabel);
+	}
+	
+	protected ImagePanel() {
+		super(true);
+		this.addFocusListener(new ImagePanelFocusListener(this));
+		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
+
+		this.contentLabel = new JLabel();
+//		this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
+		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		this.contentLabel.setLayout(new GridLayout());
 		this.add(contentLabel);
 	}
 

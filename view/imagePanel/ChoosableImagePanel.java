@@ -5,7 +5,9 @@
 package view.imagePanel;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,6 +16,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.logging.Level;
+
+import javax.swing.ImageIcon;
 
 import logger.MabisLogger;
 
@@ -31,12 +35,17 @@ public class ChoosableImagePanel extends ImagePanel {
 	private Color defaultColor;
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-	public ChoosableImagePanel(File icon) {
-		super(icon);
+	public ChoosableImagePanel(File icon, Dimension d) {
+		super();
 		this.marked = false;
 		this.defaultColor = this.getForeground();
 		this.listener = new ChoosableImagePanelMouseListener();
 		this.addMouseListener(this.listener);
+		ImageIcon tmp = new ImageIcon(icon.getAbsolutePath());
+		ImageIcon tmp2 = new ImageIcon(tmp.getImage().getScaledInstance(
+				(int) d.getWidth(), (int) d.getHeight()-30, Image.SCALE_FAST));
+		this.contentLabel.setIcon(tmp2);
+		this.imageFile = icon;
 	}
 
 	/**
