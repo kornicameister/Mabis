@@ -9,12 +9,12 @@ import model.enums.TableType;
 public class PreviewArbiter {
 
 	public static JPanel determineTyp(BaseTable tmp) throws Exception {
-		boolean result = tmp.getTableName().equals(TableType.BOOK);
+		boolean result = tmp.getTableName().equals(TableType.BOOK.toString());
 		if (!result) {
-			result = tmp.getTableName().equals(TableType.MOVIE);
+			result = tmp.getTableName().equals(TableType.MOVIE.toString());
 		}
 		if (!result) {
-			result = tmp.getTableName().equals(TableType.AUDIO_ALBUM);
+			result = tmp.getTableName().equals(TableType.AUDIO_ALBUM.toString());
 		}
 		if (result) {
 			return new PreviewChunk((Movie) tmp);
