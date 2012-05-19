@@ -49,7 +49,7 @@ public class Band extends Author implements Serializable {
 	private void createLastFMUrl() {
 		try {
 			this.lastFMUrl = new URL(urlPattern
-					+ this.getOriginalTitle().replaceAll(" ", "+"));
+					+ this.getTitle().replaceAll(" ", "+"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -63,14 +63,14 @@ public class Band extends Author implements Serializable {
 	}
 
 	public String getName() {
-		return this.getOriginalTitle();
+		return this.getTitle();
 	}
 
 	/**
 	 * @return the description
 	 */
 	public String getDescription() {
-		return this.getLocalizedTitle();
+		return this.getSubtitle();
 	}
 
 	/**

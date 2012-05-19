@@ -124,7 +124,7 @@ public class Movie extends BaseTable implements Serializable {
 	public String toString() {
 		String str = super.toString();
 		str += "----------\n";
-		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
+		str += "[TITLE: " + this.getTitle() + "]\n";
 		str += "[DIRECTORS]\n";
 		for (Author a : this.directors) {
 			str += "\t" + a.toString() + "\n";
@@ -157,8 +157,8 @@ public class Movie extends BaseTable implements Serializable {
 		for(Object d : super.toRowData()){
 			data.add(d);
 		}
-		data.add(this.getOriginalTitle());
-		data.add(this.getLocalizedTitle());
+		data.add(this.getTitle());
+		data.add(this.getSubtitle());
 		data.add(this.getGenre().getGenre());
 		data.add(this.getDuration().toString());
 		data.add(this.getAuthors());

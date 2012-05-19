@@ -91,7 +91,7 @@ public class Book extends Movie implements Serializable {
 	public String toString() {
 		String str = BaseTable.class.toString();
 		str += "----------\n";
-		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
+		str += "[TITLE: " + this.getTitle() + "]\n";
 		str += "[IDENTIFIERS:]\n";
 		Iterator<Map.Entry<BookIndustryIdentifier, String>> it = this.identifiers
 				.entrySet().iterator();
@@ -114,7 +114,7 @@ public class Book extends Movie implements Serializable {
 		int result = super.compareTo(o);
 		Book other = (Book) o;
 		if (result == 0) {
-			result = this.getOriginalTitle().compareTo(other.getOriginalTitle());
+			result = this.getTitle().compareTo(other.getTitle());
 		}
 		if (result == 0) {
 			result = this.getDescription().compareTo(other.getDescription());
@@ -149,21 +149,33 @@ public class Book extends Movie implements Serializable {
 		String str = new String();
 		str += "<html>";
 		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
-		str += "<p><b>Title:</b>" + this.getOriginalTitle() + "</p>";
-		if(this.getLocalizedTitle() != null && !this.getLocalizedTitle().isEmpty()){
-			str += "<b><i>Subtitle:</i></b>" + this.getLocalizedTitle() + "</p>";
+		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
+		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
+			str += "<b><i>Subtitle:</i></b>" + this.getSubtitle() + "</p>";
 		}
 		str += "<p><b>Pages:</b>" + this.getPages() + "</p>";
-		if(this.getAuthors() != null && !this.getAuthors().isEmpty()){
+		if (this.getAuthors() != null && !this.getAuthors().isEmpty()) {
 			str += "<b>Authors:</b>";
 			str += "<ul>";
 			for (Author author : this.getAuthors()) {
-				str += "<li>" + author.getFirstName() + " " + author.getLastName() + "</li>";
+				str += "<li>" + author.getFirstName() + " "
+						+ author.getLastName() + "</li>";
 			}
 			str += "</ul>";
 		}
+		if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
+			str += "<b>Identifiers:</b>";
+			str += "<ul>";
+			for(Map.Entry<BookIndustryIdentifier, String> e : this.getIdentifiers().entrySet()){
+				str += "<li><i>" + e.getKey().toString() + "</i><p>" + e.getValue() + "</p></li>";
+			}
+			str += "</ul>";
+		}
+		str += "<p><b>Description:</b></p>";
+		str += "<span style='margin-left:20px'>" + this.getDescription()
+				+ "</span>";
 		str += "</html>";
-		
+
 		DataOutputStream dos = null;
 		String path = GlobalPaths.TMP + String.valueOf(Math.random());
 		try {
@@ -173,8 +185,8 @@ public class Book extends Movie implements Serializable {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally{
-			if(dos != null){
+		} finally {
+			if (dos != null) {
 				try {
 					dos.close();
 				} catch (IOException e) {
@@ -182,7 +194,7 @@ public class Book extends Movie implements Serializable {
 				}
 			}
 		}
-		
+
 		try {
 			URL ulr = new URL("file:///" + path);
 			return ulr;

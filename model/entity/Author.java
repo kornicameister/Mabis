@@ -63,7 +63,7 @@ public class Author extends BaseTable implements Serializable {
 	}
 
 	public String getFirstName() {
-		return this.getOriginalTitle();
+		return this.getTitle();
 	}
 
 	public void setFirstName(String firstName) {
@@ -71,7 +71,7 @@ public class Author extends BaseTable implements Serializable {
 	}
 
 	public String getLastName() {
-		return this.getLocalizedTitle();
+		return this.getSubtitle();
 	}
 
 	public void setLastName(String lastName) {

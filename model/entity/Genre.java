@@ -61,7 +61,7 @@ public class Genre extends BaseTable implements Serializable {
 	}
 
 	/**
-	 * wraps {@link BaseTable#getOriginalTitle()}
+	 * wraps {@link BaseTable#getTitle()}
 	 * 
 	 * @return nazwę gatunku
 	 */

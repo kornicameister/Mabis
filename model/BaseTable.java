@@ -142,14 +142,14 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	/**
 	 * @return title in it's original language
 	 */
-	public String getOriginalTitle() {
+	public String getTitle() {
 		return this.titles[0];
 	}
 
 	/**
 	 * @return title being localized (for example in user_language)
 	 */
-	public String getLocalizedTitle() {
+	public String getSubtitle() {
 		return this.titles[1];
 	}
 

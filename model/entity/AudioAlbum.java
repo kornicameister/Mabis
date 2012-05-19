@@ -83,7 +83,7 @@ public class AudioAlbum extends Movie implements Serializable {
 	}
 
 	public String getTrackList() {
-		return this.getLocalizedTitle();
+		return this.getSubtitle();
 	}
 
 	public void setTrackList(String trackList) {
@@ -103,7 +103,7 @@ public class AudioAlbum extends Movie implements Serializable {
 	public String toString() {
 		String str = BaseTable.class.toString();
 		str += "----------\n";
-		str += "[TITLE: " + this.getOriginalTitle() + "]\n";
+		str += "[TITLE: " + this.getTitle() + "]\n";
 		str += "[BAND: " + this.getBand() + "]\n";
 		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
 		str += "[DURATION: " + this.getDuration() + "]\n";
