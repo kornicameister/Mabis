@@ -12,7 +12,7 @@ import model.enums.TableType;
 
 /**
  * Class maps itself to mabis.genre table Table structure: </br> | idGenre </br>
- * | genre </br>
+ * | genres </br>
  * 
  * @author kornicameister
  * 
@@ -37,9 +37,9 @@ public class Genre extends BaseTable implements Serializable {
 	}
 
 	/**
-	 * Construct new Genre with genre value
+	 * Construct new Genre with genres value
 	 * 
-	 * @param genre
+	 * @param genres
 	 */
 	public Genre(String genre) {
 		super(genre);
@@ -54,7 +54,7 @@ public class Genre extends BaseTable implements Serializable {
 	/**
 	 * wraps {@link BaseTable#setTitle(String)}
 	 * 
-	 * @param genre
+	 * @param genres
 	 */
 	public void setGenre(String genre) {
 		this.titles[0] = genre;

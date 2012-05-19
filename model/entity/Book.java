@@ -26,7 +26,7 @@ import settings.GlobalPaths;
 /**
  * Klasa {@link Book} jest obiektową wersją tabeli bazy danych <b>mabis.book</b>
  * o następującej strukturze: </br> | idBook </br> | isbn </br> | titleOriginal
- * </br> | titleLocale </br> | genre </br> | pages </br> | cover </br> | writer
+ * </br> | titleLocale </br> | genres </br> | pages </br> | cover </br> | writer
  * </br>
  * 
  * @author kornicameister
@@ -145,6 +145,7 @@ public class Book extends Movie implements Serializable {
 		return data.toArray();
 	}
 
+	@Override
 	public URL toDescription() {
 		String str = new String();
 		str += "<html>";

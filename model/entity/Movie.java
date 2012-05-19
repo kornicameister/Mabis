@@ -8,6 +8,8 @@ import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
 
+import settings.GlobalPaths;
+
 import model.BaseTable;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
@@ -15,7 +17,7 @@ import model.utilities.ForeignKey;
 /**
  * Table structure: </br> | idMovie </br> | titleOriginal </br> | titleLocale
  * </br> | duration </br> | description </br> | cover </br> | backCover </br> |
- * director </br> | genre </br>
+ * director </br> | genres </br>
  * 
  * @author kornicameister
  * @version 0.3
@@ -24,7 +26,7 @@ public class Movie extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 2787293119303350654L;
 	protected Picture cover;
 	protected TreeSet<Author> directors;
-	protected Genre genre;
+	protected TreeSet<Genre> genres;
 	private Time duration;
 	protected Double rating;
 
@@ -68,7 +70,8 @@ public class Movie extends BaseTable implements Serializable {
 		this.setDuration(new Time(0));
 		this.tableName = TableType.MOVIE.toString();
 		this.rating = new Double(0.0);
-		this.directors = new TreeSet<Author>();
+		this.directors = new TreeSet<>();
+		this.genres = new TreeSet<>();
 	}
 
 	public Time getDuration() {
@@ -106,11 +109,15 @@ public class Movie extends BaseTable implements Serializable {
 	}
 
 	public Genre getGenre() {
-		return genre;
+		return genres.first();
 	}
 
-	public void setGenre(Genre genre) {
-		this.genre = genre;
+	public void addGenre(Genre genre) {
+		this.genres.add(genre);
+	}
+	
+	public TreeSet<Genre> getGenres(){
+		return this.genres;
 	}
 
 	public void setRating(Double averageRating) {
@@ -167,6 +174,12 @@ public class Movie extends BaseTable implements Serializable {
 		return data.toArray();
 	}
 
+	/**
+	 * Tworzy opis obiektu w formacie html, bazując na składowych polach klas
+	 * 
+	 * @return url do pliku html, zachowanego w ścieżce {@link GlobalPaths#TMP}
+	 *         .Plik html zawiera prosty opis obiektu kolekcji
+	 */
 	public URL toDescription() {
 		return null;
 		// TODO add impl
