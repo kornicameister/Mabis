@@ -5,6 +5,7 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 
 import model.BaseTable;
@@ -119,6 +120,12 @@ public class AudioAlbum extends Movie implements Serializable {
 		}
 		data.set(6, "Band");
 		return data.toArray();
+	}
+
+	@Override
+	public URL toDescription() {
+		return null;
+		// TODO add impl
 	}
 
 }

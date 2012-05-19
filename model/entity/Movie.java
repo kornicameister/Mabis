@@ -1,6 +1,7 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -115,8 +116,8 @@ public class Movie extends BaseTable implements Serializable {
 	public void setRating(Double averageRating) {
 		this.rating = new Double(averageRating);
 	}
-	
-	public Double getRating(){
+
+	public Double getRating() {
 		return this.rating;
 	}
 
@@ -139,7 +140,7 @@ public class Movie extends BaseTable implements Serializable {
 	@Override
 	public Object[] toColumnIdentifiers() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add("Title");
@@ -154,7 +155,7 @@ public class Movie extends BaseTable implements Serializable {
 	@Override
 	public Object[] toRowData() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toRowData()){
+		for (Object d : super.toRowData()) {
 			data.add(d);
 		}
 		data.add(this.getTitle());
@@ -164,6 +165,11 @@ public class Movie extends BaseTable implements Serializable {
 		data.add(this.getAuthors());
 		data.add(new ImageIcon(this.getCover().getImagePath()));
 		return data.toArray();
+	}
+
+	public URL toDescription() {
+		return null;
+		// TODO add impl
 	}
 
 }
