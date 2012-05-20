@@ -88,17 +88,14 @@ public class Author extends BaseTable implements Serializable {
 
 	@Override
 	public String toString() {
-		String str = super.toString();
-		str += "----------\n";
-		str += "[FNAME: " + this.getFirstName() + "]\n";
-		str += "[LNAME: " + this.getLastName() + "]\n";
-		return str;
+		return this.getPrimaryKey() + ": " + this.getFirstName() + " "
+				+ this.getLastName();
 	}
 
 	@Override
 	public Object[] toColumnIdentifiers() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add("First name");
@@ -110,7 +107,7 @@ public class Author extends BaseTable implements Serializable {
 	@Override
 	public Object[] toRowData() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add(this.getFirstName());

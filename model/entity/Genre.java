@@ -76,16 +76,13 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	public String toString() {
-		String str = super.toString();
-		str += "----------\n";
-		str += "[GENRE: " + this.getGenre() + "]\n";
-		return str;
+		return this.getPrimaryKey() + ": " + this.getGenre();
 	}
 
 	@Override
 	public Object[] toColumnIdentifiers() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add("Genre");
@@ -95,7 +92,7 @@ public class Genre extends BaseTable implements Serializable {
 	@Override
 	public Object[] toRowData() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add(this.getGenre());
