@@ -26,8 +26,8 @@ import model.utilities.ForeignKey;
 public abstract class BaseTable implements Table, Comparable<BaseTable>,
 		Serializable {
 	private static final long serialVersionUID = 8934017748567797527L;
-	private Integer primaryKey = null;
-	protected String[] titles = null;
+	private Integer primaryKey;
+	protected String[] titles;
 	protected TableType tableType;
 
 	/**
@@ -95,7 +95,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private void initFields() {
 		this.primaryKey = new Integer(-1);
 		this.titles = new String[4];
-		this.tableType = TableType.UNDEFINED;
+		this.tableType = TableType.NULL;
 	}
 
 	/**
@@ -149,7 +149,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	}
 
 	/**
-	 * @return title being localized (for example in user_language)
+	 * @return subtitle of this collection's item
 	 */
 	public String getSubtitle() {
 		return this.titles[1];
@@ -177,8 +177,8 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	 * 
 	 * @return wektor z opisem kolumn
 	 */
-	public Object[] toColumnIdentifiers(){
-		Object data[] = {"ID"};
+	public Object[] toColumnIdentifiers() {
+		Object data[] = { "ID" };
 		return data;
 	}
 
@@ -188,8 +188,8 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	 * 
 	 * @return tablicę danych Object
 	 */
-	public Object[] toRowData(){
-		Object data[] = {this.primaryKey};
+	public Object[] toRowData() {
+		Object data[] = { this.primaryKey };
 		return data;
 	}
 
