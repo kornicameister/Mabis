@@ -149,6 +149,8 @@ public class Book extends Movie implements Serializable {
 	public URL toDescription() {
 		String str = new String();
 		str += "<html>";
+		str += "<p style='color: red'><b>Rating:</b>" + this.getRating()
+				+ "</p>";
 		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
 		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
 		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
@@ -167,8 +169,18 @@ public class Book extends Movie implements Serializable {
 		if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
 			str += "<b>Identifiers:</b>";
 			str += "<ul>";
-			for(Map.Entry<BookIndustryIdentifier, String> e : this.getIdentifiers().entrySet()){
-				str += "<li><i>" + e.getKey().toString() + "</i><p>" + e.getValue() + "</p></li>";
+			for (Map.Entry<BookIndustryIdentifier, String> e : this
+					.getIdentifiers().entrySet()) {
+				str += "<li><i>" + e.getKey().toString() + "</i><p>"
+						+ e.getValue() + "</p></li>";
+			}
+			str += "</ul>";
+		}
+		if (this.getGenres() != null && !this.getGenres().isEmpty()) {
+			str += "<b>Genres:</b>";
+			str += "<ul>";
+			for (Genre g : this.getGenres()) {
+				str += "<li>" + g.getGenre() + "</li>";
 			}
 			str += "</ul>";
 		}
@@ -178,7 +190,7 @@ public class Book extends Movie implements Serializable {
 		str += "</html>";
 
 		DataOutputStream dos = null;
-		String path = GlobalPaths.TMP + String.valueOf(Math.random());
+		String path = GlobalPaths.TMP + String.valueOf(Math.random()*Double.MAX_EXPONENT);
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
 			dos.writeBytes(str);

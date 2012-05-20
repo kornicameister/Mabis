@@ -1,6 +1,12 @@
 package model.entity;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -8,11 +14,10 @@ import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
 
-import settings.GlobalPaths;
-
 import model.BaseTable;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
+import settings.GlobalPaths;
 
 /**
  * Table structure: </br> | idMovie </br> | titleOriginal </br> | titleLocale
@@ -115,8 +120,8 @@ public class Movie extends BaseTable implements Serializable {
 	public void addGenre(Genre genre) {
 		this.genres.add(genre);
 	}
-	
-	public TreeSet<Genre> getGenres(){
+
+	public TreeSet<Genre> getGenres() {
 		return this.genres;
 	}
 
@@ -181,8 +186,64 @@ public class Movie extends BaseTable implements Serializable {
 	 *         .Plik html zawiera prosty opis obiektu kolekcji
 	 */
 	public URL toDescription() {
+		String str = new String();
+		str += "<html>";
+		str += "<p style='color: red'><b>Rating:</b>" + this.getRating()
+				+ "</p>";
+		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
+		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
+		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
+			str += "<b><i>Subtitle:</i></b>" + this.getSubtitle() + "</p>";
+		}
+		str += "<p><b>Lenght:</b>" + this.getDuration() + "</p>";
+		if (this.getAuthors() != null && !this.getAuthors().isEmpty()) {
+			str += "<b>Directors:</b>";
+			str += "<ul>";
+			for (Author author : this.getAuthors()) {
+				str += "<li>" + author.getFirstName() + " "
+						+ author.getLastName() + "</li>";
+			}
+			str += "</ul>";
+		}
+		if(this.getGenres() != null && !this.getGenres().isEmpty()){
+			str += "<b>Genres:</b>";
+			str += "<ul>";
+			for(Genre g : this.getGenres()){
+				str += "<li>" + g.getGenre() + "</li>";
+			}
+			str += "</ul>";
+		}
+		str += "<p><b>Description:</b></p>";
+		str += "<span style='margin-left:20px'>" + this.getDescription()
+				+ "</span>";
+		str += "</html>";
+
+		DataOutputStream dos = null;
+		String path = GlobalPaths.TMP + String.valueOf(Math.random()*Double.MAX_EXPONENT);
+		try {
+			dos = new DataOutputStream(new FileOutputStream(new File(path)));
+			dos.writeBytes(str);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (dos != null) {
+				try {
+					dos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		try {
+			URL ulr = new URL("file:///" + path);
+			return ulr;
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 		return null;
-		// TODO add impl
 	}
 
 }
