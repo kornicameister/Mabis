@@ -90,7 +90,7 @@ public abstract class ItemCreator extends JFrame {
 				.addComponent(this.buttonPanel));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
-				.addComponent(this.searchPanel)
+				.addComponent(this.searchPanel,30,30,30)
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.contentPanel))
