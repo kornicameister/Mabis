@@ -3,7 +3,6 @@
  */
 package view.items;
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -59,10 +58,8 @@ public abstract class ItemCreator extends JFrame {
 		this.layoutComponents();
 
 		setDefaultLookAndFeelDecorated(true);
-		this.setMinimumSize(new Dimension(300, 600));
 		this.setLocationRelativeTo(null);
-		this.setSize(this.getMinimumSize());
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
 	/**
@@ -90,16 +87,13 @@ public abstract class ItemCreator extends JFrame {
 				.addComponent(this.buttonPanel));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
-				.addComponent(this.searchPanel,30,30,30)
+				.addComponent(this.searchPanel, 30, 30, 30)
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.contentPanel))
-				.addComponent(this.buttonPanel, GroupLayout.DEFAULT_SIZE, 30,
-						30));
+				.addComponent(this.buttonPanel, 30, 30, 30));
 
-		this.revalidate();
 		this.pack();
-		this.repaint();
 	}
 
 	/**
@@ -154,20 +148,8 @@ public abstract class ItemCreator extends JFrame {
 
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
-		/**
-		 * Przycisk, który wyzwala akcję powodującą umieszczenie danego obiektu
-		 * w bazie danych
-		 */
 		private JButton createButton;
-		/**
-		 * Przycisk powoduje wyczyszczenie wszystkich pól danego contentu
-		 * 
-		 * @see ItemCreator#contentPanel
-		 */
 		private JButton clearButton;
-		/**
-		 * Przycisk powoduje zakończenie działania kreatora
-		 */
 		private JButton cancelButton;
 
 		public ICButtonPanel() {
@@ -178,7 +160,7 @@ public abstract class ItemCreator extends JFrame {
 			this.cancelButton = new JButton("Cancel");
 			this.cancelButton.addActionListener(listener);
 
-			this.setLayout(new GridLayout(2, 2));
+			this.setLayout(new GridLayout(1, 3));
 			this.add(this.createButton);
 			this.add(this.clearButton);
 			this.add(this.cancelButton);

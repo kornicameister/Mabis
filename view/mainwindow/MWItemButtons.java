@@ -13,7 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import view.items.BookCreator;
+import view.items.creators.AudioAlbumCreator;
+import view.items.creators.BookCreator;
 
 import logger.MabisLogger;
 
@@ -74,7 +75,8 @@ public class MWItemButtons extends JPanel {
 				BookCreator bc = new BookCreator("New book");
 				bc.setVisible(true);
 			} else if (source.equals(newAudioAlbumButton)) {
-
+				AudioAlbumCreator aac = new AudioAlbumCreator("New audio album");
+				aac.setVisible(true);
 			} else if (source.equals(newMovieButton)) {
 
 			} else if (source.equals(scanForMoviesButton)) {
