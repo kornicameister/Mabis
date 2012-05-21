@@ -203,6 +203,9 @@ public abstract class ItemCreator extends JFrame {
 							"Failed to create new item",
 							"Creation miracle failed",
 							JOptionPane.ERROR_MESSAGE);
+				}else{
+					setVisible(false);
+					dispose();
 				}
 			} else if (source.equals(buttonPanel.getFromNetButton)) {
 				fetchFromAPI();

@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -38,6 +39,7 @@ import view.items.itemsprieview.ItemsPreview;
 import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
 import controller.entity.AuthorSQLFactory;
+import controller.entity.BookSQLFactory;
 import controller.entity.GenreSQLFactory;
 
 /**
@@ -51,7 +53,7 @@ public class BookCreator extends ItemCreator {
 	private TitlesPanel titlesPanel;
 	private DetailedInformationPanel detailedInfoPanel;
 	private JScrollPane descriptionScrollPane;
-	private Book selectedBook;
+	private Book selectedBook = new Book();
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -145,6 +147,27 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected Boolean createItem() {
+		this.selectedBook.setTitle(this.titlesPanel.titleOriginal.getText());
+		this.selectedBook.setSubTitle(this.titlesPanel.subTitle.getText());
+
+		if (!this.selectedBook.getIdentifiers().values()
+				.contains(this.detailedInfoPanel.isbnField.getText())) {
+			this.selectedBook.addGenre(new Genre(
+					this.detailedInfoPanel.isbnField.getText()));
+		}
+		this.selectedBook.setPages(Integer.valueOf(this.detailedInfoPanel.pages
+				.getText()));
+		this.selectedBook.setDescription(this.descriptionArea.getText());
+
+		BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT,
+				this.selectedBook);
+		try {
+			bsf.executeSQL(true);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
 		return false;
 	}
 
@@ -155,9 +178,18 @@ public class BookCreator extends ItemCreator {
 		}
 		GoogleBookApi gba = new GoogleBookApi();
 		try {
+			String title = new String();
+			if (this.titlesPanel.titleOriginal.getText() != null
+					&& !this.titlesPanel.titleOriginal.getText().isEmpty()) {
+				title = this.titlesPanel.titleOriginal.getText();
+			}
 			TreeMap<String, String> params = new TreeMap<String, String>();
-			params.put("inauthor:", "Stephen King");
-			gba.query("Dark Tower", params);
+			if (this.detailedInfoPanel.authorBox.getSelectedItem() != null) {
+				String tmp = (String) this.detailedInfoPanel.authorBox
+						.getSelectedItem();
+				params.put("inauthor:", tmp);
+			}
+			gba.query(title, params);
 			collectedItems = gba.getResult();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -187,16 +219,21 @@ public class BookCreator extends ItemCreator {
 		this.detailedInfoPanel.pages.setText(this.selectedBook.getPages()
 				.toString());
 		for (Author a : this.selectedBook.getAuthors()) {
-			this.detailedInfoPanel.authorBox.addItem(a.getFirstName() + " "
-					+ a.getLastName());
+			if (!(a.getFirstName().isEmpty() || a.getLastName().isEmpty())) {
+				this.detailedInfoPanel.authorBox.addItem(a.getFirstName() + " "
+						+ a.getLastName());
+			}
+			//TODO add checking if obtained author (coming from google book api) is already present in database
 		}
 		for (Genre g : this.selectedBook.getGenres()) {
-			if (!g.getGenre().equals("null")) {
+			if (!g.getGenre().equals("null") && !g.getGenre().isEmpty()) {
 				this.detailedInfoPanel.genreBox.addItem(g.getGenre());
 			}
 		}
-		this.detailedInfoPanel.isbnField.setText(this.selectedBook
-				.getIdentifier(BookIndustryIdentifier.ISBN_10));
+		if (this.selectedBook.getIdentifier(BookIndustryIdentifier.ISBN_13) != null) {
+			this.detailedInfoPanel.isbnField.setText(this.selectedBook
+					.getIdentifier(BookIndustryIdentifier.ISBN_13));
+		}
 		this.detailedInfoPanel.authorBox
 				.setSelectedIndex(this.detailedInfoPanel.authorBox
 						.getItemCount() - 1);
@@ -284,8 +321,8 @@ public class BookCreator extends ItemCreator {
 		private final JComboBox<String> authorBox = new JComboBox<>();
 
 		// TODO add loading these values from database
-		private Author authors[];
-		private Genre genres[];
+		private ArrayList<Author> authors;
+		private ArrayList<Genre> genres;
 		private JButton newGenreButton = new JButton("N");
 		private JButton selectGenreButton = new JButton("S");
 		private JButton newAuthorButton = new JButton("N");
@@ -306,10 +343,10 @@ public class BookCreator extends ItemCreator {
 				e.printStackTrace();
 			} finally {
 				if (authors == null) {
-					authors = new Author[0];
+					authors = new ArrayList<>();
 				}
 				if (genres == null) {
-					genres = new Genre[0];
+					genres = new ArrayList<>();
 				}
 			}
 
@@ -321,22 +358,16 @@ public class BookCreator extends ItemCreator {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
 					new Genre());
 			gsf.executeSQL(true);
-			this.genres = new Genre[gsf.getGenres().size()];
-			short it = 0;
-			for (Genre g : gsf.getGenres()) {
-				this.genres[it++] = g;
-			}
+			this.genres = new ArrayList<>();
+			this.genres.addAll(gsf.getGenres());
 		}
 
 		private void loadAuthors() throws SQLException {
 			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
 					new Author());
 			asf.executeSQL(true);
-			this.authors = new Author[asf.getAuthors().size()];
-			short it = 0;
-			for (Author a : asf.getAuthors()) {
-				this.authors[it++] = a;
-			}
+			this.authors = new ArrayList<>();
+			this.authors.addAll(asf.getAuthors());
 		}
 
 		/**
@@ -365,69 +396,6 @@ public class BookCreator extends ItemCreator {
 		}
 
 		/**
-		 * Nasłuchuje na wydarzenia pochodzące od przycisków sterujących
-		 * dodawaniem nowych autorów i gatunków
-		 * 
-		 * @author kornicameister
-		 * 
-		 */
-		private class DetailedInfoActionListener implements ActionListener {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JButton source = (JButton) e.getSource();
-				if (source.equals(newAuthorButton)) {
-					String returned = JOptionPane.showInputDialog(null,
-							"Input:", source.getName(),
-							JOptionPane.PLAIN_MESSAGE);
-					String parts[] = returned.split(" ");
-					String firstName = parts[0];
-					String lastName = new String();
-					for (int i = 1; i < parts.length; i++) {
-						lastName += parts[i];
-						if (i < parts.length - 1) {
-							lastName += " ";
-						}
-					}
-					selectedBook.addAuthor(new Author(firstName, lastName));
-					authorBox.addItem(returned);
-				} else if (source.equals(newGenreButton)) {
-					String returned = JOptionPane.showInputDialog(null,
-							"Input:", source.getName(),
-							JOptionPane.PLAIN_MESSAGE);
-					selectedBook.addGenre(new Genre(returned));
-					genreBox.addItem(returned);
-				} else if (source.equals(selectAuthorButton)
-						|| source.equals(selectGenreButton)) {
-					if (authors.length == 0 || genres.length == 0) {
-						return;
-					}
-					Object arr[] = null;
-					if (source.equals(selectAuthorButton)) {
-						arr = authors;
-					} else {
-						arr = genres;
-					}
-					Object returned = JOptionPane.showInputDialog(source,
-							"Select one from following box", source.getName(),
-							JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
-					if (source.equals(selectAuthorButton)) {
-						Author a = (Author) returned;
-						authorBox.addItem(a.getFirstName() + " "
-								+ a.getLastName());
-						selectedBook.addAuthor(a);
-					} else {
-						Genre g = (Genre) returned;
-						genreBox.addItem(g.getGenre());
-						selectedBook.addGenre(g);
-					}
-				}
-				MabisLogger.getLogger().log(Level.INFO,
-						"Action called by clicking at {0}", source);
-			}
-		}
-
-		/**
 		 * Zawartość pól {@link DetailedInformationPanel#isbnField} oraz
 		 * {@link DetailedInformationPanel#pages} zostaje wyciszczone. Indeksy
 		 * list {@link DetailedInformationPanel#authorCombobox} oraz
@@ -437,8 +405,8 @@ public class BookCreator extends ItemCreator {
 		public void clear() {
 			this.isbnField.setText("");
 			this.pages.setText("");
-			this.authorBox.setSelectedIndex(0);
-			this.genreBox.setSelectedIndex(0);
+			this.authorBox.setSelectedIndex(-1);
+			this.genreBox.setSelectedIndex(-1);
 		}
 
 		private void layoutComponents() {
@@ -466,9 +434,6 @@ public class BookCreator extends ItemCreator {
 			this.add(tmp);
 		}
 
-		/**
-		 * Metoda
-		 */
 		private void layoutGenreComboBox() {
 			JPanel tmp = new JPanel();
 			tmp.setBorder(BorderFactory.createTitledBorder("Genre"));
@@ -486,5 +451,74 @@ public class BookCreator extends ItemCreator {
 			this.add(tmp);
 		}
 
+		/**
+		 * Nasłuchuje na wydarzenia pochodzące od przycisków sterujących
+		 * dodawaniem nowych autorów i gatunków
+		 * 
+		 * @author kornicameister
+		 * 
+		 */
+		private class DetailedInfoActionListener implements ActionListener {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JButton source = (JButton) e.getSource();
+				if (source.equals(newAuthorButton)) {
+					String returned = JOptionPane.showInputDialog(null,
+							"Input:", source.getName(),
+							JOptionPane.PLAIN_MESSAGE);
+					String parts[] = returned.split(" ");
+					String firstName = parts[0];
+					String lastName = new String();
+					for (int i = 1; i < parts.length; i++) {
+						lastName += parts[i];
+						if (i < parts.length - 1) {
+							lastName += " ";
+						}
+					}
+					Author tmp = new Author(firstName, lastName);
+					if (!selectedBook.getAuthors().contains(tmp)) {
+						selectedBook.addAuthor(tmp);
+					}
+					authorBox.addItem(returned);
+				} else if (source.equals(newGenreButton)) {
+					String returned = JOptionPane.showInputDialog(null,
+							"Input:", source.getName(),
+							JOptionPane.PLAIN_MESSAGE);
+
+					Genre tmp = new Genre(returned);
+					if (!selectedBook.getGenres().contains(tmp)) {
+						selectedBook.addGenre(tmp);
+					}
+					genreBox.addItem(returned);
+				} else if (source.equals(selectAuthorButton)
+						|| source.equals(selectGenreButton)) {
+					if (authors.size() == 0 || genres.size() == 0) {
+						return;
+					}
+					Object arr[] = null;
+					if (source.equals(selectAuthorButton)) {
+						arr = authors.toArray();
+					} else {
+						arr = genres.toArray();
+					}
+					Object returned = JOptionPane.showInputDialog(source,
+							"Select one from following box", source.getName(),
+							JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
+					if (source.equals(selectAuthorButton)) {
+						Author a = (Author) returned;
+						authorBox.addItem(a.getFirstName() + " "
+								+ a.getLastName());
+						selectedBook.addAuthor(a);
+					} else {
+						Genre g = (Genre) returned;
+						genreBox.addItem(g.getGenre());
+						selectedBook.addGenre(g);
+					}
+				}
+				MabisLogger.getLogger().log(Level.INFO,
+						"Action called by clicking at {0}", source);
+			}
+		}
 	}
 }
