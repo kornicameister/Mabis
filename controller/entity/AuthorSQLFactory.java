@@ -113,11 +113,15 @@ public class AuthorSQLFactory extends SQLFactory {
 	 * @throws SQLException
 	 */
 	private Integer insertAvatar(Picture picture) throws SQLException {
-		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
-				picture);
-		this.lastAffactedId = psf.executeSQL(localDatabase);
-		picture.setPrimaryKey(this.lastAffactedId);
-		return lastAffactedId;
+		if (picture != null) {
+			PictureSQLFactory psf = new PictureSQLFactory(
+					SQLStamentType.INSERT, picture);
+			this.lastAffactedId = psf.executeSQL(localDatabase);
+			picture.setPrimaryKey(this.lastAffactedId);
+			return lastAffactedId;
+		}else{
+			return 0;
+		}
 	}
 
 	/**

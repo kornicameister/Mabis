@@ -29,6 +29,7 @@ public class GenreSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			st.setObject(1, genre);
+			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(genre, st);
 			break;

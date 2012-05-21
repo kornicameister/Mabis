@@ -1,5 +1,6 @@
 package controller.api;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -65,9 +66,9 @@ public class GoogleBookApi extends ApiAccess {
 
 		List volumesList = books.volumes().list(fullQuery);
 
-		volumesList.setPrintType("books");
-		volumesList.setPrettyPrint(true);
-		volumesList.setProjection("full");
+		// volumesList.setPrintType("books");
+		// volumesList.setPrettyPrint(true);
+		// volumesList.setProjection("full");
 
 		// Execute the query.
 		Volumes volumes = volumesList.execute();
@@ -103,17 +104,23 @@ public class GoogleBookApi extends ApiAccess {
 				if (authors != null && !authors.isEmpty()) {
 					for (int i = 0; i < authors.size(); ++i) {
 						String names[] = authors.get(i).split(" ");
-						String firstName = new String();
+						String firstName = names[0];
 						String lastName = new String();
-						for (int j = 0; j < names.length; j++) {
+						for (int j = 1; j < names.length; j++) {
+							lastName += names[j];
 							if (j < names.length - 1) {
-								firstName += names[j] + " ";
-							} else {
-								lastName += names[j];
+								lastName += " ";
 							}
 						}
-						book.addAuthor(new Author(firstName, lastName));
-						// TODO add searching for author's face !
+						try {
+							Author tmp = new Author(firstName, lastName);
+							tmp.setPicture(new Picture(GoogleImageSearch
+									.queryForImage(authors.get(i)),
+									ImageType.AUTHOR));
+							book.addAuthor(tmp);
+						} catch (FileNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
 				} else {
 					book.addAuthor(new Author());
@@ -149,11 +156,9 @@ public class GoogleBookApi extends ApiAccess {
 
 				// genres
 				if (vi.getCategories() != null && !vi.getCategories().isEmpty()) {
-					for(String genre : vi.getCategories()){
+					for (String genre : vi.getCategories()) {
 						book.addGenre(new Genre(genre));
 					}
-				} else {
-					book.addGenre(new Genre("null"));
 				}
 
 				// pages
@@ -166,7 +171,8 @@ public class GoogleBookApi extends ApiAccess {
 				// saving found book
 				this.result.add(book);
 			}
-			MabisLogger.getLogger().log(Level.FINE,"Loaded {0} books from GoogleBook API",this.result.size());
+			MabisLogger.getLogger().log(Level.FINE,
+					"Loaded {0} books from GoogleBook API", this.result.size());
 		}
 	}
 

@@ -70,7 +70,7 @@ public class PictureSQLFactory extends SQLFactory {
 			in = new FileInputStream(oldPicture);
 			OutputStream out = new FileOutputStream(newPicture);
 
-			byte[] buf = new byte[1024];
+			byte[] buf = new byte[4096];
 			int len;
 			while ((len = in.read(buf)) > 0) {
 				out.write(buf, 0, len);
