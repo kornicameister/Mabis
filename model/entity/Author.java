@@ -115,4 +115,18 @@ public class Author extends BaseTable implements Serializable {
 		data.add(new ImageIcon(this.getPictureFile().getImagePath()));
 		return data.toArray();
 	}
+
+	@Override
+	public int compareTo(BaseTable o) {
+		int result = super.compareTo(o);
+		Author tmp = (Author) o;
+		if (result == 0) {
+			result = this.getLastName().compareTo(tmp.getLastName());
+		}
+		if (result == 0) {
+			result = this.getFirstName().compareTo(tmp.getFirstName());
+		}
+		return result;
+	}
+
 }
