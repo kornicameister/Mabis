@@ -94,9 +94,10 @@ public class ItemsPreview extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		JButton source = (JButton) e.getSource();
 		if (source.equals(this.acceptSelectedButton)) {
-			this.firePropertyChange("selectedItem", null,
-					((PreviewChunk) this.tabbedPanel.getSelectedComponent())
-							.getPreviedItem());
+			this.firePropertyChange(
+					"selectedItem",
+					null,
+					((PreviewChunk) this.tabbedPanel.getSelectedComponent()).previedItem);
 		}
 		// no matter which one from two buttons was clicked, closing preview
 		// anyway

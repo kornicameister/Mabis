@@ -41,20 +41,20 @@ public class ImagePanel extends JPanel implements Accessible {
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
 
 		this.contentLabel = new JLabel();
-//		this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
+		// this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		this.contentLabel.setLayout(new GridLayout());
 		this.contentLabel.setIcon(new ImageIcon(f.getAbsolutePath()));
 		this.add(contentLabel);
 	}
-	
+
 	protected ImagePanel() {
 		super(true);
 		this.addFocusListener(new ImagePanelFocusListener(this));
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
 
 		this.contentLabel = new JLabel();
-//		this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
+		// this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		this.contentLabel.setLayout(new GridLayout());
 		this.add(contentLabel);
@@ -73,8 +73,12 @@ public class ImagePanel extends JPanel implements Accessible {
 	public void setImage(File f) {
 		this.imageFile = f;
 		ImageIcon tmp = new ImageIcon(f.getAbsolutePath());
-		Image tmp2 = tmp.getImage().getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_FAST);
-		this.contentLabel.setIcon(new ImageIcon(tmp2));
+		if (tmp.getIconHeight() > this.getHeight()
+				&& tmp.getIconWidth() > this.getWidth()) {
+			tmp = new ImageIcon(tmp.getImage().getScaledInstance(
+					this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH));
+		}
+		this.contentLabel.setIcon(tmp);
 	}
 
 	public ImageIcon getImage() {

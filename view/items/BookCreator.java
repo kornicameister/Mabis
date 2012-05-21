@@ -5,32 +5,39 @@ package view.items;
 
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
+import model.enums.BookIndustryIdentifier;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.itemsprieview.ItemsPreview;
 import controller.api.GoogleBookApi;
 
 /**
- * @author kornicameister
+ * @authorBox kornicameister
  * 
  */
 public class BookCreator extends ItemCreator {
@@ -121,8 +128,6 @@ public class BookCreator extends ItemCreator {
 		descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 				"Descripion"));
-		descriptionScrollPane
-				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 	}
 
 	@Override
@@ -175,14 +180,28 @@ public class BookCreator extends ItemCreator {
 		this.titlesPanel.subTitle.setText(this.selectedBook.getSubtitle());
 		this.coverPanel.setImage(this.selectedBook.getCover().getImageFile());
 		this.descriptionArea.setText(this.selectedBook.getDescription());
-		this.detailedInfoPanel.pages.setText(this.selectedBook.getPages().toString());
+		this.detailedInfoPanel.pages.setText(this.selectedBook.getPages()
+				.toString());
+		for (Author a : this.selectedBook.getAuthors()) {
+			this.detailedInfoPanel.authorBox.addItem(a.getFirstName() + " "
+					+ a.getLastName());
+		}
+		for (Genre g : this.selectedBook.getGenres()) {
+			if(!g.getGenre().equals("null")){
+				this.detailedInfoPanel.genreBox.addItem(g.getGenre());
+			}
+		}
+		this.detailedInfoPanel.isbnField.setText(this.selectedBook
+				.getIdentifier(BookIndustryIdentifier.ISBN_10));
+		this.detailedInfoPanel.authorBox.setSelectedIndex(this.detailedInfoPanel.authorBox.getItemCount()-1);
+		this.detailedInfoPanel.genreBox.setSelectedIndex(this.detailedInfoPanel.genreBox.getItemCount()-1);
 	}
 
 	/**
 	 * Panel agregujący. Umieszczone są nim pola, służące do wprowadzania
 	 * tytułów
 	 * 
-	 * @author kornicameister
+	 * @authorBox kornicameister
 	 * 
 	 */
 	protected final class TitlesPanel extends JPanel {
@@ -238,7 +257,7 @@ public class BookCreator extends ItemCreator {
 	/**
 	 * Panel agregujący pola dla informacji szczegółowych o książce
 	 * 
-	 * @author kornicameister
+	 * @authorBox kornicameister
 	 * 
 	 */
 	private final class DetailedInformationPanel extends JPanel {
@@ -253,30 +272,103 @@ public class BookCreator extends ItemCreator {
 		 * pole tekstowe dla ilości stron danej ksiązki
 		 */
 		private final JTextField pages = new JTextField();
-		/**
-		 * {@link JComboBox} z gatunkami. Użytkownik wybiera z tego pola jeden
-		 * gatunek który najlepiej będzie opisywał daną książkę.
-		 */
-		private final JComboBox<Genre> genreCombobox = new JComboBox<Genre>();
-		/**
-		 * {@link JComboBox} z autorami (pisarzami). Użytkownik wybiera z tego
-		 * pola pisarza danej książki.
-		 */
-		private final JComboBox<Author> authorCombobox = new JComboBox<Author>();
+		private final JComboBox<String> genreBox = new JComboBox<>();
+		private final JComboBox<String> authorBox = new JComboBox<>();
+
+		// TODO add loading these values from database
+		private final Author authors[] = new Author[1];
+		private final Genre genres[] = new Genre[1];
+		private JButton newGenreButton = new JButton("N");
+		private JButton selectGenreButton = new JButton("S");
+		private JButton newAuthorButton = new JButton("N");
+		private JButton selectAuthorButton = new JButton("S");
+		
+		DetailedInfoActionListener actionListener = new DetailedInfoActionListener();
 
 		public DetailedInformationPanel(boolean isDoubleBuffered) {
 			super(isDoubleBuffered);
-			this.layoutComponents();
 			this.setBorder(BorderFactory.createTitledBorder(
 					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 					"Details"));
 
+			this.authors[0] = new Author("Tomasz", "Trębski");
+			this.genres[0] = new Genre("Metal");
+
+			this.initComponents();
+			this.layoutComponents();
+		}
+
+		/**
+		 * Inicjalizuje komponenty tego JPanel
+		 */
+		private void initComponents() {
 			this.isbnField.setBorder(BorderFactory.createTitledBorder("ISBN"));
+			this.isbnField.setToolTipText("Provide ISBN-13 based identifier");
 			this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
-			this.genreCombobox.setBorder(BorderFactory
-					.createTitledBorder("Genre"));
-			this.authorCombobox.setBorder(BorderFactory
-					.createTitledBorder("Author"));
+
+			this.genreBox.setName("genreBox");
+			this.newGenreButton.setToolTipText("Create new genre");
+			this.newGenreButton.setName("Create new genre");
+			this.newGenreButton.addActionListener(this.actionListener);
+			this.selectGenreButton.setToolTipText("Select genre");
+			this.selectGenreButton.setName("Select genre");
+			this.selectGenreButton.addActionListener(this.actionListener);
+
+			this.authorBox.setName("authorBox");
+			this.newAuthorButton.setToolTipText("Create new author");
+			this.newAuthorButton.setName("Create new author");
+			this.newAuthorButton.addActionListener(this.actionListener);
+			this.selectAuthorButton.setToolTipText("Select author");
+			this.selectAuthorButton.setName("Select author");
+			this.selectAuthorButton.addActionListener(this.actionListener);
+		}
+
+		private class DetailedInfoActionListener implements ActionListener {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JButton source = (JButton) e.getSource();
+				if (source.equals(newAuthorButton)) {
+					String returned = JOptionPane.showInputDialog(null, "Input:", source.getName(), JOptionPane.PLAIN_MESSAGE);
+					String parts[] = returned.split(" ");
+					String firstName = parts[0];
+					String lastName = new String();
+					for(int i = 1 ; i < parts.length ; i++){
+						lastName += parts[i];
+						if(i < parts.length - 1){
+							lastName += " ";
+						}
+					}
+					selectedBook.addAuthor(new Author(firstName,lastName));
+					authorBox.addItem(returned);
+				} else if (source.equals(newGenreButton)) {
+					String returned = JOptionPane.showInputDialog(null, "Input:", source.getName(), JOptionPane.PLAIN_MESSAGE);
+					selectedBook.addGenre(new Genre(returned));
+					genreBox.addItem(returned);
+				} else if (source.equals(selectAuthorButton)
+						|| source.equals(selectGenreButton)) {
+					Object arr[] = null;
+					if (source.equals(selectAuthorButton)) {
+						arr = authors;
+					} else {
+						arr = genres;
+					}
+					Object returned = JOptionPane.showInputDialog(source,
+							"Select one from following box", source.getName(),
+							JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
+					if (source.equals(selectAuthorButton)) {
+						Author a = (Author) returned;
+						authorBox.addItem(a.getFirstName() + " "
+								+ a.getLastName());
+						selectedBook.addAuthor(a);
+					} else {
+						Genre g = (Genre) returned;
+						genreBox.addItem(g.getGenre());
+						selectedBook.addGenre(g);
+					}
+				}
+				MabisLogger.getLogger().log(Level.INFO,"Action called by clicking at {0}",source);
+			}
 		}
 
 		/**
@@ -289,16 +381,53 @@ public class BookCreator extends ItemCreator {
 		public void clear() {
 			this.isbnField.setText("");
 			this.pages.setText("");
-			this.genreCombobox.setSelectedIndex(0);
-			this.authorCombobox.setSelectedIndex(0);
+			this.authorBox.setSelectedIndex(0);
+			this.genreBox.setSelectedIndex(0);
 		}
 
 		private void layoutComponents() {
-			this.setLayout(new GridLayout(4, 1, 5, 5));
+			this.setLayout(new GridLayout(4, 1));
 			this.add(this.isbnField);
 			this.add(this.pages);
-			this.add(this.genreCombobox);
-			this.add(this.authorCombobox);
+			this.layoutGenreComboBox();
+			this.layoutAuthorComboBox();
+		}
+
+		private void layoutAuthorComboBox() {
+			JPanel tmp = new JPanel();
+			tmp.setBorder(BorderFactory.createTitledBorder("Authors"));
+			GroupLayout gl = new GroupLayout(tmp);
+			tmp.setLayout(gl);
+
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+					.addComponent(this.authorBox,140,140,140)
+					.addComponent(this.newAuthorButton, 50, 50, 50)
+					.addComponent(this.selectAuthorButton, 50, 50, 50));
+			gl.setVerticalGroup(gl.createParallelGroup()
+					.addComponent(this.authorBox, 25, 25, 25)
+					.addComponent(this.newAuthorButton)
+					.addComponent(this.selectAuthorButton));
+			this.add(tmp);
+		}
+
+		/**
+		 * Metoda
+		 */
+		private void layoutGenreComboBox() {
+			JPanel tmp = new JPanel();
+			tmp.setBorder(BorderFactory.createTitledBorder("Genre"));
+			GroupLayout gl = new GroupLayout(tmp);
+			tmp.setLayout(gl);
+
+			gl.setHorizontalGroup(gl.createSequentialGroup()
+					.addComponent(this.genreBox,140,140,140)
+					.addComponent(this.newGenreButton, 50, 50, 50)
+					.addComponent(this.selectGenreButton, 50, 50, 50));
+			gl.setVerticalGroup(gl.createParallelGroup()
+					.addComponent(this.genreBox, 25, 25, 25)
+					.addComponent(this.newGenreButton)
+					.addComponent(this.selectGenreButton));
+			this.add(tmp);
 		}
 
 	}

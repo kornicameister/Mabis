@@ -205,10 +205,10 @@ public class Movie extends BaseTable implements Serializable {
 			}
 			str += "</ul>";
 		}
-		if(this.getGenres() != null && !this.getGenres().isEmpty()){
+		if (this.getGenres() != null && !this.getGenres().isEmpty()) {
 			str += "<b>Genres:</b>";
 			str += "<ul>";
-			for(Genre g : this.getGenres()){
+			for (Genre g : this.getGenres()) {
 				str += "<li>" + g.getGenre() + "</li>";
 			}
 			str += "</ul>";
@@ -219,7 +219,8 @@ public class Movie extends BaseTable implements Serializable {
 		str += "</html>";
 
 		DataOutputStream dos = null;
-		String path = GlobalPaths.TMP + String.valueOf(Math.random()*Double.MAX_EXPONENT);
+		String path = GlobalPaths.TMP
+				+ String.valueOf(Math.random() * Double.MAX_EXPONENT);
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
 			dos.writeBytes(str);

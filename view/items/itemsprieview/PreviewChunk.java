@@ -23,7 +23,7 @@ import view.imagePanel.ImagePanel;
  */
 public class PreviewChunk extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private final Movie previedItem;
+	final Movie previedItem;
 
 	/**
 	 * PreviewChunk jako parametr przyjmuje refrencje do obiektu typu Movie
@@ -57,12 +57,5 @@ public class PreviewChunk extends JPanel {
 			JScrollPane pane = new JScrollPane(description);
 			this.add(pane);
 		}
-	}
-
-	/**
-	 * @return the previedItem
-	 */
-	public Movie getPreviedItem() {
-		return previedItem;
 	}
 }
