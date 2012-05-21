@@ -11,6 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -34,7 +35,10 @@ import model.enums.BookIndustryIdentifier;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.itemsprieview.ItemsPreview;
+import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
+import controller.entity.AuthorSQLFactory;
+import controller.entity.GenreSQLFactory;
 
 /**
  * @authorBox kornicameister
@@ -187,14 +191,18 @@ public class BookCreator extends ItemCreator {
 					+ a.getLastName());
 		}
 		for (Genre g : this.selectedBook.getGenres()) {
-			if(!g.getGenre().equals("null")){
+			if (!g.getGenre().equals("null")) {
 				this.detailedInfoPanel.genreBox.addItem(g.getGenre());
 			}
 		}
 		this.detailedInfoPanel.isbnField.setText(this.selectedBook
 				.getIdentifier(BookIndustryIdentifier.ISBN_10));
-		this.detailedInfoPanel.authorBox.setSelectedIndex(this.detailedInfoPanel.authorBox.getItemCount()-1);
-		this.detailedInfoPanel.genreBox.setSelectedIndex(this.detailedInfoPanel.genreBox.getItemCount()-1);
+		this.detailedInfoPanel.authorBox
+				.setSelectedIndex(this.detailedInfoPanel.authorBox
+						.getItemCount() - 1);
+		this.detailedInfoPanel.genreBox
+				.setSelectedIndex(this.detailedInfoPanel.genreBox
+						.getItemCount() - 1);
 	}
 
 	/**
@@ -276,13 +284,13 @@ public class BookCreator extends ItemCreator {
 		private final JComboBox<String> authorBox = new JComboBox<>();
 
 		// TODO add loading these values from database
-		private final Author authors[] = new Author[1];
-		private final Genre genres[] = new Genre[1];
+		private Author authors[];
+		private Genre genres[];
 		private JButton newGenreButton = new JButton("N");
 		private JButton selectGenreButton = new JButton("S");
 		private JButton newAuthorButton = new JButton("N");
 		private JButton selectAuthorButton = new JButton("S");
-		
+
 		DetailedInfoActionListener actionListener = new DetailedInfoActionListener();
 
 		public DetailedInformationPanel(boolean isDoubleBuffered) {
@@ -291,11 +299,44 @@ public class BookCreator extends ItemCreator {
 					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 					"Details"));
 
-			this.authors[0] = new Author("Tomasz", "Trębski");
-			this.genres[0] = new Genre("Metal");
+			try {
+				this.loadAuthors();
+				this.loadGenres();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				if (authors == null) {
+					authors = new Author[0];
+				}
+				if (genres == null) {
+					genres = new Genre[0];
+				}
+			}
 
 			this.initComponents();
 			this.layoutComponents();
+		}
+
+		private void loadGenres() throws SQLException {
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
+					new Genre());
+			gsf.executeSQL(true);
+			this.genres = new Genre[gsf.getGenres().size()];
+			short it = 0;
+			for (Genre g : gsf.getGenres()) {
+				this.genres[it++] = g;
+			}
+		}
+
+		private void loadAuthors() throws SQLException {
+			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
+					new Author());
+			asf.executeSQL(true);
+			this.authors = new Author[asf.getAuthors().size()];
+			short it = 0;
+			for (Author a : asf.getAuthors()) {
+				this.authors[it++] = a;
+			}
 		}
 
 		/**
@@ -323,30 +364,44 @@ public class BookCreator extends ItemCreator {
 			this.selectAuthorButton.addActionListener(this.actionListener);
 		}
 
+		/**
+		 * Nasłuchuje na wydarzenia pochodzące od przycisków sterujących
+		 * dodawaniem nowych autorów i gatunków
+		 * 
+		 * @author kornicameister
+		 * 
+		 */
 		private class DetailedInfoActionListener implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JButton source = (JButton) e.getSource();
 				if (source.equals(newAuthorButton)) {
-					String returned = JOptionPane.showInputDialog(null, "Input:", source.getName(), JOptionPane.PLAIN_MESSAGE);
+					String returned = JOptionPane.showInputDialog(null,
+							"Input:", source.getName(),
+							JOptionPane.PLAIN_MESSAGE);
 					String parts[] = returned.split(" ");
 					String firstName = parts[0];
 					String lastName = new String();
-					for(int i = 1 ; i < parts.length ; i++){
+					for (int i = 1; i < parts.length; i++) {
 						lastName += parts[i];
-						if(i < parts.length - 1){
+						if (i < parts.length - 1) {
 							lastName += " ";
 						}
 					}
-					selectedBook.addAuthor(new Author(firstName,lastName));
+					selectedBook.addAuthor(new Author(firstName, lastName));
 					authorBox.addItem(returned);
 				} else if (source.equals(newGenreButton)) {
-					String returned = JOptionPane.showInputDialog(null, "Input:", source.getName(), JOptionPane.PLAIN_MESSAGE);
+					String returned = JOptionPane.showInputDialog(null,
+							"Input:", source.getName(),
+							JOptionPane.PLAIN_MESSAGE);
 					selectedBook.addGenre(new Genre(returned));
 					genreBox.addItem(returned);
 				} else if (source.equals(selectAuthorButton)
 						|| source.equals(selectGenreButton)) {
+					if (authors.length == 0 || genres.length == 0) {
+						return;
+					}
 					Object arr[] = null;
 					if (source.equals(selectAuthorButton)) {
 						arr = authors;
@@ -367,7 +422,8 @@ public class BookCreator extends ItemCreator {
 						selectedBook.addGenre(g);
 					}
 				}
-				MabisLogger.getLogger().log(Level.INFO,"Action called by clicking at {0}",source);
+				MabisLogger.getLogger().log(Level.INFO,
+						"Action called by clicking at {0}", source);
 			}
 		}
 
@@ -400,7 +456,7 @@ public class BookCreator extends ItemCreator {
 			tmp.setLayout(gl);
 
 			gl.setHorizontalGroup(gl.createSequentialGroup()
-					.addComponent(this.authorBox,140,140,140)
+					.addComponent(this.authorBox, 140, 140, 140)
 					.addComponent(this.newAuthorButton, 50, 50, 50)
 					.addComponent(this.selectAuthorButton, 50, 50, 50));
 			gl.setVerticalGroup(gl.createParallelGroup()
@@ -420,7 +476,7 @@ public class BookCreator extends ItemCreator {
 			tmp.setLayout(gl);
 
 			gl.setHorizontalGroup(gl.createSequentialGroup()
-					.addComponent(this.genreBox,140,140,140)
+					.addComponent(this.genreBox, 140, 140, 140)
 					.addComponent(this.newGenreButton, 50, 50, 50)
 					.addComponent(this.selectGenreButton, 50, 50, 50));
 			gl.setVerticalGroup(gl.createParallelGroup()
