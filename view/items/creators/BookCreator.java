@@ -58,8 +58,7 @@ public class BookCreator extends ItemCreator {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public BookCreator(String title) throws HeadlessException,
-			CreatorContentNullPointerException {
+	public BookCreator(String title) throws CreatorContentNullPointerException {
 		super(title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
 				.getMinimumSize().getHeight());
@@ -111,20 +110,70 @@ public class BookCreator extends ItemCreator {
 	@Override
 	public void initComponents() {
 		super.initComponents();
-		contentPanel = new JPanel(true);
+		this.contentPanel = new JPanel(true);
 
-		titlesPanel = new TitlesPanel(true);
-		detailedInfoPanel = new DetailedInformationPanel(true);
-		coverPanel = new ImagePanel(new File(
+		this.titlesPanel = new TitlesPanel(true);
+
+		this.detailedInfoPanel = new DetailedInformationPanel(true);
+		this.detailedInfoPanel.authorsMiniPanel
+				.addPropertyChangeListener(new PropertyChangeListener() {
+
+					@Override
+					public void propertyChange(PropertyChangeEvent e) {
+						System.out.println(e.getPropertyName());
+						String property = e.getPropertyName();
+						if (property.equals("authorSelected")
+								|| property.equals("authorCreated")) {
+							Author tmp = (Author) e.getNewValue();
+							if (selectedBook.getAuthors().size() == 0) {
+								selectedBook.addAuthor(tmp);
+								return;
+							}
+							for (Author a : selectedBook.getAuthors()) {
+								if (!(a.getFirstName().equals(
+										tmp.getFirstName()) && a.getLastName()
+										.equals(tmp.getLastName()))) {
+									selectedBook.addAuthor(tmp);
+									return;
+								}
+							}
+						}
+					}
+				});
+		this.detailedInfoPanel.genresMiniPanel
+				.addPropertyChangeListener(new PropertyChangeListener() {
+
+					@Override
+					public void propertyChange(PropertyChangeEvent e) {
+						System.out.println(e.getPropertyName());
+						String property = e.getPropertyName();
+						if (property.equals("genreSelected")
+								|| property.equals("authorCreated")) {
+							Genre tmp = (Genre) e.getNewValue();
+							if (selectedBook.getGenres().size() == 0) {
+								selectedBook.addGenre(tmp);
+								return;
+							}
+							for (Genre g : selectedBook.getGenres()) {
+								if (!g.getGenre().equals(tmp.getGenre())) {
+									selectedBook.addGenre(tmp);
+									return;
+								}
+							}
+						}
+					}
+				});
+
+		this.coverPanel = new ImagePanel(new File(
 				GlobalPaths.DEFAULT_COVER_PATH.toString()));
-		coverPanel
+		this.coverPanel
 				.setBorder(BorderFactory.createTitledBorder(
 						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 						"Cover"));
 
-		descriptionArea = new JTextArea();
-		descriptionScrollPane = new JScrollPane(this.descriptionArea);
-		descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
+		this.descriptionArea = new JTextArea();
+		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
+		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 				"Descripion"));
 	}
@@ -242,13 +291,7 @@ public class BookCreator extends ItemCreator {
 	 */
 	protected final class TitlesPanel extends JPanel {
 		private static final long serialVersionUID = -8642265229218524372L;
-		/**
-		 * pole tekstowe dla tytułu w oryginalnym języku
-		 */
 		private final JTextField titleOriginal = new JTextField();
-		/**
-		 * pole tekstowe dla tytułu, który jest przetłumaczony
-		 */
 		private final JTextField subTitle = new JTextField();
 
 		/**
@@ -298,15 +341,7 @@ public class BookCreator extends ItemCreator {
 	 */
 	private final class DetailedInformationPanel extends JPanel {
 		private static final long serialVersionUID = 3476477969389283620L;
-		/**
-		 * pole tekstowe dla wprowadzania numeru isbn dla książki Ma dodany
-		 * odpowiedni walidator, który nie pozwala na wprowadzenie numeru o złym
-		 * formacie
-		 */
 		private final JTextField isbnField = new JTextField();
-		/**
-		 * pole tekstowe dla ilości stron danej ksiązki
-		 */
 		private final JTextField pages = new JTextField();
 
 		private GenreMiniPanel genresMiniPanel;
