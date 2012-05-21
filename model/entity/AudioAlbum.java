@@ -21,9 +21,8 @@ import settings.GlobalPaths;
 
 /**
  * Klasa jest obiektową reprezentacją tabeli audioAlbum z bazy danych mabis.
- * Posiada następujące atrybuty: </br> | idAudio </br> | cover</br> |
- * backCover</br> | cdCover</br> | tagCloud</br> | trackList</br> | artist</br>
- * | totalTime
+ * Posiada następujące atrybuty: </br> | idAudio </br> | title </br> |
+ * cover</br> | tagCloud</br> | trackList</br> | artist</br> | totalTime
  * 
  * @author kornicameister
  * @version 0.2

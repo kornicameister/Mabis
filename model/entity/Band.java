@@ -28,6 +28,10 @@ public class Band extends Author implements Serializable {
 	private Genre masterGenre = null;
 	private static final String urlPattern = "http://www.lastfm.pl/music/band_name";
 
+	public Band() {
+		super();
+	}
+
 	/**
 	 * Construct Band class with bandName
 	 * 
@@ -128,13 +132,7 @@ public class Band extends Author implements Serializable {
 
 	@Override
 	public String toString() {
-		String str = super.toString();
-		str += "----------\n";
-		str += "[NAME: " + this.getName() + "]\n";
-		str += "[LASTFM: " + this.getLastFMUrl().toString() + "]\n";
-		str += "[GENRE: " + this.getMasterGenre() + "]\n";
-		str += "[TAGCLOUD: " + this.getTagCloud() + "]\n";
-		return str;
+		return this.getPrimaryKey() + ": " + this.getName();
 	}
 
 	@Override
