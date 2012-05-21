@@ -108,9 +108,7 @@ public class Movie extends BaseTable implements Serializable {
 	}
 
 	public void addAuthor(Author author) {
-		if (!this.directors.contains(author)) {
-			this.directors.add(author);
-		}
+		this.directors.add(author);
 	}
 
 	public Genre getGenre() {

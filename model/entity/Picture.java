@@ -108,7 +108,7 @@ public class Picture extends BaseTable implements Serializable {
 		this.imageFilePath = output.getAbsolutePath();
 	}
 
-	private void saveHash(URL imageUrl) throws IOException {
+	private void saveHash(URL imageUrl) throws IOException, FileNotFoundException {
 		URLConnection conn = imageUrl.openConnection();
 		conn.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");

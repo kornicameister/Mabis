@@ -95,6 +95,9 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private void initFields() {
 		this.primaryKey = new Integer(-1);
 		this.titles = new String[4];
+		for(int i = 0 ; i < this.titles.length ; i++){
+			this.titles[i] = new String();
+		}
 		this.tableType = TableType.NULL;
 	}
 

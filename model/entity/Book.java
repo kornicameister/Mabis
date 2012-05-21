@@ -116,7 +116,7 @@ public class Book extends Movie implements Serializable {
 		if (result == 0) {
 			result = this.getTitle().compareTo(other.getTitle());
 		}
-		if (result == 0) {
+		if (result == 0 && (this.getDescription() != null)) {
 			result = this.getDescription().compareTo(other.getDescription());
 		}
 		return result;
@@ -190,7 +190,7 @@ public class Book extends Movie implements Serializable {
 		str += "</html>";
 
 		DataOutputStream dos = null;
-		String path = GlobalPaths.TMP + String.valueOf(Math.random()*Double.MAX_EXPONENT);
+		String path = GlobalPaths.TMP + String.valueOf(this.hashCode());
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
 			dos.writeBytes(str);

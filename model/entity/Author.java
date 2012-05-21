@@ -118,6 +118,9 @@ public class Author extends BaseTable implements Serializable {
 
 	@Override
 	public int compareTo(BaseTable o) {
+		if(o == null){
+			return 0;
+		}
 		int result = super.compareTo(o);
 		Author tmp = (Author) o;
 		if (result == 0) {
