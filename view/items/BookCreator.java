@@ -172,24 +172,19 @@ public class BookCreator extends ItemCreator {
 	}
 
 	@Override
-	protected void fetchFromAPI() {
+	protected void fetchFromAPI(String query, String criteria) {
 		if (this.collectedItems != null) {
 			this.collectedItems.clear();
 		}
 		GoogleBookApi gba = new GoogleBookApi();
 		try {
-			String title = new String();
-			if (this.titlesPanel.titleOriginal.getText() != null
-					&& !this.titlesPanel.titleOriginal.getText().isEmpty()) {
-				title = this.titlesPanel.titleOriginal.getText();
-			}
 			TreeMap<String, String> params = new TreeMap<String, String>();
-			if (this.detailedInfoPanel.authorBox.getSelectedItem() != null) {
-				String tmp = (String) this.detailedInfoPanel.authorBox
-						.getSelectedItem();
-				params.put("inauthor:", tmp);
+			if (criteria.contains("author")) {
+				params.put("inauthor:", query);
+			} else if (criteria.contains("title")) {
+				params.put("intitle:", query);
 			}
-			gba.query(title, params);
+			gba.query(params);
 			collectedItems = gba.getResult();
 		} catch (IOException e) {
 			e.printStackTrace();

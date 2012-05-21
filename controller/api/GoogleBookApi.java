@@ -52,7 +52,7 @@ public class GoogleBookApi extends ApiAccess {
 	}
 
 	@Override
-	public void query(String query, TreeMap<String, String> params)
+	public void query(TreeMap<String, String> query)
 			throws IOException {
 		final Books books = Books
 				.builder(new NetHttpTransport(), new JacksonFactory())
@@ -61,7 +61,6 @@ public class GoogleBookApi extends ApiAccess {
 						new GoogleKeyInitializer(API_ACCESS_KEY)).build();
 
 		String fullQuery = new String();
-		fullQuery += params;
 		fullQuery += query;
 
 		List volumesList = books.volumes().list(fullQuery);

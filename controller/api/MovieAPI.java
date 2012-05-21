@@ -25,7 +25,6 @@ public class MovieAPI extends ApiAccess {
 	}
 
 	@Override
-	public void query(String question, TreeMap<String, String> params)
-			throws IOException {
+	public void query(TreeMap<String, String> params) throws IOException {
 	}
 }

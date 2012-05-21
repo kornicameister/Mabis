@@ -21,7 +21,7 @@ public class AudioAlbumAPI extends ApiAccess {
 	}
 
 	@Override
-	public void query(String question, TreeMap<String, String> params)
+	public void query(TreeMap<String, String> params)
 			throws IOException {
 	}
 

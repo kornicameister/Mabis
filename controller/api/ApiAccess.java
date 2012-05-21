@@ -28,7 +28,7 @@ public abstract class ApiAccess {
 	 *            mapa parametrów w formacie string:string
 	 * @throws IOException
 	 */
-	public abstract void query(String question, TreeMap<String, String> params)
+	public abstract void query(TreeMap<String, String> query)
 			throws IOException;
 
 	/**

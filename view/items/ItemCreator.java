@@ -14,9 +14,11 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
@@ -33,11 +35,14 @@ import model.BaseTable;
  */
 public abstract class ItemCreator extends JFrame {
 	private static final long serialVersionUID = -2333519518489232774L;
+
 	protected JPanel contentPanel;
 	private JPanel contentPane;
 	private ICButtonPanel buttonPanel;
 	private ICActionListener listener;
 	protected TreeSet<BaseTable> collectedItems;
+
+	private ICSearchPanel searchPanel;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -78,12 +83,14 @@ public abstract class ItemCreator extends JFrame {
 
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
+				.addComponent(this.searchPanel)
 				.addGroup(
 						gl.createSequentialGroup().addComponent(
 								this.contentPanel))
 				.addComponent(this.buttonPanel));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
+				.addComponent(this.searchPanel)
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.contentPanel))
@@ -103,6 +110,7 @@ public abstract class ItemCreator extends JFrame {
 	protected void initComponents() throws CreatorContentNullPointerException {
 		this.listener = new ICActionListener();
 		this.buttonPanel = new ICButtonPanel();
+		this.searchPanel = new ICSearchPanel();
 	}
 
 	/**
@@ -129,9 +137,11 @@ public abstract class ItemCreator extends JFrame {
 	 * . Po wywołeniu akcji, podejmowana jest próba pobrania informacji o danym
 	 * obiekcie kolekcji przez publiczne API.
 	 * 
+	 * @param query
+	 * 
 	 * 
 	 */
-	protected abstract void fetchFromAPI();
+	protected abstract void fetchFromAPI(String query, String criteria);
 
 	/**
 	 * Metoda powinna zostać wywołana po wybraniu przez użytkownika elementu
@@ -159,7 +169,6 @@ public abstract class ItemCreator extends JFrame {
 		 * Przycisk powoduje zakończenie działania kreatora
 		 */
 		private JButton cancelButton;
-		private JButton getFromNetButton;
 
 		public ICButtonPanel() {
 			this.createButton = new JButton("Create");
@@ -168,15 +177,40 @@ public abstract class ItemCreator extends JFrame {
 			this.clearButton.addActionListener(listener);
 			this.cancelButton = new JButton("Cancel");
 			this.cancelButton.addActionListener(listener);
-			this.getFromNetButton = new JButton("Fetch from web");
-			this.getFromNetButton.addActionListener(listener);
 
 			this.setLayout(new GridLayout(2, 2));
-
-			this.add(this.getFromNetButton);
 			this.add(this.createButton);
 			this.add(this.clearButton);
 			this.add(this.cancelButton);
+		}
+	}
+
+	private class ICSearchPanel extends JPanel {
+		private static final long serialVersionUID = 806539065413054227L;
+		private JTextField searchQuery = new JTextField();
+		private JComboBox<String> criteria;
+		private JButton searchButton = new JButton("Search");
+		private String arrayOfCriteria[] = { "by author", "by title" };
+
+		public ICSearchPanel() {
+			super(true);
+
+			this.criteria = new JComboBox<String>(this.arrayOfCriteria);
+			this.criteria.setSelectedIndex(0);
+
+			this.setLayout(new GridLayout(1, 3));
+			this.add(this.searchQuery);
+			this.add(this.criteria);
+			this.add(this.searchButton);
+
+			this.searchButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					fetchFromAPI(searchQuery.getText(),
+							(String) criteria.getSelectedItem());
+				}
+			});
 		}
 	}
 
@@ -203,12 +237,10 @@ public abstract class ItemCreator extends JFrame {
 							"Failed to create new item",
 							"Creation miracle failed",
 							JOptionPane.ERROR_MESSAGE);
-				}else{
+				} else {
 					setVisible(false);
 					dispose();
 				}
-			} else if (source.equals(buttonPanel.getFromNetButton)) {
-				fetchFromAPI();
 			}
 			MabisLogger.getLogger().log(Level.INFO,
 					"ItemCreator action called :: {0}",
