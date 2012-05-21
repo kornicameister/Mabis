@@ -75,7 +75,7 @@ public class Book extends Movie implements Serializable {
 		this.identifiers.put(bii, val);
 	}
 
-	private TreeMap<BookIndustryIdentifier, String> getIdentifiers() {
+	public TreeMap<BookIndustryIdentifier, String> getIdentifiers() {
 		return this.identifiers;
 	}
 

@@ -207,4 +207,10 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 		}
 		return compareValue;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return this.compareTo((BaseTable) obj) == 0;
+	}
+
 }

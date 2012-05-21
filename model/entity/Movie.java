@@ -247,4 +247,17 @@ public class Movie extends BaseTable implements Serializable {
 		return null;
 	}
 
+	@Override
+	public int compareTo(BaseTable o) {
+		int result = super.compareTo(o);
+		Movie tmp = (Movie)o;
+		if(result == 0){
+			result = (this.directors.equals(tmp.directors) ? 0 : -1);
+		}
+		if(result == 0){
+			result = (this.genres.equals(tmp.genres) ? 0 : -1);
+		}
+		return result;
+	}
+
 }

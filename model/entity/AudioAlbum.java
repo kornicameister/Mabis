@@ -143,7 +143,8 @@ public class AudioAlbum extends Movie implements Serializable {
 		str += "</html>";
 
 		DataOutputStream dos = null;
-		String path = GlobalPaths.TMP + String.valueOf(Math.random()*Double.MAX_EXPONENT);
+		String path = GlobalPaths.TMP
+				+ String.valueOf(Math.random() * Double.MAX_EXPONENT);
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
 			dos.writeBytes(str);
