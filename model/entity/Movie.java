@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
@@ -32,7 +32,7 @@ public class Movie extends BaseTable implements Serializable {
 	protected Picture cover;
 	protected TreeSet<Author> directors;
 	protected TreeSet<Genre> genres;
-	private Time duration;
+	private Date duration;
 	protected Double rating;
 
 	/**
@@ -72,18 +72,18 @@ public class Movie extends BaseTable implements Serializable {
 
 	@Override
 	protected void initInternalFields() {
-		this.setDuration(new Time(0));
+		this.duration = new Date(0);
 		this.tableType = TableType.MOVIE;
 		this.rating = new Double(0.0);
 		this.directors = new TreeSet<>();
 		this.genres = new TreeSet<>();
 	}
 
-	public Time getDuration() {
+	public Date getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Time duration) {
+	public void setDuration(Date duration) {
 		this.duration = duration;
 	}
 
@@ -248,11 +248,11 @@ public class Movie extends BaseTable implements Serializable {
 	@Override
 	public int compareTo(BaseTable o) {
 		int result = super.compareTo(o);
-		Movie tmp = (Movie)o;
-		if(result == 0){
+		Movie tmp = (Movie) o;
+		if (result == 0) {
 			result = (this.directors.equals(tmp.directors) ? 0 : -1);
 		}
-		if(result == 0){
+		if (result == 0) {
 			result = (this.genres.equals(tmp.genres) ? 0 : -1);
 		}
 		return result;

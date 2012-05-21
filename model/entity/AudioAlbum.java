@@ -84,6 +84,9 @@ public class AudioAlbum extends Movie implements Serializable {
 	}
 
 	public Band getBand() {
+		if(this.directors.isEmpty()){
+			return null;
+		}
 		return (Band) this.directors.first();
 	}
 

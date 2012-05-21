@@ -27,11 +27,11 @@ import model.entity.Genre;
 import model.enums.BookIndustryIdentifier;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
-import view.items.AuthorMiniPanel;
 import view.items.CreatorContentNullPointerException;
-import view.items.GenreMiniPanel;
 import view.items.ItemCreator;
 import view.items.itemsprieview.ItemsPreview;
+import view.items.minipanels.AuthorMiniPanel;
+import view.items.minipanels.GenreMiniPanel;
 import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
 import controller.entity.AuthorSQLFactory;
@@ -120,7 +120,6 @@ public class BookCreator extends ItemCreator {
 
 					@Override
 					public void propertyChange(PropertyChangeEvent e) {
-						System.out.println(e.getPropertyName());
 						String property = e.getPropertyName();
 						if (property.equals("authorSelected")
 								|| property.equals("authorCreated")) {
@@ -145,10 +144,9 @@ public class BookCreator extends ItemCreator {
 
 					@Override
 					public void propertyChange(PropertyChangeEvent e) {
-						System.out.println(e.getPropertyName());
 						String property = e.getPropertyName();
 						if (property.equals("genreSelected")
-								|| property.equals("authorCreated")) {
+								|| property.equals("genreCreated")) {
 							Genre tmp = (Genre) e.getNewValue();
 							if (selectedBook.getGenres().size() == 0) {
 								selectedBook.addGenre(tmp);

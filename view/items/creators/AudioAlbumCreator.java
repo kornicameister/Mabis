@@ -3,15 +3,19 @@
  */
 package view.items.creators;
 
-import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -21,16 +25,19 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import model.BaseTable;
-import model.entity.Author;
+import model.entity.AudioAlbum;
 import model.entity.Band;
 import model.entity.Genre;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
 import view.items.ItemCreator;
-import view.items.AuthorMiniPanel;
+import view.items.minipanels.BandMiniPanel;
+import view.items.minipanels.GenreMiniPanel;
 import controller.SQLStamentType;
+import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.BandSQLFactory;
+import controller.entity.GenreSQLFactory;
 
 /**
  * @author kornicameister
@@ -41,10 +48,11 @@ public class AudioAlbumCreator extends ItemCreator {
 	private JTextField titleField;
 	private JTextArea trackList;
 	private ItemTagCloudPanel tagCloud;
-	private AuthorMiniPanel bandMiniPanel;
+	private BandMiniPanel bandMiniPanel;
 	private JFormattedTextField durationField;
 	private ImagePanel coverPanel;
 	private JScrollPane scrollTrackList;
+	private AudioAlbum selectedAlbum = new AudioAlbum();
 
 	public AudioAlbumCreator(String title)
 			throws CreatorContentNullPointerException {
@@ -112,11 +120,31 @@ public class AudioAlbumCreator extends ItemCreator {
 			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT,
 					new Band());
 			asf.executeSQL(true);
-			TreeSet<Author> bridge = new TreeSet<>();
+			TreeSet<Band> bridge = new TreeSet<>();
 			for (Band b : asf.getBands()) {
 				bridge.add(b);
 			}
-			this.bandMiniPanel = new AuthorMiniPanel("Bands", bridge);
+			this.bandMiniPanel = new BandMiniPanel("Bands", bridge);
+			this.bandMiniPanel
+					.addPropertyChangeListener(new PropertyChangeListener() {
+
+						@Override
+						public void propertyChange(PropertyChangeEvent e) {
+							String property = e.getPropertyName();
+							if (property.equals("bandSelected")
+									|| property.equals("bandCreated")) {
+								Band tmp = (Band) e.getNewValue();
+								if (selectedAlbum.getBand() == null) {
+									selectedAlbum.setBand(tmp);
+									return;
+								} else if (!selectedAlbum.getBand().getName()
+										.equals(tmp.getName())) {
+									selectedAlbum.setBand(tmp);
+									return;
+								}
+							}
+						}
+					});
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -136,7 +164,20 @@ public class AudioAlbumCreator extends ItemCreator {
 
 	@Override
 	protected Boolean createItem() {
-		return null;
+		this.selectedAlbum.setTitle(this.titleField.getText());
+		this.selectedAlbum.setDuration((Date) this.durationField.getValue());
+		this.selectedAlbum.setTrackList(this.trackList.getText());
+		for (Genre g : this.tagCloud.tags) {
+			this.selectedAlbum.addGenre(g);
+		}
+		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
+				SQLStamentType.INSERT, this.selectedAlbum);
+		try {
+			return aasf.executeSQL(true) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
@@ -161,9 +202,46 @@ public class AudioAlbumCreator extends ItemCreator {
 		private ArrayList<Genre> tags = new ArrayList<>();
 		private TreeMap<Genre, JLabel> tagToLabel = new TreeMap<>();
 		private JPanel contentPanel = new JPanel();
+		private GenreMiniPanel gmp;
 
 		public ItemTagCloudPanel() {
-			this.contentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+			// this.contentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+			this.contentPanel.setLayout(new BoxLayout(this.contentPanel,
+					BoxLayout.Y_AXIS));
+
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
+					new Genre());
+			try {
+				gsf.executeSQL(true);
+				gmp = new GenreMiniPanel("Tags", gsf.getGenres());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			this.add(gmp, BorderLayout.PAGE_START);
+			this.add(this.contentPanel);
+
+			this.gmp.getGenreBox().setVisible(false);
+			this.gmp.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent e) {
+					String property = e.getPropertyName();
+					if (property.equals("genreSelected")
+							|| property.equals("genreCreated")) {
+						Genre tmp = (Genre) e.getNewValue();
+						if (tags.size() == 0) {
+							addTag(tmp);
+							return;
+						}
+						for (Genre g : tags) {
+							if (!g.getGenre().equals(tmp.getGenre())) {
+								addTag(g);
+								return;
+							}
+						}
+					}
+				}
+			});
 		}
 
 		void addTag(Genre g) {

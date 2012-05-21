@@ -1,4 +1,4 @@
-package view.items;
+package view.items.minipanels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

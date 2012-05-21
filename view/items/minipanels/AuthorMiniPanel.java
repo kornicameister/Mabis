@@ -1,4 +1,4 @@
-package view.items;
+package view.items.minipanels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -19,18 +20,20 @@ import model.entity.Author;
 public class AuthorMiniPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 3416144336071217011L;
 	private final ArrayList<Author> authors = new ArrayList<>();
-	private final JButton newAuthorButton = new JButton("N");
-	private final JButton selectAuthorButton = new JButton("S");
-	private final JComboBox<String> authorsBox = new JComboBox<>();
+	protected final JButton newAuthorButton = new JButton("N");
+	protected final JButton selectAuthorButton = new JButton("S");
+	protected JComponent authorsBox = new JComboBox<String>();
 
 	public AuthorMiniPanel(String string, TreeSet<Author> treeSet) {
-		this.authors.addAll(treeSet);
+		if (treeSet != null) {
+			this.authors.addAll(treeSet);
+		}
 		this.setBorder(BorderFactory.createTitledBorder(string));
 		this.initComponents();
 		this.layoutComponents();
 	}
 
-	private void initComponents() {
+	protected void initComponents() {
 		this.selectAuthorButton.setToolTipText("Select author");
 		this.selectAuthorButton.setName("Select author");
 		this.newAuthorButton.setToolTipText("Create new author");
@@ -43,8 +46,9 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	/**
 	 * @return the authorsBox
 	 */
+	@SuppressWarnings("unchecked")
 	public JComboBox<String> getAuthorsBox() {
-		return authorsBox;
+		return (JComboBox<String>) authorsBox;
 	}
 
 	private void layoutComponents() {
@@ -63,6 +67,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 		this.add(tmp);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton source = (JButton) e.getSource();
@@ -81,7 +86,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 				}
 				Author tmp = new Author(firstName, lastName);
 				this.firePropertyChange("authorCreated", null, tmp);
-				authorsBox.addItem(returned);
+				((JComboBox<String>) authorsBox).addItem(returned);
 			}
 		} else if (source.equals(selectAuthorButton)) {
 			if (authors.size() == 0) {
@@ -93,8 +98,8 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 					JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 			if (returned != null) {
 				Author tmp = (Author) returned;
-				authorsBox
-						.addItem(tmp.getFirstName() + " " + tmp.getLastName());
+				((JComboBox<String>) authorsBox).addItem(tmp.getFirstName()
+						+ " " + tmp.getLastName());
 				this.firePropertyChange("authorSelected", null, tmp);
 			}
 		}
