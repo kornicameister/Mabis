@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -24,7 +24,7 @@ import model.entity.Book;
  * @author kornicameister
  * 
  */
-public class ItemsPreview extends JDialog implements ActionListener {
+public class ItemsPreview extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -5983748388561797286L;
 	protected final TreeSet<BaseTable> elements;
 	protected JTabbedPane tabbedPanel;
@@ -33,7 +33,7 @@ public class ItemsPreview extends JDialog implements ActionListener {
 	private static Dimension dim = new Dimension(620, 470);
 
 	public ItemsPreview(String title, TreeSet<BaseTable> elements) {
-		super();
+		super(title);
 		this.elements = elements;
 
 		this.setSize(this.getMinimumSize());

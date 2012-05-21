@@ -223,7 +223,8 @@ public class BookCreator extends ItemCreator {
 				this.detailedInfoPanel.authorBox.addItem(a.getFirstName() + " "
 						+ a.getLastName());
 			}
-			//TODO add checking if obtained author (coming from google book api) is already present in database
+			// TODO add checking if obtained author (coming from google book
+			// api) is already present in database
 		}
 		for (Genre g : this.selectedBook.getGenres()) {
 			if (!g.getGenre().equals("null") && !g.getGenre().isEmpty()) {
@@ -467,30 +468,33 @@ public class BookCreator extends ItemCreator {
 					String returned = JOptionPane.showInputDialog(null,
 							"Input:", source.getName(),
 							JOptionPane.PLAIN_MESSAGE);
-					String parts[] = returned.split(" ");
-					String firstName = parts[0];
-					String lastName = new String();
-					for (int i = 1; i < parts.length; i++) {
-						lastName += parts[i];
-						if (i < parts.length - 1) {
-							lastName += " ";
+					if (returned != null) {
+						String parts[] = returned.split(" ");
+						String firstName = parts[0];
+						String lastName = new String();
+						for (int i = 1; i < parts.length; i++) {
+							lastName += parts[i];
+							if (i < parts.length - 1) {
+								lastName += " ";
+							}
 						}
+						Author tmp = new Author(firstName, lastName);
+						if (!selectedBook.getAuthors().contains(tmp)) {
+							selectedBook.addAuthor(tmp);
+						}
+						authorBox.addItem(returned);
 					}
-					Author tmp = new Author(firstName, lastName);
-					if (!selectedBook.getAuthors().contains(tmp)) {
-						selectedBook.addAuthor(tmp);
-					}
-					authorBox.addItem(returned);
 				} else if (source.equals(newGenreButton)) {
 					String returned = JOptionPane.showInputDialog(null,
 							"Input:", source.getName(),
 							JOptionPane.PLAIN_MESSAGE);
-
-					Genre tmp = new Genre(returned);
-					if (!selectedBook.getGenres().contains(tmp)) {
-						selectedBook.addGenre(tmp);
+					if (returned != null) {
+						Genre tmp = new Genre(returned);
+						if (!selectedBook.getGenres().contains(tmp)) {
+							selectedBook.addGenre(tmp);
+						}
+						genreBox.addItem(returned);
 					}
-					genreBox.addItem(returned);
 				} else if (source.equals(selectAuthorButton)
 						|| source.equals(selectGenreButton)) {
 					if (authors.size() == 0 || genres.size() == 0) {
@@ -505,19 +509,21 @@ public class BookCreator extends ItemCreator {
 					Object returned = JOptionPane.showInputDialog(source,
 							"Select one from following box", source.getName(),
 							JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
-					if (source.equals(selectAuthorButton)) {
-						Author a = (Author) returned;
-						authorBox.addItem(a.getFirstName() + " "
-								+ a.getLastName());
-						selectedBook.addAuthor(a);
-					} else {
-						Genre g = (Genre) returned;
-						genreBox.addItem(g.getGenre());
-						selectedBook.addGenre(g);
+					if (returned != null) {
+						if (source.equals(selectAuthorButton)) {
+							Author a = (Author) returned;
+							authorBox.addItem(a.getFirstName() + " "
+									+ a.getLastName());
+							selectedBook.addAuthor(a);
+						} else {
+							Genre g = (Genre) returned;
+							genreBox.addItem(g.getGenre());
+							selectedBook.addGenre(g);
+						}
 					}
 				}
 				MabisLogger.getLogger().log(Level.INFO,
-						"Action called by clicking at {0}", source);
+						"Action called by clicking at {0}", source.getName());
 			}
 		}
 	}

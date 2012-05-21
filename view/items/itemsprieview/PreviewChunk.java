@@ -7,8 +7,10 @@ import java.net.URL;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
 import model.entity.AudioAlbum;
+import model.entity.Author;
 import model.entity.Book;
 import model.entity.Movie;
 import view.imagePanel.ImagePanel;
@@ -51,11 +53,18 @@ public class PreviewChunk extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.setLayout(new GridLayout(1, 2));
+		this.setLayout(new GridLayout(1, 3));
 		this.add(panel);
 		if (description != null) {
 			JScrollPane pane = new JScrollPane(description);
 			this.add(pane);
 		}
+		JTabbedPane authors = new JTabbedPane(JTabbedPane.BOTTOM);
+		authors.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		for (Author a : entity.getAuthors()) {
+			ImagePanel p = new ImagePanel(a.getPictureFile().getImageFile());
+			authors.addTab(a.getLastName(), p);
+		}
+		this.add(authors);
 	}
 }

@@ -88,7 +88,8 @@ public class Picture extends BaseTable implements Serializable {
 			FileNotFoundException {
 		this.saveHash(url);
 		URLConnection urlConn = url.openConnection();
-		urlConn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		urlConn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		urlConn.connect();
 
 		// saving file
@@ -108,12 +109,17 @@ public class Picture extends BaseTable implements Serializable {
 		this.imageFilePath = output.getAbsolutePath();
 	}
 
-	private void saveHash(URL imageUrl) throws IOException, FileNotFoundException {
+	private void saveHash(URL imageUrl) throws IOException {
 		URLConnection conn = imageUrl.openConnection();
 		conn.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		conn.connect();
-		this.titles[0] = Hasher.hashStream(conn.getInputStream());
+		try {
+			this.titles[0] = Hasher.hashStream(conn.getInputStream());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public String getImagePath() {
@@ -184,7 +190,7 @@ public class Picture extends BaseTable implements Serializable {
 	@Override
 	public Object[] toColumnIdentifiers() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add("Picture");
@@ -196,7 +202,7 @@ public class Picture extends BaseTable implements Serializable {
 	@Override
 	public Object[] toRowData() {
 		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
+		for (Object d : super.toColumnIdentifiers()) {
 			data.add(d);
 		}
 		data.add(new ImageIcon(this.imageFilePath));

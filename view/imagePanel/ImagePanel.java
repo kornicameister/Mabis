@@ -41,14 +41,13 @@ public class ImagePanel extends JPanel implements Accessible {
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
 
 		this.contentLabel = new JLabel();
-		// this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		this.contentLabel.setLayout(new GridLayout());
 		this.contentLabel.setIcon(new ImageIcon(f.getAbsolutePath()));
 		this.add(contentLabel);
 	}
 
-	protected ImagePanel() {
+	public ImagePanel() {
 		super(true);
 		this.addFocusListener(new ImagePanelFocusListener(this));
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
