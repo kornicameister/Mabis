@@ -74,7 +74,7 @@ public class AudioAlbumCreator extends ItemCreator {
 
 		gl.setHorizontalGroup(gl
 				.createSequentialGroup()
-				.addComponent(this.coverPanel, 220, 220, 220)
+				.addComponent(this.coverPanel, 250, 250, 250)
 				.addGroup(
 						gl.createParallelGroup()
 								.addGroup(
@@ -87,7 +87,7 @@ public class AudioAlbumCreator extends ItemCreator {
 								.addComponent(this.tagCloud)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
-				.addComponent(this.coverPanel, 200, 200, 200)
+				.addComponent(this.coverPanel, 250, 250, 250)
 				.addGroup(
 						gl.createSequentialGroup()
 								.addGroup(
@@ -101,7 +101,13 @@ public class AudioAlbumCreator extends ItemCreator {
 								.addComponent(this.scrollTrackList, 100, 100,
 										100)
 								.addComponent(this.tagCloud, 100, 100, 100)));
-
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+						.toString()));
+			}
+		});
 		this.revalidate();
 		this.pack();
 	}
@@ -115,7 +121,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.trackList = new JTextArea();
 		this.scrollTrackList = new JScrollPane(this.trackList);
 		this.scrollTrackList.setBorder(BorderFactory
-				.createTitledBorder("AudioAlbumTrack list"));
+				.createTitledBorder("Tracklist"));
 		this.tagCloud = new ItemTagCloudPanel();
 		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
 		try {
@@ -154,9 +160,7 @@ public class AudioAlbumCreator extends ItemCreator {
 				"hh:mm"));
 		this.durationField.setBorder(BorderFactory
 				.createTitledBorder("Duration"));
-		this.coverPanel = new ImagePanel(new File(
-				GlobalPaths.DEFAULT_COVER_PATH.toString()));
-		this.coverPanel.setBorder(BorderFactory.createTitledBorder("Cover"));
+		this.coverPanel = new ImagePanel();
 		String arrayOfCriteria[] = { "by album" };
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
@@ -175,7 +179,7 @@ public class AudioAlbumCreator extends ItemCreator {
 	protected Boolean createItem() {
 		this.selectedAlbum.setTitle(this.titleField.getText());
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
-//		this.selectedAlbum.setTrackList(this.trackList.getText());
+		// this.selectedAlbum.setTrackList(this.trackList.getText());
 		for (Genre g : this.tagCloud.tags) {
 			this.selectedAlbum.addGenre(g);
 		}
@@ -220,7 +224,7 @@ public class AudioAlbumCreator extends ItemCreator {
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-//		AudioAlbum a = (AudioAlbum) table;
+		// AudioAlbum a = (AudioAlbum) table;
 	}
 
 	/**

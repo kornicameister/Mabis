@@ -1,6 +1,7 @@
 package view.items.itemsprieview;
 
 import java.awt.GridLayout;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -13,6 +14,7 @@ import model.entity.AudioAlbum;
 import model.entity.Author;
 import model.entity.Book;
 import model.entity.Movie;
+import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 
 /**
@@ -34,11 +36,10 @@ public class PreviewChunk extends JPanel {
 	 * 
 	 * @param entity
 	 */
-	public PreviewChunk(Movie entity) {
+	public PreviewChunk(final Movie entity) {
 		super(true);
 		this.previedItem = entity;
-		// tworzymy panel ze zdjęciem
-		ImagePanel panel = new ImagePanel(entity.getCover().getImageFile());
+		final ImagePanel panel = new ImagePanel();
 
 		JEditorPane description = null;
 		try {
@@ -55,6 +56,18 @@ public class PreviewChunk extends JPanel {
 		}
 		this.setLayout(new GridLayout(1, 3));
 		this.add(panel);
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (entity.getCover() == null) {
+					panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+							.toString()));
+				} else {
+					panel.setImage(entity.getCover().getImageFile());
+				}
+			}
+		});
+
 		if (description != null) {
 			JScrollPane pane = new JScrollPane(description);
 			this.add(pane);

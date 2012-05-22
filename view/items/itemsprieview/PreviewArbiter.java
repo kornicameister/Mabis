@@ -20,7 +20,6 @@ public class PreviewArbiter {
 			return new PreviewChunk((Movie) tmp);
 		} else {
 			throw new Exception("Invalid table type provided");
-			// TODO add custom exception
 		}
 	}
 

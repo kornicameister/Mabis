@@ -78,7 +78,7 @@ public class BookCreator extends ItemCreator {
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-								.addComponent(this.coverPanel)
+								.addComponent(this.coverPanel,250,250,250)
 								.addGroup(
 										gl.createParallelGroup()
 												.addComponent(this.titlesPanel)
@@ -90,7 +90,7 @@ public class BookCreator extends ItemCreator {
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.coverPanel,
-										GroupLayout.DEFAULT_SIZE, 200, 220)
+										250, 250, 250)
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(
@@ -102,7 +102,13 @@ public class BookCreator extends ItemCreator {
 														GroupLayout.DEFAULT_SIZE,
 														100, 120)))
 				.addComponent(descriptionScrollPane, 140, 140, 140));
-
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+						.toString()));
+			}
+		});
 		this.revalidate();
 		this.pack();
 	}
@@ -162,12 +168,7 @@ public class BookCreator extends ItemCreator {
 					}
 				});
 
-		this.coverPanel = new ImagePanel(new File(
-				GlobalPaths.DEFAULT_COVER_PATH.toString()));
-		this.coverPanel
-				.setBorder(BorderFactory.createTitledBorder(
-						BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-						"Cover"));
+		this.coverPanel = new ImagePanel();
 
 		this.descriptionArea = new JTextArea();
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);

@@ -1,7 +1,7 @@
 package view.imagePanel;
 
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -35,7 +35,7 @@ public class ImagePanel extends JPanel implements Accessible {
 
 		this.contentLabel = new JLabel();
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		this.contentLabel.setLayout(new GridLayout());
+		this.contentLabel.setLayout(new FlowLayout());
 		this.contentLabel.setIcon(new ImageIcon(f.getAbsolutePath()));
 		this.add(contentLabel);
 	}
@@ -45,9 +45,8 @@ public class ImagePanel extends JPanel implements Accessible {
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
 
 		this.contentLabel = new JLabel();
-		// this.contentLabel.setBorder(BorderFactory.createTitledBorder("LOL"));
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		this.contentLabel.setLayout(new GridLayout());
+		this.contentLabel.setLayout(new FlowLayout());
 		this.add(contentLabel);
 	}
 

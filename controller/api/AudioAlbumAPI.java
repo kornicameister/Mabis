@@ -93,39 +93,15 @@ public class AudioAlbumAPI extends ApiAccess {
 
 		AudioAlbum aa;
 		JSONObject albumObject;
-		boolean error = false;
 		for (int i = 0; i < albumMatches.length(); i++) {
 			aa = new AudioAlbum();
 			albumObject = albumMatches.getJSONObject(i);
-			if(albumObject.getString("name") != null && !albumObject.getString("name").isEmpty()){
-				aa.setTitle(albumObject.getString("name"));
-			}else{
-				error = true;
-			}
-			if(!this.parseTrackList(albumObject.getString("mbid")).isEmpty()){
-				aa.setTrackList(this.parseTrackList(albumObject.getString("mbid")));
-			}else{
-				error = true;
-			}
-			if(!this.parseTags(albumObject.getString("mbid")).isEmpty()){
-				aa.setGenres(this.parseTags(albumObject.getString("mbid")));
-			}else{
-				error = true;
-			}
-			if(this.parseBand(albumObject.getString("artist")) != null && !this.parseBand(albumObject.getString("artist")).getName().isEmpty()){
-				aa.setBand(this.parseBand(albumObject.getString("artist")));
-			}else{
-				error = true;
-			}
-			if(this.parseImage(albumObject.getJSONArray("image")) != null){
-				aa.setCover(this.parseImage(albumObject.getJSONArray("image")));
-			}else{
-				error = true;
-			}
-			if(!error){
-				this.result.add(aa);
-				error = false;
-			}
+			aa.setTitle(albumObject.getString("name"));
+			aa.setTrackList(this.parseTrackList(albumObject.getString("mbid")));
+			aa.setGenres(this.parseTags(albumObject.getString("mbid")));
+			aa.setBand(this.parseBand(albumObject.getString("artist")));
+			aa.setCover(this.parseImage(albumObject.getJSONArray("image")));
+			this.result.add(aa);
 		}
 	}
 
