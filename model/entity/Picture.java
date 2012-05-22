@@ -71,7 +71,7 @@ public class Picture extends BaseTable implements Serializable {
 
 	public Picture(URL url, ImageType t) throws IOException {
 		super();
-		saveImageFromGoogleUrl(url);
+		saveImageFromURL(url);
 		this.type = t;
 	}
 
@@ -84,7 +84,7 @@ public class Picture extends BaseTable implements Serializable {
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
-	private void saveImageFromGoogleUrl(URL url) throws IOException,
+	private void saveImageFromURL(URL url) throws IOException,
 			FileNotFoundException {
 		this.saveHash(url);
 		URLConnection urlConn = url.openConnection();

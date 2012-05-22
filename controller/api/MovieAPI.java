@@ -1,8 +1,6 @@
 package controller.api;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 /**
@@ -12,16 +10,8 @@ import java.util.TreeMap;
  */
 public class MovieAPI extends ApiAccess {
 
-	/**
-	 * 
-	 */
 	public MovieAPI() {
-	}
-
-	@Override
-	protected ArrayList<URL> setApiAccessPointList() {
-		// TODO Auto-generated method stub
-		return null;
+		super();
 	}
 
 	@Override

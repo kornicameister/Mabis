@@ -177,7 +177,6 @@ public abstract class ItemCreator extends JFrame {
 
 			this.setLayout(new GridLayout(1, 3));
 			this.add(this.searchQuery);
-			this.add(this.criteria);
 			this.add(this.searchButton);
 
 			this.searchButton.addActionListener(new ActionListener() {
@@ -193,6 +192,7 @@ public abstract class ItemCreator extends JFrame {
 		public void setSearchCriteria(String[] arr) {
 			this.criteria = new JComboBox<String>(arr);
 			this.criteria.setSelectedIndex(0);
+			this.add(this.criteria, 1);
 		}
 	}
 

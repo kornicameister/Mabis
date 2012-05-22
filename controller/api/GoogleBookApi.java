@@ -2,15 +2,12 @@ package controller.api;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
-import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
@@ -30,30 +27,14 @@ import com.google.api.services.books.model.Volume.VolumeInfo.IndustryIdentifiers
 import com.google.api.services.books.model.Volumes;
 
 public class GoogleBookApi extends ApiAccess {
-	private final TreeSet<BaseTable> result;
 	private static final String API_ACCESS_KEY = "AIzaSyDZ7cVkpBjtmHtjKAhsvXOlWfetZQi4Ubo";
 
 	public GoogleBookApi() {
 		super();
-		this.result = new TreeSet<BaseTable>();
 	}
 
 	@Override
-	protected ArrayList<URL> setApiAccessPointList()
-			throws MalformedURLException {
-		return null;
-	}
-
-	/**
-	 * @return the result
-	 */
-	public TreeSet<BaseTable> getResult() {
-		return result;
-	}
-
-	@Override
-	public void query(TreeMap<String, String> query)
-			throws IOException {
+	public void query(TreeMap<String, String> query) throws IOException {
 		final Books books = Books
 				.builder(new NetHttpTransport(), new JacksonFactory())
 				.setApplicationName("Mabis")

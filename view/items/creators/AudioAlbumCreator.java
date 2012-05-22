@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,9 +33,11 @@ import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
 import view.items.ItemCreator;
+import view.items.itemsprieview.ItemsPreview;
 import view.items.minipanels.BandMiniPanel;
 import view.items.minipanels.GenreMiniPanel;
 import controller.SQLStamentType;
+import controller.api.AudioAlbumAPI;
 import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.BandSQLFactory;
 import controller.entity.GenreSQLFactory;
@@ -189,12 +192,36 @@ public class AudioAlbumCreator extends ItemCreator {
 
 	@Override
 	protected void fetchFromAPI(String query, String criteria) {
+		if (this.collectedItems != null) {
+			this.collectedItems.clear();
+		}
+		AudioAlbumAPI aaa = new AudioAlbumAPI();
+		try {
+			TreeMap<String, String> params = new TreeMap<String, String>();
+			params.put("album", query);
+			aaa.query(params);
+			collectedItems = aaa.getResult();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// init panel with obtained collection items so as to allow
+		// user to choose one selected
+		ItemsPreview ip = new ItemsPreview("Collected audio albums",
+				this.collectedItems);
+		ip.addPropertyChangeListener("selectedItem",
+				new PropertyChangeListener() {
 
+					@Override
+					public void propertyChange(PropertyChangeEvent e) {
+						fillWithResult((BaseTable) e.getNewValue());
+					}
+				});
+		ip.setVisible(true);
 	}
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-
+//		AudioAlbum a = (AudioAlbum) table;
 	}
 
 	/**

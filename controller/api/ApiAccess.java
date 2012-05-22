@@ -1,12 +1,21 @@
 package controller.api;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.TreeSet;
+
+import model.BaseTable;
 
 public abstract class ApiAccess {
-	protected ArrayList<URL> accessPoints;
+	protected TreeSet<BaseTable> result;
+
+	public ApiAccess() {
+		this.result = new TreeSet<BaseTable>();
+	}
+
+	public TreeSet<BaseTable> getResult() {
+		return result;
+	}
 
 	/**
 	 * Metoda abstrakcyjna. Powinna określać, definiować szereg czynności
