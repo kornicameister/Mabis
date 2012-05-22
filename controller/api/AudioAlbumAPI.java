@@ -13,12 +13,8 @@ import java.util.TreeMap;
  *
  */
 public class AudioAlbumAPI extends ApiAccess {
-
-	@Override
-	protected ArrayList<URL> setApiAccessPointList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private final static String API_KEY = "&api_key=9dcb20fc9c4a1bcfa67e6e85f7c59f1e";
+	private final static String QUERY_URL = "http://ws.audioscrobbler.com/2.0/?";
 
 	@Override
 	public void query(TreeMap<String, String> params)

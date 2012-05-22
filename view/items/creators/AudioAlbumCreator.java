@@ -155,11 +155,18 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.coverPanel = new ImagePanel(new File(
 				GlobalPaths.DEFAULT_COVER_PATH.toString()));
 		this.coverPanel.setBorder(BorderFactory.createTitledBorder("Cover"));
+		String arrayOfCriteria[] = { "by album" };
+		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
 
 	@Override
 	protected void clearContentFields() {
-
+		this.titleField.setText("");
+		this.trackList.setText("");
+		this.tagCloud.clear();
+		this.durationField.setText("");
+		this.bandMiniPanel.clear();
+		this.selectedAlbum = new AudioAlbum();
 	}
 
 	@Override

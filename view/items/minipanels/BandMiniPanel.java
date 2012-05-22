@@ -64,4 +64,8 @@ public class BandMiniPanel extends AuthorMiniPanel {
 	public JComboBox<String> getBandsBox() {
 		return this.getAuthorsBox();
 	}
+
+	public void clear() {
+		((JTextField)authorsBox).setText("");
+	}
 }
