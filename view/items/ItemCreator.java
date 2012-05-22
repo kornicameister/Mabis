@@ -40,8 +40,7 @@ public abstract class ItemCreator extends JFrame {
 	private ICButtonPanel buttonPanel;
 	private ICActionListener listener;
 	protected TreeSet<BaseTable> collectedItems;
-
-	private ICSearchPanel searchPanel;
+	protected ICSearchPanel searchPanel;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -167,18 +166,14 @@ public abstract class ItemCreator extends JFrame {
 		}
 	}
 
-	private class ICSearchPanel extends JPanel {
+	public class ICSearchPanel extends JPanel {
 		private static final long serialVersionUID = 806539065413054227L;
 		private JTextField searchQuery = new JTextField();
 		private JComboBox<String> criteria;
 		private JButton searchButton = new JButton("Search");
-		private String arrayOfCriteria[] = { "by author", "by title" };
 
 		public ICSearchPanel() {
 			super(true);
-
-			this.criteria = new JComboBox<String>(this.arrayOfCriteria);
-			this.criteria.setSelectedIndex(0);
 
 			this.setLayout(new GridLayout(1, 3));
 			this.add(this.searchQuery);
@@ -193,6 +188,11 @@ public abstract class ItemCreator extends JFrame {
 							(String) criteria.getSelectedItem());
 				}
 			});
+		}
+
+		public void setSearchCriteria(String[] arr) {
+			this.criteria = new JComboBox<String>(arr);
+			this.criteria.setSelectedIndex(0);
 		}
 	}
 

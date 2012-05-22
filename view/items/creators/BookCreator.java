@@ -174,6 +174,8 @@ public class BookCreator extends ItemCreator {
 		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 				"Descripion"));
+		String arrayOfCriteria[] = { "by author", "by title" };
+		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
 
 	@Override
