@@ -14,7 +14,11 @@ public class AudioAlbumTrack implements Serializable,
 	public AudioAlbumTrack(Short id, String name, String dur) {
 		this.id = id;
 		this.name = name;
-		this.duration = Long.valueOf(dur);
+		if(dur.isEmpty()){
+			this.duration = 0l;
+		}else{
+			this.duration = Long.valueOf(dur);
+		}
 		this.lastFMUrl = null;
 	}
 
@@ -68,6 +72,6 @@ public class AudioAlbumTrack implements Serializable,
 	@Override
 	public String toString() {
 		return this.id.toString() + ". " + this.name + "\t("
-				+ this.duration.toString() + ")";
+				+ this.getDuration() + ")";
 	}
 }
