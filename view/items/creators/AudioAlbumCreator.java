@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -116,7 +115,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.trackList = new JTextArea();
 		this.scrollTrackList = new JScrollPane(this.trackList);
 		this.scrollTrackList.setBorder(BorderFactory
-				.createTitledBorder("Track list"));
+				.createTitledBorder("AudioAlbumTrack list"));
 		this.tagCloud = new ItemTagCloudPanel();
 		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
 		try {
@@ -175,8 +174,8 @@ public class AudioAlbumCreator extends ItemCreator {
 	@Override
 	protected Boolean createItem() {
 		this.selectedAlbum.setTitle(this.titleField.getText());
-		this.selectedAlbum.setDuration((Date) this.durationField.getValue());
-		this.selectedAlbum.setTrackList(this.trackList.getText());
+		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
+//		this.selectedAlbum.setTrackList(this.trackList.getText());
 		for (Genre g : this.tagCloud.tags) {
 			this.selectedAlbum.addGenre(g);
 		}

@@ -13,9 +13,11 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import model.BaseTable;
 import model.enums.TableType;
+import model.utilities.AudioAlbumTrack;
 import model.utilities.ForeignKey;
 import settings.GlobalPaths;
 
@@ -29,6 +31,7 @@ import settings.GlobalPaths;
  */
 public class AudioAlbum extends Movie implements Serializable {
 	private static final long serialVersionUID = -6884151728501220580L;
+	private TreeSet<AudioAlbumTrack> trackList;
 
 	/**
 	 * Construct audioAlbum with following title and tracklist
@@ -39,7 +42,6 @@ public class AudioAlbum extends Movie implements Serializable {
 	public AudioAlbum(String title, String trackList) {
 		super();
 		this.titles[0] = title;
-		this.titles[1] = trackList;
 	}
 
 	/**
@@ -73,18 +75,32 @@ public class AudioAlbum extends Movie implements Serializable {
 	protected void initInternalFields() {
 		super.initInternalFields();
 		this.tableType = TableType.AUDIO_ALBUM;
+		this.trackList = new TreeSet<>();
 	}
 
-	public String getTrackList() {
-		return this.getSubtitle();
+	public TreeSet<AudioAlbumTrack> getTrackList() {
+		return this.trackList;
 	}
 
-	public void setTrackList(String trackList) {
-		this.setSubTitle(trackList);
+	public void setTrackList(TreeSet<AudioAlbumTrack> trackList) {
+		this.trackList = trackList;
+		this.duration = 0l;
+		Long ms = new Long(0l);
+		for (AudioAlbumTrack t : this.trackList) {
+			ms += t.getLongDuration();
+		}
+		this.duration = ms;
+	}
+
+	public void addTrack(AudioAlbumTrack t) {
+		this.trackList.add(t);
+		Long ms = this.duration;
+		ms += t.getLongDuration();
+		this.duration = ms;
 	}
 
 	public Band getBand() {
-		if(this.directors.isEmpty()){
+		if (this.directors.isEmpty()) {
 			return null;
 		}
 		return (Band) this.directors.first();
@@ -130,7 +146,14 @@ public class AudioAlbum extends Movie implements Serializable {
 			str += "<b><i>Subtitle:</i></b>" + this.getSubtitle() + "</p>";
 		}
 		str += "<p><b>Lenght:</b>" + this.getDuration() + "</p>";
-		str += "<p><b>Tracklist:</b>" + this.getTrackList() + "</p>";
+		if (this.getTrackList() != null && !this.getTrackList().isEmpty()) {
+			str += "<b>Tracklist:</b>";
+			str += "<ul>";
+			for (AudioAlbumTrack t : this.getTrackList()) {
+				str += "<li>" + t.toString() + "</li>";
+			}
+			str += "</ul>";
+		}
 		if (this.getGenres() != null && !this.getGenres().isEmpty()) {
 			str += "<b>Genres:</b>";
 			str += "<ul>";

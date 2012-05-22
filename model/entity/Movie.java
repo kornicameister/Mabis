@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
 import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
@@ -32,7 +32,7 @@ public class Movie extends BaseTable implements Serializable {
 	protected Picture cover;
 	protected TreeSet<Author> directors;
 	protected TreeSet<Genre> genres;
-	private Date duration;
+	protected Long duration;
 	protected Double rating;
 
 	/**
@@ -72,18 +72,32 @@ public class Movie extends BaseTable implements Serializable {
 
 	@Override
 	protected void initInternalFields() {
-		this.duration = new Date(0);
+		this.duration = new Long(0l);
 		this.tableType = TableType.MOVIE;
 		this.rating = new Double(0.0);
 		this.directors = new TreeSet<>();
 		this.genres = new TreeSet<>();
 	}
 
-	public Date getDuration() {
+	public Long getLongDuration() {
 		return duration;
 	}
 
-	public void setDuration(Date duration) {
+	public String getDuration() {
+		if (duration > 3600) {
+			// we have full hour
+			int hours = (int) (this.duration / 3600);
+			int minutes = (int) (this.duration - (hours * 3600));
+			int leftSeconds = (int) (this.duration - (minutes * 60));
+			return hours + ":" + minutes + ":" + leftSeconds;
+		}
+		// less than hour
+		int minutes = (int) (this.duration / 60);
+		int leftSeconds = (int) (this.duration - (minutes * 60));
+		return minutes + ":" + leftSeconds;
+	}
+
+	public void setDuration(Long duration) {
 		this.duration = duration;
 	}
 
@@ -121,6 +135,10 @@ public class Movie extends BaseTable implements Serializable {
 
 	public TreeSet<Genre> getGenres() {
 		return this.genres;
+	}
+
+	public void setGenres(Collection<Genre> g) {
+		this.genres.addAll(g);
 	}
 
 	public void setRating(Double averageRating) {

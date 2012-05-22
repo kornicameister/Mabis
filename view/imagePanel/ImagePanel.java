@@ -3,21 +3,15 @@ package view.imagePanel;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
 
 import javax.accessibility.Accessible;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import logger.MabisLogger;
 
 /**
  * Class is to conveniently place an image inside of JPanel By Extending JPanel
@@ -37,7 +31,6 @@ public class ImagePanel extends JPanel implements Accessible {
 	public ImagePanel(File f) {
 		super(true);
 		this.imageFile = f;
-		this.addFocusListener(new ImagePanelFocusListener(this));
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
 
 		this.contentLabel = new JLabel();
@@ -49,7 +42,6 @@ public class ImagePanel extends JPanel implements Accessible {
 
 	public ImagePanel() {
 		super(true);
-		this.addFocusListener(new ImagePanelFocusListener(this));
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
 
 		this.contentLabel = new JLabel();
@@ -92,43 +84,6 @@ public class ImagePanel extends JPanel implements Accessible {
 	public String toString() {
 		return "ImagePanel [(" + this.getWidth() + "," + this.getHeight()
 				+ ");(" + this.imageFile.getPath() + ")]";
-	}
-
-	class ImagePanelFocusListener implements FocusListener {
-		private ImagePanel ref;
-
-		public ImagePanelFocusListener(ImagePanel ref) {
-			this.ref = ref;
-		}
-
-		@Override
-		public void focusGained(FocusEvent e) {
-			String path = null;
-			try {
-				path = ((ImagePanel) e.getComponent()).getImageFile()
-						.getCanonicalPath();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			ref.firePropertyChange("focusable", false, true);
-			MabisLogger.getLogger().log(Level.INFO,
-					"{0} gained focus, tooltip visible", path);
-			repaint();
-		}
-
-		@Override
-		public void focusLost(FocusEvent e) {
-			String path = null;
-			try {
-				path = ((ImagePanel) e.getComponent()).getImageFile()
-						.getCanonicalPath();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			ref.firePropertyChange("focusable", true, false);
-			MabisLogger.getLogger().log(Level.INFO, "{0} lost focus", path);
-			repaint();
-		}
 	}
 
 	public class ImagePanelMouseMotionListener extends MouseAdapter implements

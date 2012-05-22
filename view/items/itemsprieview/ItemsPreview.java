@@ -15,7 +15,6 @@ import javax.swing.JTabbedPane;
 
 import logger.MabisLogger;
 import model.BaseTable;
-import model.entity.Book;
 
 /**
  * Klasa jest okienkiem w którym umieszczane są elementy kolekcji. Służy jako
@@ -72,7 +71,7 @@ public class ItemsPreview extends JFrame implements ActionListener {
 				p = PreviewArbiter.determineTyp(bs);
 				p.setBorder(BorderFactory.createTitledBorder(
 						BorderFactory.createEtchedBorder(), bs.getTitle()));
-				this.tabbedPanel.addTab(((Book) bs).getTitle().substring(0,10), p);
+				this.tabbedPanel.addTab(bs.getTitle().substring(0, 10), p);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
