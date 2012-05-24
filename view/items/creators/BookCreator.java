@@ -244,12 +244,10 @@ public class BookCreator extends ItemCreator {
 								String propertyName = evt.getPropertyName();
 								if (propertyName.equals("taskStarted")) {
 									taskSize = (Integer) evt.getNewValue();
-									System.out.println("Task size = " + taskSize);
 									step = (searchBar.getMaximum() - searchBar.getMinimum()) / taskSize;
 									value = searchBar.getMinimum() + step;
 								} else if (propertyName.equals("taskStep")) {
 									value = step*(int)evt.getNewValue();
-									System.out.println("New value:" + value);
 									setProgress(value);
 								}
 							}
@@ -265,8 +263,7 @@ public class BookCreator extends ItemCreator {
 						gba.query(params);
 					setProgress(searchBar.getMaximum());
 
-					ItemsPreview ip = new ItemsPreview("Collected books",
-							gba.getResult());
+					ItemsPreview ip = new ItemsPreview("Collected books", gba.getResult());
 					ip.addPropertyChangeListener("selectedItem",
 							new PropertyChangeListener() {
 								@Override
