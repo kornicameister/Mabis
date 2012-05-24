@@ -37,11 +37,12 @@ public class AudioAlbum extends Movie implements Serializable {
 	 * Construct audioAlbum with following title and tracklist
 	 * 
 	 * @param title
-	 * @param trackList
+	 * @param treeSet
 	 */
-	public AudioAlbum(String title, String trackList) {
+	public AudioAlbum(String title, TreeSet<AudioAlbumTrack> set) {
 		super();
 		this.titles[0] = title;
+		this.trackList = set;
 	}
 
 	/**
@@ -162,9 +163,6 @@ public class AudioAlbum extends Movie implements Serializable {
 			}
 			str += "</ul>";
 		}
-		str += "<p><b>Description:</b></p>";
-		str += "<span style='margin-left:20px'>" + this.getDescription()
-				+ "</span>";
 		str += "</html>";
 
 		DataOutputStream dos = null;

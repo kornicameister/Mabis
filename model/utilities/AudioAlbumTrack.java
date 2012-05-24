@@ -10,6 +10,7 @@ public class AudioAlbumTrack implements Serializable,
 	private Short id;
 	private String name;
 	private URL lastFMUrl;
+	private Double rating;
 
 	public AudioAlbumTrack(Short id, String name, String dur) {
 		this.id = id;
@@ -20,6 +21,7 @@ public class AudioAlbumTrack implements Serializable,
 			this.duration = Long.valueOf(dur);
 		}
 		this.lastFMUrl = null;
+		this.rating = 0.0;
 	}
 
 	public String getDuration() {
@@ -73,5 +75,13 @@ public class AudioAlbumTrack implements Serializable,
 	public String toString() {
 		return this.id.toString() + ". " + this.name + "\t("
 				+ this.getDuration() + ")";
+	}
+
+	public Double getRating() {
+		return rating;
+	}
+
+	public void setRating(Double rating) {
+		this.rating = rating;
 	}
 }

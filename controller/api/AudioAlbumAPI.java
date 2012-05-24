@@ -12,7 +12,9 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
+import logger.MabisLogger;
 import model.entity.AudioAlbum;
 import model.entity.Band;
 import model.entity.Genre;
@@ -91,17 +93,23 @@ public class AudioAlbumAPI extends ApiAccess {
 		JSONArray albumMatches = startObject.getJSONObject("results")
 				.getJSONObject("albummatches").getJSONArray("album");
 
-		AudioAlbum aa;
+		AudioAlbum aa = null;
 		JSONObject albumObject;
 		for (int i = 0; i < albumMatches.length(); i++) {
-			aa = new AudioAlbum();
 			albumObject = albumMatches.getJSONObject(i);
-			aa.setTitle(albumObject.getString("name"));
-			aa.setTrackList(this.parseTrackList(albumObject.getString("mbid")));
-			aa.setGenres(this.parseTags(albumObject.getString("mbid")));
-			aa.setBand(this.parseBand(albumObject.getString("artist")));
-			aa.setCover(this.parseImage(albumObject.getJSONArray("image")));
-			this.result.add(aa);
+			try {
+				aa = new AudioAlbum(albumObject.getString("name"),
+						this.parseTrackList(albumObject.getString("mbid")));
+				aa.setGenres(this.parseTags(albumObject.getString("mbid")));
+				aa.setBand(this.parseBand(albumObject.getString("artist")));
+				aa.setCover(this.parseImage(albumObject.getJSONArray("image")));
+				this.result.add(aa);
+			} catch (JSONException pp) {
+				Object params[] = { aa.getTitle(), pp.getMessage() };
+				MabisLogger.getLogger().log(Level.WARNING,
+						"During processing of {0}, exception was caught - {1}",
+						params);
+			}
 		}
 	}
 
@@ -112,27 +120,16 @@ public class AudioAlbumAPI extends ApiAccess {
 		try {
 			JSONObject startObject = new JSONObject(accessAPI(params)
 					.toString());
-			if (startObject.has("error")) {
+			if (startObject.has("error") || !startObject.has("toptags")) {
 				return tags;
 			}
 			if (!startObject.getJSONObject("toptags").has("tag")) {
 				return tags;
 			}
-			JSONArray tracks = null;
-			try {
-				tracks = startObject.getJSONObject("toptags").getJSONArray(
-						"tag");
-			} catch (JSONException ee) {
-				JSONObject tracksObject = startObject.getJSONObject("toptags")
-						.getJSONObject("tag");
-				tags.add(new Genre(tracksObject.getString("name")));
-			} finally {
-				if (tracks != null) {
-					for (int i = 0; i < tracks.length() / 8; i++) {
-						tags.add(new Genre(tracks.getJSONObject(i).getString(
-								"name")));
-					}
-				}
+			JSONArray tracks = startObject.getJSONObject("toptags")
+					.getJSONArray("tag");
+			for (int i = 0; i < 5; i++) {
+				tags.add(new Genre(tracks.getJSONObject(i).getString("name")));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -148,31 +145,22 @@ public class AudioAlbumAPI extends ApiAccess {
 		try {
 			JSONObject startObject = new JSONObject(accessAPI(params)
 					.toString());
-			if (startObject.has("error")) {
+			if (startObject.has("error") || !startObject.has("album")) {
 				return trackList;
 			}
-			JSONArray tracks = null;
-			JSONObject track;
-			try {
-				tracks = startObject.getJSONObject("album")
-						.getJSONObject("tracks").getJSONArray("track");
-			} catch (JSONException ee) {
-				track = startObject.getJSONObject("album")
-						.getJSONObject("tracks").getJSONObject("track");
+			if (!startObject.getJSONObject("album").has("tracks")
+					|| startObject.getJSONObject("album")
+							.getJSONObject("tracks").has("album")) {
+				return trackList;
+			}
+			JSONArray tracks = startObject.getJSONObject("album")
+					.getJSONObject("tracks").getJSONArray("track");
+			JSONObject track = null;
+			for (int i = 0; i < tracks.length(); i++) {
+				track = tracks.getJSONObject(i);
 				trackList.add(new AudioAlbumTrack((short) track.getJSONObject(
 						"@attr").getInt("rank"), track.getString("name"), track
 						.getString("duration")));
-			} finally {
-				if (tracks != null) {
-					for (int i = 0; i < tracks.length(); i++) {
-						track = tracks.getJSONObject(i);
-						trackList
-								.add(new AudioAlbumTrack((short) track
-										.getJSONObject("@attr").getInt("rank"),
-										track.getString("name"), track
-												.getString("duration")));
-					}
-				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -187,29 +175,15 @@ public class AudioAlbumAPI extends ApiAccess {
 		try {
 			JSONObject startObject = new JSONObject(accessAPI(params)
 					.toString());
-			JSONArray artistMatches = null;
+			JSONArray artistMatches = startObject.getJSONObject("results")
+					.getJSONObject("artistmatches").getJSONArray("artist");
 			JSONObject artistObject = null;
-			try {
-				artistMatches = startObject.getJSONObject("results")
-						.getJSONObject("artistmatches").getJSONArray("artist");
-			} catch (JSONException ee) {
-				artistObject = startObject.getJSONObject("results")
-						.getJSONObject("artistmatches").getJSONObject("artist");
+			for (int i = 0; i < artistMatches.length(); i++) {
+				artistObject = artistMatches.getJSONObject(i);
 				if (artistObject.getString("name").equals(band)) {
 					b.setPicture(this.parseImage(artistObject
 							.getJSONArray("image")));
 					return b;
-				}
-			} finally {
-				if (artistMatches != null) {
-					for (int i = 0; i < artistMatches.length(); i++) {
-						artistObject = artistMatches.getJSONObject(i);
-						if (artistObject.getString("name").equals(band)) {
-							b.setPicture(this.parseImage(artistObject
-									.getJSONArray("image")));
-							return b;
-						}
-					}
 				}
 			}
 		} catch (IOException e) {

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import model.BaseTable;
+import model.enums.GenreType;
 import model.enums.TableType;
 
 /**
@@ -19,6 +20,7 @@ import model.enums.TableType;
  */
 public class Genre extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 3862214016426775417L;
+	private GenreType gType;
 
 	/**
 	 * Construct new Genre with default empty constructor
@@ -106,5 +108,13 @@ public class Genre extends BaseTable implements Serializable {
 			result = this.getGenre().compareTo(((Genre)o).getGenre());
 		}
 		return result;
+	}
+
+	public GenreType getgType() {
+		return gType;
+	}
+
+	public void setgType(GenreType gType) {
+		this.gType = gType;
 	}
 }
