@@ -70,7 +70,7 @@ public class ItemsPreview extends JFrame implements ActionListener {
 			try {
 				p = PreviewArbiter.determineTyp(bs);
 				p.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), bs.getTitle()));
-				this.tabbedPanel.addTab(bs.getTitle().substring(0, 10), p);
+				this.tabbedPanel.addTab(bs.getTitle(), p);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

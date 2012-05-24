@@ -21,7 +21,6 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import model.BaseTable;
@@ -35,6 +34,7 @@ import view.items.ItemCreator;
 import view.items.itemsprieview.ItemsPreview;
 import view.items.minipanels.BandMiniPanel;
 import view.items.minipanels.GenreMiniPanel;
+import view.items.minipanels.TrackListPanel;
 import controller.SQLStamentType;
 import controller.api.AudioAlbumAPI;
 import controller.entity.AudioAlbumSQLFactory;
@@ -48,13 +48,13 @@ import controller.entity.GenreSQLFactory;
 public class AudioAlbumCreator extends ItemCreator {
 	private static final long serialVersionUID = 4214813665020457959L;
 	private JTextField titleField;
-	private JTextArea trackList;
 	private ItemTagCloudPanel tagCloud;
 	private BandMiniPanel bandMiniPanel;
 	private JFormattedTextField durationField;
 	private ImagePanel coverPanel;
-	private JScrollPane scrollTrackList;
+	private TrackListPanel trackList;
 	private AudioAlbum selectedAlbum = new AudioAlbum();
+	private JScrollPane trackListScroll;
 
 	public AudioAlbumCreator(String title)
 			throws CreatorContentNullPointerException {
@@ -83,7 +83,7 @@ public class AudioAlbumCreator extends ItemCreator {
 												.addComponent(
 														this.durationField))
 								.addComponent(this.bandMiniPanel)
-								.addComponent(this.scrollTrackList)
+								.addComponent(this.trackListScroll)
 								.addComponent(this.tagCloud)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
@@ -98,8 +98,7 @@ public class AudioAlbumCreator extends ItemCreator {
 														this.durationField, 35,
 														35, 35))
 								.addComponent(this.bandMiniPanel, 70, 70, 70)
-								.addComponent(this.scrollTrackList, 100, 100,
-										100)
+								.addComponent(this.trackListScroll, 100, 100, 100)
 								.addComponent(this.tagCloud, 100, 100, 100)));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -118,10 +117,8 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.contentPanel = new JPanel(true);
 		this.titleField = new JTextField();
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
-		this.trackList = new JTextArea();
-		this.scrollTrackList = new JScrollPane(this.trackList);
-		this.scrollTrackList.setBorder(BorderFactory
-				.createTitledBorder("Tracklist"));
+		this.trackList = new TrackListPanel();
+		this.trackListScroll = new JScrollPane(this.trackList);
 		this.tagCloud = new ItemTagCloudPanel();
 		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
 		try {
@@ -168,7 +165,7 @@ public class AudioAlbumCreator extends ItemCreator {
 	@Override
 	protected void clearContentFields() {
 		this.titleField.setText("");
-		this.trackList.setText("");
+		this.trackList.clear();
 		this.tagCloud.clear();
 		this.durationField.setText("");
 		this.bandMiniPanel.clear();
@@ -224,11 +221,12 @@ public class AudioAlbumCreator extends ItemCreator {
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-		 AudioAlbum a = (AudioAlbum) table;
-		 this.titleField.setText(a.getTitle());
-		 this.durationField.setText(a.getDuration());
-		 this.coverPanel.setImage(a.getCover().getImageFile());
-		 //add setting left field
+		AudioAlbum a = (AudioAlbum) table;
+		this.titleField.setText(a.getTitle());
+		this.durationField.setText(a.getDuration());
+		this.coverPanel.setImage(a.getCover().getImageFile());
+		this.trackList.setTracks(a.getTrackList());
+		// add setting left field
 	}
 
 	/**

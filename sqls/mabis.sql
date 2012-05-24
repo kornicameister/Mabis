@@ -29,6 +29,7 @@ create table if not exists mabis.user (
 create table if not exists mabis.genre (
     idGenre int(11) auto_increment,
     object longblob not null,
+    type int(11) not null,
     primary key (idGenre)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_polish_ci;
 

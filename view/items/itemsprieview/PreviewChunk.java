@@ -56,6 +56,7 @@ public class PreviewChunk extends JPanel {
 		}
 		this.setLayout(new GridLayout(1, 3));
 		this.add(panel);
+		
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
