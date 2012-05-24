@@ -224,7 +224,11 @@ public class AudioAlbumCreator extends ItemCreator {
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-		// AudioAlbum a = (AudioAlbum) table;
+		 AudioAlbum a = (AudioAlbum) table;
+		 this.titleField.setText(a.getTitle());
+		 this.durationField.setText(a.getDuration());
+		 this.coverPanel.setImage(a.getCover().getImageFile());
+		 //add setting left field
 	}
 
 	/**
