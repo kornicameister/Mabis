@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 
 import model.BaseTable;
 import model.entity.AudioAlbum;
@@ -98,7 +99,8 @@ public class AudioAlbumCreator extends ItemCreator {
 														this.durationField, 35,
 														35, 35))
 								.addComponent(this.bandMiniPanel, 70, 70, 70)
-								.addComponent(this.trackListScroll, 100, 100, 100)
+								.addComponent(this.trackListScroll, 100, 100,
+										100)
 								.addComponent(this.tagCloud, 100, 100, 100)));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -195,28 +197,75 @@ public class AudioAlbumCreator extends ItemCreator {
 		if (this.collectedItems != null) {
 			this.collectedItems.clear();
 		}
-		AudioAlbumAPI aaa = new AudioAlbumAPI();
-		try {
-			TreeMap<String, String> params = new TreeMap<String, String>();
-			params.put("album", query);
-			aaa.query(params);
-			collectedItems = aaa.getResult();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// init panel with obtained collection items so as to allow
-		// user to choose one selected
-		ItemsPreview ip = new ItemsPreview("Collected audio albums",
-				this.collectedItems);
-		ip.addPropertyChangeListener("selectedItem",
-				new PropertyChangeListener() {
+	
+		class LoadFromApi extends SwingWorker<Void, Void> {
+			private String query;
+			private Integer taskSize;
+			private int step, value;
 
-					@Override
-					public void propertyChange(PropertyChangeEvent e) {
-						fillWithResult((BaseTable) e.getNewValue());
-					}
-				});
-		ip.setVisible(true);
+			public void setQuery(String query) {
+				this.query = query;
+			}
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				AudioAlbumAPI aaa = new AudioAlbumAPI();
+				aaa.getPcs().addPropertyChangeListener(
+						new PropertyChangeListener() {
+
+							@Override
+							public void propertyChange(PropertyChangeEvent evt) {
+								String propertyName = evt.getPropertyName();
+								if(propertyName.equals("taskStarted")){
+									taskSize = (Integer) evt.getNewValue();
+									step = (searchBar.getMaximum() - searchBar.getMinimum())/taskSize;
+									value = searchBar.getMinimum() + step;
+									setProgress(value);
+								}else if(propertyName.equals("taskStep")){
+									value += step;
+									setProgress(value);
+								}
+							}
+						});
+
+				try {
+					setProgress(searchBar.getMinimum());
+					TreeMap<String, String> params = new TreeMap<String, String>();
+					params.put("album", query);
+					aaa.query(params);
+					setProgress(searchBar.getMaximum());
+					
+					ItemsPreview ip = new ItemsPreview("Collected audio albums",aaa.getResult());
+					ip.addPropertyChangeListener("selectedItem",
+							new PropertyChangeListener() {
+								@Override
+								public void propertyChange(PropertyChangeEvent e) {
+									fillWithResult((BaseTable) e.getNewValue());
+								}
+							});
+					ip.setVisible(true);
+					
+					return null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		}
+
+		LoadFromApi lfa = new LoadFromApi();
+		lfa.setQuery(query);
+		lfa.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("progress" == evt.getPropertyName()) {
+		            searchBar.setValue((Integer) evt.getNewValue());
+		        } 
+			}
+		});
+		
+		lfa.execute();
 	}
 
 	@Override

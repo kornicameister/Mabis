@@ -17,6 +17,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
@@ -41,6 +42,7 @@ public abstract class ItemCreator extends JFrame {
 	private ICActionListener listener;
 	protected TreeSet<BaseTable> collectedItems;
 	protected ICSearchPanel searchPanel;
+	protected JProgressBar searchBar;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -80,6 +82,7 @@ public abstract class ItemCreator extends JFrame {
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addComponent(this.searchPanel)
+				.addComponent(this.searchBar)
 				.addGroup(
 						gl.createSequentialGroup().addComponent(
 								this.contentPanel))
@@ -87,6 +90,7 @@ public abstract class ItemCreator extends JFrame {
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
 				.addComponent(this.searchPanel, 30, 30, 30)
+				.addComponent(this.searchBar,40,40,40)
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.contentPanel))
@@ -104,6 +108,10 @@ public abstract class ItemCreator extends JFrame {
 		this.listener = new ICActionListener();
 		this.buttonPanel = new ICButtonPanel();
 		this.searchPanel = new ICSearchPanel();
+		this.searchBar = new JProgressBar(JProgressBar.HORIZONTAL);
+		this.searchBar.setMinimum(0);
+		this.searchBar.setMaximum(100);
+		this.searchBar.setStringPainted(true);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package controller.api;
 
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -8,6 +9,7 @@ import model.BaseTable;
 
 public abstract class ApiAccess {
 	protected TreeSet<BaseTable> result;
+	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	public ApiAccess() {
 		this.result = new TreeSet<BaseTable>();
@@ -30,4 +32,8 @@ public abstract class ApiAccess {
 	 */
 	public abstract void query(TreeMap<String, String> query)
 			throws IOException;
+
+	public PropertyChangeSupport getPcs() {
+		return pcs;
+	}
 }

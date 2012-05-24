@@ -66,8 +66,7 @@ public class AudioAlbumAPI extends ApiAccess {
 		} else if (type.contains("artist")) {
 			downloadURL = new URL(ARTIST_SEARCH + line + API_KEY + JSON_ENABLED);
 		} else if (type.contains("tracks")) {
-			downloadURL = new URL(MBID_ALBUM_INFO + line + API_KEY
-					+ JSON_ENABLED);
+			downloadURL = new URL(MBID_ALBUM_INFO + line + API_KEY + JSON_ENABLED);
 		} else if (type.contains("tags")) {
 			downloadURL = new URL(MBID_TOP_TAGS + line + API_KEY + JSON_ENABLED);
 		}
@@ -93,6 +92,9 @@ public class AudioAlbumAPI extends ApiAccess {
 		JSONArray albumMatches = startObject.getJSONObject("results")
 				.getJSONObject("albummatches").getJSONArray("album");
 
+		// fire task lenght
+		this.pcs.firePropertyChange("taskStarted", 0, albumMatches.length());
+
 		AudioAlbum aa = null;
 		JSONObject albumObject;
 		for (int i = 0; i < albumMatches.length(); i++) {
@@ -104,6 +106,7 @@ public class AudioAlbumAPI extends ApiAccess {
 				aa.setBand(this.parseBand(albumObject.getString("artist")));
 				aa.setCover(this.parseImage(albumObject.getJSONArray("image")));
 				this.result.add(aa);
+				this.pcs.firePropertyChange("taskStep",i,i+1);
 			} catch (JSONException pp) {
 				Object params[] = { aa.getTitle(), pp.getMessage() };
 				MabisLogger.getLogger().log(Level.WARNING,
