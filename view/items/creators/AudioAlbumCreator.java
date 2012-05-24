@@ -230,9 +230,9 @@ public class AudioAlbumCreator extends ItemCreator {
 
 				try {
 					setProgress(searchBar.getMinimum());
-					TreeMap<String, String> params = new TreeMap<String, String>();
-					params.put("album", query);
-					aaa.query(params);
+						TreeMap<String, String> params = new TreeMap<String, String>();
+						params.put("album", query);
+						aaa.query(params);
 					setProgress(searchBar.getMaximum());
 					
 					ItemsPreview ip = new ItemsPreview("Collected audio albums",aaa.getResult());
@@ -244,7 +244,6 @@ public class AudioAlbumCreator extends ItemCreator {
 								}
 							});
 					ip.setVisible(true);
-					
 					return null;
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -256,15 +255,14 @@ public class AudioAlbumCreator extends ItemCreator {
 		LoadFromApi lfa = new LoadFromApi();
 		lfa.setQuery(query);
 		lfa.addPropertyChangeListener(new PropertyChangeListener() {
-			
+
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if ("progress" == evt.getPropertyName()) {
-		            searchBar.setValue((Integer) evt.getNewValue());
-		        } 
+					searchBar.setValue((Integer) evt.getNewValue());
+				}
 			}
 		});
-		
 		lfa.execute();
 	}
 

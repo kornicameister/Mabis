@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import model.BaseTable;
@@ -78,7 +79,7 @@ public class BookCreator extends ItemCreator {
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-								.addComponent(this.coverPanel,250,250,250)
+								.addComponent(this.coverPanel, 250, 250, 250)
 								.addGroup(
 										gl.createParallelGroup()
 												.addComponent(this.titlesPanel)
@@ -89,8 +90,7 @@ public class BookCreator extends ItemCreator {
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-								.addComponent(this.coverPanel,
-										250, 250, 250)
+								.addComponent(this.coverPanel, 250, 250, 250)
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(
@@ -219,32 +219,82 @@ public class BookCreator extends ItemCreator {
 		if (this.collectedItems != null) {
 			this.collectedItems.clear();
 		}
-		GoogleBookApi gba = new GoogleBookApi();
-		try {
-			TreeMap<String, String> params = new TreeMap<String, String>();
-			if (criteria.contains("author")) {
-				params.put("inauthor:", query);
-			} else if (criteria.contains("title")) {
-				params.put("intitle:", query);
-			}
-			gba.query(params);
-			collectedItems = gba.getResult();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// init panel with obtained collection items so as to allow
-		// user to choose one selected
-		ItemsPreview ip = new ItemsPreview("Collected books",
-				this.collectedItems);
-		ip.addPropertyChangeListener("selectedItem",
-				new PropertyChangeListener() {
 
-					@Override
-					public void propertyChange(PropertyChangeEvent e) {
-						fillWithResult((BaseTable) e.getNewValue());
-					}
-				});
-		ip.setVisible(true);
+		class LoadFromApi extends SwingWorker<Void, Void> {
+			private String query, criteria;
+			private Integer taskSize;
+			private int step, value;
+
+			public void setQuery(String query) {
+				this.query = query;
+			}
+
+			public void setCriteria(String c) {
+				this.criteria = c;
+			}
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				GoogleBookApi gba = new GoogleBookApi();
+				gba.getPcs().addPropertyChangeListener(
+						new PropertyChangeListener() {
+
+							@Override
+							public void propertyChange(PropertyChangeEvent evt) {
+								String propertyName = evt.getPropertyName();
+								if (propertyName.equals("taskStarted")) {
+									taskSize = (Integer) evt.getNewValue();
+									System.out.println("Task size = " + taskSize);
+									step = (searchBar.getMaximum() - searchBar.getMinimum()) / taskSize;
+									value = searchBar.getMinimum() + step;
+								} else if (propertyName.equals("taskStep")) {
+									value = step*(int)evt.getNewValue();
+									System.out.println("New value:" + value);
+									setProgress(value);
+								}
+							}
+						});
+				try {
+					setProgress(searchBar.getMinimum());
+						TreeMap<String, String> params = new TreeMap<String, String>();
+						if (criteria.contains("author")) {
+							params.put("inauthor:", query);
+						} else if (criteria.contains("title")) {
+							params.put("intitle:", query);
+						}
+						gba.query(params);
+					setProgress(searchBar.getMaximum());
+
+					ItemsPreview ip = new ItemsPreview("Collected books",
+							gba.getResult());
+					ip.addPropertyChangeListener("selectedItem",
+							new PropertyChangeListener() {
+								@Override
+								public void propertyChange(PropertyChangeEvent e) {
+									fillWithResult((BaseTable) e.getNewValue());
+								}
+							});
+					ip.setVisible(true);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		}
+
+		LoadFromApi lfa = new LoadFromApi();
+		lfa.setQuery(query);
+		lfa.setCriteria(criteria);
+		lfa.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("progress" == evt.getPropertyName()) {
+					searchBar.setValue((Integer) evt.getNewValue());
+				}
+			}
+		});
+		lfa.execute();
 	}
 
 	@Override

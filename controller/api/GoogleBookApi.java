@@ -56,9 +56,14 @@ public class GoogleBookApi extends ApiAccess {
 			return;
 		}
 
+		
 		ArrayList<Volume> foundBooks = (ArrayList<Volume>) volumes.getItems();
 		Book book = null;
 
+		this.pcs.firePropertyChange("taskStarted",
+									0,
+									foundBooks.size());
+		
 		for (Volume volume : foundBooks) {
 			VolumeInfo vi = volume.getVolumeInfo();
 			if (vi.getTitle() != null && !vi.getTitle().isEmpty()) {
@@ -150,6 +155,7 @@ public class GoogleBookApi extends ApiAccess {
 
 				// saving found book
 				this.result.add(book);
+				this.pcs.firePropertyChange("taskStep",this.result.size()-1,this.result.size());
 			}
 			MabisLogger.getLogger().log(Level.FINE,
 					"Loaded {0} books from GoogleBook API", this.result.size());
