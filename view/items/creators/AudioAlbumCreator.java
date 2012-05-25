@@ -202,9 +202,23 @@ public class AudioAlbumCreator extends ItemCreator {
 			private String query;
 			private Integer taskSize;
 			private int step, value;
+			private TreeSet<BaseTable> results;
 
 			public void setQuery(String query) {
 				this.query = query;
+			}
+
+			@Override
+			protected void done(){
+				ItemsPreview ip = new ItemsPreview("Collected audio albums", this.results);
+				ip.addPropertyChangeListener("selectedItem",
+						new PropertyChangeListener() {
+							@Override
+							public void propertyChange(PropertyChangeEvent e) {
+								fillWithResult((BaseTable) e.getNewValue());
+							}
+						});
+				ip.setVisible(true);
 			}
 
 			@Override
@@ -233,17 +247,9 @@ public class AudioAlbumCreator extends ItemCreator {
 						TreeMap<String, String> params = new TreeMap<String, String>();
 						params.put("album", query);
 						aaa.query(params);
+						this.results = aaa.getResult();
 					setProgress(searchBar.getMaximum());
 					
-					ItemsPreview ip = new ItemsPreview("Collected audio albums",aaa.getResult());
-					ip.addPropertyChangeListener("selectedItem",
-							new PropertyChangeListener() {
-								@Override
-								public void propertyChange(PropertyChangeEvent e) {
-									fillWithResult((BaseTable) e.getNewValue());
-								}
-							});
-					ip.setVisible(true);
 					return null;
 				} catch (IOException e) {
 					e.printStackTrace();

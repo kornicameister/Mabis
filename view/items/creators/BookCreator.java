@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -224,6 +225,7 @@ public class BookCreator extends ItemCreator {
 			private String query, criteria;
 			private Integer taskSize;
 			private int step, value;
+			private TreeSet<BaseTable> results;
 
 			public void setQuery(String query) {
 				this.query = query;
@@ -233,6 +235,19 @@ public class BookCreator extends ItemCreator {
 				this.criteria = c;
 			}
 
+			@Override
+			protected void done(){
+				ItemsPreview ip = new ItemsPreview("Collected books", this.results);
+				ip.addPropertyChangeListener("selectedItem",
+						new PropertyChangeListener() {
+							@Override
+							public void propertyChange(PropertyChangeEvent e) {
+								fillWithResult((BaseTable) e.getNewValue());
+							}
+						});
+				ip.setVisible(true);
+			}
+			
 			@Override
 			protected Void doInBackground() throws Exception {
 				GoogleBookApi gba = new GoogleBookApi();
@@ -261,17 +276,10 @@ public class BookCreator extends ItemCreator {
 							params.put("intitle:", query);
 						}
 						gba.query(params);
+						this.results = gba.getResult();
 					setProgress(searchBar.getMaximum());
 
-					ItemsPreview ip = new ItemsPreview("Collected books", gba.getResult());
-					ip.addPropertyChangeListener("selectedItem",
-							new PropertyChangeListener() {
-								@Override
-								public void propertyChange(PropertyChangeEvent e) {
-									fillWithResult((BaseTable) e.getNewValue());
-								}
-							});
-					ip.setVisible(true);
+					
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
