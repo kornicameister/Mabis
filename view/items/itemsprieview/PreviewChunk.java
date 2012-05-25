@@ -4,12 +4,14 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import logger.MabisLogger;
 import model.entity.AudioAlbum;
 import model.entity.Author;
 import model.entity.Book;
@@ -39,7 +41,7 @@ public class PreviewChunk extends JPanel {
 	public PreviewChunk(final Movie entity) {
 		super(true);
 		this.previedItem = entity;
-		final ImagePanel panel = new ImagePanel();
+		ImagePanel panel = new ImagePanel();
 
 		JEditorPane description = null;
 		try {
@@ -51,23 +53,36 @@ public class PreviewChunk extends JPanel {
 				description.setText("Description unavailable");
 			}
 			description.setEditable(false);
+			File tmp = new File(url.toExternalForm().substring(8));
+			if (!tmp.delete()) {
+				MabisLogger.getLogger().log(Level.WARNING,
+						"Failed to remove descriptive file at {0}",
+						url.toExternalForm());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		this.setLayout(new GridLayout(1, 3));
 		this.add(panel);
+
+		if (entity.getCover() == null) {
+			panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+					.toString()));
+		} else {
+			panel = new ImagePanel(entity.getCover().getImageFile());
+		}
 		
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (entity.getCover() == null) {
-					panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-							.toString()));
-				} else {
-					panel.setImage(entity.getCover().getImageFile());
-				}
-			}
-		});
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+//				if (entity.getCover() == null) {
+//					panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+//							.toString()));
+//				} else {
+//					panel.setImage(entity.getCover().getImageFile());
+//				}
+//			}
+//		});
 
 		if (description != null) {
 			JScrollPane pane = new JScrollPane(description);
