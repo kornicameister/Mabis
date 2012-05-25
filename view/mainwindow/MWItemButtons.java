@@ -15,6 +15,7 @@ import javax.swing.border.EtchedBorder;
 
 import view.items.creators.AudioAlbumCreator;
 import view.items.creators.BookCreator;
+import view.items.creators.MovieCreator;
 
 import logger.MabisLogger;
 
@@ -30,7 +31,6 @@ public class MWItemButtons extends JPanel {
 	private JButton newBookButton;
 	private JButton newMovieButton;
 	private JButton newAudioAlbumButton;
-	private JButton scanForMoviesButton;
 	private MWItemButtonsListener listener;
 
 	public MWItemButtons() {
@@ -48,8 +48,6 @@ public class MWItemButtons extends JPanel {
 		this.newBookButton.addActionListener(this.listener);
 		this.newMovieButton = new JButton("New movie");
 		this.newMovieButton.addActionListener(this.listener);
-		this.scanForMoviesButton = new JButton("Search movies");
-		this.scanForMoviesButton.addActionListener(this.listener);
 		this.newAudioAlbumButton = new JButton("New audio");
 		this.newAudioAlbumButton.addActionListener(this.listener);
 
@@ -57,7 +55,6 @@ public class MWItemButtons extends JPanel {
 		this.add(this.newAudioAlbumButton);
 		this.add(this.newBookButton);
 		this.add(this.newMovieButton);
-		this.add(this.scanForMoviesButton);
 	}
 
 	/**
@@ -78,9 +75,8 @@ public class MWItemButtons extends JPanel {
 				AudioAlbumCreator aac = new AudioAlbumCreator("New audio album");
 				aac.setVisible(true);
 			} else if (source.equals(newMovieButton)) {
-
-			} else if (source.equals(scanForMoviesButton)) {
-
+				MovieCreator mc = new MovieCreator("New movie");
+				mc.setVisible(true);
 			}
 			MabisLogger.getLogger().log(Level.INFO, "Action called ::  {0}",
 					source.getActionCommand());
