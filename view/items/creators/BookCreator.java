@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -218,11 +219,10 @@ public class BookCreator extends ItemCreator {
 		return false;
 	}
 
-	class LoadFromApi extends SwingWorker<Void, Void> {
+	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {
 		private String query, criteria;
 		private Integer taskSize;
 		private int step, value;
-		private TreeSet<BaseTable> results;
 
 		public void setQuery(String query) {
 			this.query = query;
@@ -234,19 +234,26 @@ public class BookCreator extends ItemCreator {
 
 		@Override
 		protected void done() {
-			ItemsPreview ip = new ItemsPreview("Collected books", this.results);
-			ip.addPropertyChangeListener("selectedItem",
-					new PropertyChangeListener() {
-						@Override
-						public void propertyChange(PropertyChangeEvent e) {
-							fillWithResult((BaseTable) e.getNewValue());
-						}
-					});
-			ip.setVisible(true);
+			try {
+				ItemsPreview ip = new ItemsPreview("Collected books",this.get());
+				ip.addPropertyChangeListener("selectedItem",
+						new PropertyChangeListener() {
+							@Override
+							public void propertyChange(PropertyChangeEvent e) {
+								fillWithResult((BaseTable) e.getNewValue());
+							}
+						});
+				ip.setVisible(true);
+			} catch (InterruptedException | ExecutionException e1) {
+				e1.printStackTrace();
+				MabisLogger.getLogger().log(Level.SEVERE,
+						"Failed to receive data from background thread \n {0}",
+						e1.getMessage());
+			}
 		}
 
 		@Override
-		protected Void doInBackground() throws Exception {
+		protected TreeSet<BaseTable> doInBackground() throws Exception {
 			GoogleBookApi gba = new GoogleBookApi();
 			gba.getPcs().addPropertyChangeListener(
 					new PropertyChangeListener() {
@@ -274,9 +281,8 @@ public class BookCreator extends ItemCreator {
 					params.put("intitle:", query);
 				}
 				gba.query(params);
-				this.results = gba.getResult();
 				setProgress(searchProgressBar.getMaximum());
-
+				return gba.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -310,7 +316,7 @@ public class BookCreator extends ItemCreator {
 		while (!lfa.isCancelled()) {
 			lfa.cancel(true);
 		}
-		MabisLogger.getLogger().log(Level.INFO,"Terminated search operation");
+		MabisLogger.getLogger().log(Level.INFO, "Terminated search operation");
 		this.searchProgressBar.setValue(0);
 	}
 

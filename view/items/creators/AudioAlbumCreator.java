@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -196,36 +197,44 @@ public class AudioAlbumCreator extends ItemCreator {
 	}
 
 	/**
-	 * Podklasa SwingWorkera, pozwala na wykonanie całej łączności z API poprzez 
+	 * Podklasa SwingWorkera, pozwala na wykonanie całej łączności z API poprzez
 	 * wątek działający w tle
+	 * 
 	 * @author kornicameister
-	 *
+	 * 
 	 */
-	class LoadFromApi extends SwingWorker<Void, Void> {
+	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {
 		private String query;
 		private Integer taskSize;
 		private int step, value;
-		private TreeSet<BaseTable> results;
 
 		public void setQuery(String query) {
 			this.query = query;
 		}
-		
+
 		@Override
-		protected void done(){
-			ItemsPreview ip = new ItemsPreview("Collected audio albums", this.results);
-			ip.addPropertyChangeListener("selectedItem",
-					new PropertyChangeListener() {
-						@Override
-						public void propertyChange(PropertyChangeEvent e) {
-							fillWithResult((BaseTable) e.getNewValue());
-						}
-					});
-			ip.setVisible(true);
+		protected void done() {
+			try {
+				ItemsPreview ip = new ItemsPreview("Collected audio albums",
+						this.get());
+				ip.addPropertyChangeListener("selectedItem",
+						new PropertyChangeListener() {
+							@Override
+							public void propertyChange(PropertyChangeEvent e) {
+								fillWithResult((BaseTable) e.getNewValue());
+							}
+						});
+				ip.setVisible(true);
+			} catch (InterruptedException | ExecutionException e1) {
+				e1.printStackTrace();
+				MabisLogger.getLogger().log(Level.SEVERE,
+						"Failed to receive data from background thread \n {0}",
+						e1.getMessage());
+			}
 		}
 
 		@Override
-		protected Void doInBackground() throws Exception {
+		protected TreeSet<BaseTable> doInBackground() throws Exception {
 			AudioAlbumAPI aaa = new AudioAlbumAPI();
 			aaa.getPcs().addPropertyChangeListener(
 					new PropertyChangeListener() {
@@ -233,12 +242,13 @@ public class AudioAlbumCreator extends ItemCreator {
 						@Override
 						public void propertyChange(PropertyChangeEvent evt) {
 							String propertyName = evt.getPropertyName();
-							if(propertyName.equals("taskStarted")){
+							if (propertyName.equals("taskStarted")) {
 								taskSize = (Integer) evt.getNewValue();
-								step = (searchProgressBar.getMaximum() - searchProgressBar.getMinimum())/taskSize;
+								step = (searchProgressBar.getMaximum() - searchProgressBar
+										.getMinimum()) / taskSize;
 								value = searchProgressBar.getMinimum() + step;
 								setProgress(value);
-							}else if(propertyName.equals("taskStep")){
+							} else if (propertyName.equals("taskStep")) {
 								value += step;
 								setProgress(value);
 							}
@@ -247,20 +257,18 @@ public class AudioAlbumCreator extends ItemCreator {
 
 			try {
 				setProgress(searchProgressBar.getMinimum());
-					TreeMap<String, String> params = new TreeMap<String, String>();
-					params.put("album", query);
-					aaa.query(params);
-					this.results = aaa.getResult();
+				TreeMap<String, String> params = new TreeMap<String, String>();
+				params.put("album", query);
+				aaa.query(params);
 				setProgress(searchProgressBar.getMaximum());
-				
-				return null;
+				return aaa.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			return null;
 		}
 	}
-	
+
 	@Override
 	protected void fetchFromAPI(String query, String criteria) {
 		if (this.collectedItems != null) {
@@ -280,13 +288,13 @@ public class AudioAlbumCreator extends ItemCreator {
 		});
 		lfa.execute();
 	}
-	
+
 	@Override
-	protected void cancelAPISearch(){
-		while(!lfa.isCancelled()){
+	protected void cancelAPISearch() {
+		while (!lfa.isCancelled()) {
 			lfa.cancel(true);
 		}
-		MabisLogger.getLogger().log(Level.INFO,"Terminated search operation");
+		MabisLogger.getLogger().log(Level.INFO, "Terminated search operation");
 		this.searchProgressBar.setValue(0);
 	}
 

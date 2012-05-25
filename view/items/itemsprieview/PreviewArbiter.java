@@ -9,6 +9,9 @@ import model.enums.TableType;
 public class PreviewArbiter {
 
 	public static JPanel determineTyp(BaseTable tmp) throws Exception {
+		if(tmp == null){
+			throw new Exception("Null table !!!");
+		}
 		boolean result = tmp.getTableType().equals(TableType.BOOK);
 		if (!result) {
 			result = tmp.getTableType().equals(TableType.MOVIE);

@@ -66,32 +66,26 @@ public class PreviewChunk extends JPanel {
 		this.add(panel);
 
 		if (entity.getCover() == null) {
-			panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-					.toString()));
+			panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
 		} else {
 			panel = new ImagePanel(entity.getCover().getImageFile());
 		}
-		
-//		java.awt.EventQueue.invokeLater(new Runnable() {
-//			@Override
-//			public void run() {
-//				if (entity.getCover() == null) {
-//					panel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-//							.toString()));
-//				} else {
-//					panel.setImage(entity.getCover().getImageFile());
-//				}
-//			}
-//		});
 
 		if (description != null) {
 			JScrollPane pane = new JScrollPane(description);
 			this.add(pane);
 		}
+		
 		JTabbedPane authors = new JTabbedPane(JTabbedPane.BOTTOM);
 		authors.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		for (Author a : entity.getAuthors()) {
-			ImagePanel p = new ImagePanel(a.getPictureFile().getImageFile());
+			ImagePanel p = null;
+			if (a.getPictureFile().getImageFile() != null) {
+				p = new ImagePanel(new File(
+						GlobalPaths.DEFAULT_COVER_PATH.toString()));
+			} else {
+				p = new ImagePanel(a.getPictureFile().getImageFile());
+			}
 			authors.addTab(a.getLastName(), p);
 		}
 		this.add(authors);
