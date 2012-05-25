@@ -3,24 +3,20 @@
  */
 package view.items.creators;
 
-import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -37,13 +33,12 @@ import view.items.CreatorContentNullPointerException;
 import view.items.ItemCreator;
 import view.items.itemsprieview.ItemsPreview;
 import view.items.minipanels.BandMiniPanel;
-import view.items.minipanels.GenreMiniPanel;
+import view.items.minipanels.TagCloudMiniPanel;
 import view.items.minipanels.TrackListPanel;
 import controller.SQLStamentType;
 import controller.api.AudioAlbumAPI;
 import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.BandSQLFactory;
-import controller.entity.GenreSQLFactory;
 
 /**
  * @author kornicameister
@@ -52,7 +47,7 @@ import controller.entity.GenreSQLFactory;
 public class AudioAlbumCreator extends ItemCreator {
 	private static final long serialVersionUID = 4214813665020457959L;
 	private JTextField titleField;
-	private ItemTagCloudPanel tagCloud;
+	private TagCloudMiniPanel tagCloud;
 	private BandMiniPanel bandMiniPanel;
 	private JFormattedTextField durationField;
 	private ImagePanel coverPanel;
@@ -125,7 +120,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.trackList = new TrackListPanel();
 		this.trackListScroll = new JScrollPane(this.trackList);
-		this.tagCloud = new ItemTagCloudPanel();
+		this.tagCloud = new TagCloudMiniPanel();
 		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
 		try {
 			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT,
@@ -183,7 +178,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setTitle(this.titleField.getText());
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		// this.selectedAlbum.setTrackList(this.trackList.getText());
-		for (Genre g : this.tagCloud.tags) {
+		for (Genre g : this.tagCloud.getTags()) {
 			this.selectedAlbum.addGenre(g);
 		}
 		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
@@ -308,90 +303,5 @@ public class AudioAlbumCreator extends ItemCreator {
 		// add setting left field
 	}
 
-	/**
-	 * Klasa symuluje chmurę tagów. Tagi mogą być do niej dodawana pojedynczo
-	 * lub jako cała {@link ArrayList}
-	 * 
-	 * @author kornicameister
-	 * 
-	 */
-	class ItemTagCloudPanel extends JPanel {
-		private static final long serialVersionUID = -8170767178911147951L;
-		private ArrayList<Genre> tags = new ArrayList<>();
-		private TreeMap<Genre, JLabel> tagToLabel = new TreeMap<>();
-		private JPanel contentPanel = new JPanel();
-		private GenreMiniPanel gmp;
-
-		public ItemTagCloudPanel() {
-			// this.contentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-			this.contentPanel.setLayout(new BoxLayout(this.contentPanel,
-					BoxLayout.Y_AXIS));
-
-			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
-					new Genre());
-			try {
-				gsf.executeSQL(true);
-				gmp = new GenreMiniPanel("Tags", gsf.getGenres());
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			this.add(gmp, BorderLayout.PAGE_START);
-			this.add(this.contentPanel);
-
-			this.gmp.getGenreBox().setVisible(false);
-			this.gmp.addPropertyChangeListener(new PropertyChangeListener() {
-
-				@Override
-				public void propertyChange(PropertyChangeEvent e) {
-					String property = e.getPropertyName();
-					if (property.equals("genreSelected")
-							|| property.equals("genreCreated")) {
-						Genre tmp = (Genre) e.getNewValue();
-						if (tags.size() == 0) {
-							addTag(tmp);
-							return;
-						}
-						for (Genre g : tags) {
-							if (!g.getGenre().equals(tmp.getGenre())) {
-								addTag(g);
-								return;
-							}
-						}
-					}
-				}
-			});
-		}
-
-		void addTag(Genre g) {
-			if (!this.tags.contains(g)) {
-				this.tags.add(g);
-				// add to content panel
-				JLabel tmp = new JLabel(g.toString());
-				this.tagToLabel.put(g, tmp);
-				this.contentPanel.add(tmp);
-			}
-		}
-
-		void setTags(ArrayList<Genre> genres) {
-			this.tags = genres;
-			this.contentPanel.removeAll();
-			for (Genre g : this.tags) {
-				JLabel tmp = new JLabel(g.toString());
-				this.contentPanel.add(tmp);
-				this.tagToLabel.put(g, tmp);
-			}
-		}
-
-		void removeTag(Genre g) {
-			this.tags.remove(g);
-			this.contentPanel.remove(this.tagToLabel.get(g));
-			this.repaint();
-		}
-
-		void clear() {
-			this.tags.clear();
-			this.contentPanel.removeAll();
-			this.repaint();
-		}
-	}
+	
 }
