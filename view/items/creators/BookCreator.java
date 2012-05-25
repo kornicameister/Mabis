@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -22,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
+import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
@@ -52,6 +54,7 @@ public class BookCreator extends ItemCreator {
 	private DetailedInformationPanel detailedInfoPanel;
 	private JScrollPane descriptionScrollPane;
 	private Book selectedBook = new Book();
+	private LoadFromApi lfa;
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -215,79 +218,79 @@ public class BookCreator extends ItemCreator {
 		return false;
 	}
 
+	class LoadFromApi extends SwingWorker<Void, Void> {
+		private String query, criteria;
+		private Integer taskSize;
+		private int step, value;
+		private TreeSet<BaseTable> results;
+
+		public void setQuery(String query) {
+			this.query = query;
+		}
+
+		public void setCriteria(String c) {
+			this.criteria = c;
+		}
+
+		@Override
+		protected void done() {
+			ItemsPreview ip = new ItemsPreview("Collected books", this.results);
+			ip.addPropertyChangeListener("selectedItem",
+					new PropertyChangeListener() {
+						@Override
+						public void propertyChange(PropertyChangeEvent e) {
+							fillWithResult((BaseTable) e.getNewValue());
+						}
+					});
+			ip.setVisible(true);
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			GoogleBookApi gba = new GoogleBookApi();
+			gba.getPcs().addPropertyChangeListener(
+					new PropertyChangeListener() {
+
+						@Override
+						public void propertyChange(PropertyChangeEvent evt) {
+							String propertyName = evt.getPropertyName();
+							if (propertyName.equals("taskStarted")) {
+								taskSize = (Integer) evt.getNewValue();
+								step = (searchProgressBar.getMaximum() - searchProgressBar
+										.getMinimum()) / taskSize;
+								value = searchProgressBar.getMinimum() + step;
+							} else if (propertyName.equals("taskStep")) {
+								value = step * (int) evt.getNewValue();
+								setProgress(value);
+							}
+						}
+					});
+			try {
+				setProgress(searchProgressBar.getMinimum());
+				TreeMap<String, String> params = new TreeMap<String, String>();
+				if (criteria.contains("author")) {
+					params.put("inauthor:", query);
+				} else if (criteria.contains("title")) {
+					params.put("intitle:", query);
+				}
+				gba.query(params);
+				this.results = gba.getResult();
+				setProgress(searchProgressBar.getMaximum());
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+
 	@Override
 	protected void fetchFromAPI(String query, String criteria) {
 		if (this.collectedItems != null) {
 			this.collectedItems.clear();
 		}
 
-		class LoadFromApi extends SwingWorker<Void, Void> {
-			private String query, criteria;
-			private Integer taskSize;
-			private int step, value;
-			private TreeSet<BaseTable> results;
-
-			public void setQuery(String query) {
-				this.query = query;
-			}
-
-			public void setCriteria(String c) {
-				this.criteria = c;
-			}
-
-			@Override
-			protected void done(){
-				ItemsPreview ip = new ItemsPreview("Collected books", this.results);
-				ip.addPropertyChangeListener("selectedItem",
-						new PropertyChangeListener() {
-							@Override
-							public void propertyChange(PropertyChangeEvent e) {
-								fillWithResult((BaseTable) e.getNewValue());
-							}
-						});
-				ip.setVisible(true);
-			}
-			
-			@Override
-			protected Void doInBackground() throws Exception {
-				GoogleBookApi gba = new GoogleBookApi();
-				gba.getPcs().addPropertyChangeListener(
-						new PropertyChangeListener() {
-
-							@Override
-							public void propertyChange(PropertyChangeEvent evt) {
-								String propertyName = evt.getPropertyName();
-								if (propertyName.equals("taskStarted")) {
-									taskSize = (Integer) evt.getNewValue();
-									step = (searchBar.getMaximum() - searchBar.getMinimum()) / taskSize;
-									value = searchBar.getMinimum() + step;
-								} else if (propertyName.equals("taskStep")) {
-									value = step*(int)evt.getNewValue();
-									setProgress(value);
-								}
-							}
-						});
-				try {
-					setProgress(searchBar.getMinimum());
-						TreeMap<String, String> params = new TreeMap<String, String>();
-						if (criteria.contains("author")) {
-							params.put("inauthor:", query);
-						} else if (criteria.contains("title")) {
-							params.put("intitle:", query);
-						}
-						gba.query(params);
-						this.results = gba.getResult();
-					setProgress(searchBar.getMaximum());
-
-					
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		}
-
-		LoadFromApi lfa = new LoadFromApi();
+		lfa = new LoadFromApi();
 		lfa.setQuery(query);
 		lfa.setCriteria(criteria);
 		lfa.addPropertyChangeListener(new PropertyChangeListener() {
@@ -295,11 +298,20 @@ public class BookCreator extends ItemCreator {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if ("progress" == evt.getPropertyName()) {
-					searchBar.setValue((Integer) evt.getNewValue());
+					searchProgressBar.setValue((Integer) evt.getNewValue());
 				}
 			}
 		});
 		lfa.execute();
+	}
+
+	@Override
+	protected void cancelAPISearch() {
+		while (!lfa.isCancelled()) {
+			lfa.cancel(true);
+		}
+		MabisLogger.getLogger().log(Level.INFO,"Terminated search operation");
+		this.searchProgressBar.setValue(0);
 	}
 
 	@Override

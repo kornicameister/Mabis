@@ -42,7 +42,7 @@ public abstract class ItemCreator extends JFrame {
 	private ICActionListener listener;
 	protected TreeSet<BaseTable> collectedItems;
 	protected ICSearchPanel searchPanel;
-	protected JProgressBar searchBar;
+	protected JProgressBar searchProgressBar;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -82,7 +82,7 @@ public abstract class ItemCreator extends JFrame {
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addComponent(this.searchPanel)
-				.addComponent(this.searchBar)
+				.addComponent(this.searchProgressBar)
 				.addGroup(
 						gl.createSequentialGroup().addComponent(
 								this.contentPanel))
@@ -90,7 +90,7 @@ public abstract class ItemCreator extends JFrame {
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
 				.addComponent(this.searchPanel, 30, 30, 30)
-				.addComponent(this.searchBar,40,40,40)
+				.addComponent(this.searchProgressBar, 40, 40, 40)
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.contentPanel))
@@ -108,10 +108,10 @@ public abstract class ItemCreator extends JFrame {
 		this.listener = new ICActionListener();
 		this.buttonPanel = new ICButtonPanel();
 		this.searchPanel = new ICSearchPanel();
-		this.searchBar = new JProgressBar(JProgressBar.HORIZONTAL);
-		this.searchBar.setMinimum(0);
-		this.searchBar.setMaximum(100);
-		this.searchBar.setStringPainted(true);
+		this.searchProgressBar = new JProgressBar(JProgressBar.HORIZONTAL);
+		this.searchProgressBar.setMinimum(0);
+		this.searchProgressBar.setMaximum(100);
+		this.searchProgressBar.setStringPainted(true);
 	}
 
 	/**
@@ -143,6 +143,11 @@ public abstract class ItemCreator extends JFrame {
 	 * 
 	 */
 	protected abstract void fetchFromAPI(String query, String criteria);
+	
+	/**
+	 * Metoda pozwala na zakończenie procesu wyszukiwania.
+	 */
+	protected abstract void cancelAPISearch();
 
 	/**
 	 * Metoda powinna zostać wywołana po wybraniu przez użytkownika elementu
@@ -179,20 +184,29 @@ public abstract class ItemCreator extends JFrame {
 		private JTextField searchQuery = new JTextField();
 		private JComboBox<String> criteria;
 		private JButton searchButton = new JButton("Search");
+		private JButton cancelButton = new JButton("Cancel");
 
 		public ICSearchPanel() {
 			super(true);
 
-			this.setLayout(new GridLayout(1, 3));
+			this.setLayout(new GridLayout(1, 4));
 			this.add(this.searchQuery);
 			this.add(this.searchButton);
+			this.add(this.cancelButton);
 
 			this.searchButton.addActionListener(new ActionListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					fetchFromAPI(searchQuery.getText(),
-							(String) criteria.getSelectedItem());
+				public void actionPerformed(ActionEvent e) {
+					fetchFromAPI(searchQuery.getText(), (String) criteria.getSelectedItem());
+				}
+			});
+			
+			this.cancelButton.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					cancelAPISearch();
 				}
 			});
 		}

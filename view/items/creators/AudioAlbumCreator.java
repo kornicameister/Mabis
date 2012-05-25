@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -24,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
+import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.AudioAlbum;
 import model.entity.Band;
@@ -56,6 +58,7 @@ public class AudioAlbumCreator extends ItemCreator {
 	private TrackListPanel trackList;
 	private AudioAlbum selectedAlbum = new AudioAlbum();
 	private JScrollPane trackListScroll;
+	private LoadFromApi lfa;
 
 	public AudioAlbumCreator(String title)
 			throws CreatorContentNullPointerException {
@@ -192,84 +195,99 @@ public class AudioAlbumCreator extends ItemCreator {
 		return false;
 	}
 
+	/**
+	 * Podklasa SwingWorkera, pozwala na wykonanie całej łączności z API poprzez 
+	 * wątek działający w tle
+	 * @author kornicameister
+	 *
+	 */
+	class LoadFromApi extends SwingWorker<Void, Void> {
+		private String query;
+		private Integer taskSize;
+		private int step, value;
+		private TreeSet<BaseTable> results;
+
+		public void setQuery(String query) {
+			this.query = query;
+		}
+		
+		@Override
+		protected void done(){
+			ItemsPreview ip = new ItemsPreview("Collected audio albums", this.results);
+			ip.addPropertyChangeListener("selectedItem",
+					new PropertyChangeListener() {
+						@Override
+						public void propertyChange(PropertyChangeEvent e) {
+							fillWithResult((BaseTable) e.getNewValue());
+						}
+					});
+			ip.setVisible(true);
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {
+			AudioAlbumAPI aaa = new AudioAlbumAPI();
+			aaa.getPcs().addPropertyChangeListener(
+					new PropertyChangeListener() {
+
+						@Override
+						public void propertyChange(PropertyChangeEvent evt) {
+							String propertyName = evt.getPropertyName();
+							if(propertyName.equals("taskStarted")){
+								taskSize = (Integer) evt.getNewValue();
+								step = (searchProgressBar.getMaximum() - searchProgressBar.getMinimum())/taskSize;
+								value = searchProgressBar.getMinimum() + step;
+								setProgress(value);
+							}else if(propertyName.equals("taskStep")){
+								value += step;
+								setProgress(value);
+							}
+						}
+					});
+
+			try {
+				setProgress(searchProgressBar.getMinimum());
+					TreeMap<String, String> params = new TreeMap<String, String>();
+					params.put("album", query);
+					aaa.query(params);
+					this.results = aaa.getResult();
+				setProgress(searchProgressBar.getMaximum());
+				
+				return null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+	
 	@Override
 	protected void fetchFromAPI(String query, String criteria) {
 		if (this.collectedItems != null) {
 			this.collectedItems.clear();
 		}
-	
-		class LoadFromApi extends SwingWorker<Void, Void> {
-			private String query;
-			private Integer taskSize;
-			private int step, value;
-			private TreeSet<BaseTable> results;
 
-			public void setQuery(String query) {
-				this.query = query;
-			}
-
-			@Override
-			protected void done(){
-				ItemsPreview ip = new ItemsPreview("Collected audio albums", this.results);
-				ip.addPropertyChangeListener("selectedItem",
-						new PropertyChangeListener() {
-							@Override
-							public void propertyChange(PropertyChangeEvent e) {
-								fillWithResult((BaseTable) e.getNewValue());
-							}
-						});
-				ip.setVisible(true);
-			}
-
-			@Override
-			protected Void doInBackground() throws Exception {
-				AudioAlbumAPI aaa = new AudioAlbumAPI();
-				aaa.getPcs().addPropertyChangeListener(
-						new PropertyChangeListener() {
-
-							@Override
-							public void propertyChange(PropertyChangeEvent evt) {
-								String propertyName = evt.getPropertyName();
-								if(propertyName.equals("taskStarted")){
-									taskSize = (Integer) evt.getNewValue();
-									step = (searchBar.getMaximum() - searchBar.getMinimum())/taskSize;
-									value = searchBar.getMinimum() + step;
-									setProgress(value);
-								}else if(propertyName.equals("taskStep")){
-									value += step;
-									setProgress(value);
-								}
-							}
-						});
-
-				try {
-					setProgress(searchBar.getMinimum());
-						TreeMap<String, String> params = new TreeMap<String, String>();
-						params.put("album", query);
-						aaa.query(params);
-						this.results = aaa.getResult();
-					setProgress(searchBar.getMaximum());
-					
-					return null;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		}
-
-		LoadFromApi lfa = new LoadFromApi();
+		lfa = new LoadFromApi();
 		lfa.setQuery(query);
 		lfa.addPropertyChangeListener(new PropertyChangeListener() {
 
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if ("progress" == evt.getPropertyName()) {
-					searchBar.setValue((Integer) evt.getNewValue());
+					searchProgressBar.setValue((Integer) evt.getNewValue());
 				}
 			}
 		});
 		lfa.execute();
+	}
+	
+	@Override
+	protected void cancelAPISearch(){
+		while(!lfa.isCancelled()){
+			lfa.cancel(true);
+		}
+		MabisLogger.getLogger().log(Level.INFO,"Terminated search operation");
+		this.searchProgressBar.setValue(0);
 	}
 
 	@Override
