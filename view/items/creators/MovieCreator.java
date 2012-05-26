@@ -4,8 +4,10 @@ import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
@@ -24,6 +26,8 @@ import view.items.ItemCreator;
 import view.items.minipanels.AuthorMiniPanel;
 import view.items.minipanels.TagCloudMiniPanel;
 import controller.SQLStamentType;
+import controller.api.MovieAPI;
+import controller.api.MovieAPI.MovieApiTarget;
 import controller.entity.AuthorSQLFactory;
 
 /**
@@ -131,6 +135,8 @@ public class MovieCreator extends ItemCreator {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		String arr[] = {"by title"};
+		this.searchPanel.setSearchCriteria(arr);
 	}
 
 	@Override
@@ -147,8 +153,14 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected void fetchFromAPI(String query, String criteria) {
-		// TODO Auto-generated method stub
-
+		MovieAPI ma = new MovieAPI(MovieApiTarget.IMDB);
+		TreeMap<String, String> params = new TreeMap<>();
+		params.put(query, criteria);
+		try {
+			ma.query(params);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
