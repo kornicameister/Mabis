@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import model.BaseTable;
+import model.enums.AuthorType;
 import model.enums.TableType;
 
 /**
@@ -22,6 +23,7 @@ import model.enums.TableType;
 public class Author extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 7692599340459728530L;
 	private Picture pictureFile;
+	private AuthorType type;
 
 	/**
 	 * Domyślny pusty konstruktor dla klasy {@link Author}
@@ -53,7 +55,7 @@ public class Author extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAuthor", "object", "avatarFK" };
+		String tmp[] = { "idAuthor", "object", "avatarFK", "type"};
 		return tmp;
 	}
 
@@ -84,6 +86,14 @@ public class Author extends BaseTable implements Serializable {
 
 	public Picture getPictureFile() {
 		return pictureFile;
+	}
+
+	public AuthorType getType() {
+		return this.type;
+	}
+	
+	public void setType(AuthorType t){
+		this.type = t;
 	}
 
 	@Override

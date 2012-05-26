@@ -44,12 +44,6 @@ public class Band extends Author implements Serializable {
 		this.createLastFMUrl();
 	}
 
-	@Override
-	public String[] metaData() {
-		String tmp[] = { "idBand", "object", "avatarFK", "genreFK" };
-		return tmp;
-	}
-
 	private void createLastFMUrl() {
 		try {
 			this.lastFMUrl = new URL(urlPattern
