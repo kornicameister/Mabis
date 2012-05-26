@@ -3,7 +3,6 @@
  */
 package view.items.creators;
 
-import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -40,9 +39,7 @@ import view.items.minipanels.AuthorMiniPanel;
 import view.items.minipanels.TagCloudMiniPanel;
 import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
-import controller.entity.AuthorSQLFactory;
 import controller.entity.BookSQLFactory;
-import controller.entity.GenreSQLFactory;
 
 /**
  * @authorBox kornicameister
@@ -52,8 +49,12 @@ public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
 	private ImagePanel coverPanel;
 	private JTextArea descriptionArea;
-	private TitlesPanel titlesPanel;
-	private DetailedInformationPanel detailedInfoPanel;
+	private JTextField titleOriginal;
+	private JTextField subTitle;
+	private JTextField isbnField;
+	private JTextField pages;
+	private TagCloudMiniPanel tagCloud;
+	private AuthorMiniPanel authorsMiniPanel;
 	private JScrollPane descriptionScrollPane;
 	private Book selectedBook = new Book();
 	private LoadFromApi lfa;
@@ -88,9 +89,16 @@ public class BookCreator extends ItemCreator {
 								.addComponent(this.coverPanel, 250, 250, 250)
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titlesPanel)
 												.addComponent(
-														this.detailedInfoPanel)))
+														this.titleOriginal)
+												.addComponent(this.subTitle)
+												.addGap(5)
+												.addComponent(this.isbnField)
+												.addComponent(this.pages)
+												.addGap(5)
+												.addComponent(
+														this.authorsMiniPanel)
+												.addComponent(this.tagCloud)))
 				.addComponent(descriptionScrollPane));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
@@ -100,13 +108,22 @@ public class BookCreator extends ItemCreator {
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(
-														this.titlesPanel,
+														this.titleOriginal,
 														GroupLayout.DEFAULT_SIZE,
 														60, 80)
 												.addComponent(
-														this.detailedInfoPanel,
+														this.subTitle,
 														GroupLayout.DEFAULT_SIZE,
-														100, 120)))
+														60, 80)
+												.addComponent(this.isbnField,
+														40, 40, 40)
+												.addComponent(this.pages, 40,
+														40, 40)
+												.addComponent(
+														this.authorsMiniPanel,
+														80, 80, 80)
+												.addComponent(this.tagCloud,
+														80, 80, 80)))
 				.addComponent(descriptionScrollPane, 140, 140, 140));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -123,11 +140,13 @@ public class BookCreator extends ItemCreator {
 	public void initComponents() {
 		super.initComponents();
 		this.contentPanel = new JPanel(true);
-
-		this.titlesPanel = new TitlesPanel(true);
-
-		this.detailedInfoPanel = new DetailedInformationPanel(true);
-		this.detailedInfoPanel.authorsMiniPanel
+		this.titleOriginal = new JTextField();
+		this.subTitle = new JTextField();
+		this.subTitle.setBorder(BorderFactory.createTitledBorder("Subtitle"));
+		this.titleOriginal.setBorder(BorderFactory.createTitledBorder("Title"));
+		this.authorsMiniPanel = new AuthorMiniPanel("Authors",
+				new TreeSet<Author>());
+		this.authorsMiniPanel
 				.addPropertyChangeListener(new PropertyChangeListener() {
 
 					@Override
@@ -153,7 +172,10 @@ public class BookCreator extends ItemCreator {
 				});
 
 		this.coverPanel = new ImagePanel();
-
+		this.isbnField = new JTextField();
+		this.pages = new JTextField();
+		this.tagCloud = new TagCloudMiniPanel(new TreeSet<Genre>(),
+				GenreType.BOOK);
 		this.descriptionArea = new JTextArea();
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
 		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
@@ -168,22 +190,24 @@ public class BookCreator extends ItemCreator {
 		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
 				.toString()));
 		this.descriptionArea.setText("");
-		this.titlesPanel.clear();
-		this.detailedInfoPanel.clear();
+		this.titleOriginal.setText("");
+		this.subTitle.setText("");
+		this.pages.setText("");
+		this.authorsMiniPanel.clear();
+		this.tagCloud.clear();
+		this.isbnField.setText("");
 	}
 
 	@Override
 	protected Boolean createItem() {
-		this.selectedBook.setTitle(this.titlesPanel.titleOriginal.getText());
-		this.selectedBook.setSubTitle(this.titlesPanel.subTitle.getText());
+		this.selectedBook.setTitle(this.titleOriginal.getText());
+		this.selectedBook.setSubTitle(this.subTitle.getText());
 
 		if (!this.selectedBook.getIdentifiers().values()
-				.contains(this.detailedInfoPanel.isbnField.getText())) {
-			this.selectedBook.addGenre(new Genre(
-					this.detailedInfoPanel.isbnField.getText()));
+				.contains(this.isbnField.getText())) {
+			this.selectedBook.addGenre(new Genre(this.isbnField.getText()));
 		}
-		this.selectedBook.setPages(Integer.valueOf(this.detailedInfoPanel.pages
-				.getText()));
+		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 		this.selectedBook.setDescription(this.descriptionArea.getText());
 
 		BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT,
@@ -303,164 +327,29 @@ public class BookCreator extends ItemCreator {
 	@Override
 	protected void fillWithResult(BaseTable table) {
 		this.selectedBook = (Book) table;
-		this.titlesPanel.titleOriginal.setText(this.selectedBook.getTitle());
-		this.titlesPanel.subTitle.setText(this.selectedBook.getSubtitle());
+		this.titleOriginal.setText(this.selectedBook.getTitle());
+		this.subTitle.setText(this.selectedBook.getSubtitle());
 		this.coverPanel.setImage(this.selectedBook.getCover().getImageFile());
 		this.descriptionArea.setText(this.selectedBook.getDescription());
-		this.detailedInfoPanel.pages.setText(this.selectedBook.getPages()
-				.toString());
+		this.pages.setText(this.selectedBook.getPages().toString());
 		for (Author a : this.selectedBook.getAuthors()) {
 			if (!(a.getFirstName().isEmpty() || a.getLastName().isEmpty())) {
-				this.detailedInfoPanel.authorsMiniPanel.getAuthorsBox()
-						.addItem(a.getFirstName() + " " + a.getLastName());
+				this.authorsMiniPanel.getAuthorsBox().addItem(
+						a.getFirstName() + " " + a.getLastName());
 			}
 			// TODO add checking if obtained author (coming from google book
 			// api) is already present in database
 		}
 		for (Genre g : this.selectedBook.getGenres()) {
 			if (!g.getGenre().equals("null") && !g.getGenre().isEmpty()) {
-				this.detailedInfoPanel.tagCloud.addTag(g);
+				this.tagCloud.addTag(g);
 			}
 		}
 		if (this.selectedBook.getIdentifier(BookIndustryIdentifier.ISBN_13) != null) {
-			this.detailedInfoPanel.isbnField.setText(this.selectedBook
+			this.isbnField.setText(this.selectedBook
 					.getIdentifier(BookIndustryIdentifier.ISBN_13));
 		}
-		this.detailedInfoPanel.authorsMiniPanel.getAuthorsBox()
-				.setSelectedIndex(
-						this.detailedInfoPanel.authorsMiniPanel.getAuthorsBox()
-								.getItemCount() - 1);
-	}
-
-	/**
-	 * Panel agregujący. Umieszczone są nim pola, służące do wprowadzania
-	 * tytułów
-	 * 
-	 * @authorBox kornicameister
-	 * 
-	 */
-	protected final class TitlesPanel extends JPanel {
-		private static final long serialVersionUID = -8642265229218524372L;
-		private final JTextField titleOriginal = new JTextField();
-		private final JTextField subTitle = new JTextField();
-
-		/**
-		 * Tworzy panel dla tytułów
-		 * 
-		 * @param isDoubleBuffered
-		 *            true - jeśli panel ma mieć podwójne buforowanie </br>
-		 *            false - jeśli podwójne buforowanie ma być wyłączone
-		 */
-		public TitlesPanel(boolean isDoubleBuffered) {
-			super(isDoubleBuffered);
-			this.layoutComponents();
-			this.setBorder(BorderFactory.createTitledBorder(
-					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-					"Titles"));
-			this.subTitle.setBorder(BorderFactory
-					.createTitledBorder("Subtitle"));
-			this.titleOriginal.setBorder(BorderFactory
-					.createTitledBorder("Title"));
-		}
-
-		protected void clear() {
-			this.subTitle.setText("");
-			this.titleOriginal.setText("");
-		}
-
-		private void layoutComponents() {
-			this.setLayout(new GridLayout(2, 1, 5, 5));
-			this.add(this.titleOriginal);
-			this.add(this.subTitle);
-		}
-
-		public JTextField getTitleOriginal() {
-			return titleOriginal;
-		}
-
-		public JTextField getTitleLocale() {
-			return subTitle;
-		}
-	}
-
-	/**
-	 * Panel agregujący pola dla informacji szczegółowych o książce
-	 * 
-	 * @authorBox kornicameister
-	 * 
-	 */
-	private final class DetailedInformationPanel extends JPanel {
-		private static final long serialVersionUID = 3476477969389283620L;
-		private final JTextField isbnField = new JTextField();
-		private final JTextField pages = new JTextField();
-
-		private TagCloudMiniPanel tagCloud;
-		private AuthorMiniPanel authorsMiniPanel;
-
-		public DetailedInformationPanel(boolean isDoubleBuffered) {
-			super(isDoubleBuffered);
-			this.setBorder(BorderFactory.createTitledBorder(
-					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-					"Details"));
-			try {
-				this.loadAuthors();
-				this.loadGenres();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			this.initComponents();
-			this.layoutComponents();
-		}
-
-		private void loadGenres() throws SQLException {
-			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
-					new Genre());
-			gsf.addWhereClause("type", GenreType.BOOK.toString());
-			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
-					GenreType.BOOK);
-		}
-
-		private void loadAuthors() throws SQLException {
-			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
-					new Author());
-			asf.executeSQL(true);
-			this.authorsMiniPanel = new AuthorMiniPanel("Authors",
-					asf.getAuthors());
-		}
-
-		/**
-		 * Inicjalizuje komponenty tego JPanel
-		 */
-		private void initComponents() {
-			this.isbnField.setBorder(BorderFactory.createTitledBorder("ISBN"));
-			this.isbnField.setToolTipText("Provide ISBN-13 based identifier");
-			this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
-		}
-
-		/**
-		 * Zawartość pól {@link DetailedInformationPanel#isbnField} oraz
-		 * {@link DetailedInformationPanel#pages} zostaje wyciszczone. Indeksy
-		 * list {@link DetailedInformationPanel#authorCombobox} oraz
-		 * {@link DetailedInformationPanel#genreCombobox} zostaję ustawione na
-		 * początkowe pozycje.
-		 */
-		public void clear() {
-			this.isbnField.setText("");
-			this.pages.setText("");
-			this.authorsMiniPanel.getAuthorsBox().removeAllItems();
-			this.tagCloud.clear();
-			selectedBook.getGenres().clear();
-			selectedBook.getAuthors().clear();
-		}
-
-		private void layoutComponents() {
-			this.setLayout(new GridLayout(4, 1));
-			this.add(this.isbnField);
-			this.add(this.pages);
-			this.add(this.tagCloud);
-			this.add(this.authorsMiniPanel);
-		}
+		this.authorsMiniPanel.getAuthorsBox().setSelectedIndex(
+				this.authorsMiniPanel.getAuthorsBox().getItemCount() - 1);
 	}
 }
