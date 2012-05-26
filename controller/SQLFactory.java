@@ -75,19 +75,17 @@ public abstract class SQLFactory implements StatementFactory {
 		default:
 			break;
 		}
-		String fieldList = null;
 		rawQueryCopy = rawQueryCopy.replaceFirst("!", this.table.getTableType()
 				.toString());
-		fieldList = this.buildFieldList(this.table.metaData());
 		// first pass
 		switch (this.type) {
 		case INSERT:
-			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
+			rawQueryCopy = rawQueryCopy.replaceFirst("!", this.buildFieldList(this.table.metaData()));
 			rawQueryCopy = rawQueryCopy.replaceFirst("!",
 					this.questionMarkFieldList);
 			break;
 		case UPDATE:
-			rawQueryCopy = rawQueryCopy.replaceFirst("!", fieldList);
+			rawQueryCopy = rawQueryCopy.replaceFirst("!", this.buildFieldList(this.table.metaData()));
 			rawQueryCopy = rawQueryCopy.replaceAll(",", " = ?, ");
 			break;
 		default:
@@ -217,7 +215,7 @@ public abstract class SQLFactory implements StatementFactory {
 	public String buildWhereChunk() {
 		String a = new String();
 		for (WhereClause where : this.wheres) {
-			a += where.attribute + "=" + where.value + ",";
+			a += where.attribute + "='" + where.value + "',";
 		}
 		if (a.length() == 0) {
 			return "";
