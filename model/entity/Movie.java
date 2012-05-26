@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.TreeSet;
 
 import javax.swing.ImageIcon;
@@ -94,17 +96,8 @@ public class Movie extends BaseTable implements Serializable {
 	}
 
 	public String getDuration() {
-		if (duration > 3600) {
-			// we have full hour
-			int hours = (int) (this.duration / 3600);
-			int minutes = (int) (this.duration - (hours * 3600));
-			int leftSeconds = (int) (this.duration - (minutes * 60));
-			return hours + ":" + minutes + ":" + leftSeconds;
-		}
-		// less than hour
-		int minutes = (int) (this.duration / 60);
-		int leftSeconds = (int) (this.duration - (minutes * 60));
-		return minutes + ":" + leftSeconds;
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
+		return sdf.format(new Date(this.duration));
 	}
 
 	public void setDuration(Long duration) {
@@ -214,8 +207,7 @@ public class Movie extends BaseTable implements Serializable {
 	public URL toDescription() {
 		String str = new String();
 		str += "<html>";
-		str += "<p style='color: red'><b>Rating:</b>" + this.getRating()
-				+ "</p>";
+		str += "<p style='color: red'><b>Rating:</b>" + this.getRating() + "</p>";
 		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
 		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
 		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
@@ -240,13 +232,11 @@ public class Movie extends BaseTable implements Serializable {
 			str += "</ul>";
 		}
 		str += "<p><b>Description:</b></p>";
-		str += "<span style='margin-left:20px'>" + this.getDescription()
-				+ "</span>";
+		str += "<span style='margin-left:20px'>" + this.getDescription() + "</span>";
 		str += "</html>";
 
 		DataOutputStream dos = null;
-		String path = GlobalPaths.TMP
-				+ String.valueOf(Math.random() * Double.MAX_EXPONENT);
+		String path = GlobalPaths.TMP + String.valueOf(this.hashCode());
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
 			dos.writeBytes(str);
