@@ -24,7 +24,9 @@ import javax.swing.SwingWorker;
 import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Author;
+import model.entity.Genre;
 import model.entity.Movie;
+import model.enums.GenreType;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
@@ -36,6 +38,8 @@ import controller.SQLStamentType;
 import controller.api.MovieAPI;
 import controller.api.MovieAPI.MovieApiTarget;
 import controller.entity.AuthorSQLFactory;
+import controller.entity.GenreSQLFactory;
+import controller.entity.MovieSQLFactory;
 
 /**
  * 
@@ -61,7 +65,7 @@ public class MovieCreator extends ItemCreator {
 			CreatorContentNullPointerException {
 		super(title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 190, (int) this
-				.getMinimumSize().getHeight()+50);
+				.getMinimumSize().getHeight() + 50);
 	}
 
 	@Override
@@ -72,30 +76,35 @@ public class MovieCreator extends ItemCreator {
 
 		gl.setAutoCreateGaps(true);
 		gl.setAutoCreateContainerGaps(true);
-		
-		gl.setHorizontalGroup(
-				gl.createSequentialGroup()
-				.addComponent(this.coverPanel,250,250,250)
+
+		gl.setHorizontalGroup(gl
+				.createSequentialGroup()
+				.addComponent(this.coverPanel, 250, 250, 250)
 				.addGroup(
 						gl.createParallelGroup()
-						.addGroup(
-								gl.createSequentialGroup()
-								.addComponent(this.titleField)
-								.addComponent(this.durationField))
-						.addComponent(this.directorsPanel)
-						.addComponent(this.tagCloud)
-						.addComponent(this.descriptionScrollPane)));
-		gl.setVerticalGroup(
-				gl.createParallelGroup()
-				.addComponent(this.coverPanel,250,250,250)
-				.addGroup(gl.createSequentialGroup()
-						.addGroup(
-								gl.createParallelGroup()
-								.addComponent(this.titleField,40,40,40)
-								.addComponent(this.durationField,40,40,40))
-						.addComponent(this.directorsPanel)
-						.addComponent(this.tagCloud)
-						.addComponent(this.descriptionScrollPane)));
+								.addGroup(
+										gl.createSequentialGroup()
+												.addComponent(this.titleField)
+												.addComponent(
+														this.durationField))
+								.addComponent(this.directorsPanel)
+								.addComponent(this.tagCloud)
+								.addComponent(this.descriptionScrollPane)));
+		gl.setVerticalGroup(gl
+				.createParallelGroup()
+				.addComponent(this.coverPanel, 250, 250, 250)
+				.addGroup(
+						gl.createSequentialGroup()
+								.addGroup(
+										gl.createParallelGroup()
+												.addComponent(this.titleField,
+														40, 40, 40)
+												.addComponent(
+														this.durationField, 40,
+														40, 40))
+								.addComponent(this.directorsPanel)
+								.addComponent(this.tagCloud)
+								.addComponent(this.descriptionScrollPane)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -115,13 +124,16 @@ public class MovieCreator extends ItemCreator {
 		this.titleField = new JTextField();
 		this.descriptionArea = new JTextArea();
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
-		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder("Plot"));
+		this.descriptionScrollPane.setBorder(BorderFactory
+				.createTitledBorder("Plot"));
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
-		this.tagCloud = new TagCloudMiniPanel();
-		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
-		this.durationField = new JFormattedTextField(new SimpleDateFormat("hh:mm"));
-		this.durationField.setBorder(BorderFactory.createTitledBorder("Duration"));
+		this.durationField = new JFormattedTextField(new SimpleDateFormat(
+				"hh:mm"));
+		this.durationField.setBorder(BorderFactory
+				.createTitledBorder("Duration"));
 		this.coverPanel = new ImagePanel();
+
+		// loading directors
 		try {
 			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
 					new Author());
@@ -137,8 +149,8 @@ public class MovieCreator extends ItemCreator {
 						@Override
 						public void propertyChange(PropertyChangeEvent e) {
 							String property = e.getPropertyName();
-							if (property.equals("bandSelected")
-									|| property.equals("bandCreated")) {
+							if (property.equals("authorSelected")
+									|| property.equals("authorCreated")) {
 								Author tmp = (Author) e.getNewValue();
 								if (selectedMovie.getAuthors() == null) {
 									selectedMovie.addAuthor(tmp);
@@ -150,7 +162,24 @@ public class MovieCreator extends ItemCreator {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		String arr[] = {"by title"};
+
+		// loading genres
+		try {
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
+					new Genre());
+			gsf.addWhereClause("type", GenreType.MOVIE.toString());
+			gsf.executeSQL(true);
+			TreeSet<Genre> bridge = new TreeSet<>();
+			for (Genre a : gsf.getGenres()) {
+				bridge.add(a);
+			}
+			this.tagCloud = new TagCloudMiniPanel();
+			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+			this.tagCloud.setTags(bridge);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		String arr[] = { "by title" };
 		this.searchPanel.setSearchCriteria(arr);
 	}
 
@@ -159,20 +188,29 @@ public class MovieCreator extends ItemCreator {
 		this.titleField.setText("");
 		this.durationField.setText("");
 		this.descriptionArea.setText("");
-		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
+		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+				.toString()));
 		this.directorsPanel.clear();
 		this.tagCloud.clear();
 	}
 
 	@Override
 	protected Boolean createItem() {
-		return null;
+		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT,
+				this.selectedMovie);
+		try {
+			msf.executeSQL(true);
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
-	
+
 	/**
 	 * Podklasa SwingWorkera, pozwala na wykonanie całej łączności z API poprzez
-	 * wątek działający w tle.
-	 * Wyspecjalizowana do łączenia się z API dla filmów.
+	 * wątek działający w tle. Wyspecjalizowana do łączenia się z API dla
+	 * filmów.
 	 * 
 	 * @author kornicameister
 	 * 
@@ -189,7 +227,8 @@ public class MovieCreator extends ItemCreator {
 		@Override
 		protected void done() {
 			try {
-				ItemsPreview ip = new ItemsPreview("Collected movies", this.get());
+				ItemsPreview ip = new ItemsPreview("Collected movies",
+						this.get());
 				ip.addPropertyChangeListener("selectedItem",
 						new PropertyChangeListener() {
 							@Override
@@ -200,39 +239,41 @@ public class MovieCreator extends ItemCreator {
 				ip.setVisible(true);
 			} catch (InterruptedException | ExecutionException e1) {
 				e1.printStackTrace();
-				MabisLogger.getLogger().log(Level.SEVERE,"Failed to receive data from background thread \n {0}",e1.getMessage());
+				MabisLogger.getLogger().log(Level.SEVERE,
+						"Failed to receive data from background thread \n {0}",
+						e1.getMessage());
 			}
 		}
 
 		@Override
 		protected TreeSet<BaseTable> doInBackground() throws Exception {
 			MovieAPI ma = new MovieAPI(MovieApiTarget.IMDB);
-			ma.getPcs().addPropertyChangeListener(
-					new PropertyChangeListener() {
+			ma.getPcs().addPropertyChangeListener(new PropertyChangeListener() {
 
-						@Override
-						public void propertyChange(PropertyChangeEvent evt) {
-							String propertyName = evt.getPropertyName();
-							if (propertyName.equals("taskStarted")) {
-								taskSize = (Integer) evt.getNewValue();
-								step = (searchProgressBar.getMaximum() - searchProgressBar.getMinimum()) / taskSize;
-								value = searchProgressBar.getMinimum() + step;
-								setProgress(value);
-								if(taskSize.equals(1)){
-									value = 0;
-								}
-							} else if (propertyName.equals("taskStep")) {
-								value += step;
-								setProgress(value);
-							}
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					String propertyName = evt.getPropertyName();
+					if (propertyName.equals("taskStarted")) {
+						taskSize = (Integer) evt.getNewValue();
+						step = (searchProgressBar.getMaximum() - searchProgressBar
+								.getMinimum()) / taskSize;
+						value = searchProgressBar.getMinimum() + step;
+						setProgress(value);
+						if (taskSize.equals(1)) {
+							value = 0;
 						}
-					});
+					} else if (propertyName.equals("taskStep")) {
+						value += step;
+						setProgress(value);
+					}
+				}
+			});
 
 			try {
 				setProgress(searchProgressBar.getMinimum());
-					TreeMap<String, String> params = new TreeMap<>();
-					params.put("movie", query);
-					ma.query(params);
+				TreeMap<String, String> params = new TreeMap<>();
+				params.put("movie", query);
+				ma.query(params);
 				setProgress(searchProgressBar.getMaximum());
 				return ma.getResult();
 			} catch (IOException e) {
