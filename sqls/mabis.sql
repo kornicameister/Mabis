@@ -40,23 +40,10 @@ create table if not exists mabis.author (
     idAuthor int(11) auto_increment,
     object longblob not null,
     avatarFK int(11) null default '0',
+    type varchar(15) not null,
     primary key (idAuthor),
     key avatarAuthorKey (avatarFK) using btree,
     constraint avatarAuthorRef foreign key (avatarFK)
-        references picture (idPicture)
-        on delete set null
-)  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_polish_ci;
-
-/**
- * table of metal bands ;-) for audios
- */
-create table if not exists mabis.band (
-    idBand int(11) auto_increment,
-    object longblob not null,
-    avatarFK int(11) null default '0' comment 'references to idPicture',
-    primary key (idBand),
-    key avatarBandKey (avatarFK) using btree,
-    constraint avatarBandRef foreign key (avatarFK)
         references picture (idPicture)
         on delete set null
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_polish_ci;
@@ -158,7 +145,7 @@ create table if not exists mabis.audioAlbum (
     key audioCoverRef (coverFK) using btree,
     key audioBandRef (artistFK) using btree,
     constraint audioBandRef foreign key (artistFK)
-        references band (idBand)
+        references author (idAuthor)
         on delete set null on update restrict,
     constraint audioCoverRef foreign key (coverFK)
         references picture (idPicture)
