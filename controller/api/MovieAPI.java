@@ -45,7 +45,7 @@ public class MovieAPI extends ApiAccess {
 
 	@Override
 	public void query(TreeMap<String, String> params) throws IOException {
-		String title = (String) params.keySet().toArray()[0];
+		String title = (String) params.values().toArray()[0];
 		title = title.replaceAll(" ", "+");
 		try {
 			switch (this.target) {
@@ -91,14 +91,21 @@ public class MovieAPI extends ApiAccess {
 
 		arr = startObject.getString("Director").split(", ");
 		for (String a : arr) {
-			String fName = a.split(" ")[0];
-			String lName = a.split(" ")[1];
-			m.addAuthor(new Author(fName, lName));
+			Author tmp = new Author(a.split(" ")[0], a.split(" ")[1]);
+			try {
+				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),ImageType.AUTHOR));
+				m.addAuthor(tmp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if(tmp.getPictureFile() == null){
+					tmp.setPicture(null);
+				}
+			}
 		}
 
 		try {
-			m.setCover(new Picture(new URL(startObject.getString("Poster")),
-					ImageType.FRONT_COVER));
+			m.setCover(new Picture(new URL(startObject.getString("Poster")),ImageType.FRONT_COVER));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

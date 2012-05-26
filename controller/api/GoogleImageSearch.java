@@ -3,7 +3,6 @@ package controller.api;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -32,11 +31,7 @@ public class GoogleImageSearch {
 				builder.append(line);
 			}
 			return new URL(parseJson(builder));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
+		} catch (JSONException | IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -44,14 +39,14 @@ public class GoogleImageSearch {
 
 	/**
 	 * @param builder
-	 * @return 
+	 * @return
 	 * @throws JSONException
 	 */
 	private static String parseJson(StringBuilder builder) throws JSONException {
 		JSONObject json = new JSONObject(builder.toString());
 		JSONObject responseData = json.getJSONObject("responseData");
 		JSONArray results = responseData.getJSONArray("results");
-		if(results.length() == 0){
+		if (results.length() == 0) {
 			return null;
 		}
 		responseData = results.getJSONObject(0);
