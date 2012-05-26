@@ -100,6 +100,7 @@ public class AuthorSQLFactory extends SQLFactory {
 			throws SQLException {
 		st.setInt(1, this.insertAvatar(entity.getPictureFile()));
 		st.setObject(2, entity);
+		st.setString(3, entity.getType().toString());
 		st.execute();
 		st.clearParameters();
 		this.lastAffactedId = Utilities.lastInsertedId(entity, st);
