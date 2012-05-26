@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import model.BaseTable;
@@ -46,6 +47,7 @@ public class MovieCreator extends ItemCreator {
 	private AuthorMiniPanel directorsPanel;
 	private JFormattedTextField durationField;
 	private Movie selectedMovie;
+	private JTextArea descriptionArea;
 
 	public MovieCreator(String title) throws HeadlessException,
 			CreatorContentNullPointerException {
@@ -73,7 +75,8 @@ public class MovieCreator extends ItemCreator {
 								.addComponent(this.titleField)
 								.addComponent(this.durationField))
 						.addComponent(this.directorsPanel)
-						.addComponent(this.tagCloud)));
+						.addComponent(this.tagCloud)
+						.addComponent(this.descriptionArea)));
 		gl.setVerticalGroup(
 				gl.createParallelGroup()
 				.addComponent(this.coverPanel,250,250,250)
@@ -83,7 +86,8 @@ public class MovieCreator extends ItemCreator {
 								.addComponent(this.titleField,40,40,40)
 								.addComponent(this.durationField,40,40,40))
 						.addComponent(this.directorsPanel)
-						.addComponent(this.tagCloud)));
+						.addComponent(this.tagCloud)
+						.addComponent(this.descriptionArea)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -101,6 +105,8 @@ public class MovieCreator extends ItemCreator {
 		super.initComponents();
 		this.contentPanel = new JPanel(true);
 		this.titleField = new JTextField();
+		this.descriptionArea = new JTextArea();
+		this.descriptionArea.setBorder(BorderFactory.createTitledBorder("Plot"));
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.tagCloud = new TagCloudMiniPanel();
 		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
