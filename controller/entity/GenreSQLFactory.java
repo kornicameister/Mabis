@@ -12,6 +12,7 @@ import utilities.Utilities;
 
 import model.BaseTable;
 import model.entity.Genre;
+import model.enums.GenreType;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -29,6 +30,7 @@ public class GenreSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			st.setObject(1, genre);
+			st.setString(2, genre.getType().toString());
 			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(genre, st);
@@ -60,6 +62,7 @@ public class GenreSQLFactory extends SQLFactory {
 								new ByteArrayInputStream(buf));
 						genre = (Genre) objectIn.readObject();
 						genre.setPrimaryKey(set.getInt("idGenre"));
+						genre.setType(GenreType.valueOf(set.getString("type")));
 						this.genres.add(genre);
 					} catch (IOException e) {
 						e.printStackTrace();

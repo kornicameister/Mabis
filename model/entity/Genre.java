@@ -49,7 +49,7 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idGenre", "object" };
+		String tmp[] = { "idGenre", "object", "type"};
 		return tmp;
 	}
 
@@ -110,11 +110,11 @@ public class Genre extends BaseTable implements Serializable {
 		return result;
 	}
 
-	public GenreType getgType() {
+	public GenreType getType() {
 		return gType;
 	}
 
-	public void setgType(GenreType gType) {
+	public void setType(GenreType gType) {
 		this.gType = gType;
 	}
 }

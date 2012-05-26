@@ -117,6 +117,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 				"Action called by clicking at {0}", source.getName());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void clear() {
 		this.authors.clear();
 		JComboBox<String> tmp = (JComboBox<String>) this.authorsBox;
