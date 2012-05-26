@@ -19,6 +19,7 @@ import model.entity.AudioAlbum;
 import model.entity.Band;
 import model.entity.Genre;
 import model.entity.Picture;
+import model.enums.GenreType;
 import model.enums.ImageType;
 import model.utilities.AudioAlbumTrack;
 
@@ -132,7 +133,7 @@ public class AudioAlbumAPI extends ApiAccess {
 			JSONArray tracks = startObject.getJSONObject("toptags")
 					.getJSONArray("tag");
 			for (int i = 0; i < 5; i++) {
-				tags.add(new Genre(tracks.getJSONObject(i).getString("name")));
+				tags.add(new Genre(tracks.getJSONObject(i).getString("name"),GenreType.AUDIO));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

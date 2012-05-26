@@ -14,6 +14,7 @@ import model.entity.Book;
 import model.entity.Genre;
 import model.entity.Picture;
 import model.enums.BookIndustryIdentifier;
+import model.enums.GenreType;
 import model.enums.ImageType;
 
 import com.google.api.client.googleapis.services.GoogleKeyInitializer;
@@ -57,18 +58,16 @@ public class GoogleBookApi extends ApiAccess {
 			return;
 		}
 
-		
 		ArrayList<Volume> foundBooks = (ArrayList<Volume>) volumes.getItems();
 
-		this.pcs.firePropertyChange("taskStarted",
-									0,
-									foundBooks.size());
-		
+		this.pcs.firePropertyChange("taskStarted", 0, foundBooks.size());
+
 		for (Volume volume : foundBooks) {
 			VolumeInfo vi = volume.getVolumeInfo();
 			if (vi.getTitle() != null && !vi.getTitle().isEmpty()) {
 				this.result.add(parseVolume(vi));
-				this.pcs.firePropertyChange("taskStep",this.result.size()-1,this.result.size());
+				this.pcs.firePropertyChange("taskStep", this.result.size() - 1,
+						this.result.size());
 			}
 			MabisLogger.getLogger().log(Level.FINE,
 					"Loaded {0} books from GoogleBook API", this.result.size());
@@ -89,12 +88,13 @@ public class GoogleBookApi extends ApiAccess {
 		}
 
 		// adding identifiers
-		ArrayList<IndustryIdentifiers> ii = (ArrayList<IndustryIdentifiers>) vi.getIndustryIdentifiers();
+		ArrayList<IndustryIdentifiers> ii = (ArrayList<IndustryIdentifiers>) vi
+				.getIndustryIdentifiers();
 		if (ii != null && !ii.isEmpty()) {
 			for (IndustryIdentifiers identifier : ii) {
-				book.addIdentifier(BookIndustryIdentifier
-						.findType(identifier.getType()), identifier
-						.getIdentifier());
+				book.addIdentifier(
+						BookIndustryIdentifier.findType(identifier.getType()),
+						identifier.getIdentifier());
 			}
 		}
 
@@ -113,7 +113,8 @@ public class GoogleBookApi extends ApiAccess {
 				}
 				try {
 					Author tmp = new Author(firstName, lastName);
-					tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(authors.get(i)),ImageType.AUTHOR));
+					tmp.setPicture(new Picture(GoogleImageSearch
+							.queryForImage(authors.get(i)), ImageType.AUTHOR));
 					book.addAuthor(tmp);
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -126,8 +127,7 @@ public class GoogleBookApi extends ApiAccess {
 		}
 
 		// Description (if any).
-		if (vi.getDescription() != null
-				&& vi.getDescription().length() > 0) {
+		if (vi.getDescription() != null && vi.getDescription().length() > 0) {
 			book.setDescription(vi.getDescription());
 		}
 
@@ -159,7 +159,7 @@ public class GoogleBookApi extends ApiAccess {
 		// genres
 		if (vi.getCategories() != null && !vi.getCategories().isEmpty()) {
 			for (String genre : vi.getCategories()) {
-				book.addGenre(new Genre(genre));
+				book.addGenre(new Genre(genre,GenreType.BOOK));
 			}
 		}
 

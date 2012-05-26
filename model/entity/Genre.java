@@ -46,6 +46,11 @@ public class Genre extends BaseTable implements Serializable {
 	public Genre(String genre) {
 		super(genre);
 	}
+	
+	public Genre(String genre,GenreType t) {
+		super(genre);
+		this.gType = t;
+	}
 
 	@Override
 	public String[] metaData() {

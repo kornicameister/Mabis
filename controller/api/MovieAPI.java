@@ -11,6 +11,7 @@ import model.entity.Author;
 import model.entity.Genre;
 import model.entity.Movie;
 import model.entity.Picture;
+import model.enums.GenreType;
 import model.enums.ImageType;
 
 import org.json.JSONException;
@@ -86,26 +87,28 @@ public class MovieAPI extends ApiAccess {
 
 		String arr[] = startObject.getString("Genre").split(", ");
 		for (String g : arr) {
-			m.addGenre(new Genre(g));
+			m.addGenre(new Genre(g, GenreType.MOVIE));
 		}
 
 		arr = startObject.getString("Director").split(", ");
 		for (String a : arr) {
 			Author tmp = new Author(a.split(" ")[0], a.split(" ")[1]);
 			try {
-				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),ImageType.AUTHOR));
+				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),
+						ImageType.AUTHOR));
 				m.addAuthor(tmp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if(tmp.getPictureFile() == null){
+				if (tmp.getPictureFile() == null) {
 					tmp.setPicture(null);
 				}
 			}
 		}
 
 		try {
-			m.setCover(new Picture(new URL(startObject.getString("Poster")),ImageType.FRONT_COVER));
+			m.setCover(new Picture(new URL(startObject.getString("Poster")),
+					ImageType.FRONT_COVER));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
