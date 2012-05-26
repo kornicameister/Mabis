@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
@@ -72,15 +73,18 @@ public class TagCloudMiniPanel extends JPanel {
 	void addTag(Genre g) {
 		if (!this.tags.contains(g)) {
 			this.tags.add(g);
-			// add to content panel
 			JLabel tmp = new JLabel(g.toString());
 			this.tagToLabel.put(g, tmp);
 			this.contentPanel.add(tmp);
 		}
 	}
 
-	void setTags(ArrayList<Genre> genres) {
-		this.tags = genres;
+	public
+	void setTags(Collection<Genre> genres) {
+		this.tags.clear();
+		for(Genre g : genres){
+			this.tags.add(g);
+		}
 		this.contentPanel.removeAll();
 		for (Genre g : this.tags) {
 			JLabel tmp = new JLabel(g.toString());

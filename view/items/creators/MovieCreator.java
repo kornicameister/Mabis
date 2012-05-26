@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
@@ -53,6 +54,7 @@ public class MovieCreator extends ItemCreator {
 	private JFormattedTextField durationField;
 	private Movie selectedMovie;
 	private JTextArea descriptionArea;
+	private JScrollPane descriptionScrollPane;
 	private LoadFromApi lfa;
 
 	public MovieCreator(String title) throws HeadlessException,
@@ -82,7 +84,7 @@ public class MovieCreator extends ItemCreator {
 								.addComponent(this.durationField))
 						.addComponent(this.directorsPanel)
 						.addComponent(this.tagCloud)
-						.addComponent(this.descriptionArea)));
+						.addComponent(this.descriptionScrollPane)));
 		gl.setVerticalGroup(
 				gl.createParallelGroup()
 				.addComponent(this.coverPanel,250,250,250)
@@ -93,7 +95,7 @@ public class MovieCreator extends ItemCreator {
 								.addComponent(this.durationField,40,40,40))
 						.addComponent(this.directorsPanel)
 						.addComponent(this.tagCloud)
-						.addComponent(this.descriptionArea)));
+						.addComponent(this.descriptionScrollPane)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -112,7 +114,8 @@ public class MovieCreator extends ItemCreator {
 		this.contentPanel = new JPanel(true);
 		this.titleField = new JTextField();
 		this.descriptionArea = new JTextArea();
-		this.descriptionArea.setBorder(BorderFactory.createTitledBorder("Plot"));
+		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
+		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder("Plot"));
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.tagCloud = new TagCloudMiniPanel();
 		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
@@ -127,7 +130,7 @@ public class MovieCreator extends ItemCreator {
 			for (Author a : asf.getAuthors()) {
 				bridge.add(a);
 			}
-			this.directorsPanel = new AuthorMiniPanel("Bands", bridge);
+			this.directorsPanel = new AuthorMiniPanel("Directors", bridge);
 			this.directorsPanel
 					.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -153,13 +156,16 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected void clearContentFields() {
-		// TODO Auto-generated method stub
-
+		this.titleField.setText("");
+		this.durationField.setText("");
+		this.descriptionArea.setText("");
+		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH.toString()));
+		this.directorsPanel.clear();
+		this.tagCloud.clear();
 	}
 
 	@Override
 	protected Boolean createItem() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -258,14 +264,22 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected void cancelAPISearch() {
-		// TODO Auto-generated method stub
-
+		while (!lfa.isCancelled()) {
+			lfa.cancel(true);
+		}
+		MabisLogger.getLogger().log(Level.INFO, "Terminated search operation");
+		this.searchProgressBar.setValue(0);
 	}
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-		// TODO Auto-generated method stub
-
+		this.selectedMovie = (Movie) table;
+		this.titleField.setText(this.selectedMovie.getTitle());
+		this.durationField.setText(this.selectedMovie.getDuration());
+		this.descriptionArea.setText(this.selectedMovie.getDescription());
+		this.coverPanel.setImage(this.selectedMovie.getCover().getImageFile());
+		this.directorsPanel.setAuthors(this.selectedMovie.getAuthors());
+		this.tagCloud.setTags(this.selectedMovie.getGenres());
 	}
 
 }

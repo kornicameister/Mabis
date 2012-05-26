@@ -19,7 +19,7 @@ import model.entity.Author;
 
 public class AuthorMiniPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 3416144336071217011L;
-	private final ArrayList<Author> authors = new ArrayList<>();
+	private ArrayList<Author> authors = new ArrayList<>();
 	protected final JButton newAuthorButton = new JButton("N");
 	protected final JButton selectAuthorButton = new JButton("S");
 	protected JComponent authorsBox = new JComboBox<String>();
@@ -43,9 +43,19 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 		this.selectAuthorButton.addActionListener(this);
 	}
 
-	/**
-	 * @return the authorsBox
-	 */
+	@SuppressWarnings("unchecked")
+	public void setAuthors(TreeSet<Author> authors){
+		this.authors.clear();
+		this.authors.addAll(authors);
+		for(Author a : this.authors){
+			((JComboBox<String>)this.authorsBox).addItem(a.toString());
+		}
+	}
+	
+	public ArrayList<Author> getAuthors() {
+		return authors;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public JComboBox<String> getAuthorsBox() {
 		return (JComboBox<String>) authorsBox;
@@ -105,6 +115,12 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 		}
 		MabisLogger.getLogger().log(Level.INFO,
 				"Action called by clicking at {0}", source.getName());
+	}
+
+	public void clear() {
+		this.authors.clear();
+		JComboBox<String> tmp = (JComboBox<String>) this.authorsBox;
+		tmp.removeAllItems();
 	}
 
 }
