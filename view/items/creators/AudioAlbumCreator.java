@@ -173,8 +173,8 @@ public class AudioAlbumCreator extends ItemCreator {
 	private void initializeTagCloud(){
 		try {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT, new Genre());
-			gsf.executeSQL(true);
 			gsf.addWhereClause("type", GenreType.AUDIO.toString());
+			gsf.executeSQL(true);
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.AUDIO);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
 		} catch (SQLException e) {
