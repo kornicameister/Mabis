@@ -46,7 +46,8 @@ public class MovieCreator extends ItemCreator {
 	public MovieCreator(String title) throws HeadlessException,
 			CreatorContentNullPointerException {
 		super(title);
-		// TODO Auto-generated constructor stub
+		this.setSize((int) this.getMinimumSize().getWidth() + 190, (int) this
+				.getMinimumSize().getHeight()+50);
 	}
 
 	@Override
@@ -57,6 +58,28 @@ public class MovieCreator extends ItemCreator {
 
 		gl.setAutoCreateGaps(true);
 		gl.setAutoCreateContainerGaps(true);
+		
+		gl.setHorizontalGroup(
+				gl.createSequentialGroup()
+				.addComponent(this.coverPanel,250,250,250)
+				.addGroup(
+						gl.createParallelGroup()
+						.addGroup(
+								gl.createSequentialGroup()
+								.addComponent(this.titleField)
+								.addComponent(this.durationField))
+						.addComponent(this.directorsPanel)
+						.addComponent(this.tagCloud)));
+		gl.setVerticalGroup(
+				gl.createParallelGroup()
+				.addComponent(this.coverPanel,250,250,250)
+				.addGroup(gl.createSequentialGroup()
+						.addGroup(
+								gl.createParallelGroup()
+								.addComponent(this.titleField,40,40,40)
+								.addComponent(this.durationField,40,40,40))
+						.addComponent(this.directorsPanel)
+						.addComponent(this.tagCloud)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
