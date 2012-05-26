@@ -34,6 +34,7 @@ public class Movie extends BaseTable implements Serializable {
 	protected TreeSet<Genre> genres;
 	protected Long duration;
 	protected Double rating;
+	protected String yearOfRelease;
 
 	/**
 	 * Construct Movie using default constructor
@@ -77,8 +78,17 @@ public class Movie extends BaseTable implements Serializable {
 		this.rating = new Double(0.0);
 		this.directors = new TreeSet<>();
 		this.genres = new TreeSet<>();
+		this.yearOfRelease = new String();
+	}
+	
+	public String getYearOfRelease() {
+		return yearOfRelease;
 	}
 
+	public void setYearOfRelease(String yearOfRelease) {
+		this.yearOfRelease = yearOfRelease;
+	}
+	
 	public Long getLongDuration() {
 		return duration;
 	}
