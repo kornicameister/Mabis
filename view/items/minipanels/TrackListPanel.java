@@ -1,5 +1,6 @@
 package view.items.minipanels;
 
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -43,21 +44,14 @@ public class TrackListPanel extends JPanel {
 		}
 		this.trackListTable = new JTable(this.dtm);
 
-		this.trackListTable.addKeyListener(new KeyListener() {
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
+		class TrackListTableKeyLister extends KeyAdapter implements KeyListener{
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 				System.out.println(KeyEvent.getKeyText(e.getKeyCode()));
 			}
-		});
+		}
+		this.trackListTable.addKeyListener(new TrackListTableKeyLister());
 
 		this.add(this.trackListTable);
 	}
