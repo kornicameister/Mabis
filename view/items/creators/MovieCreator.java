@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -16,7 +18,9 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 
+import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Author;
 import model.entity.Movie;
@@ -24,6 +28,7 @@ import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
 import view.items.ItemCreator;
+import view.items.itemsprieview.ItemsPreview;
 import view.items.minipanels.AuthorMiniPanel;
 import view.items.minipanels.TagCloudMiniPanel;
 import controller.SQLStamentType;
@@ -48,6 +53,7 @@ public class MovieCreator extends ItemCreator {
 	private JFormattedTextField durationField;
 	private Movie selectedMovie;
 	private JTextArea descriptionArea;
+	private LoadFromApi lfa;
 
 	public MovieCreator(String title) throws HeadlessException,
 			CreatorContentNullPointerException {
@@ -156,17 +162,98 @@ public class MovieCreator extends ItemCreator {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/**
+	 * Podklasa SwingWorkera, pozwala na wykonanie całej łączności z API poprzez
+	 * wątek działający w tle.
+	 * Wyspecjalizowana do łączenia się z API dla filmów.
+	 * 
+	 * @author kornicameister
+	 * 
+	 */
+	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {
+		private String query;
+		private Integer taskSize;
+		private int step, value;
+
+		public void setQuery(String query) {
+			this.query = query;
+		}
+
+		@Override
+		protected void done() {
+			try {
+				ItemsPreview ip = new ItemsPreview("Collected movies", this.get());
+				ip.addPropertyChangeListener("selectedItem",
+						new PropertyChangeListener() {
+							@Override
+							public void propertyChange(PropertyChangeEvent e) {
+								fillWithResult((BaseTable) e.getNewValue());
+							}
+						});
+				ip.setVisible(true);
+			} catch (InterruptedException | ExecutionException e1) {
+				e1.printStackTrace();
+				MabisLogger.getLogger().log(Level.SEVERE,"Failed to receive data from background thread \n {0}",e1.getMessage());
+			}
+		}
+
+		@Override
+		protected TreeSet<BaseTable> doInBackground() throws Exception {
+			MovieAPI ma = new MovieAPI(MovieApiTarget.IMDB);
+			ma.getPcs().addPropertyChangeListener(
+					new PropertyChangeListener() {
+
+						@Override
+						public void propertyChange(PropertyChangeEvent evt) {
+							String propertyName = evt.getPropertyName();
+							if (propertyName.equals("taskStarted")) {
+								taskSize = (Integer) evt.getNewValue();
+								step = (searchProgressBar.getMaximum() - searchProgressBar.getMinimum()) / taskSize;
+								value = searchProgressBar.getMinimum() + step;
+								setProgress(value);
+								if(taskSize.equals(1)){
+									value = 0;
+								}
+							} else if (propertyName.equals("taskStep")) {
+								value += step;
+								setProgress(value);
+							}
+						}
+					});
+
+			try {
+				setProgress(searchProgressBar.getMinimum());
+					TreeMap<String, String> params = new TreeMap<>();
+					params.put("movie", query);
+					ma.query(params);
+				setProgress(searchProgressBar.getMaximum());
+				return ma.getResult();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
 
 	@Override
 	protected void fetchFromAPI(String query, String criteria) {
-		MovieAPI ma = new MovieAPI(MovieApiTarget.IMDB);
-		TreeMap<String, String> params = new TreeMap<>();
-		params.put(query, criteria);
-		try {
-			ma.query(params);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (this.collectedItems != null) {
+			this.collectedItems.clear();
 		}
+
+		lfa = new LoadFromApi();
+		lfa.setQuery(query);
+		lfa.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("progress" == evt.getPropertyName()) {
+					searchProgressBar.setValue((Integer) evt.getNewValue());
+				}
+			}
+		});
+		lfa.execute();
 	}
 
 	@Override

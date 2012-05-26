@@ -77,6 +77,7 @@ public class MovieAPI extends ApiAccess {
 	}
 
 	private void parseIMDBResponse(StringBuilder builder) throws JSONException {
+		this.pcs.firePropertyChange("taskStarted", 0, 1);
 		JSONObject startObject = new JSONObject(builder.toString());
 
 		Movie m = new Movie(startObject.getString("Title"));
@@ -115,6 +116,7 @@ public class MovieAPI extends ApiAccess {
 		}
 		m.setDuration(res);
 		this.result.add(m);
+		this.pcs.firePropertyChange("taskStep", 0, 1);
 	}
 
 	public MovieApiTarget getTarget() {
