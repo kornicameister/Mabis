@@ -27,6 +27,7 @@ import model.BaseTable;
 import model.entity.AudioAlbum;
 import model.entity.Band;
 import model.entity.Genre;
+import model.enums.GenreType;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
@@ -39,6 +40,7 @@ import controller.SQLStamentType;
 import controller.api.AudioAlbumAPI;
 import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.BandSQLFactory;
+import controller.entity.GenreSQLFactory;
 
 /**
  * @author kornicameister
@@ -120,8 +122,20 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.trackList = new TrackListPanel();
 		this.trackListScroll = new JScrollPane(this.trackList);
-		this.tagCloud = new TagCloudMiniPanel();
-		this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+		
+		this.initializeTagCloud();
+		this.initializeBandMiniPanel();
+		
+		this.durationField = new JFormattedTextField(new SimpleDateFormat(
+				"hh:mm"));
+		this.durationField.setBorder(BorderFactory
+				.createTitledBorder("Duration"));
+		this.coverPanel = new ImagePanel();
+		String arrayOfCriteria[] = { "by album" };
+		this.searchPanel.setSearchCriteria(arrayOfCriteria);
+	}
+	
+	private void initializeBandMiniPanel() {
 		try {
 			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT,
 					new Band());
@@ -154,13 +168,18 @@ public class AudioAlbumCreator extends ItemCreator {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		this.durationField = new JFormattedTextField(new SimpleDateFormat(
-				"hh:mm"));
-		this.durationField.setBorder(BorderFactory
-				.createTitledBorder("Duration"));
-		this.coverPanel = new ImagePanel();
-		String arrayOfCriteria[] = { "by album" };
-		this.searchPanel.setSearchCriteria(arrayOfCriteria);
+	}
+
+	private void initializeTagCloud(){
+		try {
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT, new Genre());
+			gsf.executeSQL(true);
+			gsf.addWhereClause("type", GenreType.AUDIO.toString());
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.AUDIO);
+			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

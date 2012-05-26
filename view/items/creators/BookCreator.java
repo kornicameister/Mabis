@@ -30,13 +30,14 @@ import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
 import model.enums.BookIndustryIdentifier;
+import model.enums.GenreType;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
 import view.items.ItemCreator;
 import view.items.itemsprieview.ItemsPreview;
 import view.items.minipanels.AuthorMiniPanel;
-import view.items.minipanels.GenreMiniPanel;
+import view.items.minipanels.TagCloudMiniPanel;
 import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
 import controller.entity.AuthorSQLFactory;
@@ -150,28 +151,6 @@ public class BookCreator extends ItemCreator {
 						}
 					}
 				});
-		this.detailedInfoPanel.genresMiniPanel
-				.addPropertyChangeListener(new PropertyChangeListener() {
-
-					@Override
-					public void propertyChange(PropertyChangeEvent e) {
-						String property = e.getPropertyName();
-						if (property.equals("genreSelected")
-								|| property.equals("genreCreated")) {
-							Genre tmp = (Genre) e.getNewValue();
-							if (selectedBook.getGenres().size() == 0) {
-								selectedBook.addGenre(tmp);
-								return;
-							}
-							for (Genre g : selectedBook.getGenres()) {
-								if (!g.getGenre().equals(tmp.getGenre())) {
-									selectedBook.addGenre(tmp);
-									return;
-								}
-							}
-						}
-					}
-				});
 
 		this.coverPanel = new ImagePanel();
 
@@ -235,7 +214,8 @@ public class BookCreator extends ItemCreator {
 		@Override
 		protected void done() {
 			try {
-				ItemsPreview ip = new ItemsPreview("Collected books",this.get());
+				ItemsPreview ip = new ItemsPreview("Collected books",
+						this.get());
 				ip.addPropertyChangeListener("selectedItem",
 						new PropertyChangeListener() {
 							@Override
@@ -339,8 +319,7 @@ public class BookCreator extends ItemCreator {
 		}
 		for (Genre g : this.selectedBook.getGenres()) {
 			if (!g.getGenre().equals("null") && !g.getGenre().isEmpty()) {
-				this.detailedInfoPanel.genresMiniPanel.getGenreBox().addItem(
-						g.getGenre());
+				this.detailedInfoPanel.tagCloud.addTag(g);
 			}
 		}
 		if (this.selectedBook.getIdentifier(BookIndustryIdentifier.ISBN_13) != null) {
@@ -351,9 +330,6 @@ public class BookCreator extends ItemCreator {
 				.setSelectedIndex(
 						this.detailedInfoPanel.authorsMiniPanel.getAuthorsBox()
 								.getItemCount() - 1);
-		this.detailedInfoPanel.genresMiniPanel.getGenreBox().setSelectedIndex(
-				this.detailedInfoPanel.genresMiniPanel.getGenreBox()
-						.getItemCount() - 1);
 	}
 
 	/**
@@ -418,7 +394,7 @@ public class BookCreator extends ItemCreator {
 		private final JTextField isbnField = new JTextField();
 		private final JTextField pages = new JTextField();
 
-		private GenreMiniPanel genresMiniPanel;
+		private TagCloudMiniPanel tagCloud;
 		private AuthorMiniPanel authorsMiniPanel;
 
 		public DetailedInformationPanel(boolean isDoubleBuffered) {
@@ -440,8 +416,10 @@ public class BookCreator extends ItemCreator {
 		private void loadGenres() throws SQLException {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
 					new Genre());
+			gsf.addWhereClause("type", GenreType.BOOK.toString());
 			gsf.executeSQL(true);
-			this.genresMiniPanel = new GenreMiniPanel("Genres", gsf.getGenres());
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
+					GenreType.BOOK);
 		}
 
 		private void loadAuthors() throws SQLException {
@@ -472,16 +450,16 @@ public class BookCreator extends ItemCreator {
 			this.isbnField.setText("");
 			this.pages.setText("");
 			this.authorsMiniPanel.getAuthorsBox().removeAllItems();
-			selectedBook.getAuthors().clear();
-			this.genresMiniPanel.getGenreBox().removeAllItems();
+			this.tagCloud.clear();
 			selectedBook.getGenres().clear();
+			selectedBook.getAuthors().clear();
 		}
 
 		private void layoutComponents() {
 			this.setLayout(new GridLayout(4, 1));
 			this.add(this.isbnField);
 			this.add(this.pages);
-			this.add(this.genresMiniPanel);
+			this.add(this.tagCloud);
 			this.add(this.authorsMiniPanel);
 		}
 	}

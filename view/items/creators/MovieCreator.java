@@ -133,6 +133,14 @@ public class MovieCreator extends ItemCreator {
 				.createTitledBorder("Duration"));
 		this.coverPanel = new ImagePanel();
 
+		this.initializeAuthorsMiniPanel();
+		this.initializeTagCloud();
+
+		String arr[] = { "by title" };
+		this.searchPanel.setSearchCriteria(arr);
+	}
+
+	private void initializeAuthorsMiniPanel() {
 		// loading directors
 		try {
 			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
@@ -162,25 +170,21 @@ public class MovieCreator extends ItemCreator {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
 
+	private void initializeTagCloud() {
 		// loading genres
 		try {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
 					new Genre());
 			gsf.addWhereClause("type", GenreType.MOVIE.toString());
 			gsf.executeSQL(true);
-			TreeSet<Genre> bridge = new TreeSet<>();
-			for (Genre a : gsf.getGenres()) {
-				bridge.add(a);
-			}
-			this.tagCloud = new TagCloudMiniPanel();
-			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
-			this.tagCloud.setTags(bridge);
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.MOVIE);
+			this.tagCloud.setBorder(BorderFactory
+					.createTitledBorder("Tag cloud"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		String arr[] = { "by title" };
-		this.searchPanel.setSearchCriteria(arr);
 	}
 
 	@Override
