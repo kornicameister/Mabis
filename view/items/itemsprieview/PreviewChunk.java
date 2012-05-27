@@ -58,6 +58,8 @@ public class PreviewChunk extends JPanel {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

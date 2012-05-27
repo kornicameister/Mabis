@@ -94,8 +94,7 @@ public class MovieAPI extends ApiAccess {
 		for (String a : arr) {
 			Author tmp = new Author(a.split(" ")[0], a.split(" ")[1]);
 			try {
-				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),
-						ImageType.AUTHOR));
+				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),ImageType.AUTHOR));
 				m.addAuthor(tmp);
 			} catch (IOException e) {
 				e.printStackTrace();

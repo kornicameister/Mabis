@@ -88,8 +88,8 @@ public class Picture extends BaseTable implements Serializable {
 			FileNotFoundException {
 		this.saveHash(url);
 		URLConnection urlConn = url.openConnection();
-		urlConn.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		urlConn.addRequestProperty("Referer", "www.google.com");
+		urlConn.setRequestProperty("User-Agent","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		urlConn.connect();
 
 		// saving file
@@ -99,7 +99,7 @@ public class Picture extends BaseTable implements Serializable {
 		this.imageFilePath = output.getAbsolutePath();
 
 		FileOutputStream fos = new FileOutputStream(output);
-		byte[] b = new byte[2048];
+		byte[] b = new byte[4096];
 		int length;
 		while ((length = is.read(b)) != -1) {
 			fos.write(b, 0, length);

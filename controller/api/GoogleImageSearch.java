@@ -2,9 +2,13 @@ package controller.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.logging.Level;
+
+import logger.MabisLogger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +26,7 @@ public class GoogleImageSearch {
 			url = new URL(MAGIC_URL + query + MAGIC_OPTIONS);
 			connection = url.openConnection();
 			connection.addRequestProperty("Referer", "www.example.com");
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 			String line;
 			StringBuilder builder = new StringBuilder();
 			BufferedReader reader;
@@ -49,8 +54,17 @@ public class GoogleImageSearch {
 		if (results.length() == 0) {
 			return null;
 		}
-		responseData = results.getJSONObject(0);
-		String url = responseData.getString("url");
+		String url = null;
+		for(int i = 0 ; i < results.length() ; i++){
+			try {
+				url = results.getJSONObject(i).getString("url");
+				InputStream is = new URL(url).openStream();
+				is.close();
+				return url;
+			} catch (IOException e) {
+				MabisLogger.getLogger().log(Level.WARNING,"Image at {0} seems to be unavailable",url);
+			}
+		}
 		return url;
 	}
 }

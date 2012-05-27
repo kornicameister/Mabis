@@ -212,8 +212,7 @@ public class MovieCreator extends ItemCreator {
 		@Override
 		protected void done() {
 			try {
-				ItemsPreview ip = new ItemsPreview("Collected movies",
-						this.get());
+				ItemsPreview ip = new ItemsPreview("Collected movies",this.get());
 				ip.addPropertyChangeListener("selectedItem",
 						new PropertyChangeListener() {
 							@Override

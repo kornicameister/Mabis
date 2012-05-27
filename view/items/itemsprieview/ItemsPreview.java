@@ -99,10 +99,12 @@ public class ItemsPreview extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		JButton source = (JButton) e.getSource();
 		if (source.equals(this.acceptSelectedButton)) {
+			JScrollPane selected = (JScrollPane) this.tabbedPanel.getSelectedComponent();
+			PreviewChunk chunk = (PreviewChunk) selected.getViewport().getView();
 			this.firePropertyChange(
 					"selectedItem",
 					null,
-					((PreviewChunk) this.tabbedPanel.getSelectedComponent()).previedItem);
+					chunk.previedItem);
 		}
 		// no matter which one from two buttons was clicked, closing preview
 		// anyway
