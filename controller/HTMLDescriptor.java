@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map.Entry;
 
+import javax.swing.JEditorPane;
+
 import model.BaseTable;
 import model.entity.AudioAlbum;
 import model.entity.Author;
@@ -21,12 +23,22 @@ import settings.GlobalPaths;
 
 /**
  * Klasa tworzy opis HTML przekazanego obiektu.
+ * Wewnętrznie dokonuje sprawdzenia typu obiektu który został doń przekazany.
+ * Operując swoimi statycznymi metodami kieruje logikę do odpowiedniego generatora
+ * ciała dokumenta html.
  * @author kornicameister
- *
+ * @see 
  */
 public class HTMLDescriptor {
 	
-	public static URL toHTML(BaseTable bt){
+	/**
+	 * Główna metoda deskryptora, dodaje początek i koniec poprawnego dokumentu html.
+	 * 
+	 * @param bt obiekt klasy 
+	 * @return adres url to lokalnego plik
+	 * @throws Exception jeśli nastąpiła próba 
+	 */
+	public static URL toHTML(BaseTable bt) throws Exception{
 		
 		String fullContent = new String();
 		fullContent += "<html><body>";
@@ -36,7 +48,7 @@ public class HTMLDescriptor {
 		return HTMLDescriptor.saveToFileSystem(fullContent);
 	}
 
-	private static String generateBody(BaseTable bt) {
+	private static String generateBody(BaseTable bt) throws Exception {
 		switch(bt.getTableType()){
 		case AUDIO_ALBUM:
 			return HTMLDescriptor.generateAudioAlbumBody((AudioAlbum)bt);
@@ -45,7 +57,7 @@ public class HTMLDescriptor {
 		case BOOK:
 			return HTMLDescriptor.generateBookBody((Book)bt);
 		default:
-			return new String();
+			throw new Exception("Wrong table type provided");
 		}
 	}
 
@@ -221,8 +233,12 @@ public class HTMLDescriptor {
 	}
 
 	/**
-	 * @param fullContent
-	 * @return
+	 * Zapisuje stworzoną zawartość pliku html to fizycznego pliku na dysku.
+	 * Ścieżka ustawiona jest na {@link GlobalPaths#TMP}
+	 * 
+	 * @param fullContent zawartość pliku html
+	 * @return link wymagany przez {@link JEditorPane}
+	 * @see JEditorPane
 	 */
 	private static URL saveToFileSystem(String fullContent) {
 		DataOutputStream dos = null;
