@@ -51,26 +51,24 @@ public class HTMLDescriptor {
 
 	private static String generateBookBody(Book bt) {
 		String bodyPart = new String();
+		bodyPart += "<h1>" + bt.getTitle() + "</h1>";
+		if (bt.getSubtitle() != null && !bt.getSubtitle().isEmpty()) {
+			bodyPart += "<h2>" + bt.getSubtitle() + "</h2>";
+		}
 		bodyPart += "<table border='0'>";
 		bodyPart += "<tr>";
-		bodyPart += "<td>";
-		if(bt.getCover() != null && bt.getCover().getImageFile() != null){;
+		bodyPart += "<td width='240'>";
+		if(bt.getCover() != null && bt.getCover().getImageFile() != null){
 			bodyPart += "<img height='230' width='230' src='" + bt.getCover().getImageFile().getAbsolutePath() + "'/>";
 		}
 		bodyPart += "</td>";
 		bodyPart += "<td>";		
 			bodyPart += "<p><b>Rating:</b>" + bt.getRating() + "</p>";
 			bodyPart += "<p><b>ID:</b>" + bt.getPrimaryKey() + "</p>";
-			bodyPart += "<p><b>Title:</b>" + bt.getTitle() + "</p>";
-			if (bt.getSubtitle() != null && !bt.getSubtitle().isEmpty()) {
-				bodyPart += "<b><i>Subtitle:</i></b>" + bt.getSubtitle() + "</p>";
-			}
 			bodyPart += "<p><b>Pages:</b>" + bt.getPages() + "</p>";
 		bodyPart += "</td>";
 	
 		if (bt.getAuthors() != null && !bt.getAuthors().isEmpty()) {
-			bodyPart += "</tr>";
-			bodyPart += "<tr>";
 			bodyPart += "<td>";
 				bodyPart += "<b>Directors:</b>";
 				bodyPart += "<ul>";
@@ -79,13 +77,11 @@ public class HTMLDescriptor {
 				}
 				bodyPart += "</ul>";
 			bodyPart += "</td>";
-			bodyPart += "</tr>";
-			bodyPart += "<tr>";
 		}
 		
 		if(bt.getDescription() != null && !bt.getDescription().isEmpty()){
-			bodyPart += "</tr>";
-			bodyPart += "<td>";
+			bodyPart += "</tr><tr>";
+			bodyPart += "<td width=\"240\">";
 				bodyPart += "<p><b>Description</b></p>";
 				bodyPart += bt.getDescription();
 			bodyPart += "</td>";
@@ -103,17 +99,14 @@ public class HTMLDescriptor {
 		}
 
 		if (bt.getGenres() != null && !bt.getGenres().isEmpty()) {
-			bodyPart += "</tr>";
-			bodyPart += "<tr>";
-				bodyPart += "<td>";
-					bodyPart += "<b>Genres:</b>";
-					bodyPart += "<ul>";
-					for (Genre g : bt.getGenres()) {
-						bodyPart += "<li>" + g.getGenre() + "</li>";
-					}
-					bodyPart += "</ul>";
-				bodyPart += "</td>";
-			bodyPart += "</tr>";
+			bodyPart += "<td>";
+				bodyPart += "<b>Genres:</b>";
+				bodyPart += "<ul>";
+				for (Genre g : bt.getGenres()) {
+					bodyPart += "<li>" + g.getGenre() + "</li>";
+				}
+				bodyPart += "</ul>";
+			bodyPart += "</td>";
 		}else{
 			bodyPart += "</tr>";
 		}
