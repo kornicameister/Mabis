@@ -149,8 +149,8 @@ public class Book extends Movie implements Serializable {
 	public URL toDescription() {
 		String str = new String();
 		str += "<html>";
-		str += "<p style='color: red'><b>Rating:</b>" + this.getRating()
-				+ "</p>";
+		str += "<p style='color: red'><b>Rating:</b>" + this.getRating() + "</p>";
+		str += "<div class='photo'><img src='" + this.getCover().getImageFile().getAbsolutePath() + "'/></div>";
 		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
 		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
 		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {

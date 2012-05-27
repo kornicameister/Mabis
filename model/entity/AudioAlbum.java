@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 import model.BaseTable;
@@ -113,64 +112,18 @@ public class AudioAlbum extends Movie implements Serializable {
 	}
 
 	@Override
-	public String toString() {
-		String str = BaseTable.class.toString();
-		str += "----------\n";
-		str += "[TITLE: " + this.getTitle() + "]\n";
-		str += "[BAND: " + this.getBand() + "]\n";
-		str += "[TAGCLOUD: " + this.getGenres() + "]\n";
-		str += "[DURATION: " + this.getDuration() + "]\n";
-		str += "[COVER:" + this.getCover() + "]\n";
-		return str;
-	}
-
-	@Override
-	public Object[] toColumnIdentifiers() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for (Object d : super.toColumnIdentifiers()) {
-			data.add(d);
-		}
-		data.set(6, "Band");
-		return data.toArray();
-	}
-
-	@Override
 	public URL toDescription() {
-		String str = new String();
-		str += "<html>";
-		str += "<p style='color: red'><b>Rating:</b>" + this.getRating()
-				+ "</p>";
-		str += "<p><b>Band:</b>" + this.getBand().getName() + "</p>";
-		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
-		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
-		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
-			str += "<b><i>Subtitle:</i></b>" + this.getSubtitle() + "</p>";
-		}
-		str += "<p><b>Lenght:</b>" + this.getDuration() + "</p>";
-		if (this.getTrackList() != null && !this.getTrackList().isEmpty()) {
-			str += "<b>Tracklist:</b>";
-			str += "<ul>";
-			for (AudioAlbumTrack t : this.getTrackList()) {
-				str += "<li>" + t.toString() + "</li>";
-			}
-			str += "</ul>";
-		}
-		if (this.getGenres() != null && !this.getGenres().isEmpty()) {
-			str += "<b>Genres:</b>";
-			str += "<ul>";
-			for (Genre g : this.getGenres()) {
-				str += "<li>" + g.getGenre() + "</li>";
-			}
-			str += "</ul>";
-		}
-		str += "</html>";
+		String fullContent = new String();
+		fullContent += "<html><body>";
+		fullContent += this.generateBody();
+		fullContent += "</body></html>";
 
 		DataOutputStream dos = null;
 		String path = GlobalPaths.TMP
 				+ String.valueOf(Math.random() * Double.MAX_EXPONENT);
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
-			dos.writeBytes(str);
+			dos.writeBytes(fullContent);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -194,4 +147,56 @@ public class AudioAlbum extends Movie implements Serializable {
 		return null;
 	}
 
+	private String generateBody() {
+		String bodyPart = new String();
+		bodyPart += "<h1>" + this.getBand().getName() + "</h1>";
+		
+		bodyPart += "<table border='0'>";
+			bodyPart += "<tr>";
+				bodyPart += "<td>";
+				if(this.getCover() != null && this.getCover().getImageFile() != null){
+					bodyPart += "<img src='" + this.getCover().getImageFile().getAbsolutePath() + "'/>";
+				}else{
+					bodyPart += "<img src='" + GlobalPaths.DEFAULT_COVER_PATH.toString() + "'/>";
+				}
+				bodyPart += "</td>";
+				bodyPart += "<td>";		
+					bodyPart += "<p><b>Rating:</b>" + this.getRating() + "</p>";
+					bodyPart += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
+					bodyPart += "<p><b>Title:</b>" + this.getTitle() + "</p>";
+					if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
+						bodyPart += "<b><i>Subtitle:</i></b>" + this.getSubtitle() + "</p>";
+					}
+					bodyPart += "<p><b>Lenght:</b>" + this.getDuration() + "</p>";
+				bodyPart += "</td>";
+			
+				if (this.getTrackList() != null && !this.getTrackList().isEmpty()) {
+					bodyPart += "<td>";
+						bodyPart += "<b>Tracklist:</b>";
+						bodyPart += "<ul>";
+						for (AudioAlbumTrack t : this.getTrackList()) {
+							bodyPart += "<li>" + t.toString() + "</li>";
+						}
+						bodyPart += "</ul>";
+					bodyPart += "</td>";
+				}
+		
+				if (this.getGenres() != null && !this.getGenres().isEmpty()) {
+					bodyPart += "</tr>";
+					bodyPart += "<tr>";
+						bodyPart += "<td>";
+							bodyPart += "<b>Genres:</b>";
+							bodyPart += "<ul>";
+							for (Genre g : this.getGenres()) {
+								bodyPart += "<li>" + g.getGenre() + "</li>";
+							}
+							bodyPart += "</ul>";
+						bodyPart += "</td>";
+					bodyPart += "</tr>";
+				}else{
+					bodyPart += "</tr>";
+				}
+		bodyPart += "</table>";
+		return bodyPart;
+	}
 }

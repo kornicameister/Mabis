@@ -7,10 +7,9 @@ import java.awt.event.ActionListener;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import logger.MabisLogger;
@@ -43,19 +42,16 @@ public class ItemsPreview extends JFrame implements ActionListener {
 
 		this.setMinimumSize(dim);
 		this.setSize(dim);
-		this.setResizable(false);
+//		this.setResizable(false);
 	}
 
 	private void layoutComponents() {
 		this.setLayout(new BorderLayout());
-		this.tabbedPanel
-				.setPreferredSize(new Dimension(Integer.MAX_VALUE, 380));
+		this.tabbedPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 380));
 		this.add(this.tabbedPanel, BorderLayout.PAGE_START);
-		this.acceptSelectedButton.setPreferredSize(new Dimension(
-				Integer.MAX_VALUE / 2, 30));
+		this.acceptSelectedButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2, 30));
 		this.add(this.acceptSelectedButton, BorderLayout.CENTER);
-		this.cancelButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2,
-				30));
+		this.cancelButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2,30));
 		this.add(this.cancelButton, BorderLayout.PAGE_END);
 	}
 
@@ -65,12 +61,9 @@ public class ItemsPreview extends JFrame implements ActionListener {
 	protected void initComponents() {
 		this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
 		this.tabbedPanel.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		JPanel p = null;
 		for (BaseTable bs : this.elements) {
 			try {
-				p = PreviewArbiter.determineTyp(bs);
-				p.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), bs.getTitle()));
-				this.tabbedPanel.addTab(bs.getTitle(), p);
+				this.tabbedPanel.addTab(bs.getTitle(), new JScrollPane(PreviewArbiter.determineTyp(bs)));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
