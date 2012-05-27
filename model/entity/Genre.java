@@ -83,7 +83,7 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.getPrimaryKey() + ": " + this.getGenre();
+		return this.getPrimaryKey() + ": " + this.getGenre() + ": -> " + this.getType() + "\n";
 	}
 
 	@Override

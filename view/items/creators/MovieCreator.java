@@ -179,8 +179,7 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected Boolean createItem() {
-		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT,
-				this.selectedMovie);
+		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
 		try {
 			msf.executeSQL(true);
 			return true;
@@ -301,6 +300,9 @@ public class MovieCreator extends ItemCreator {
 		this.durationField.setText(this.selectedMovie.getDuration());
 		this.descriptionArea.setText(this.selectedMovie.getDescription());
 		this.coverPanel.setImage(this.selectedMovie.getCover().getImageFile());
+		for(Author a : this.selectedMovie.getAuthors()){
+			a.setType(AuthorType.MOVIE_DIRECTOR);
+		}
 		this.directorsPanel.setAuthors(this.selectedMovie.getAuthors());
 		this.tagCloud.setTags(this.selectedMovie.getGenres());
 	}

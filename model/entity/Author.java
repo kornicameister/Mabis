@@ -106,7 +106,7 @@ public class Author extends BaseTable implements Serializable {
 	@Override
 	public String toString() {
 		return this.getPrimaryKey() + ": " + this.getFirstName() + " "
-				+ this.getLastName();
+				+ this.getLastName() + ": " + this.getType() + "\n";
 	}
 
 	@Override

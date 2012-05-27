@@ -29,8 +29,8 @@ public class GenreSQLFactory extends SQLFactory {
 		Genre genre = (Genre) this.table;
 		switch (this.type) {
 		case INSERT:
-			st.setObject(1, genre);
-			st.setString(2, genre.getType().toString());
+			st.setString(1, genre.getType().toString());
+			st.setObject(2, genre);
 			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(genre, st);

@@ -32,8 +32,8 @@ public class MovieSQLFactory extends SQLFactory {
 		case INSERT:
 			short parameterIndex = 1;
 			// TODO add transactions
-			st.setInt(parameterIndex++, this.insertGenre(movie.getGenre()));
-			st.setInt(parameterIndex++, this.insertDirector(movie.getAuthors().first()));
+			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
+			st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
 			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
 			st.setObject(parameterIndex++, movie);
 			st.execute();
@@ -68,7 +68,7 @@ public class MovieSQLFactory extends SQLFactory {
 	protected Integer insertCover(Picture cover) throws SQLException {
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
 				cover);
-		this.lastAffactedId = psf.executeSQL(localDatabase);
+		this.lastAffactedId = psf.executeSQL(false);
 		cover.setPrimaryKey(this.lastAffactedId);
 		return lastAffactedId;
 	}
@@ -83,19 +83,19 @@ public class MovieSQLFactory extends SQLFactory {
 	 * @return numer identyfikacyjny reżysera filmu
 	 * @throws SQLException
 	 */
-	protected Integer insertDirector(Author director) throws SQLException {
-		AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
-				director);
-		asf.addWhereClause("idAuthor", director.getPrimaryKey().toString());
-		asf.executeSQL(true);
-		if (asf.getAuthors().isEmpty()) {
-			asf.setStatementType(SQLStamentType.INSERT);
-			this.lastAffactedId = asf.executeSQL(true);
-			director.setPrimaryKey(this.lastAffactedId);
-			return this.lastAffactedId;
-		} else {
-			for (Author a : asf.getAuthors()) {
-				this.lastAffactedId = a.getPrimaryKey();
+	protected Integer insertDirectors(TreeSet<Author> directors) throws SQLException {
+		this.lastAffactedId = -1;
+		for(Author director : directors){
+			if(director.getPrimaryKey() < 0){
+				AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.INSERT, director);
+				if(this.lastAffactedId < 0){
+					this.lastAffactedId = asf.executeSQL(false);
+					director.setPrimaryKey(this.lastAffactedId);
+				}else{
+					director.setPrimaryKey(asf.executeSQL(false));
+				}
+			}else{
+				this.lastAffactedId = director.getPrimaryKey();
 				return this.lastAffactedId;
 			}
 		}
@@ -106,25 +106,27 @@ public class MovieSQLFactory extends SQLFactory {
 	 * Metoda umieszcza w bazie danych informacje o gatunku danego filmu. Jeśli
 	 * dany gatunek jest już w bazie danych, wtedy pobierany jest jego numer
 	 * identyfikacyjny
+	 * @param genres 
 	 * 
 	 * @param genres
 	 *            gatunek filmu
 	 * @return numer identyfikacynyjny gatunku
 	 * @throws SQLException
 	 */
-	protected Integer insertGenre(Genre genre) throws SQLException {
+	protected Integer insertGenres(TreeSet<Genre> genres) throws SQLException {
 		this.lastAffactedId = -1;
-		GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT, genre);
-		gsf.addWhereClause("idGenre", genre.getPrimaryKey().toString());
-		gsf.executeSQL(true);
-		if (gsf.getGenres().isEmpty()) {
-			// no such genres, inserting
-			gsf.setStatementType(SQLStamentType.INSERT);
-			this.lastAffactedId = gsf.executeSQL(true);
-			genre.setPrimaryKey(this.lastAffactedId);
-		} else {
-			for (Genre g : gsf.getGenres()) {
-				this.lastAffactedId = g.getPrimaryKey();
+		for(Genre genre: genres){
+			if(genre.getPrimaryKey() < 0){
+				GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.INSERT, genre);
+				gsf.setStatementType(SQLStamentType.INSERT);
+				if(this.lastAffactedId < 0){
+					this.lastAffactedId = gsf.executeSQL(false);
+					genre.setPrimaryKey(this.lastAffactedId);
+				}else{
+					genre.setPrimaryKey(gsf.executeSQL(true));
+				}
+			}else{
+				this.lastAffactedId = genre.getPrimaryKey();
 				break;
 			}
 		}

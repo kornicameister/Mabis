@@ -99,10 +99,13 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	protected void insertEntity(Author entity, PreparedStatement st)
 			throws SQLException {
-		st.setInt(1, this.insertAvatar(entity.getPictureFile()));
-		st.setObject(2, entity);
 		if(!entity.getTableType().equals(TableType.USER)){
-			st.setString(3, entity.getType().toString());
+			st.setString(1, entity.getType().toString());
+			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
+			st.setObject(3, entity);
+		}else{
+			st.setObject(1, entity);
+			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
 		}
 		st.execute();
 		st.clearParameters();
@@ -118,9 +121,8 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	private Integer insertAvatar(Picture picture) throws SQLException {
 		if (picture != null) {
-			PictureSQLFactory psf = new PictureSQLFactory(
-					SQLStamentType.INSERT, picture);
-			this.lastAffactedId = psf.executeSQL(localDatabase);
+			PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT, picture);
+			this.lastAffactedId = psf.executeSQL(false);
 			picture.setPrimaryKey(this.lastAffactedId);
 			return lastAffactedId;
 		}else{

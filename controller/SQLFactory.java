@@ -115,8 +115,7 @@ public abstract class SQLFactory implements StatementFactory {
 	}
 
 	@Override
-	public Integer executeSQL(boolean local) throws SQLException {
-		this.localDatabase = local;
+	public Integer executeSQL(boolean noAutoCommit) throws SQLException {
 		try {
 			if (!MySQLAccess.getConnection().isValid(1000)) {
 				MabisLogger.getLogger().log(Level.SEVERE,
@@ -128,27 +127,15 @@ public abstract class SQLFactory implements StatementFactory {
 		}
 
 		PreparedStatement st = null;
-		MySQLAccess msql = null;
 		this.sqlQuery = this.createSQL();
 
-		if (localDatabase) {
-			st = MySQLAccess.getConnection().prepareStatement(this.sqlQuery,
-					Statement.RETURN_GENERATED_KEYS);
-		} else {
-			msql = new MySQLAccess();
-			st = msql.connectToOnlineDatabase().prepareStatement(this.sqlQuery,
-					Statement.RETURN_GENERATED_KEYS);
-		}
-
+		st = MySQLAccess.getConnection().prepareStatement(this.sqlQuery,
+				Statement.RETURN_GENERATED_KEYS);
+		
 		this.executeByTableAndType(st);
-
+		
 		st.close();
 		st = null;
-
-		if (msql != null) {
-			msql.disconnectFromOnlineDatabase();
-			msql = null;
-		}
 
 		System.gc();
 		return lastAffactedId;
@@ -215,12 +202,12 @@ public abstract class SQLFactory implements StatementFactory {
 	public String buildWhereChunk() {
 		String a = new String();
 		for (WhereClause where : this.wheres) {
-			a += where.attribute + "='" + where.value + "',";
+			a += where.attribute + "='" + where.value + "' and ";
 		}
 		if (a.length() == 0) {
 			return "";
 		}
-		return a.substring(0, a.length() - 1);
+		return a.substring(0, a.length() - 5);
 	}
 
 	@Override
