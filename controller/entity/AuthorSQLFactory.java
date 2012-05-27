@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import model.BaseTable;
 import model.entity.Author;
 import model.entity.Picture;
+import model.enums.TableType;
 import utilities.Utilities;
 import controller.SQLFactory;
 import controller.SQLStamentType;
@@ -100,7 +101,9 @@ public class AuthorSQLFactory extends SQLFactory {
 			throws SQLException {
 		st.setInt(1, this.insertAvatar(entity.getPictureFile()));
 		st.setObject(2, entity);
-		st.setString(3, entity.getType().toString());
+		if(!entity.getTableType().equals(TableType.USER)){
+			st.setString(3, entity.getType().toString());
+		}
 		st.execute();
 		st.clearParameters();
 		this.lastAffactedId = Utilities.lastInsertedId(entity, st);
