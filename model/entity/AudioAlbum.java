@@ -154,10 +154,8 @@ public class AudioAlbum extends Movie implements Serializable {
 		bodyPart += "<table border='0'>";
 			bodyPart += "<tr>";
 				bodyPart += "<td>";
-				if(this.getCover() != null && this.getCover().getImageFile() != null){
-					bodyPart += "<img src='" + this.getCover().getImageFile().getAbsolutePath() + "'/>";
-				}else{
-					bodyPart += "<img src='" + GlobalPaths.DEFAULT_COVER_PATH.toString() + "'/>";
+				if(this.getCover() != null && this.getCover().getImageFile() != null){;
+					bodyPart += "<img height='230' width='230' src='" + this.getCover().getImageFile().getAbsolutePath() + "'/>";
 				}
 				bodyPart += "</td>";
 				bodyPart += "<td>";		

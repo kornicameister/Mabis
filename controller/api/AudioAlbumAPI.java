@@ -4,6 +4,7 @@
 package controller.api;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -26,6 +27,8 @@ import model.utilities.AudioAlbumTrack;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import settings.GlobalPaths;
 
 /**
  * @author kornicameister
@@ -90,8 +93,7 @@ public class AudioAlbumAPI extends ApiAccess {
 	 */
 	private void parseResponse(StringBuilder builder) throws JSONException {
 		JSONObject startObject = new JSONObject(builder.toString());
-		JSONArray albumMatches = startObject.getJSONObject("results")
-				.getJSONObject("albummatches").getJSONArray("album");
+		JSONArray albumMatches = startObject.getJSONObject("results").getJSONObject("albummatches").getJSONArray("album");
 
 		// fire task lenght
 		this.pcs.firePropertyChange("taskStarted", 0, albumMatches.length());
@@ -130,8 +132,7 @@ public class AudioAlbumAPI extends ApiAccess {
 			if (!startObject.getJSONObject("toptags").has("tag")) {
 				return tags;
 			}
-			JSONArray tracks = startObject.getJSONObject("toptags")
-					.getJSONArray("tag");
+			JSONArray tracks = startObject.getJSONObject("toptags").getJSONArray("tag");
 			for (int i = 0; i < 5; i++) {
 				tags.add(new Genre(tracks.getJSONObject(i).getString("name"),GenreType.AUDIO));
 			}
@@ -150,15 +151,12 @@ public class AudioAlbumAPI extends ApiAccess {
 			JSONObject startObject = new JSONObject(accessAPI(params)
 					.toString());
 			if (startObject.has("error") || !startObject.has("album")) {
-				return trackList;
+				throw new JSONException("Error located or there is no valid tracklist");
 			}
-			if (!startObject.getJSONObject("album").has("tracks")
-					|| startObject.getJSONObject("album")
-							.getJSONObject("tracks").has("album")) {
-				return trackList;
+			if (!startObject.getJSONObject("album").has("tracks") || startObject.getJSONObject("album").getJSONObject("tracks").has("album")) {
+				throw new JSONException("There is no valid albums for tracks object");
 			}
-			JSONArray tracks = startObject.getJSONObject("album")
-					.getJSONObject("tracks").getJSONArray("track");
+			JSONArray tracks = startObject.getJSONObject("album").getJSONObject("tracks").getJSONArray("track");
 			JSONObject track = null;
 			for (int i = 0; i < tracks.length(); i++) {
 				track = tracks.getJSONObject(i);
@@ -177,10 +175,8 @@ public class AudioAlbumAPI extends ApiAccess {
 		TreeMap<String, String> params = new TreeMap<>();
 		params.put("artist", band);
 		try {
-			JSONObject startObject = new JSONObject(accessAPI(params)
-					.toString());
-			JSONArray artistMatches = startObject.getJSONObject("results")
-					.getJSONObject("artistmatches").getJSONArray("artist");
+			JSONObject startObject = new JSONObject(accessAPI(params).toString());
+			JSONArray artistMatches = startObject.getJSONObject("results") .getJSONObject("artistmatches").getJSONArray("artist");
 			JSONObject artistObject = null;
 			for (int i = 0; i < artistMatches.length(); i++) {
 				artistObject = artistMatches.getJSONObject(i);
@@ -201,10 +197,13 @@ public class AudioAlbumAPI extends ApiAccess {
 			JSONObject picture = images.getJSONObject(i);
 			if (picture.getString("#text") != null) {
 				try {
-					return new Picture(new URL(picture.getString("#text")),
-							ImageType.FRONT_COVER);
+					return new Picture(new URL(picture.getString("#text")),ImageType.FRONT_COVER);
 				} catch (MalformedURLException e) {
-					return null;
+					try {
+						return new Picture(GlobalPaths.DEFAULT_COVER_PATH.toString(),ImageType.FRONT_COVER);
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

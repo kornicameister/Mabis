@@ -1,12 +1,12 @@
 package view.items.itemsprieview;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -42,24 +42,38 @@ public class ItemsPreview extends JFrame implements ActionListener {
 
 		this.setMinimumSize(dim);
 		this.setSize(dim);
-//		this.setResizable(false);
+		// this.setResizable(false);
 	}
 
 	private void layoutComponents() {
-		this.setLayout(new BorderLayout());
-		this.tabbedPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 380));
-		this.add(this.tabbedPanel, BorderLayout.PAGE_START);
-		this.acceptSelectedButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2, 30));
-		this.add(this.acceptSelectedButton, BorderLayout.CENTER);
-		this.cancelButton.setPreferredSize(new Dimension(Integer.MAX_VALUE / 2,30));
-		this.add(this.cancelButton, BorderLayout.PAGE_END);
+
+		GroupLayout gl = new GroupLayout(this.getContentPane());
+		this.getContentPane().setLayout(gl);
+
+		gl.setAutoCreateGaps(true);
+		gl.setAutoCreateContainerGaps(true);
+
+		gl.setHorizontalGroup(gl
+				.createParallelGroup()
+				.addComponent(this.tabbedPanel)
+				.addGroup(
+						gl.createSequentialGroup()
+								.addComponent(this.acceptSelectedButton)
+								.addComponent(this.cancelButton)));
+		gl.setVerticalGroup(gl
+				.createSequentialGroup()
+				.addComponent(this.tabbedPanel)
+				.addGroup(
+						gl.createParallelGroup()
+								.addComponent(this.acceptSelectedButton,40,40,40)
+								.addComponent(this.cancelButton,40,40,40)));
 	}
 
 	/**
 	 * Inicjalizacja składowych tego okienka, tj. {@link ItemsPreview}
 	 */
 	protected void initComponents() {
-		this.tabbedPanel = new JTabbedPane(JTabbedPane.TOP);
+		this.tabbedPanel = new JTabbedPane(JTabbedPane.BOTTOM);
 		this.tabbedPanel.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		for (BaseTable bs : this.elements) {
 			try {
