@@ -16,6 +16,7 @@ public class TrackListPanel extends JPanel {
 	private static final long serialVersionUID = 4109556422700649333L;
 	private JTable trackListTable;
 	private DefaultTableModel dtm;
+	private TreeSet<AudioAlbumTrack> tracks;
 
 	public TrackListPanel() {
 		super(true);
@@ -28,6 +29,7 @@ public class TrackListPanel extends JPanel {
 			this.initializeTable(new TreeSet<AudioAlbumTrack>());
 		} else {
 			this.initializeTable(tracks);
+			this.tracks = tracks;
 		}
 	}
 
@@ -78,5 +80,9 @@ public class TrackListPanel extends JPanel {
 			this.trackListTable.revalidate();
 			row.clear();
 		}
+	}
+	
+	public TreeSet<AudioAlbumTrack> getTracks() {
+		return tracks;
 	}
 }

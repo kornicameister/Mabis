@@ -23,7 +23,7 @@ import model.enums.TableType;
 public class Author extends BaseTable implements Serializable {
 	private static final long serialVersionUID = 7692599340459728530L;
 	private Picture pictureFile;
-	private AuthorType type;
+	protected AuthorType type;
 
 	/**
 	 * Domyślny pusty konstruktor dla klasy {@link Author}
@@ -51,6 +51,13 @@ public class Author extends BaseTable implements Serializable {
 	 */
 	public Author(int pk) {
 		super(pk);
+	}
+
+	public Author(String fName, String lName, AuthorType type) {
+		super();
+		this.setTitle(fName);
+		this.setSubTitle(lName);
+		this.type = type;
 	}
 
 	@Override

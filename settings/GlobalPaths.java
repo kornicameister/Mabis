@@ -11,7 +11,8 @@ public enum GlobalPaths {
 			"src/resources/defaultCover.png"), DEFAULT_AVATAR_PATH(
 			"src/resources/defaultAvatar.png"), BAND_CACHE_PATH(
 			"./cache/bands/"), AUTHOR_CACHE_PATH("./cache/authors/"), MEDIA_CACHE_PATH(
-			"./cache/media/"), TMP(System.getProperty("java.io.tmpdir")+"/mabis/");
+			"./cache/media/"), TMP(System.getProperty("java.io.tmpdir")
+			+ "/mabis/"), CROSS_SIGN("src/resources/cross_sign.png");
 
 	private final String path;
 

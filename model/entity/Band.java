@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import model.enums.AuthorType;
 import model.enums.TableType;
 
 /**
@@ -42,6 +43,13 @@ public class Band extends Author implements Serializable {
 		super();
 		this.setTitle(bandName);
 		this.createLastFMUrl();
+	}
+
+	public Band(String bandName, AuthorType type) {
+		super();
+		this.setTitle(bandName);
+		this.createLastFMUrl();
+		this.type = type;
 	}
 
 	private void createLastFMUrl() {

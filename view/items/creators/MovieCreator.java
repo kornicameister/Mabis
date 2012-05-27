@@ -26,6 +26,7 @@ import model.BaseTable;
 import model.entity.Author;
 import model.entity.Genre;
 import model.entity.Movie;
+import model.enums.AuthorType;
 import model.enums.GenreType;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
@@ -141,32 +142,12 @@ public class MovieCreator extends ItemCreator {
 	}
 
 	private void initializeAuthorsMiniPanel() {
-		// loading directors
 		try {
-			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
-					new Author());
+			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT, new Author());
+			asf.addWhereClause("type", AuthorType.MOVIE_DIRECTOR.toString());
 			asf.executeSQL(true);
-			TreeSet<Author> bridge = new TreeSet<>();
-			for (Author a : asf.getAuthors()) {
-				bridge.add(a);
-			}
-			this.directorsPanel = new AuthorMiniPanel("Directors", bridge);
-			this.directorsPanel
-					.addPropertyChangeListener(new PropertyChangeListener() {
-
-						@Override
-						public void propertyChange(PropertyChangeEvent e) {
-							String property = e.getPropertyName();
-							if (property.equals("authorSelected")
-									|| property.equals("authorCreated")) {
-								Author tmp = (Author) e.getNewValue();
-								if (selectedMovie.getAuthors() == null) {
-									selectedMovie.addAuthor(tmp);
-									return;
-								}
-							}
-						}
-					});
+			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.MOVIE_DIRECTOR);
+			this.directorsPanel.setBorder(BorderFactory.createTitledBorder("Authors"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

@@ -28,6 +28,7 @@ import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
+import model.enums.AuthorType;
 import model.enums.BookIndustryIdentifier;
 import model.enums.GenreType;
 import settings.GlobalPaths;
@@ -39,7 +40,9 @@ import view.items.minipanels.AuthorMiniPanel;
 import view.items.minipanels.TagCloudMiniPanel;
 import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
+import controller.entity.AuthorSQLFactory;
 import controller.entity.BookSQLFactory;
+import controller.entity.GenreSQLFactory;
 
 /**
  * @authorBox kornicameister
@@ -68,7 +71,7 @@ public class BookCreator extends ItemCreator {
 	 */
 	public BookCreator(String title) throws CreatorContentNullPointerException {
 		super(title);
-		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
+		this.setSize((int) this.getMinimumSize().getWidth() + 220, (int) this
 				.getMinimumSize().getHeight());
 	}
 
@@ -96,8 +99,7 @@ public class BookCreator extends ItemCreator {
 												.addComponent(this.isbnField)
 												.addComponent(this.pages)
 												.addGap(5)
-												.addComponent(
-														this.authorsMiniPanel)
+												.addComponent(this.authorsMiniPanel)
 												.addComponent(this.tagCloud)))
 				.addComponent(descriptionScrollPane));
 		gl.setVerticalGroup(gl
@@ -119,11 +121,8 @@ public class BookCreator extends ItemCreator {
 														40, 40, 40)
 												.addComponent(this.pages, 40,
 														40, 40)
-												.addComponent(
-														this.authorsMiniPanel,
-														80, 80, 80)
-												.addComponent(this.tagCloud,
-														80, 80, 80)))
+												.addComponent(this.authorsMiniPanel)
+												.addComponent(this.tagCloud)))
 				.addComponent(descriptionScrollPane, 140, 140, 140));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -144,38 +143,15 @@ public class BookCreator extends ItemCreator {
 		this.subTitle = new JTextField();
 		this.subTitle.setBorder(BorderFactory.createTitledBorder("Subtitle"));
 		this.titleOriginal.setBorder(BorderFactory.createTitledBorder("Title"));
-		this.authorsMiniPanel = new AuthorMiniPanel("Authors",
-				new TreeSet<Author>());
-		this.authorsMiniPanel
-				.addPropertyChangeListener(new PropertyChangeListener() {
 
-					@Override
-					public void propertyChange(PropertyChangeEvent e) {
-						String property = e.getPropertyName();
-						if (property.equals("authorSelected")
-								|| property.equals("authorCreated")) {
-							Author tmp = (Author) e.getNewValue();
-							if (selectedBook.getAuthors().size() == 0) {
-								selectedBook.addAuthor(tmp);
-								return;
-							}
-							for (Author a : selectedBook.getAuthors()) {
-								if (!(a.getFirstName().equals(
-										tmp.getFirstName()) && a.getLastName()
-										.equals(tmp.getLastName()))) {
-									selectedBook.addAuthor(tmp);
-									return;
-								}
-							}
-						}
-					}
-				});
+		this.initAuthorsMiniPanel();
+		this.initGenresPanel();
 
 		this.coverPanel = new ImagePanel();
 		this.isbnField = new JTextField();
+		this.isbnField.setBorder(BorderFactory.createTitledBorder("ISBN 13"));
 		this.pages = new JTextField();
-		this.tagCloud = new TagCloudMiniPanel(new TreeSet<Genre>(),
-				GenreType.BOOK);
+		this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
 		this.descriptionArea = new JTextArea();
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
 		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
@@ -183,6 +159,32 @@ public class BookCreator extends ItemCreator {
 				"Descripion"));
 		String arrayOfCriteria[] = { "by author", "by title" };
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
+	}
+
+	private void initGenresPanel() {
+		try {
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
+					new Genre());
+			gsf.addWhereClause("type", GenreType.BOOK.toString());
+			gsf.executeSQL(true);
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
+					GenreType.BOOK);
+			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Genres"));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void initAuthorsMiniPanel() {
+		try {
+			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
+					new Author());
+			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
+			asf.executeSQL(true);
+			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),AuthorType.BOOK_AUTHOR);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -334,22 +336,17 @@ public class BookCreator extends ItemCreator {
 		this.pages.setText(this.selectedBook.getPages().toString());
 		for (Author a : this.selectedBook.getAuthors()) {
 			if (!(a.getFirstName().isEmpty() || a.getLastName().isEmpty())) {
-				this.authorsMiniPanel.getAuthorsBox().addItem(
-						a.getFirstName() + " " + a.getLastName());
+				this.authorsMiniPanel.addRow(a);
 			}
-			// TODO add checking if obtained author (coming from google book
-			// api) is already present in database
 		}
 		for (Genre g : this.selectedBook.getGenres()) {
 			if (!g.getGenre().equals("null") && !g.getGenre().isEmpty()) {
-				this.tagCloud.addTag(g);
+				this.tagCloud.addRow(g);
 			}
 		}
 		if (this.selectedBook.getIdentifier(BookIndustryIdentifier.ISBN_13) != null) {
 			this.isbnField.setText(this.selectedBook
 					.getIdentifier(BookIndustryIdentifier.ISBN_13));
 		}
-		this.authorsMiniPanel.getAuthorsBox().setSelectedIndex(
-				this.authorsMiniPanel.getAuthorsBox().getItemCount() - 1);
 	}
 }

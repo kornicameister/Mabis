@@ -12,7 +12,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -21,6 +23,7 @@ import javax.swing.table.DefaultTableModel;
 
 import model.entity.Genre;
 import model.enums.GenreType;
+import settings.GlobalPaths;
 
 /**
  * Klasa symuluje chmurę tagów. Tagi mogą być do niej dodawana pojedynczo lub
@@ -62,7 +65,7 @@ public class TagCloudMiniPanel extends JPanel {
 				String property = e.getPropertyName();
 				if (property.equals("genreSelected")
 						|| property.equals("genreCreated")) {
-					addTag((Genre) e.getNewValue());
+					addRow((Genre) e.getNewValue());
 				}
 			}
 		});
@@ -85,8 +88,11 @@ public class TagCloudMiniPanel extends JPanel {
 		this.tagsTable.getColumnModel().getColumn(1).setMaxWidth(40);
 	}
 
-	public void addTag(Genre g) {
-		Object data[] = { this.genreToRow.size()+1,g.getPrimaryKey(), g.getGenre() };
+	public void addRow(Genre g) {
+		Object data[] = { this.genreToRow.size()+1,null, g.getGenre() };
+		if(g.getPrimaryKey() < 0){
+			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+		}
 		this.tagsModel.addRow(data);
 		this.genreToRow.put(g, this.genreToRow.size());
 	}
@@ -111,11 +117,15 @@ public class TagCloudMiniPanel extends JPanel {
 
 	public void clear() {
 		gmp.tags.clear();
+		this.clearTable();
+		this.genreToRow.clear();
+	}
+
+	private void clearTable(){
 		for (int i = tagsModel.getRowCount(); i > 0; i--) {
 			this.tagsModel.removeRow(i);
 		}
 		this.tagsTable.revalidate();
-		this.genreToRow.clear();
 	}
 
 	public ArrayList<Genre> getTags() {

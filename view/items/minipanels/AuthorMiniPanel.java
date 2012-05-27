@@ -3,32 +3,44 @@ package view.items.minipanels;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
+import settings.GlobalPaths;
 
 import logger.MabisLogger;
 import model.entity.Author;
+import model.enums.AuthorType;
 
 public class AuthorMiniPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 3416144336071217011L;
 	private ArrayList<Author> authors = new ArrayList<>();
+
 	protected final JButton newAuthorButton = new JButton("N");
 	protected final JButton selectAuthorButton = new JButton("S");
-	protected JComponent authorsBox = new JComboBox<String>();
 
-	public AuthorMiniPanel(String string, TreeSet<Author> treeSet) {
-		if (treeSet != null) {
-			this.authors.addAll(treeSet);
-		}
-		this.setBorder(BorderFactory.createTitledBorder(string));
+	protected JTable table;
+	protected DefaultTableModel tableModel;
+	private JScrollPane scrollForTable;
+	protected TreeMap<Author, Integer> authorToRow = new TreeMap<>();
+	protected AuthorType type;
+
+	public AuthorMiniPanel(TreeSet<Author> authors, AuthorType type) {
+		this.authors.addAll(authors);
+		this.type = type;
 		this.initComponents();
 		this.layoutComponents();
 	}
@@ -41,46 +53,91 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 
 		this.newAuthorButton.addActionListener(this);
 		this.selectAuthorButton.addActionListener(this);
+
+		this.initTable();
+		this.scrollForTable = new JScrollPane(this.table);
 	}
 
-	@SuppressWarnings("unchecked")
-	public void setAuthors(TreeSet<Author> authors){
+	protected void initTable() {
+		String columnNames[] = { "LP", "ID", "First Name", "Last Name" };
+		this.tableModel = new DefaultTableModel(columnNames, 0);
+		this.table = new JTable(tableModel);
+	}
+
+	public void addRow(Author a) {
+		Object data[] = { this.authorToRow.size() + 1, null,
+				a.getFirstName(), a.getLastName() };
+		if(a.getPrimaryKey() < 0){
+			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+		}
+		this.tableModel.addRow(data);
+		this.authorToRow.put(a, this.authorToRow.size());
+	}
+
+	public void removeRow(Author a) {
+		this.authors.remove(a);
+		this.tableModel.removeRow(this.authorToRow.get(a));
+		this.authorToRow.remove(a);
+		this.table.revalidate();
+	}
+
+	public void setAuthors(TreeSet<Author> authors) {
 		this.authors.clear();
-		this.authors.addAll(authors);
-		for(Author a : this.authors){
-			((JComboBox<String>)this.authorsBox).addItem(a.toString());
+		this.clearTable();
+		for (Author a : authors) {
+			this.authors.add(a);
+			this.addRow(a);
 		}
 	}
-	
+
+	private void clearTable() {
+		for (int i = tableModel.getRowCount(); i > 0; i--) {
+			this.tableModel.removeRow(i);
+		}
+		this.table.revalidate();
+	}
+
 	public ArrayList<Author> getAuthors() {
 		return authors;
 	}
-	
-	@SuppressWarnings("unchecked")
-	public JComboBox<String> getAuthorsBox() {
-		return (JComboBox<String>) authorsBox;
-	}
 
 	private void layoutComponents() {
-		JPanel tmp = new JPanel();
-		GroupLayout gl = new GroupLayout(tmp);
-		tmp.setLayout(gl);
+		GroupLayout gl = new GroupLayout(this);
+		this.setLayout(gl);
 
-		gl.setHorizontalGroup(gl.createSequentialGroup()
-				.addComponent(this.authorsBox, 140, 140, 140)
-				.addComponent(this.newAuthorButton, 50, 50, 50)
-				.addComponent(this.selectAuthorButton, 50, 50, 50));
-		gl.setVerticalGroup(gl.createParallelGroup()
-				.addComponent(this.authorsBox, 25, 25, 25)
-				.addComponent(this.newAuthorButton)
-				.addComponent(this.selectAuthorButton));
-		this.add(tmp);
+		gl.setHorizontalGroup(gl
+				.createSequentialGroup()
+				.addGroup(
+						gl.createParallelGroup()
+								.addComponent(this.newAuthorButton, 50, 50, 50)
+								.addComponent(this.selectAuthorButton, 50, 50,
+										50)).addGap(5)
+				.addComponent(this.scrollForTable));
+		gl.setVerticalGroup(gl
+				.createParallelGroup()
+				.addGroup(
+						gl.createSequentialGroup()
+								.addComponent(this.newAuthorButton)
+								.addComponent(this.selectAuthorButton))
+				.addComponent(this.scrollForTable, 90, 90, 90));
+
+		this.table.getColumnModel().getColumn(0).setMaxWidth(40);
+		this.table.getColumnModel().getColumn(1).setMaxWidth(40);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton source = (JButton) e.getSource();
+		Comparator<Author> comparator = new Comparator<Author>() {
+			@Override
+			public int compare(Author o1, Author o2) {
+				int result = o1.getLastName().compareTo(o2.getLastName());
+				if (result == 0) {
+					result = o1.getFirstName().compareTo(o2.getFirstName());
+				}
+				return result;
+			}
+		};
 		if (source.equals(newAuthorButton)) {
 			String returned = JOptionPane.showInputDialog(null, "Input:",
 					source.getName(), JOptionPane.PLAIN_MESSAGE);
@@ -94,9 +151,12 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 						lastName += " ";
 					}
 				}
-				Author tmp = new Author(firstName, lastName);
+				Author tmp = new Author(firstName, lastName, this.type);
+				if (Collections.binarySearch(this.authors, tmp, comparator) < 0) {
+					this.authors.add(tmp);
+					this.addRow(tmp);
+				}
 				this.firePropertyChange("authorCreated", null, tmp);
-				((JComboBox<String>) authorsBox).addItem(returned);
 			}
 		} else if (source.equals(selectAuthorButton)) {
 			if (authors.size() == 0) {
@@ -108,20 +168,19 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 					JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 			if (returned != null) {
 				Author tmp = (Author) returned;
-				((JComboBox<String>) authorsBox).addItem(tmp.getFirstName()
-						+ " " + tmp.getLastName());
-				this.firePropertyChange("authorSelected", null, tmp);
+				if (Collections.binarySearch(this.authors, tmp, comparator) < 0) {
+					this.addRow(tmp);
+				}
 			}
 		}
 		MabisLogger.getLogger().log(Level.INFO,
 				"Action called by clicking at {0}", source.getName());
 	}
 
-	@SuppressWarnings("unchecked")
 	public void clear() {
+		this.clearTable();
 		this.authors.clear();
-		JComboBox<String> tmp = (JComboBox<String>) this.authorsBox;
-		tmp.removeAllItems();
+		this.authorToRow.clear();
 	}
 
 }

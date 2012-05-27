@@ -18,7 +18,6 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
@@ -27,6 +26,7 @@ import model.BaseTable;
 import model.entity.AudioAlbum;
 import model.entity.Band;
 import model.entity.Genre;
+import model.enums.AuthorType;
 import model.enums.GenreType;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
@@ -55,7 +55,6 @@ public class AudioAlbumCreator extends ItemCreator {
 	private ImagePanel coverPanel;
 	private TrackListPanel trackList;
 	private AudioAlbum selectedAlbum = new AudioAlbum();
-	private JScrollPane trackListScroll;
 	private LoadFromApi lfa;
 
 	public AudioAlbumCreator(String title)
@@ -85,7 +84,7 @@ public class AudioAlbumCreator extends ItemCreator {
 												.addComponent(
 														this.durationField))
 								.addComponent(this.bandMiniPanel)
-								.addComponent(this.trackListScroll)
+								.addComponent(this.trackList)
 								.addComponent(this.tagCloud)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
@@ -99,9 +98,8 @@ public class AudioAlbumCreator extends ItemCreator {
 												.addComponent(
 														this.durationField, 35,
 														35, 35))
-								.addComponent(this.bandMiniPanel, 70, 70, 70)
-								.addComponent(this.trackListScroll, 100, 100,
-										100)
+								.addComponent(this.bandMiniPanel, 120, 120, 120)
+								.addComponent(this.trackList, 120, 120, 120)
 								.addComponent(this.tagCloud, 100, 100, 100)));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -121,11 +119,11 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.titleField = new JTextField();
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.trackList = new TrackListPanel();
-		this.trackListScroll = new JScrollPane(this.trackList);
-		
+		this.trackList.setBorder(BorderFactory.createTitledBorder("TrackList"));
+
 		this.initializeTagCloud();
 		this.initializeBandMiniPanel();
-		
+
 		this.durationField = new JFormattedTextField(new SimpleDateFormat(
 				"hh:mm"));
 		this.durationField.setBorder(BorderFactory
@@ -134,49 +132,32 @@ public class AudioAlbumCreator extends ItemCreator {
 		String arrayOfCriteria[] = { "by album" };
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
-	
+
 	private void initializeBandMiniPanel() {
 		try {
 			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT,
 					new Band());
+			asf.addWhereClause("type", AuthorType.AUDIO_ALBUM_BAND.toString());
 			asf.executeSQL(true);
-			TreeSet<Band> bridge = new TreeSet<>();
-			for (Band b : asf.getBands()) {
-				bridge.add(b);
-			}
-			this.bandMiniPanel = new BandMiniPanel("Bands", bridge);
-			this.bandMiniPanel
-					.addPropertyChangeListener(new PropertyChangeListener() {
-
-						@Override
-						public void propertyChange(PropertyChangeEvent e) {
-							String property = e.getPropertyName();
-							if (property.equals("bandSelected")
-									|| property.equals("bandCreated")) {
-								Band tmp = (Band) e.getNewValue();
-								if (selectedAlbum.getBand() == null) {
-									selectedAlbum.setBand(tmp);
-									return;
-								} else if (!selectedAlbum.getBand().getName()
-										.equals(tmp.getName())) {
-									selectedAlbum.setBand(tmp);
-									return;
-								}
-							}
-						}
-					});
+			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),
+					AuthorType.AUDIO_ALBUM_BAND);
+			this.bandMiniPanel.setBorder(BorderFactory
+					.createTitledBorder("Bands"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void initializeTagCloud(){
+	private void initializeTagCloud() {
 		try {
-			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT, new Genre());
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
+					new Genre());
 			gsf.addWhereClause("type", GenreType.AUDIO.toString());
 			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.AUDIO);
-			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
+					GenreType.AUDIO);
+			this.tagCloud.setBorder(BorderFactory
+					.createTitledBorder("Tag cloud"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -196,10 +177,11 @@ public class AudioAlbumCreator extends ItemCreator {
 	protected Boolean createItem() {
 		this.selectedAlbum.setTitle(this.titleField.getText());
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
-		// this.selectedAlbum.setTrackList(this.trackList.getText());
+		this.selectedAlbum.setTrackList(this.trackList.getTracks());
 		for (Genre g : this.tagCloud.getTags()) {
 			this.selectedAlbum.addGenre(g);
 		}
+		this.selectedAlbum.setBand((Band) this.bandMiniPanel.getBands().toArray()[0]);
 		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
 				SQLStamentType.INSERT, this.selectedAlbum);
 		try {
@@ -271,10 +253,10 @@ public class AudioAlbumCreator extends ItemCreator {
 
 			try {
 				setProgress(searchProgressBar.getMinimum());
-				TreeMap<String, String> params = new TreeMap<String, String>();
-				params.put("album", query);
-				aaa.query(params);
-				setProgress(searchProgressBar.getMaximum());
+					TreeMap<String, String> params = new TreeMap<String, String>();
+						params.put("album", query);
+						aaa.query(params);
+					setProgress(searchProgressBar.getMaximum());
 				return aaa.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -319,8 +301,10 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.durationField.setText(a.getDuration());
 		this.coverPanel.setImage(a.getCover().getImageFile());
 		this.trackList.setTracks(a.getTrackList());
-		// add setting left field
+		for(Genre g : a.getGenres()){
+			this.tagCloud.addRow(g);
+		}
+		this.bandMiniPanel.addRow(a.getBand());
 	}
 
-	
 }

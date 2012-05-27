@@ -2,47 +2,80 @@ package view.items.minipanels;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
+import settings.GlobalPaths;
 
 import logger.MabisLogger;
+import model.entity.Author;
 import model.entity.Band;
+import model.enums.AuthorType;
 
 public class BandMiniPanel extends AuthorMiniPanel {
 	private static final long serialVersionUID = -7769648241373563025L;
 	private final ArrayList<Band> bands = new ArrayList<>();
 
-	public BandMiniPanel(String string, TreeSet<Band> bands) {
-		super(string, null);
+	public BandMiniPanel(TreeSet<Band> bands, AuthorType type) {
+		super(new TreeSet<Author>(), type);
 		this.bands.addAll(bands);
 	}
 
 	@Override
+	public void addRow(Author a) {
+		Band b = (Band) a;
+		Object data[] = { this.authorToRow.size() + 1, null,
+				b.getName() };
+		if(a.getPrimaryKey() < 0){
+			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+		}
+		this.tableModel.addRow(data);
+		this.authorToRow.put(a, this.authorToRow.size());
+	}
+
+	@Override
+	protected void initTable() {
+		String columnNames[] = { "LP", "ID", "Name" };
+		this.tableModel = new DefaultTableModel(columnNames, 0);
+		this.table = new JTable(tableModel);
+	}
+
+	@Override
 	protected void initComponents() {
+		super.initComponents();
 		this.selectAuthorButton.setToolTipText("Select band");
 		this.selectAuthorButton.setName("Select one of the following band");
-		this.selectAuthorButton.addActionListener(this);
 		this.newAuthorButton.setToolTipText("Create new band");
 		this.newAuthorButton.setName("Create new band");
-		this.newAuthorButton.addActionListener(this);
-		this.authorsBox = new JTextField();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JButton source = (JButton) e.getSource();
+		Comparator<Band> comparator = new Comparator<Band>() {
+			@Override
+			public int compare(Band o1, Band o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		};
 		if (source.equals(newAuthorButton)) {
 			String returned = JOptionPane.showInputDialog(null, "Input:",
 					source.getName(), JOptionPane.PLAIN_MESSAGE);
 			if (returned != null) {
-				Band tmp = new Band(returned);
-				this.firePropertyChange("bandCreated", null, tmp);
-				((JTextField)authorsBox).setText(returned);
+				Band tmp = new Band(returned, this.type);
+				if (Collections.binarySearch(this.bands, tmp, comparator) < 0) {
+					this.bands.add(tmp);
+					this.addRow(tmp);
+				}
 			}
 		} else if (source.equals(selectAuthorButton)) {
 			if (bands.size() == 0) {
@@ -54,18 +87,16 @@ public class BandMiniPanel extends AuthorMiniPanel {
 					JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 			if (returned != null) {
 				Band tmp = (Band) returned;
-				this.firePropertyChange("bandSelected", null, tmp);
+				if (Collections.binarySearch(this.bands, tmp, comparator) < 0) {
+					this.addRow(tmp);
+				}
 			}
 		}
 		MabisLogger.getLogger().log(Level.INFO,
 				"Action called by clicking at {0}", source.getName());
 	}
 
-	public JComboBox<String> getBandsBox() {
-		return this.getAuthorsBox();
-	}
-
-	public void clear() {
-		((JTextField)authorsBox).setText("");
+	public ArrayList<Band> getBands() {
+		return bands;
 	}
 }
