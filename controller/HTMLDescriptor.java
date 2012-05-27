@@ -135,8 +135,6 @@ public class HTMLDescriptor {
 				bodyPart += "</td>";
 				
 				if (m.getAuthors() != null && !m.getAuthors().isEmpty()) {
-					bodyPart += "</tr>";
-					bodyPart += "<tr>";
 					bodyPart += "<td>";
 						bodyPart += "<b>Directors:</b>";
 						bodyPart += "<ul>";
@@ -145,13 +143,17 @@ public class HTMLDescriptor {
 						}
 						bodyPart += "</ul>";
 					bodyPart += "</td>";
-					bodyPart += "</tr>";
-					bodyPart += "<tr>";
+				}
+				
+				if(m.getDescription() != null && !m.getDescription().isEmpty()){
+					bodyPart += "</tr><tr>";
+					bodyPart += "<td width=\"240\">";
+						bodyPart += "<p><b>Description</b></p>";
+						bodyPart += m.getDescription();
+					bodyPart += "</td>";
 				}
 				
 				if (m.getGenres() != null && !m.getGenres().isEmpty()) {
-					bodyPart += "</tr>";
-					bodyPart += "<tr>";
 						bodyPart += "<td>";
 							bodyPart += "<b>Genres:</b>";
 							bodyPart += "<ul>";
@@ -160,7 +162,6 @@ public class HTMLDescriptor {
 							}
 							bodyPart += "</ul>";
 						bodyPart += "</td>";
-					bodyPart += "</tr>";
 				}else{
 					bodyPart += "</tr>";
 				}
