@@ -36,7 +36,7 @@ import settings.GlobalPaths;
  */
 public class TagCloudMiniPanel extends JPanel {
 	private static final long serialVersionUID = -8170767178911147951L;
-	private JTable tagsTable = new JTable();
+	private JTable tagsTable;
 	private TreeMap<Genre, Integer> genreToRow = new TreeMap<Genre, Integer>();
 	private DefaultTableModel tagsModel;
 	private GenreMiniPanel gmp;
@@ -50,6 +50,20 @@ public class TagCloudMiniPanel extends JPanel {
 	}
 
 	private void initializeTagTable() {
+		
+		this.tagsTable = new JTable(){
+			private static final long serialVersionUID = 7008651440453021313L;
+
+			@Override
+			public Class<?> getColumnClass(int column) {
+				if(column == 1){
+					return JLabel.class;
+				}
+				return Object.class;
+			}
+			
+		};
+		
 		String columnNames[] = { "LP", "ID", "Name" };
 		this.tagsModel = new DefaultTableModel(columnNames, 0);
 		this.tagsTable = new JTable(this.tagsModel);
@@ -89,9 +103,11 @@ public class TagCloudMiniPanel extends JPanel {
 	}
 
 	public void addRow(Genre g) {
-		Object data[] = { this.genreToRow.size()+1,null, g.getGenre() };
+		Object data[] = { this.genreToRow.size()+1, null, g.getGenre() };
 		if(g.getPrimaryKey() < 0){
 			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+		}else{
+			data[1] = new JLabel(new ImageIcon(GlobalPaths.OK_SIGN.toString()));
 		}
 		this.tagsModel.addRow(data);
 		this.genreToRow.put(g, this.genreToRow.size());
@@ -101,9 +117,7 @@ public class TagCloudMiniPanel extends JPanel {
 		gmp.tags.clear();
 		for (Genre g : genres) {
 			gmp.tags.add(g);
-			Object data[] = { this.genreToRow.size()+1, g.getPrimaryKey(), g.getGenre() };
-			this.tagsModel.addRow(data);
-			this.genreToRow.put(g, this.genreToRow.size());
+			this.addRow(g);
 		}
 		this.tagsTable.revalidate();
 	}

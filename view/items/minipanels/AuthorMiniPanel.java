@@ -61,14 +61,29 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	protected void initTable() {
 		String columnNames[] = { "LP", "ID", "First Name", "Last Name" };
 		this.tableModel = new DefaultTableModel(columnNames, 0);
-		this.table = new JTable(tableModel);
+		this.table = new JTable(tableModel){
+			private static final long serialVersionUID = 6303631988571439208L;
+
+			/* (non-Javadoc)
+			 * @see javax.swing.JTable#getColumnClass(int)
+			 */
+			@Override
+			public Class<?> getColumnClass(int column) {
+				if(column == 1){
+					return JLabel.class;
+				}
+				return Object.class;
+			}
+			
+		};
 	}
 
 	public void addRow(Author a) {
-		Object data[] = { this.authorToRow.size() + 1, null,
-				a.getFirstName(), a.getLastName() };
+		Object data[] = { this.authorToRow.size() + 1, null, a.getFirstName(), a.getLastName() };
 		if(a.getPrimaryKey() < 0){
-			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+			data[1] = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
+		}else{
+			data[1] = new ImageIcon(GlobalPaths.OK_SIGN.toString());
 		}
 		this.tableModel.addRow(data);
 		this.authorToRow.put(a, this.authorToRow.size());
