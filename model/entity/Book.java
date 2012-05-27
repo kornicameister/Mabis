@@ -4,15 +4,7 @@
  */
 package model.entity;
 
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -21,7 +13,6 @@ import model.BaseTable;
 import model.enums.BookIndustryIdentifier;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
-import settings.GlobalPaths;
 
 /**
  * Klasa {@link Book} jest obiektową wersją tabeli bazy danych <b>mabis.book</b>
@@ -121,99 +112,5 @@ public class Book extends Movie implements Serializable {
 		}
 		return result;
 	}
-
-	@Override
-	public Object[] toColumnIdentifiers() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for (Object d : super.toColumnIdentifiers()) {
-			data.add(d);
-		}
-		data.set(4, "Pages");
-		data.set(5, "Writer");
-		data.add(5, "Identifier number");
-		return data.toArray();
-	}
-
-	@Override
-	public Object[] toRowData() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for (Object d : super.toRowData()) {
-			data.add(d);
-		}
-		data.set(4, this.getPages());
-		data.add(5, this.getIdentifiers());
-		return data.toArray();
-	}
-
-	@Override
-	public URL toDescription() {
-		String str = new String();
-		str += "<html>";
-		str += "<p style='color: red'><b>Rating:</b>" + this.getRating() + "</p>";
-		str += "<div class='photo'><img src='" + this.getCover().getImageFile().getAbsolutePath() + "'/></div>";
-		str += "<p><b>ID:</b>" + this.getPrimaryKey() + "</p>";
-		str += "<p><b>Title:</b>" + this.getTitle() + "</p>";
-		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
-			str += "<b><i>Subtitle:</i></b>" + this.getSubtitle() + "</p>";
-		}
-		str += "<p><b>Pages:</b>" + this.getPages() + "</p>";
-		if (this.getAuthors() != null && !this.getAuthors().isEmpty()) {
-			str += "<b>Authors:</b>";
-			str += "<ul>";
-			for (Author author : this.getAuthors()) {
-				str += "<li>" + author.getFirstName() + " "
-						+ author.getLastName() + "</li>";
-			}
-			str += "</ul>";
-		}
-		if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
-			str += "<b>Identifiers:</b>";
-			str += "<ul>";
-			for (Map.Entry<BookIndustryIdentifier, String> e : this
-					.getIdentifiers().entrySet()) {
-				str += "<li><i>" + e.getKey().toString() + "</i><p>"
-						+ e.getValue() + "</p></li>";
-			}
-			str += "</ul>";
-		}
-		if (this.getGenres() != null && !this.getGenres().isEmpty()) {
-			str += "<b>Genres:</b>";
-			str += "<ul>";
-			for (Genre g : this.getGenres()) {
-				str += "<li>" + g.getGenre() + "</li>";
-			}
-			str += "</ul>";
-		}
-		str += "<p><b>Description:</b></p>";
-		str += "<span style='margin-left:20px'>" + this.getDescription()
-				+ "</span>";
-		str += "</html>";
-
-		DataOutputStream dos = null;
-		String path = GlobalPaths.TMP + String.valueOf(this.hashCode());
-		try {
-			dos = new DataOutputStream(new FileOutputStream(new File(path)));
-			dos.writeBytes(str);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (dos != null) {
-				try {
-					dos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		try {
-			URL ulr = new URL("file:///" + path);
-			return ulr;
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+	
 }

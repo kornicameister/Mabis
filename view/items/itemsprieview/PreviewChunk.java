@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
+import controller.HTMLDescriptor;
+
 import logger.MabisLogger;
 import model.entity.AudioAlbum;
 import model.entity.Book;
@@ -38,7 +40,7 @@ public class PreviewChunk extends JPanel {
 
 		JEditorPane description = null;
 		try {
-			URL url = entity.toDescription();
+			URL url = HTMLDescriptor.toHTML(entity);
 			if (url != null) {
 				description = new JEditorPane(url);
 			} else {
