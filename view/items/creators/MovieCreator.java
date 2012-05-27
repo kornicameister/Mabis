@@ -98,13 +98,10 @@ public class MovieCreator extends ItemCreator {
 						gl.createSequentialGroup()
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titleField,
-														40, 40, 40)
-												.addComponent(
-														this.durationField, 40,
-														40, 40))
+												.addComponent(this.titleField,40, 40, 40)
+												.addComponent(this.durationField, 40,40, 40))
 								.addComponent(this.directorsPanel)
-								.addComponent(this.tagCloud)
+								.addComponent(this.tagCloud,90,90,90)
 								.addComponent(this.descriptionScrollPane)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -124,6 +121,7 @@ public class MovieCreator extends ItemCreator {
 		this.contentPanel = new JPanel(true);
 		this.titleField = new JTextField();
 		this.descriptionArea = new JTextArea();
+		this.descriptionArea.setLineWrap(true);
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
 		this.descriptionScrollPane.setBorder(BorderFactory
 				.createTitledBorder("Plot"));

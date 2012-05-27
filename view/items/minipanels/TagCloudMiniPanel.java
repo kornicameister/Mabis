@@ -101,7 +101,7 @@ public class TagCloudMiniPanel extends JPanel {
 		gmp.tags.clear();
 		for (Genre g : genres) {
 			gmp.tags.add(g);
-			Object data[] = { g.getPrimaryKey(), g.getGenre() };
+			Object data[] = { this.genreToRow.size()+1, g.getPrimaryKey(), g.getGenre() };
 			this.tagsModel.addRow(data);
 			this.genreToRow.put(g, this.genreToRow.size());
 		}
