@@ -213,6 +213,7 @@ public class TagCloudMiniPanel extends JPanel {
 						this.tags.add(tmp);
 					}
 					this.firePropertyChange("genreCreated", null, tmp);
+					this.firePropertyChange("tag", null, tmp);
 				}
 			} else if (source.equals(selectGenreButton)) {
 				if (tags.size() == 0) {
@@ -234,6 +235,7 @@ public class TagCloudMiniPanel extends JPanel {
 							});
 					if (found < 0) {
 						this.firePropertyChange("genreSelected", null, tmp);
+						this.firePropertyChange("tag", null, tmp);
 					}
 				}
 			}

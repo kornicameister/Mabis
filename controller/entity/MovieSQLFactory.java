@@ -99,7 +99,7 @@ public class MovieSQLFactory extends SQLFactory {
 				return this.lastAffactedId;
 			}
 		}
-		return 0;
+		return this.lastAffactedId;
 	}
 
 	/**

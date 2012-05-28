@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
@@ -58,9 +59,13 @@ public class GoogleImageSearch {
 		for(int i = 0 ; i < results.length() ; i++){
 			try {
 				url = results.getJSONObject(i).getString("url");
-				InputStream is = new URL(url).openStream();
-				is.close();
-				return url;
+				try{
+					InputStream is = new URL(url).openStream();
+					is.close();
+					return url;
+				}catch(MalformedURLException e){
+					e.printStackTrace();
+				}
 			} catch (IOException e) {
 				MabisLogger.getLogger().log(Level.WARNING,"Image at {0} seems to be unavailable",url);
 			}

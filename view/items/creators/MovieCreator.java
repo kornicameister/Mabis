@@ -63,6 +63,7 @@ public class MovieCreator extends ItemCreator {
 	private JTextArea descriptionArea;
 	private JScrollPane descriptionScrollPane;
 	private LoadFromApi lfa;
+	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
 	public MovieCreator(String title) throws HeadlessException,
 			CreatorContentNullPointerException {
@@ -148,6 +149,7 @@ public class MovieCreator extends ItemCreator {
 			asf.executeSQL(true);
 			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.MOVIE_DIRECTOR);
 			this.directorsPanel.setBorder(BorderFactory.createTitledBorder("Authors"));
+			this.directorsPanel.addPropertyChangeListener("author", this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -161,11 +163,30 @@ public class MovieCreator extends ItemCreator {
 			gsf.addWhereClause("type", GenreType.MOVIE.toString());
 			gsf.executeSQL(true);
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.MOVIE);
-			this.tagCloud.setBorder(BorderFactory
-					.createTitledBorder("Tag cloud"));
+			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+			this.tagCloud.addPropertyChangeListener("tag", this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	class MiniPanelsListener implements PropertyChangeListener{
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if(evt.getPropertyName().equals("author")){
+				Author tmp = (Author) evt.getNewValue();
+				if(!selectedMovie.getAuthors().contains(tmp)){
+					selectedMovie.addAuthor(tmp);
+				}
+			}else if(evt.getPropertyName().equals("tag")){
+				Genre tmp = (Genre) evt.getNewValue();
+				if(!selectedMovie.getGenres().contains(tmp)){
+					selectedMovie.addGenre(tmp);
+				}
+			}
+		}
+		
 	}
 
 	@Override
@@ -254,9 +275,9 @@ public class MovieCreator extends ItemCreator {
 
 			try {
 				setProgress(searchProgressBar.getMinimum());
-				TreeMap<String, String> params = new TreeMap<>();
-				params.put("movie", query);
-				ma.query(params);
+					TreeMap<String, String> params = new TreeMap<>();
+					params.put("movie", query);
+					ma.query(params);
 				setProgress(searchProgressBar.getMaximum());
 				return ma.getResult();
 			} catch (IOException e) {
@@ -311,10 +332,7 @@ public class MovieCreator extends ItemCreator {
 					new Comparator<Author>() {
 						@Override
 						public int compare(Author o1, Author o2) {
-							int result = o1.getType().compareTo(o2.getType());
-							if(result == 0){
-								result = o1.getLastName().compareTo(o2.getLastName());
-							}
+							int result = o1.getLastName().compareTo(o2.getLastName());
 							if(result == 0){
 								result = o1.getFirstName().compareTo(o2.getFirstName());
 							}
@@ -333,7 +351,6 @@ public class MovieCreator extends ItemCreator {
 		
 		//check up - 2, the same thing, but now it does concern genres
 		for(Genre g : this.selectedMovie.getGenres()){
-			g.setType(GenreType.BOOK);
 			int index= Collections.binarySearch(
 					this.tagCloud.getTags(), 
 					g,

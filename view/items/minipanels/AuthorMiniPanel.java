@@ -168,7 +168,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 					this.authors.add(tmp);
 					this.addRow(tmp);
 				}
-				this.firePropertyChange("authorCreated", null, tmp);
+				this.firePropertyChange("author", null, tmp);
 			}
 		} else if (source.equals(selectAuthorButton)) {
 			if (authors.size() == 0) {
@@ -183,6 +183,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 				if (Collections.binarySearch(this.authors, tmp, comparator) < 0) {
 					this.addRow(tmp);
 				}
+				this.firePropertyChange("author", null, tmp);
 			}
 		}
 		MabisLogger.getLogger().log(Level.INFO,
