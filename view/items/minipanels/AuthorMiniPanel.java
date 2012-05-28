@@ -64,9 +64,6 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 		this.table = new JTable(tableModel){
 			private static final long serialVersionUID = 6303631988571439208L;
 
-			/* (non-Javadoc)
-			 * @see javax.swing.JTable#getColumnClass(int)
-			 */
 			@Override
 			public Class<?> getColumnClass(int column) {
 				if(column == 1){
