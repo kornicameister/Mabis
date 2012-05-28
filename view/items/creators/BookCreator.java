@@ -9,6 +9,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -61,6 +63,7 @@ public class BookCreator extends ItemCreator {
 	private JScrollPane descriptionScrollPane;
 	private Book selectedBook = new Book();
 	private LoadFromApi lfa;
+	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -170,6 +173,7 @@ public class BookCreator extends ItemCreator {
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
 					GenreType.BOOK);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Genres"));
+			this.tagCloud.addPropertyChangeListener("tag",this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -182,10 +186,30 @@ public class BookCreator extends ItemCreator {
 			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
 			asf.executeSQL(true);
 			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),AuthorType.BOOK_AUTHOR);
+			this.authorsMiniPanel.addPropertyChangeListener("author", this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+	class MiniPanelsListener implements PropertyChangeListener{
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if(evt.getPropertyName().equals("author")){
+				Author tmp = (Author) evt.getNewValue();
+				if(!selectedBook.getAuthors().contains(tmp)){
+					selectedBook.addAuthor(tmp);
+				}
+			}else if(evt.getPropertyName().equals("tag")){
+				Genre tmp = (Genre) evt.getNewValue();
+				if(!selectedBook.getGenres().contains(tmp)){
+					selectedBook.addGenre(tmp);
+				}
+			}
+		}
+		
+	}
+	
 
 	@Override
 	protected void clearContentFields() {
@@ -204,16 +228,12 @@ public class BookCreator extends ItemCreator {
 	protected Boolean createItem() {
 		this.selectedBook.setTitle(this.titleOriginal.getText());
 		this.selectedBook.setSubTitle(this.subTitle.getText());
-
-		if (!this.selectedBook.getIdentifiers().values()
-				.contains(this.isbnField.getText())) {
-			this.selectedBook.addGenre(new Genre(this.isbnField.getText()));
-		}
+		this.selectedBook.getIdentifiers().clear();
+		this.selectedBook.addIdentifier(BookIndustryIdentifier.ISBN_13, this.isbnField.getText());
 		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 		this.selectedBook.setDescription(this.descriptionArea.getText());
 
-		BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT,
-				this.selectedBook);
+		BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
 		try {
 			bsf.executeSQL(true);
 			return true;
@@ -334,19 +354,55 @@ public class BookCreator extends ItemCreator {
 		this.coverPanel.setImage(this.selectedBook.getCover().getImageFile());
 		this.descriptionArea.setText(this.selectedBook.getDescription());
 		this.pages.setText(this.selectedBook.getPages().toString());
-		for (Author a : this.selectedBook.getAuthors()) {
-			if (!(a.getFirstName().isEmpty() || a.getLastName().isEmpty())) {
-				this.authorsMiniPanel.addRow(a);
-			}
-		}
-		for (Genre g : this.selectedBook.getGenres()) {
-			if (!g.getGenre().equals("null") && !g.getGenre().isEmpty()) {
-				this.tagCloud.addRow(g);
-			}
-		}
-		if (this.selectedBook.getIdentifier(BookIndustryIdentifier.ISBN_13) != null) {
-			this.isbnField.setText(this.selectedBook
-					.getIdentifier(BookIndustryIdentifier.ISBN_13));
-		}
+		
+		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
+				//that can be found in AuthorsMiniPanel
+				for(Author a : this.selectedBook.getAuthors()){
+					int index = Collections.binarySearch(this.authorsMiniPanel.getAuthors(),
+							a,
+							new Comparator<Author>() {
+								@Override
+								public int compare(Author o1, Author o2) {
+									int result = o1.getLastName().compareTo(o2.getLastName());
+									if(result == 0){
+										result = o1.getFirstName().compareTo(o2.getFirstName());
+									}
+									return result;
+								}
+							});
+					if(index < 0){
+						this.authorsMiniPanel.addRow(a);
+						this.authorsMiniPanel.getAuthors().add(a);
+						a.setType(AuthorType.BOOK_AUTHOR);
+					}else{
+						a.setPrimaryKey(this.authorsMiniPanel.getAuthors().get(index).getPrimaryKey());
+						this.authorsMiniPanel.addRow(a);
+					}
+				}
+				
+				//check up - 2, the same thing, but now it does concern genres
+				for(Genre g : this.selectedBook.getGenres()){
+					int index= Collections.binarySearch(
+							this.tagCloud.getTags(), 
+							g,
+							new Comparator<Genre>() {
+								@Override
+								public int compare(Genre g1, Genre g2) {
+									int result = g1.getType().compareTo(g2.getType());
+									if(result == 0){
+										result = g1.getGenre().compareTo(g2.getGenre());
+									}
+									return result;
+								}
+							});
+					if(index < 0){
+						this.tagCloud.addRow(g);
+						this.tagCloud.getTags().add(g);
+						g.setType(GenreType.BOOK);
+					}else{
+						g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+						this.tagCloud.addRow(g);
+					}
+				}
 	}
 }

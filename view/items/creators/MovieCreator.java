@@ -28,8 +28,10 @@ import model.BaseTable;
 import model.entity.Author;
 import model.entity.Genre;
 import model.entity.Movie;
+import model.entity.Picture;
 import model.enums.AuthorType;
 import model.enums.GenreType;
+import model.enums.ImageType;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
@@ -202,6 +204,16 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected Boolean createItem() {
+		
+		try {
+			this.selectedMovie.setTitle(this.titleField.getText());
+			this.selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
+			this.selectedMovie.setDescription(this.descriptionArea.getText());
+			this.selectedMovie.setDuration(Long.valueOf(this.durationField.getText()));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
 		try {
 			msf.executeSQL(true);
