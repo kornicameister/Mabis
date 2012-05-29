@@ -149,8 +149,7 @@ public class AudioAlbumCreator extends ItemCreator {
 					new Band());
 			asf.addWhereClause("type", AuthorType.AUDIO_ALBUM_BAND.toString());
 			asf.executeSQL(true);
-			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),
-					AuthorType.AUDIO_ALBUM_BAND);
+			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),AuthorType.AUDIO_ALBUM_BAND);
 			this.bandMiniPanel.setBorder(BorderFactory.createTitledBorder("Bands"));
 			this.bandMiniPanel.addPropertyChangeListener("band",this.miniPanelLister);
 		} catch (SQLException e) {

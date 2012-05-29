@@ -193,7 +193,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
 					SQLStamentType.SELECT, new AudioAlbum());
 			for (ForeignKeyPair fkp : keys) {
-				aasf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
+				aasf.addWhereClause("idAudioAlbum", fkp.getKey("idAudio").getValue()
 						.toString());
 
 			}
@@ -223,7 +223,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			BookSQLFactory aasf = new BookSQLFactory(SQLStamentType.SELECT,
 					new Book());
 			for (ForeignKeyPair fkp : keys) {
-				aasf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
+				aasf.addWhereClause("idBook", fkp.getKey("idBook").getValue()
 						.toString());
 
 			}
