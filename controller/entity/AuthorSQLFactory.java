@@ -104,8 +104,8 @@ public class AuthorSQLFactory extends SQLFactory {
 			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
 			st.setObject(3, entity);
 		}else{
-			st.setObject(1, entity);
-			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
+			st.setObject(2, entity);
+			st.setInt(1, this.insertAvatar(entity.getPictureFile()));
 		}
 		st.execute();
 		st.clearParameters();
