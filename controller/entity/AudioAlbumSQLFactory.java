@@ -72,7 +72,7 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 						ObjectInputStream objectIn = new ObjectInputStream(
 								new ByteArrayInputStream(buf));
 						audioAlbum = (AudioAlbum) objectIn.readObject();
-						audioAlbum.setPrimaryKey(set.getInt("idAudio"));
+						audioAlbum.setPrimaryKey(set.getInt("idAudioAlbum"));
 						this.audioAlbums.add(audioAlbum);
 					} catch (IOException e) {
 						e.printStackTrace();

@@ -30,7 +30,7 @@ public class BandSQLFactory extends AuthorSQLFactory {
 						ObjectInputStream objectIn = new ObjectInputStream(
 								new ByteArrayInputStream(buf));
 						band = (Band) objectIn.readObject();
-						band.setPrimaryKey(set.getInt("idBand"));
+						band.setPrimaryKey(set.getInt("idAuthor"));
 						this.bands.add(band);
 					} catch (IOException e) {
 						e.printStackTrace();
