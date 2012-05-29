@@ -29,11 +29,13 @@ import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
+import model.entity.BookUser;
 import model.entity.Genre;
 import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.BookIndustryIdentifier;
 import model.enums.GenreType;
+import model.utilities.ForeignKey;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
@@ -45,6 +47,7 @@ import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
 import controller.entity.AuthorSQLFactory;
 import controller.entity.BookSQLFactory;
+import controller.entity.BookUserSQLFactory;
 import controller.entity.GenreSQLFactory;
 
 /**
@@ -234,11 +237,21 @@ public class BookCreator extends ItemCreator {
 		this.selectedBook.addIdentifier(BookIndustryIdentifier.ISBN_13, this.isbnField.getText());
 		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 		this.selectedBook.setDescription(this.descriptionArea.getText());
+		this.selectedBook.setGenres(this.tagCloud.getTags());
 
-		BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
 		try {
-			bsf.executeSQL(true);
-			return true;
+			BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
+			int bookId = bsf.executeSQL(true);
+			int userId = this.selectedUser.getPrimaryKey();
+			
+			BookUser bu = new BookUser();
+			bu.addMultiForeignKey(-1, new ForeignKey(this.selectedBook, "idBook", bookId),
+									  new ForeignKey(this.selectedUser, "idUser", userId));
+			
+			
+			BookUserSQLFactory  busf = new BookUserSQLFactory(SQLStamentType.INSERT, bu);
+			return busf.executeSQL(true) > 0;
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

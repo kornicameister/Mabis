@@ -28,11 +28,13 @@ import model.BaseTable;
 import model.entity.Author;
 import model.entity.Genre;
 import model.entity.Movie;
+import model.entity.MovieUser;
 import model.entity.Picture;
 import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.GenreType;
 import model.enums.ImageType;
+import model.utilities.ForeignKey;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
@@ -46,6 +48,7 @@ import controller.api.MovieAPI.MovieApiTarget;
 import controller.entity.AuthorSQLFactory;
 import controller.entity.GenreSQLFactory;
 import controller.entity.MovieSQLFactory;
+import controller.entity.MovieUserSQLFactory;
 
 /**
  * 
@@ -210,15 +213,23 @@ public class MovieCreator extends ItemCreator {
 			this.selectedMovie.setTitle(this.titleField.getText());
 			this.selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
 			this.selectedMovie.setDescription(this.descriptionArea.getText());
-			this.selectedMovie.setDuration(Long.valueOf(this.durationField.getText()));
+			this.selectedMovie.setDuration((Long) this.durationField.getValue());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		
-		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
 		try {
-			msf.executeSQL(true);
-			return true;
+			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
+			int movieId = msf.executeSQL(true);
+			int userId = this.selectedUser.getPrimaryKey();
+			
+			MovieUser mu = new MovieUser();
+			mu.addMultiForeignKey(-1,
+					new ForeignKey(this.selectedMovie, "idMovie", movieId),
+					new ForeignKey(this.selectedUser, "idUser", userId));
+			
+			MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
+			return musf.executeSQL(true) > 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

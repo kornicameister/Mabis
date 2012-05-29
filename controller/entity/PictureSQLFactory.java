@@ -144,7 +144,6 @@ public class PictureSQLFactory extends SQLFactory {
 	 * @throws SQLException
 	 */
 	private void syncCacheToDB() throws SQLException {
-		this.reset();
 		Picture problematic = (Picture) this.table;
 		// 1. fetch all pictures
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT, problematic);
@@ -172,6 +171,7 @@ public class PictureSQLFactory extends SQLFactory {
 						ObjectInputStream objectIn = new ObjectInputStream(
 								new ByteArrayInputStream(buf));
 						picture = (Picture) objectIn.readObject();
+						picture.setPrimaryKey(set.getInt("idPicture"));
 						this.pictures.add(picture);
 					} catch (IOException e) {
 						e.printStackTrace();
