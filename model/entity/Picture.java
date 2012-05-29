@@ -33,7 +33,7 @@ import utilities.Hasher;
 // TODO update commnents and make them more sql dependable
 public class Picture extends BaseTable implements Serializable {
 	private static final long serialVersionUID = -1350787093697204874L;
-	private final ImageType type;
+	private ImageType type;
 	private String imageFilePath = null;
 
 	public Picture() {
@@ -153,6 +153,10 @@ public class Picture extends BaseTable implements Serializable {
 
 	public ImageType getType() {
 		return type;
+	}
+
+	public void setType(ImageType type) {
+		this.type = type;
 	}
 
 	public String getCheckSum() {

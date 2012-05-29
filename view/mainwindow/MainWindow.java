@@ -198,7 +198,7 @@ public class MainWindow extends JFrame {
 	}
 
 	public void setConnectedUser(User newUser) {
-		if (newUser.equals(this.getConnectedUser())) {
+		if(this.connectedUser != null && this.connectedUser.getLogin().equals(newUser.getLogin())){
 			return;
 		}
 		User oldUser = this.getConnectedUser();

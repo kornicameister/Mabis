@@ -108,6 +108,7 @@ public class AudioAlbumAPI extends ApiAccess {
 				aa.setGenres(this.parseTags(albumObject.getString("mbid")));
 				aa.setBand(this.parseBand(albumObject.getString("artist")));
 				aa.setCover(this.parseImage(albumObject.getJSONArray("image")));
+				aa.getCover().setType(ImageType.BAND);
 				this.result.add(aa);
 				this.pcs.firePropertyChange("taskStep",i,i+1);
 			} catch (JSONException pp) {
@@ -181,8 +182,8 @@ public class AudioAlbumAPI extends ApiAccess {
 			for (int i = 0; i < artistMatches.length(); i++) {
 				artistObject = artistMatches.getJSONObject(i);
 				if (artistObject.getString("name").equals(band)) {
-					b.setPicture(this.parseImage(artistObject
-							.getJSONArray("image")));
+					b.setPicture(this.parseImage(artistObject.getJSONArray("image")));
+					b.getPictureFile().setType(ImageType.AVATAR);
 					return b;
 				}
 			}
@@ -197,10 +198,10 @@ public class AudioAlbumAPI extends ApiAccess {
 			JSONObject picture = images.getJSONObject(i);
 			if (picture.getString("#text") != null) {
 				try {
-					return new Picture(new URL(picture.getString("#text")),ImageType.FRONT_COVER);
+					return new Picture(new URL(picture.getString("#text")),ImageType.UNDEFINED);
 				} catch (MalformedURLException e) {
 					try {
-						return new Picture(GlobalPaths.DEFAULT_COVER_PATH.toString(),ImageType.FRONT_COVER);
+						return new Picture(GlobalPaths.DEFAULT_COVER_PATH.toString(),ImageType.UNDEFINED);
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					}

@@ -233,7 +233,7 @@ public class TagCloudMiniPanel extends JPanel {
 											o2.getGenre());
 								}
 							});
-					if (found < 0) {
+					if(found > 0){
 						this.firePropertyChange("genreSelected", null, tmp);
 						this.firePropertyChange("tag", null, tmp);
 					}

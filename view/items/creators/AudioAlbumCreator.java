@@ -224,7 +224,7 @@ public class AudioAlbumCreator extends ItemCreator {
 					new ForeignKey(this.selectedAlbum, "idAudio", aasf.executeSQL(true)), 
 					new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
 			
-			ausf.executeSQL(true);
+			return ausf.executeSQL(true) > 0;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

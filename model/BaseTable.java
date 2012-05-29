@@ -205,7 +205,6 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 		int compareValue = 0;
 		compareValue = this.getTableType().compareTo(o.getTableType());
 		if (compareValue == 0) {
-			// the same table, lets check primary keys
 			compareValue = this.getPrimaryKey().compareTo(o.getPrimaryKey());
 		}
 		return compareValue;
