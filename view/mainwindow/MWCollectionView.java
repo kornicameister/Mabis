@@ -4,7 +4,7 @@
 package view.mainwindow;
 
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -30,7 +30,7 @@ import model.entity.MovieUser;
 import model.entity.User;
 import model.enums.TableType;
 import model.utilities.ForeignKeyPair;
-import view.imagePanel.ChoosableImagePanel;
+import view.imagePanel.ImagePanel;
 import controller.SQLStamentType;
 import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.AudioUserSQLFactory;
@@ -46,9 +46,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private final CollectionMediator mediator = new CollectionMediator();
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
-	private final TreeMap<Movie, ChoosableImagePanel> movieThumbs = new TreeMap<Movie, ChoosableImagePanel>();
-	private final TreeMap<AudioAlbum, ChoosableImagePanel> audioThumbs = new TreeMap<AudioAlbum, ChoosableImagePanel>();
-	private final TreeMap<Book, ChoosableImagePanel> bookThumbs = new TreeMap<Book, ChoosableImagePanel>();
+	private final TreeMap<Movie, ImagePanel> movieThumbs = new TreeMap<Movie, ImagePanel>();
+	private final TreeMap<AudioAlbum, ImagePanel> audioThumbs = new TreeMap<AudioAlbum, ImagePanel>();
+	private final TreeMap<Book, ImagePanel> bookThumbs = new TreeMap<Book, ImagePanel>();
+	
 	private JPanel thumbailsPanel = null;
 	private JScrollPane scrollPanel = null;
 	
@@ -62,8 +63,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
 				"Collection"));
 
-		this.thumbailsPanel = new JPanel(
-				new FlowLayout(FlowLayout.LEFT, 10, 10));
+		this.thumbailsPanel = new JPanel(new GridLayout(0, 4, 5, 5));
 		this.scrollPanel = new JScrollPane(this.thumbailsPanel,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -83,7 +83,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 	private void reprintCollection() {
 		this.thumbailsPanel.removeAll();
-		for (ChoosableImagePanel thumb : this.movieThumbs.values()) {
+		for (ImagePanel thumb : this.movieThumbs.values()) {
 
 			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
@@ -91,21 +91,22 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			
 			this.thumbailsPanel.add(thumb);
 		}
-		for (ChoosableImagePanel thumb : this.audioThumbs.values()) {
+		for (ImagePanel thumb : this.audioThumbs.values()) {
 
 			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
 			this.thumbailsPanel.add(thumb);
 		}
-		for (ChoosableImagePanel thumb : this.bookThumbs.values()) {
+		for (ImagePanel thumb : this.bookThumbs.values()) {
 
 			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
 			this.thumbailsPanel.add(thumb);
 		}
-		this.thumbailsPanel.validate();
+		this.thumbailsPanel.revalidate();
+		this.thumbailsPanel.repaint();
 	}
 
 	/**
@@ -138,8 +139,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 			if (this.currentView.equals(TableType.BOOK.toString())) {
 				this.loadBooks(); // load and print books only
-			} else if (this.currentView
-					.equals(TableType.AUDIO_ALBUM.toString())) {
+			} else if (this.currentView.equals(TableType.AUDIO_ALBUM.toString())) {
 				this.loadAudios();// load and print audio albums only
 			} else if (this.currentView.equals(TableType.MOVIE.toString())) {
 				this.loadMovies(); // load and print movies only
@@ -185,8 +185,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					"Succesffuly obtained {0} movies for collection view",
 					movies.size());
 			for (Movie movie : movies) {
-				movieThumbs.put(movie, new ChoosableImagePanel(movie.getCover()
-						.getImageFile(), MWCollectionView.THUMBAILSIZE));
+				movieThumbs.put(movie, new ImagePanel(movie.getCover().getImageFile()));
 			}
 		}
 
@@ -215,8 +214,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 							"Succesffuly obtained {0} audio albums for collection view",
 							audios.size());
 			for (AudioAlbum album : audios) {
-				audioThumbs.put(album, new ChoosableImagePanel(album.getCover()
-						.getImageFile(), MWCollectionView.THUMBAILSIZE));
+				audioThumbs.put(album, new ImagePanel(album.getCover().getImageFile()));
 			}
 		}
 
@@ -243,8 +241,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					"Succesffuly obtained {0} books for collection view",
 					books.size());
 			for (Book b : books) {
-				bookThumbs.put(b, new ChoosableImagePanel(b.getCover()
-						.getImageFile(), MWCollectionView.THUMBAILSIZE));
+				bookThumbs.put(b, new ImagePanel(b.getCover().getImageFile()));
 			}
 		}
 

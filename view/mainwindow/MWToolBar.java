@@ -25,7 +25,6 @@ public class MWToolBar extends JToolBar implements ActionListener {
 	private JComboBox<String> groupBy, dbContent, zoomContent, viewModeContent;
 	private HashMap<String, String[]> groups;
 	private String selectedGroupBy;
-
 	private final HashMap<JComboBox<String>, String> selectedValues = new HashMap<JComboBox<String>, String>();
 
 	/**
