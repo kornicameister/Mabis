@@ -61,7 +61,7 @@ public class Movie extends BaseTable implements Serializable {
 		String tmp[] = { "idBook",
 						 "title",
 						 "object", 
-						 "writerFK", 
+						 "directorFK", 
 						 "coverFK", 
 						 "genreFK" };
 		return tmp;
