@@ -37,8 +37,8 @@ public class MovieSQLFactory extends SQLFactory {
 			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
 			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
 			st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
-			st.setString(parameterIndex++, movie.getTitle());
 			st.setObject(parameterIndex++, movie);
+			st.setString(parameterIndex++, movie.getTitle());
 			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(movie, st);
@@ -81,8 +81,7 @@ public class MovieSQLFactory extends SQLFactory {
 	 * @throws SQLException
 	 */
 	protected Integer insertCover(Picture cover) throws SQLException {
-		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
-				cover);
+		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT, cover);
 		this.lastAffactedId = psf.executeSQL(false);
 		cover.setPrimaryKey(this.lastAffactedId);
 		return lastAffactedId;
@@ -111,7 +110,6 @@ public class MovieSQLFactory extends SQLFactory {
 				}
 			}else{
 				this.lastAffactedId = director.getPrimaryKey();
-				return this.lastAffactedId;
 			}
 		}
 		return this.lastAffactedId;

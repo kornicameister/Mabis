@@ -28,8 +28,8 @@ public class MovieUserSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			au = (MovieUser) this.table;
-			st.setInt(1, au.getMultiForeing(-1).getKey("idMovie").getValue());
-			st.setInt(2, au.getMultiForeing(-1).getKey("idUser").getValue());
+			st.setInt(2, au.getMultiForeing(-1).getKey("idMovie").getValue());
+			st.setInt(1, au.getMultiForeing(-1).getKey("idUser").getValue());
 			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(au, st);
