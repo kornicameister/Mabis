@@ -26,11 +26,14 @@ import javax.swing.SwingWorker;
 import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.AudioAlbum;
+import model.entity.AudioUser;
 import model.entity.Author;
 import model.entity.Band;
 import model.entity.Genre;
+import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.GenreType;
+import model.utilities.ForeignKey;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
 import view.items.CreatorContentNullPointerException;
@@ -42,6 +45,7 @@ import view.items.minipanels.TrackListPanel;
 import controller.SQLStamentType;
 import controller.api.AudioAlbumAPI;
 import controller.entity.AudioAlbumSQLFactory;
+import controller.entity.AudioUserSQLFactory;
 import controller.entity.BandSQLFactory;
 import controller.entity.GenreSQLFactory;
 
@@ -61,9 +65,9 @@ public class AudioAlbumCreator extends ItemCreator {
 	private LoadFromApi lfa;
 	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
-	public AudioAlbumCreator(String title)
+	public AudioAlbumCreator(User u, String title)
 			throws CreatorContentNullPointerException {
-		super(title);
+		super(u, title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
 				.getMinimumSize().getHeight());
 	}
@@ -201,9 +205,18 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		this.selectedAlbum.setTrackList(this.trackList.getTracks());
 		this.selectedAlbum.setBand((Band) this.bandMiniPanel.getBands().toArray()[0]);
-		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
+
 		try {
-			return aasf.executeSQL(true) > 0;
+			AudioUser au = new AudioUser();
+			
+			AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
+			AudioUserSQLFactory ausf = new AudioUserSQLFactory(SQLStamentType.INSERT, au);
+			
+			au.addMultiForeignKey(-1, 
+					new ForeignKey(this.selectedAlbum, "idAudio", aasf.executeSQL(true)), 
+					new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
+			
+			ausf.executeSQL(true);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

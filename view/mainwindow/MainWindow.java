@@ -72,7 +72,6 @@ public class MainWindow extends JFrame {
 		this.toolBar.addPropertyChangeListener(this.collectionView);
 		this.addPropertyChangeListener("connectedUser", this.collectionView);
 		
-		
 		setSize(d);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setDefaultLookAndFeelDecorated(false);
@@ -205,6 +204,7 @@ public class MainWindow extends JFrame {
 		User oldUser = this.getConnectedUser();
 		this.connectedUser = newUser;
 		this.firePropertyChange("connectedUser", oldUser, this.connectedUser);
+		this.userListPanel.setConnectedUser(this.connectedUser);
 		java.awt.EventQueue.invokeLater(new Runnable() {
 
 			@Override

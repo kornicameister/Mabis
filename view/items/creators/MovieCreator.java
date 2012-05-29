@@ -29,6 +29,7 @@ import model.entity.Author;
 import model.entity.Genre;
 import model.entity.Movie;
 import model.entity.Picture;
+import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.GenreType;
 import model.enums.ImageType;
@@ -67,9 +68,9 @@ public class MovieCreator extends ItemCreator {
 	private LoadFromApi lfa;
 	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
-	public MovieCreator(String title) throws HeadlessException,
+	public MovieCreator(User u, String title) throws HeadlessException,
 			CreatorContentNullPointerException {
-		super(title);
+		super(u, title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 190, (int) this
 				.getMinimumSize().getHeight() + 50);
 	}

@@ -23,6 +23,7 @@ import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
 import model.BaseTable;
+import model.entity.User;
 
 /**
  * Klasa bazowa kreatora nowego obiektu dla kolekcji. Definiuje podstawową
@@ -43,6 +44,7 @@ public abstract class ItemCreator extends JFrame {
 	protected TreeSet<BaseTable> collectedItems;
 	protected ICSearchPanel searchPanel;
 	protected JProgressBar searchProgressBar;
+	protected User selectedUser;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -52,9 +54,10 @@ public abstract class ItemCreator extends JFrame {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public ItemCreator(String title) throws HeadlessException,
+	public ItemCreator(User u,String title) throws HeadlessException,
 			CreatorContentNullPointerException {
 		super(title);
+		this.selectedUser = u;
 		this.initComponents();
 		this.layoutComponents();
 

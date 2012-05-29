@@ -30,6 +30,7 @@ import model.BaseTable;
 import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
+import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.BookIndustryIdentifier;
 import model.enums.GenreType;
@@ -72,8 +73,8 @@ public class BookCreator extends ItemCreator {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public BookCreator(String title) throws CreatorContentNullPointerException {
-		super(title);
+	public BookCreator(User u, String title) throws CreatorContentNullPointerException {
+		super(u, title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 220, (int) this
 				.getMinimumSize().getHeight());
 	}

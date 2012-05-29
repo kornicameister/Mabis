@@ -13,11 +13,11 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
+import logger.MabisLogger;
+import model.entity.User;
 import view.items.creators.AudioAlbumCreator;
 import view.items.creators.BookCreator;
 import view.items.creators.MovieCreator;
-
-import logger.MabisLogger;
 
 /**
  * Klase {@link MWItemButtons} dziedziczy z JPanel i jest agregatem gdzie
@@ -26,18 +26,23 @@ import logger.MabisLogger;
  * @author kornicameister
  * 
  */
-public class MWItemButtons extends JPanel {
+public class MWItemButtons extends JPanel{
 	private static final long serialVersionUID = -4998076655395481258L;
 	private JButton newBookButton;
 	private JButton newMovieButton;
 	private JButton newAudioAlbumButton;
 	private MWItemButtonsListener listener;
+	private User connectedUser;
 
 	public MWItemButtons() {
 		super(true);
 		this.setLayout(new GridLayout(0, 1, 10, 10));
 		this.listener = new MWItemButtonsListener();
 		this.initComponents();
+	}
+	
+	public void setConnectedUser(User u){
+		this.connectedUser = u;
 	}
 
 	private void initComponents() {
@@ -69,13 +74,13 @@ public class MWItemButtons extends JPanel {
 		public void actionPerformed(ActionEvent b) {
 			JButton source = (JButton) b.getSource();
 			if (source.equals(newBookButton)) {
-				BookCreator bc = new BookCreator("New book");
+				BookCreator bc = new BookCreator(connectedUser ,"New book");
 				bc.setVisible(true);
 			} else if (source.equals(newAudioAlbumButton)) {
-				AudioAlbumCreator aac = new AudioAlbumCreator("New audio album");
+				AudioAlbumCreator aac = new AudioAlbumCreator(connectedUser,"New audio album");
 				aac.setVisible(true);
 			} else if (source.equals(newMovieButton)) {
-				MovieCreator mc = new MovieCreator("New movie");
+				MovieCreator mc = new MovieCreator(connectedUser,"New movie");
 				mc.setVisible(true);
 			}
 			MabisLogger.getLogger().log(Level.INFO, "Action called ::  {0}",
@@ -83,4 +88,5 @@ public class MWItemButtons extends JPanel {
 		}
 
 	}
+	
 }
