@@ -40,8 +40,8 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 			}
 			short parameterIndex = 1;
 			st.setInt(parameterIndex++, this.insertGenres(am.getGenres()));
-			st.setInt(parameterIndex++, this.insertDirectors(am.getAuthors()));
 			st.setInt(parameterIndex++, this.insertCover(am.getCover()));
+			st.setInt(parameterIndex++, this.insertDirectors(am.getAuthors()));
 			st.setString(parameterIndex++, am.getTitle());
 			st.setObject(parameterIndex++, am);
 			st.execute();

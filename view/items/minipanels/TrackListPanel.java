@@ -80,6 +80,7 @@ public class TrackListPanel extends JPanel {
 			this.trackListTable.revalidate();
 			row.clear();
 		}
+		this.tracks = trackList;
 	}
 	
 	public TreeSet<AudioAlbumTrack> getTracks() {

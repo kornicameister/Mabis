@@ -27,7 +27,7 @@ public class Band extends Author implements Serializable {
 	private URL lastFMUrl = null;
 	private ArrayList<Genre> tagCloud = null;
 	private Genre masterGenre = null;
-	private static final String urlPattern = "http://www.lastfm.pl/music/band_name";
+	private static final String urlPattern = "http://www.lastfm.pl/music/band_name/";
 
 	public Band() {
 		super();

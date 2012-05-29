@@ -30,9 +30,11 @@ import model.entity.AudioUser;
 import model.entity.Author;
 import model.entity.Band;
 import model.entity.Genre;
+import model.entity.Picture;
 import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.GenreType;
+import model.enums.ImageType;
 import model.utilities.ForeignKey;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
@@ -205,6 +207,12 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		this.selectedAlbum.setTrackList(this.trackList.getTracks());
 		this.selectedAlbum.setBand((Band) this.bandMiniPanel.getBands().toArray()[0]);
+		this.selectedAlbum.setGenres(this.tagCloud.getTags());
+		try {
+			this.selectedAlbum.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		try {
 			AudioUser au = new AudioUser();
@@ -332,7 +340,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.durationField.setText(a.getDuration());
 		this.coverPanel.setImage(a.getCover().getImageFile());
 		this.trackList.setTracks(a.getTrackList());
-		for(Author aa : this.selectedAlbum.getAuthors()){
+		for(Author aa : a.getAuthors()){
 			Band b = (Band)aa;
 			int index = Collections.binarySearch(this.bandMiniPanel.getBands(),
 					b,

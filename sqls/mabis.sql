@@ -147,7 +147,7 @@ create table if not exists mabis.audioAlbum (
     genreFK    int(11) null default '0' comment 'references to idGenre',
     primary key (idAudio),
     key audioCoverRef (coverFK) using btree,
-    key audioBandRef (artistFK) using btree,
+    key audioBandRef (bandFK) using btree,
     key audioGenreRed (genreFK) using btree,
     constraint audioBandRef foreign key (bandFK)
         references author (idAuthor)
