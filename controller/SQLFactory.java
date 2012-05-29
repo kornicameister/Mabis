@@ -201,13 +201,37 @@ public abstract class SQLFactory implements StatementFactory {
 	@Override
 	public String buildWhereChunk() {
 		String a = new String();
-		for (WhereClause where : this.wheres) {
-			a += where.attribute + "='" + where.value + "' and ";
+		String attribute = null;
+		if(this.wheres.size() > 1){
+			WhereClause arr[] = new WhereClause[this.wheres.size()];
+			arr = this.wheres.toArray(arr);
+			
+			attribute = arr[0].attribute;
+			a += attribute + " in (";
+			
+			for(int i = 0 ; i < arr.length ; i++){
+				if(arr[i].attribute.equals(attribute)){
+					a += String.valueOf(arr[i].value) + ",";
+				}else{
+					attribute = arr[i].attribute;
+					a += ") and " + attribute + " in + (";
+				}
+			}
+			
+			if(a.charAt(a.length()-1) == ','){
+				a = a.substring(0, a.length()-1);
+				a += ")";
+			}
+			
+		}else if (this.wheres.size() == 1){
+			WhereClause where = (WhereClause) this.wheres.toArray()[0];
+			a += where.attribute + "='" + where.value + "'";
+			return a;
 		}
 		if (a.length() == 0) {
 			return "";
 		}
-		return a.substring(0, a.length() - 5);
+		return a;
 	}
 
 	@Override
@@ -267,7 +291,11 @@ public abstract class SQLFactory implements StatementFactory {
 
 		@Override
 		public int compareTo(WhereClause o) {
-			return this.attribute.compareTo(o.attribute);
+			int result = this.attribute.compareTo(o.attribute);
+			if(result == 0){
+				result = this.value.compareTo(o.value);
+			}
+			return result;
 		}
 	}
 }

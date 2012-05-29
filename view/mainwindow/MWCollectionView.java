@@ -51,7 +51,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private final TreeMap<Book, ChoosableImagePanel> bookThumbs = new TreeMap<Book, ChoosableImagePanel>();
 	private JPanel thumbailsPanel = null;
 	private JScrollPane scrollPanel = null;
-
+	
 	public MWCollectionView(LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
 		this.initComponents();
@@ -88,10 +88,21 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
 			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+			
+			this.thumbailsPanel.add(thumb);
+		}
+		for (ChoosableImagePanel thumb : this.audioThumbs.values()) {
 
-			thumb.setBorder(BorderFactory.createTitledBorder(
-					BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
-					"LOL"));
+			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
+			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
+			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+			this.thumbailsPanel.add(thumb);
+		}
+		for (ChoosableImagePanel thumb : this.bookThumbs.values()) {
+
+			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
+			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
+			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
 			this.thumbailsPanel.add(thumb);
 		}
 		this.thumbailsPanel.validate();
@@ -167,7 +178,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			for (ForeignKeyPair fkp : keys) {
 				msf.addWhereClause("idMovie", fkp.getKey("idMovie").getValue()
 						.toString());
-
 			}
 			msf.executeSQL(true);
 			TreeSet<Movie> movies = msf.getMovies();
