@@ -59,7 +59,12 @@ public class AudioAlbum extends Movie implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAudio", "object", "coverFK", "artistFK" };
+		String tmp[] = { "idAudio",
+						"object", 
+						"title", 
+						"bandFK", 
+						"coverFK", 
+						"genreFK" };
 		return tmp;
 	}
 

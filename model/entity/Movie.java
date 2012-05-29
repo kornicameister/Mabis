@@ -58,7 +58,12 @@ public class Movie extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBook", "object", "coverFK", "directorFK", "genreFK" };
+		String tmp[] = { "idBook",
+						 "title",
+						 "object", 
+						 "writerFK", 
+						 "coverFK", 
+						 "genreFK" };
 		return tmp;
 	}
 

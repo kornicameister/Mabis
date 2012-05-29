@@ -46,7 +46,12 @@ public class Book extends Movie implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBook", "object", "genreFK", "coverFK", "writerFK" };
+		String tmp[] = { 	"idBook", 
+							"object",
+							"title",
+							"writerFK", 
+							"coverFK",
+							"genreFK"};
 		return tmp;
 	}
 
