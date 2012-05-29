@@ -6,10 +6,11 @@ import java.sql.SQLException;
 import java.util.TreeSet;
 
 import model.BaseTable;
+import model.entity.BookUser;
 import model.enums.TableType;
 import model.utilities.ForeignKey;
 import model.utilities.ForeignKeyPair;
-
+import utilities.Utilities;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 
@@ -23,8 +24,16 @@ public class BookUserSQLFactory extends SQLFactory {
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
+		BookUser au = null;
 		switch (this.type) {
 		case INSERT:
+			au = (BookUser) this.table;
+			st.setInt(1, au.getMultiForeing(-1).getKey("idBook").getValue());
+			st.setInt(2, au.getMultiForeing(-1).getKey("idUser").getValue());
+			st.execute();
+			st.clearParameters();
+			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			break;
 		case DELETE:
 		case SELECT:
 			this.parseResultSet(st.executeQuery());

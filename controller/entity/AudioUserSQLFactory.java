@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.TreeSet;
 
+import utilities.Utilities;
+
 import model.BaseTable;
 import model.entity.AudioUser;
 import model.enums.TableType;
@@ -35,8 +37,16 @@ public class AudioUserSQLFactory extends SQLFactory {
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
+		AudioUser au = null;
 		switch (this.type) {
 		case INSERT:
+			au = (AudioUser) this.table;
+			st.setInt(1, au.getMultiForeing(-1).getKey("idAudio").getValue());
+			st.setInt(2, au.getMultiForeing(-1).getKey("idUser").getValue());
+			st.execute();
+			st.clearParameters();
+			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			break;
 		case DELETE:
 		case SELECT:
 			this.parseResultSet(st.executeQuery());

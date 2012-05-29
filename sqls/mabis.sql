@@ -139,13 +139,13 @@ create table if not exists mabis.bookUser (
  * creating audios table + required additional tables
  */
 create table if not exists mabis.audioAlbum (
-    idAudio int(11) auto_increment,
+    idAudioAlbum int(11) auto_increment,
     object longblob not null,
     title varchar(100) not null,
     bandFK int(11) null default '0' comment 'references to idAuthor',
     coverFK    int(11) null default '0' comment 'references to idPicture',
     genreFK    int(11) null default '0' comment 'references to idGenre',
-    primary key (idAudio),
+    primary key (idAudioAlbum),
     key audioCoverRef (coverFK) using btree,
     key audioBandRef (bandFK) using btree,
     key audioGenreRed (genreFK) using btree,
@@ -174,6 +174,6 @@ create table if not exists mabis.audioUser (
         references user (idUser)
         on delete cascade,
     constraint audioUserAudioRef foreign key (idAudio)
-        references audioAlbum (idAudio)
+        references audioAlbum (idAudioAlbum)
         on delete cascade
 )  ENGINE=InnoDB;
