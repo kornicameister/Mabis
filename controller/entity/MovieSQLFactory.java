@@ -34,10 +34,10 @@ public class MovieSQLFactory extends SQLFactory {
 				break;
 			}
 			short parameterIndex = 1;
-			// TODO add transactions
 			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
-			st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
 			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
+			st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
+			st.setString(parameterIndex++, movie.getTitle());
 			st.setObject(parameterIndex++, movie);
 			st.execute();
 			st.clearParameters();

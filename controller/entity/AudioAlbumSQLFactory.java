@@ -13,17 +13,14 @@ import java.util.TreeSet;
 
 import model.BaseTable;
 import model.entity.AudioAlbum;
-import model.entity.Band;
-import model.entity.Picture;
 import utilities.Utilities;
-import controller.SQLFactory;
 import controller.SQLStamentType;
 
 /**
  * @author kornicameister
  * 
  */
-public class AudioAlbumSQLFactory extends SQLFactory {
+public class AudioAlbumSQLFactory extends MovieSQLFactory {
 	TreeSet<AudioAlbum> audioAlbums = new TreeSet<AudioAlbum>();
 
 	public AudioAlbumSQLFactory(SQLStamentType type, BaseTable table) {
@@ -38,14 +35,15 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 		case UPDATE:
 			break;
 		case INSERT:
+			if(this.checkIfInserted()){
+				break;
+			}
 			short parameterIndex = 1;
-			// inserting covers
-			int cover = this.insertCover(am.getCover());
-			// setting band
-			int band = this.setBand(am.getBand());
+			st.setInt(parameterIndex++, this.insertGenres(am.getGenres()));
+			st.setInt(parameterIndex++, this.insertDirectors(am.getAuthors()));
+			st.setInt(parameterIndex++, this.insertCover(am.getCover()));
+			st.setString(parameterIndex++, am.getTitle());
 			st.setObject(parameterIndex++, am);
-			st.setInt(parameterIndex++, cover);
-			st.setInt(parameterIndex++, band);
 			st.execute();
 			st.clearParameters();
 			this.lastAffactedId = Utilities.lastInsertedId(am, st);
@@ -60,45 +58,6 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
-	}
-
-	/**
-	 * Metoda działa w dwojaki sposób. Jeśli w bazie danych istnieje już zespół,
-	 * identyfikowany przez parametr <b>band</b>, to pobierany jest jego numer
-	 * identyfikacyjny. W drugim wypadku, zespół jest umieszczany w bazie
-	 * danych, a następnie pobierany jest jego numer identyfikacyjny.
-	 * 
-	 * @param band
-	 *            zespół który jest autorem tego {@link AudioAlbum}
-	 * @return klucz główny zespołu dla danego albumu
-	 * @throws SQLException
-	 */
-	private Integer setBand(Band band) throws SQLException {
-		BandSQLFactory bsf = new BandSQLFactory(SQLStamentType.SELECT, band);
-		bsf.addWhereClause("idBand", band.getPrimaryKey().toString());
-		bsf.executeSQL(true);
-		if (bsf.getBands().isEmpty()) {
-			bsf.setStatementType(SQLStamentType.INSERT);
-			this.lastAffactedId = bsf.executeSQL(true);
-			band.setPrimaryKey(this.lastAffactedId);
-		}
-		return this.lastAffactedId;
-	}
-
-	/**
-	 * Metoda odpowiedzialna jest za umieszczenie w bazie danych informacji o
-	 * okładce danego albumu
-	 * 
-	 * @param cover
-	 * @return numer identyfikacyjny ostatnio umieszczonej okładki w bazie danych
-	 * @throws SQLException
-	 */
-	private Integer insertCover(Picture cover) throws SQLException {
-		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT,
-				cover);
-		this.lastAffactedId = psf.executeSQL(localDatabase);
-		cover.setPrimaryKey(this.lastAffactedId);
-		return lastAffactedId;
 	}
 
 	@Override
