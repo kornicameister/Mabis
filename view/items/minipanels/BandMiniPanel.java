@@ -37,6 +37,8 @@ public class BandMiniPanel extends AuthorMiniPanel {
 				b.getName() };
 		if(a.getPrimaryKey() < 0){
 			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+		}else{
+			data[1] = new JLabel(new ImageIcon(GlobalPaths.OK_SIGN.toString()));
 		}
 		this.tableModel.addRow(data);
 		this.authorToRow.put(a, this.authorToRow.size());
@@ -75,6 +77,7 @@ public class BandMiniPanel extends AuthorMiniPanel {
 				if (Collections.binarySearch(this.bands, tmp, comparator) < 0) {
 					this.bands.add(tmp);
 					this.addRow(tmp);
+					this.firePropertyChange("band", null, tmp);
 				}
 			}
 		} else if (source.equals(selectAuthorButton)) {
@@ -89,6 +92,7 @@ public class BandMiniPanel extends AuthorMiniPanel {
 				Band tmp = (Band) returned;
 				if (Collections.binarySearch(this.bands, tmp, comparator) < 0) {
 					this.addRow(tmp);
+					this.firePropertyChange("band", null, tmp);
 				}
 			}
 		}

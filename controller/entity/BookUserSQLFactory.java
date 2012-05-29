@@ -59,4 +59,9 @@ public class BookUserSQLFactory extends SQLFactory {
 		return values;
 	}
 
+	@Override
+	public Boolean checkIfInserted() throws SQLException {
+		return true;
+	}
+
 }

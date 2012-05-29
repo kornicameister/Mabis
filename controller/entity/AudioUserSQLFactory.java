@@ -71,4 +71,9 @@ public class AudioUserSQLFactory extends SQLFactory {
 		return values;
 	}
 
+	@Override
+	public Boolean checkIfInserted() throws SQLException {
+		return true;
+	}
+
 }

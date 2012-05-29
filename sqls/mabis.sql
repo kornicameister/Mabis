@@ -54,8 +54,9 @@ create table if not exists mabis.author (
 create table if not exists mabis.movie (
     idMovie int(11) auto_increment,
     object longblob not null,
-    coverFK    int(11) null default '0' comment 'references to idPicture',
+    title varchar(100) not null,
     directorFK int(11) null default '0' comment 'references to idAuthor',
+    coverFK    int(11) null default '0' comment 'references to idPicture',
     genreFK    int(11) null default '0' comment 'references to idGenre',
     primary key (idMovie),
     key movieCoverRef (coverFK) using btree,
@@ -97,9 +98,10 @@ create table if not exists mabis.movieUser (
 create table if not exists mabis.book (
     idBook int(11) auto_increment,
     object longblob not null,
-    genreFK  int(11) null default '0' comment 'references to idGenre',
-    coverFK  int(11) null default '0' comment 'references to idPicture',
+    title varchar(100) not null,
     writerFK int(11) null default '0' comment 'references to idAuthor',
+    coverFK    int(11) null default '0' comment 'references to idPicture',
+    genreFK    int(11) null default '0' comment 'references to idGenre',
     primary key (idBook),
     key bookGenreRef (genreFK) using btree,
     key bookCoverRef (coverFK) using btree,
@@ -139,17 +141,23 @@ create table if not exists mabis.bookUser (
 create table if not exists mabis.audioAlbum (
     idAudio int(11) auto_increment,
     object longblob not null,
-    coverFK int(11) null default '0' comment 'references to idPicture',
-    artistFK     int(11) null default '0' comment 'references to idBand',
+    title varchar(100) not null,
+    bandFK int(11) null default '0' comment 'references to idAuthor',
+    coverFK    int(11) null default '0' comment 'references to idPicture',
+    genreFK    int(11) null default '0' comment 'references to idGenre',
     primary key (idAudio),
     key audioCoverRef (coverFK) using btree,
     key audioBandRef (artistFK) using btree,
-    constraint audioBandRef foreign key (artistFK)
+    key audioGenreRed (genreFK) using btree,
+    constraint audioBandRef foreign key (bandFK)
         references author (idAuthor)
         on delete set null on update restrict,
     constraint audioCoverRef foreign key (coverFK)
         references picture (idPicture)
-        on delete set null on update cascade
+        on delete set null on update cascade,
+    constraint audioGenreRef foreign key (genreFK)
+        references genre (idGenre)
+        on delete set null
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_polish_ci;
 
 /**

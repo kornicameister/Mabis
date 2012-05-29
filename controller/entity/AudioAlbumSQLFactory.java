@@ -134,4 +134,16 @@ public class AudioAlbumSQLFactory extends SQLFactory {
 		return this.audioAlbums;
 	}
 
+	@Override
+	public Boolean checkIfInserted() throws SQLException {
+		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.SELECT, this.table);
+		aasf.addWhereClause("title", this.table.getTitle());
+		aasf.executeSQL(true);
+		for(AudioAlbum mm : aasf.getValues()){
+			this.lastAffactedId = mm.getPrimaryKey();
+			return true;
+		}
+		return false;
+	}
+
 }

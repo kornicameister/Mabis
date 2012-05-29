@@ -30,6 +30,9 @@ public class MovieSQLFactory extends SQLFactory {
 		Movie movie = (Movie) this.table;
 		switch (this.type) {
 		case INSERT:
+			if(this.checkIfInserted()){
+				break;
+			}
 			short parameterIndex = 1;
 			// TODO add transactions
 			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
@@ -50,6 +53,18 @@ public class MovieSQLFactory extends SQLFactory {
 		default:
 			break;
 		}
+	}
+	
+	@Override
+	public Boolean checkIfInserted() throws SQLException{
+		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.SELECT, this.table);
+		msf.addWhereClause("title",this.table.getTitle());
+		msf.executeSQL(true);
+		for(Movie mm : msf.getMovies()){
+			this.lastAffactedId = mm.getPrimaryKey();
+			return true;
+		}
+		return false;
 	}
 
 	/**

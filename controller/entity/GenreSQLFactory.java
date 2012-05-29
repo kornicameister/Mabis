@@ -93,4 +93,9 @@ public class GenreSQLFactory extends SQLFactory {
 		return this.genres;
 	}
 
+	@Override
+	public Boolean checkIfInserted() throws SQLException {
+		return true;
+	}
+
 }

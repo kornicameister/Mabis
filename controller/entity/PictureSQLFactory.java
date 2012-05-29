@@ -198,4 +198,9 @@ public class PictureSQLFactory extends SQLFactory {
 		return pictures;
 	}
 
+	@Override
+	public Boolean checkIfInserted() throws SQLException {
+		return true;
+	}
+
 }

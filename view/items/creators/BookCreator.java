@@ -191,6 +191,7 @@ public class BookCreator extends ItemCreator {
 			e.printStackTrace();
 		}
 	}
+	
 	class MiniPanelsListener implements PropertyChangeListener{
 
 		@Override

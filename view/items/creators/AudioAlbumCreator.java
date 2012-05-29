@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -24,6 +26,7 @@ import javax.swing.SwingWorker;
 import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.AudioAlbum;
+import model.entity.Author;
 import model.entity.Band;
 import model.entity.Genre;
 import model.enums.AuthorType;
@@ -56,6 +59,7 @@ public class AudioAlbumCreator extends ItemCreator {
 	private TrackListPanel trackList;
 	private AudioAlbum selectedAlbum = new AudioAlbum();
 	private LoadFromApi lfa;
+	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
 	public AudioAlbumCreator(String title)
 			throws CreatorContentNullPointerException {
@@ -141,8 +145,8 @@ public class AudioAlbumCreator extends ItemCreator {
 			asf.executeSQL(true);
 			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),
 					AuthorType.AUDIO_ALBUM_BAND);
-			this.bandMiniPanel.setBorder(BorderFactory
-					.createTitledBorder("Bands"));
+			this.bandMiniPanel.setBorder(BorderFactory.createTitledBorder("Bands"));
+			this.bandMiniPanel.addPropertyChangeListener("band",this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -154,13 +158,31 @@ public class AudioAlbumCreator extends ItemCreator {
 					new Genre());
 			gsf.addWhereClause("type", GenreType.AUDIO.toString());
 			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
-					GenreType.AUDIO);
-			this.tagCloud.setBorder(BorderFactory
-					.createTitledBorder("Tag cloud"));
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.AUDIO);
+			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+			this.tagCloud.addPropertyChangeListener("tag",this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	class MiniPanelsListener implements PropertyChangeListener{
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if(evt.getPropertyName().equals("band")){
+				Band tmp = (Band) evt.getNewValue();
+				if(!selectedAlbum.getBand().equals(tmp)){
+					selectedAlbum.setBand(tmp);
+				}
+			}else if(evt.getPropertyName().equals("tag")){
+				Genre tmp = (Genre) evt.getNewValue();
+				if(!selectedAlbum.getGenres().contains(tmp)){
+					selectedAlbum.addGenre(tmp);
+				}
+			}
+		}
+		
 	}
 
 	@Override
@@ -178,12 +200,8 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setTitle(this.titleField.getText());
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		this.selectedAlbum.setTrackList(this.trackList.getTracks());
-		for (Genre g : this.tagCloud.getTags()) {
-			this.selectedAlbum.addGenre(g);
-		}
 		this.selectedAlbum.setBand((Band) this.bandMiniPanel.getBands().toArray()[0]);
-		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
-				SQLStamentType.INSERT, this.selectedAlbum);
+		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
 		try {
 			return aasf.executeSQL(true) > 0;
 		} catch (SQLException e) {
@@ -301,10 +319,54 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.durationField.setText(a.getDuration());
 		this.coverPanel.setImage(a.getCover().getImageFile());
 		this.trackList.setTracks(a.getTrackList());
-		for(Genre g : a.getGenres()){
-			this.tagCloud.addRow(g);
+		for(Author aa : this.selectedAlbum.getAuthors()){
+			Band b = (Band)aa;
+			int index = Collections.binarySearch(this.bandMiniPanel.getBands(),
+					b,
+					new Comparator<Author>() {
+						@Override
+						public int compare(Author o1, Author o2) {
+							int result = o1.getLastName().compareTo(o2.getLastName());
+							if(result == 0){
+								result = o1.getFirstName().compareTo(o2.getFirstName());
+							}
+							return result;
+						}
+					});
+			if(index < 0){
+				this.bandMiniPanel.addRow(b);
+				this.bandMiniPanel.getBands().add(b);
+				b.setType(AuthorType.AUDIO_ALBUM_BAND);
+			}else{
+				a.setPrimaryKey(this.bandMiniPanel.getAuthors().get(index).getPrimaryKey());
+				this.bandMiniPanel.addRow(b);
+			}
 		}
-		this.bandMiniPanel.addRow(a.getBand());
+		
+		//check up - 2, the same thing, but now it does concern genres
+		for(Genre g : this.selectedAlbum.getGenres()){
+			int index= Collections.binarySearch(
+					this.tagCloud.getTags(), 
+					g,
+					new Comparator<Genre>() {
+						@Override
+						public int compare(Genre g1, Genre g2) {
+							int result = g1.getType().compareTo(g2.getType());
+							if(result == 0){
+								result = g1.getGenre().compareTo(g2.getGenre());
+							}
+							return result;
+						}
+					});
+			if(index < 0){
+				this.tagCloud.addRow(g);
+				this.tagCloud.getTags().add(g);
+				g.setType(GenreType.AUDIO);
+			}else{
+				g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+				this.tagCloud.addRow(g);
+			}
+		}
 	}
 
 }

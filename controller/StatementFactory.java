@@ -148,4 +148,12 @@ public interface StatementFactory {
 	 * @throws SQLException
 	 */
 	abstract Integer executeSQL(boolean local) throws SQLException;
+	
+	/**
+	 * Metoda wykonując odpowiedni kod sql, sprawdza czy dana krotka znajduje się
+	 * już w bazie danych !
+	 * @return prawda, jeśli krotka jest w bazie
+	 * @throws SQLException
+	 */
+	abstract Boolean checkIfInserted() throws SQLException;
 }

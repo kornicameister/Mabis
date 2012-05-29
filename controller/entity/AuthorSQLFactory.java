@@ -138,4 +138,9 @@ public class AuthorSQLFactory extends SQLFactory {
 	public TreeSet<Author> getAuthors() {
 		return this.authors;
 	}
+
+	@Override
+	public Boolean checkIfInserted() throws SQLException {
+		return true;
+	}
 }
