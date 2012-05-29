@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
@@ -31,7 +31,7 @@ import controller.exceptions.PictureCacheException;
  * 
  */
 public class PictureSQLFactory extends SQLFactory {
-	private final HashMap<Integer, Picture> pictures = new HashMap<Integer, Picture>();
+	private final TreeSet<Picture> pictures = new TreeSet<>();
 
 	public PictureSQLFactory(SQLStamentType type, Picture table) {
 		super(type, table);
@@ -75,10 +75,13 @@ public class PictureSQLFactory extends SQLFactory {
 			while ((len = in.read(buf)) > 0) {
 				out.write(buf, 0, len);
 			}
+			
 			in.close();
 			out.close();
+			
 
-			pp.setImageFile(newPicture.getCanonicalPath(), pp.getCheckSum());
+			pp.setImageFile(newPicture.getCanonicalPath());
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -144,18 +147,15 @@ public class PictureSQLFactory extends SQLFactory {
 		this.reset();
 		Picture problematic = (Picture) this.table;
 		// 1. fetch all pictures
-		this.type = SQLStamentType.SELECT;
-		this.executeSQL(true);
-		for (Picture p : this.pictures.values()) {
+		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT, problematic);
+		psf.executeSQL(true);
+		for (Picture p : psf.getCovers()) {
 			if (problematic.getCheckSum().equals(p.getCheckSum())) {
-				// located picture
 				problematic.setPrimaryKey(p.getPrimaryKey());
-			} else {
-				p = null;
+				this.lastAffactedId = problematic.getPrimaryKey();
+				return;
 			}
 		}
-		this.reset();
-		this.lastAffactedId = problematic.getPrimaryKey();
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class PictureSQLFactory extends SQLFactory {
 						ObjectInputStream objectIn = new ObjectInputStream(
 								new ByteArrayInputStream(buf));
 						picture = (Picture) objectIn.readObject();
-						this.pictures.put(picture.getPrimaryKey(), picture);
+						this.pictures.add(picture);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ClassNotFoundException e) {
@@ -194,7 +194,7 @@ public class PictureSQLFactory extends SQLFactory {
 		this.pictures.clear();
 	}
 
-	public HashMap<Integer, Picture> getCovers() {
+	public TreeSet<Picture> getCovers() {
 		return pictures;
 	}
 
