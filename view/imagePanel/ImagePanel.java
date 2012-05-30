@@ -3,15 +3,20 @@ package view.imagePanel;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
+import java.util.logging.Level;
 
 import javax.accessibility.Accessible;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import logger.MabisLogger;
 
 /**
  * Class is to conveniently place an image inside of JPanel By Extending JPanel
@@ -32,6 +37,7 @@ public class ImagePanel extends JPanel implements Accessible {
 		super(true);
 		this.imageFile = f;
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
+		this.addFocusListener(new ImagePanelFocusListener(this));
 
 		this.contentLabel = new JLabel();
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -43,6 +49,7 @@ public class ImagePanel extends JPanel implements Accessible {
 	public ImagePanel() {
 		super(true);
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
+		this.addFocusListener(new ImagePanelFocusListener(this));
 
 		this.contentLabel = new JLabel();
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -53,14 +60,14 @@ public class ImagePanel extends JPanel implements Accessible {
 	public ImagePanel(File icon, Dimension d) {
 		super(true);
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
+		this.addFocusListener(new ImagePanelFocusListener(this));
 
 		this.contentLabel = new JLabel();
 		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		this.contentLabel.setLayout(new FlowLayout());
 		this.add(contentLabel);
 		ImageIcon tmp = new ImageIcon(icon.getAbsolutePath());
-		ImageIcon tmp2 = new ImageIcon(tmp.getImage().getScaledInstance(
-				(int) d.getWidth(), (int) d.getHeight()-30, Image.SCALE_FAST));
+		ImageIcon tmp2 = new ImageIcon(tmp.getImage().getScaledInstance((int) d.getWidth(), (int) d.getHeight()-30, Image.SCALE_FAST));
 		this.contentLabel.setIcon(tmp2);
 		this.imageFile = icon;
 	}
@@ -100,7 +107,7 @@ public class ImagePanel extends JPanel implements Accessible {
 				+ ");(" + this.imageFile.getPath() + ")]";
 	}
 
-	public class ImagePanelMouseMotionListener extends MouseAdapter implements
+	class ImagePanelMouseMotionListener extends MouseAdapter implements
 			MouseMotionListener {
 
 		@Override
@@ -114,4 +121,28 @@ public class ImagePanel extends JPanel implements Accessible {
 		}
 
 	}
+
+	class ImagePanelFocusListener implements FocusListener{
+		private ImagePanel ref;
+
+		public ImagePanelFocusListener(ImagePanel ref) {
+			this.ref = ref;
+		}
+		
+		@Override
+		public void focusGained(FocusEvent e) {
+			String path = ((ImagePanel) e.getComponent()).getImageFile().getName();
+			ref.firePropertyChange("focusable", false, true);
+			MabisLogger.getLogger().log(Level.INFO, "{0} gained focus", path);
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			String path = ((ImagePanel) e.getComponent()).getImageFile().getName();
+			ref.firePropertyChange("focusable", true, false);
+			MabisLogger.getLogger().log(Level.INFO,"{0} lost focus", path);
+		}
+		
+	}
+	
 }
