@@ -12,7 +12,7 @@ package model.enums;
 public enum TableType{
 	AUDIO_ALBUM("audioAlbum"), AUDIO_USER("audioUser"), AUTHOR("author"), BAND(
 			"author"), BOOK("book"), BOOK_USER("bookUser"), PICTURE("picture"), GENRE(
-			"genre"), MOVIE("movie"), MOVIE_USER("movieUser"), USER("user"), NULL("no_table_selected");
+			"genre"), MOVIE("movie"), MOVIE_USER("movieUser"), USER("user"), NULL("all");
 
 	private String name;
 	TableType(String s) {

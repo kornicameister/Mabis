@@ -49,6 +49,21 @@ public class ImagePanel extends JPanel implements Accessible {
 		this.contentLabel.setLayout(new FlowLayout());
 		this.add(contentLabel);
 	}
+	
+	public ImagePanel(File icon, Dimension d) {
+		super(true);
+		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
+
+		this.contentLabel = new JLabel();
+		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		this.contentLabel.setLayout(new FlowLayout());
+		this.add(contentLabel);
+		ImageIcon tmp = new ImageIcon(icon.getAbsolutePath());
+		ImageIcon tmp2 = new ImageIcon(tmp.getImage().getScaledInstance(
+				(int) d.getWidth(), (int) d.getHeight()-30, Image.SCALE_FAST));
+		this.contentLabel.setIcon(tmp2);
+		this.imageFile = icon;
+	}
 
 	@Override
 	public void setSize(Dimension d) {

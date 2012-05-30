@@ -9,7 +9,9 @@ import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
@@ -21,15 +23,17 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
+import model.BaseTable;
 import model.entity.AudioAlbum;
 import model.entity.AudioUser;
+import model.entity.Author;
 import model.entity.Book;
 import model.entity.BookUser;
 import model.entity.Movie;
 import model.entity.MovieUser;
 import model.entity.User;
-import model.enums.TableType;
 import model.utilities.ForeignKeyPair;
+import view.enums.CollectionView;
 import view.imagePanel.ImagePanel;
 import controller.SQLStamentType;
 import controller.entity.AudioAlbumSQLFactory;
@@ -41,18 +45,16 @@ import controller.entity.MovieUserSQLFactory;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
-	private static final Dimension THUMBAILSIZE = new Dimension(150, 200);
+	private static final Dimension THUMBAILSIZE = new Dimension(190, 220);
 	private static final long serialVersionUID = 4037649477948033295L;
 	private final CollectionMediator mediator = new CollectionMediator();
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
-	private final TreeMap<Movie, ImagePanel> movieThumbs = new TreeMap<Movie, ImagePanel>();
-	private final TreeMap<AudioAlbum, ImagePanel> audioThumbs = new TreeMap<AudioAlbum, ImagePanel>();
-	private final TreeMap<Book, ImagePanel> bookThumbs = new TreeMap<Book, ImagePanel>();
-	
+
 	private JPanel thumbailsPanel = null;
 	private JScrollPane scrollPanel = null;
-	
+	private CollectionView currentView;
+
 	public MWCollectionView(LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
 		this.initComponents();
@@ -73,7 +75,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	}
 
 	private void initPopupMenu() {
-		// TODO add listener
 		this.collectionMenu = new JPopupMenu("Collection popup menu");
 		collectionMenu.add(new JMenuItem("Edit"));
 		collectionMenu.add(new JMenuItem("Remove"));
@@ -81,32 +82,183 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		collectionMenu.setSelected(this);
 	}
 
-	private void reprintCollection() {
+	private void reprintCollection(CollectionView view) {
 		this.thumbailsPanel.removeAll();
-		for (ImagePanel thumb : this.movieThumbs.values()) {
+		this.currentView = view;
 
-			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
-			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
-			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-			
-			this.thumbailsPanel.add(thumb);
-		}
-		for (ImagePanel thumb : this.audioThumbs.values()) {
+		class SmallPrinter{
+			public void printAudios(){
+				for (AudioAlbum a : mediator.collectedAlbums) {
 
-			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
-			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
-			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-			this.thumbailsPanel.add(thumb);
-		}
-		for (ImagePanel thumb : this.bookThumbs.values()) {
+					ImagePanel thumb = new ImagePanel(a.getCover().getImageFile(), THUMBAILSIZE);
+					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
+					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
+					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+				    thumbailsPanel.add(thumb);
+				    
+				}
+			}
+			public void printBooks(){
+				for (Book b : mediator.collectedBooks) {
 
-			thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
-			thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
-			thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-			this.thumbailsPanel.add(thumb);
+					ImagePanel thumb = new ImagePanel(b.getCover().getImageFile(), THUMBAILSIZE);
+					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
+					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
+					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+					thumbailsPanel.add(thumb);
+					
+				}
+			}
+			public void printMovies(){
+				for (Movie m : mediator.collectedMovies) {
+
+					ImagePanel thumb = new ImagePanel(m.getCover().getImageFile(), THUMBAILSIZE);
+					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
+					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
+					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+
+					thumbailsPanel.add(thumb);
+				}	
+			}
 		}
+		
+		SmallPrinter sm = new SmallPrinter();
+		
+		switch (view) {
+		case VIEW_AUDIOS:
+			sm.printAudios();
+			break;
+		case VIEW_BOOKS:
+			sm.printBooks();
+			break;
+		case VIEW_MOVIES:
+			sm.printMovies();
+			break;
+		default:
+			sm.printAudios();
+			sm.printBooks();
+			sm.printMovies();
+			break;
+		}
+
 		this.thumbailsPanel.revalidate();
 		this.thumbailsPanel.repaint();
+	}
+
+	private void groupViewBy(String value) {
+		switch (this.currentView) {
+		case VIEW_AUDIOS:
+			if(value.equals("Band")){
+				Collections.sort(mediator.collectedAlbums, new Comparator<AudioAlbum>() {
+
+					@Override
+					public int compare(AudioAlbum a0, AudioAlbum a1) {
+						return a0.getBand().compareTo(a1.getBand());
+					}
+				});
+			}
+			break;
+		case VIEW_BOOKS:
+			if(value.equals("Author")){
+				Collections.sort(mediator.collectedBooks,new Comparator<Book>() {
+					@Override
+					public int compare(Book arg0, Book arg1) {
+						Object[] b1 = arg0.getAuthors().toArray();
+						Object[] b2 = arg1.getAuthors().toArray();
+						int res = 0;
+						for(int i = 0 ; i < (b1.length > b2.length ? b2.length : b1.length) ; i++){
+							res = ((Author)b1[i]).compareTo((Author)b2[i]);
+							if(res != 0){
+								return res;
+							}
+						}
+						return res;
+					}
+				});
+			}else if(value.equals("ISBN")){
+				return;
+			}
+			break;
+		case VIEW_MOVIES:
+			if(value.equals("Director")){
+				Collections.sort(mediator.collectedMovies,new Comparator<Movie>() {
+					@Override
+					public int compare(Movie a,Movie b) {
+						Object[] b1 = a.getAuthors().toArray();
+						Object[] b2 = b.getAuthors().toArray();
+						int res = 0;
+						for(int i = 0 ; i < (b1.length > b2.length ? b2.length : b1.length) ; i++){
+							res = ((Author)b1[i]).compareTo((Author)b2[i]);
+							if(res != 0){
+								return res;
+							}
+						}
+						return res;
+					}
+				});
+			}
+			break;
+		default:
+			if(value.equals("Title")){
+				class TitleComparator implements Comparator<BaseTable>{
+					@Override
+					public int compare(BaseTable a, BaseTable b) {
+						return a.getTitle().compareTo(b.getTitle()) * -1;
+					}
+				}
+				Collections.sort(mediator.collectedAlbums, new TitleComparator());
+				Collections.sort(mediator.collectedBooks, new TitleComparator());
+				Collections.sort(mediator.collectedMovies, new TitleComparator());
+			}else{
+				Collections.sort(mediator.collectedAlbums);
+				Collections.sort(mediator.collectedBooks);
+				Collections.sort(mediator.collectedMovies);
+			}
+			break;
+		}
+		reprintCollection(currentView);
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent e) {
+		if (e.getPropertyName().equals("connectedUser")) {
+			this.connectedUserReference = (User) e.getNewValue();
+			MabisLogger
+					.getLogger()
+					.log(Level.INFO,
+							this.getClass().getName()
+									+ ": updating connected user info, connected user login:"
+									+ this.connectedUserReference.getLogin());
+			return;
+		}
+
+		if (e.getPropertyName().equals("zoomChanged")) {
+			this.rezoomCollection((double) e.getNewValue());
+		} else if (e.getPropertyName().equals("contentChanged")) {
+			this.reprintCollection((CollectionView) e.getNewValue());
+		} else if (e.getPropertyName().equals("groupByChanged")) {
+			this.groupViewBy((String) e.getNewValue());
+		}
+	}
+
+	private void rezoomCollection(double factor) {
+
+	}
+
+	/**
+	 * Metoda ładuje lokalną kolecję na widok kolekcji. Pobiera dane do widoku
+	 * kolekcji poprzez mediatora ( {@link CollectionMediator} ). <b>Ważne: </b>
+	 * Metoda do poprawnego działania wymaga połączenie z bazą danych oraz
+	 * zweryfikowanego użytkownika, który jest zalogowany w aplikacji. Metoda
+	 * wywoływana powinna być tylko raz, zaraz po nawiązaniu połączenia i
+	 * zalogowaniu się przez użytownika do programu.
+	 * 
+	 * @throws SQLException
+	 */
+	// TODO dodać ładowania według predefiniowanych ustawień !!!
+	public void loadCollection() throws SQLException {
+		this.mediator.loadCollection();
+		this.reprintCollection(CollectionView.VIEW_ALL);
 	}
 
 	/**
@@ -119,48 +271,14 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	 * @version 0.1
 	 */
 	private final class CollectionMediator {
-		private String currentView, currentGroup;
+		private ArrayList<Movie> collectedMovies = new ArrayList<>();
+		private ArrayList<Book> collectedBooks = new ArrayList<>();
+		private ArrayList<AudioAlbum> collectedAlbums = new ArrayList<>();
 
-		public CollectionMediator() {
-			this.currentView = new String();
-			this.currentGroup = new String();
-		}
-
-		void loadSelected(String display) throws SQLException {
-			if (display.equals(this.currentView)) {
-				return;// THIS IS ALREADY BEING DISPLAYED
-			} else if (display != null) {
-				this.currentView = display;
-			}
-
-			audioThumbs.clear();
-			movieThumbs.clear();
-			bookThumbs.clear();
-
-			if (this.currentView.equals(TableType.BOOK.toString())) {
-				this.loadBooks(); // load and print books only
-			} else if (this.currentView.equals(TableType.AUDIO_ALBUM.toString())) {
-				this.loadAudios();// load and print audio albums only
-			} else if (this.currentView.equals(TableType.MOVIE.toString())) {
-				this.loadMovies(); // load and print movies only
-			} else if (this.currentView.equals("all")) {
-				this.loadAll();
-			}
-
-			// and finally reprinting collection
-			reprintCollection();
-		}
-
-		public void groupViewBy(String viewValue) {
-			if (this.currentGroup.equals(viewValue)) {
-				return;
-			}
-		}
-
-		private void loadAll() throws SQLException {
-			this.loadBooks();
-			this.loadAudios();
-			this.loadMovies();
+		void loadCollection() throws SQLException {
+			loadAudios();
+			loadBooks();
+			loadMovies();
 		}
 
 		private void loadMovies() throws SQLException {
@@ -180,13 +298,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 						.toString());
 			}
 			msf.executeSQL(true);
-			TreeSet<Movie> movies = msf.getMovies();
+			this.collectedMovies.addAll(msf.getMovies());
 			MabisLogger.getLogger().log(Level.INFO,
 					"Succesffuly obtained {0} movies for collection view",
-					movies.size());
-			for (Movie movie : movies) {
-				movieThumbs.put(movie, new ImagePanel(movie.getCover().getImageFile()));
-			}
+					this.collectedMovies.size());
 		}
 
 		private void loadAudios() throws SQLException {
@@ -202,20 +317,17 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
 					SQLStamentType.SELECT, new AudioAlbum());
 			for (ForeignKeyPair fkp : keys) {
-				aasf.addWhereClause("idAudioAlbum", fkp.getKey("idAudio").getValue()
-						.toString());
+				aasf.addWhereClause("idAudioAlbum", fkp.getKey("idAudio")
+						.getValue().toString());
 
 			}
 			aasf.executeSQL(true);
-			TreeSet<AudioAlbum> audios = aasf.getValues();
+			this.collectedAlbums.addAll(aasf.getValues());
 			MabisLogger
 					.getLogger()
 					.log(Level.INFO,
 							"Succesffuly obtained {0} audio albums for collection view",
-							audios.size());
-			for (AudioAlbum album : audios) {
-				audioThumbs.put(album, new ImagePanel(album.getCover().getImageFile()));
-			}
+							this.collectedAlbums.size());
 		}
 
 		private void loadBooks() throws SQLException {
@@ -236,74 +348,11 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 			}
 			aasf.executeSQL(true);
-			TreeSet<Book> books = aasf.getBooks();
+			this.collectedBooks.addAll(aasf.getBooks());
 			MabisLogger.getLogger().log(Level.INFO,
 					"Succesffuly obtained {0} books for collection view",
-					books.size());
-			for (Book b : books) {
-				bookThumbs.put(b, new ImagePanel(b.getCover().getImageFile()));
-			}
+					this.collectedBooks.size());
 		}
 
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent arg0) {
-		String group = null;
-		String value = null;
-
-		if (arg0.getPropertyName().equals("connectedUser")) {
-			this.connectedUserReference = (User) arg0.getNewValue();
-			MabisLogger
-					.getLogger()
-					.log(Level.INFO,
-							this.getClass().getName()
-									+ ": updating connected user info, connected user login:"
-									+ this.connectedUserReference.getLogin());
-			return;
-		}
-
-		if (arg0.getNewValue() instanceof String
-				&& arg0.getPropertyName() instanceof String) {
-			value = (String) arg0.getNewValue();
-			group = (String) arg0.getPropertyName();
-			if (group.equals("viewAs")) {
-				try {
-					this.mediator.loadSelected(value);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				MabisLogger
-						.getLogger()
-						.log(Level.INFO,
-								this.getClass().getName()
-										+ ": updating collection view, current view set to {0}",
-								value);
-			} else {
-				this.mediator.groupViewBy(value);
-				MabisLogger
-						.getLogger()
-						.log(Level.INFO,
-								this.getClass().getName()
-										+ ": updating collection group, current group set to {0}",
-								value);
-			}
-		}
-	}
-
-	/**
-	 * Metoda ładuje lokalną kolecję na widok kolekcji. Pobiera dane do widoku
-	 * kolekcji poprzez mediatora ( {@link CollectionMediator} ). <b>Ważne: </b>
-	 * Metoda do poprawnego działania wymaga połączenie z bazą danych oraz
-	 * zweryfikowanego użytkownika, który jest zalogowany w aplikacji. Metoda
-	 * wywoływana powinna być tylko raz, zaraz po nawiązaniu połączenia i
-	 * zalogowaniu się przez użytownika do programu.
-	 * 
-	 * @throws SQLException
-	 */
-	// TODO dodać ładowania według predefiniowanych ustawień !!!
-	public void loadCollection() throws SQLException {
-		this.mediator.loadSelected("all");
-		this.mediator.groupViewBy(null);
 	}
 }

@@ -14,8 +14,10 @@ import model.enums.TableType;
  * @see TableType
  */
 public enum CollectionView {
-	VIEW_BOOKS(TableType.BOOK), VIEW_MOVIES(TableType.MOVIE), VIEW_AUDIOS(
-			TableType.AUDIO_ALBUM), VIEW_ALL(null);
+	VIEW_BOOKS(TableType.BOOK), 
+	VIEW_MOVIES(TableType.MOVIE), 
+	VIEW_AUDIOS(TableType.AUDIO_ALBUM),
+	VIEW_ALL(TableType.NULL);
 
 	private TableType tt = null;
 
@@ -44,12 +46,12 @@ public enum CollectionView {
 		return "all";
 	}
 
-	public static String[] toArray() {
-		String tmp[] = new String[4];
-		tmp[0] = "all";
-		tmp[1] = TableType.BOOK.toString();
-		tmp[2] = TableType.MOVIE.toString();
-		tmp[3] = TableType.AUDIO_ALBUM.toString();
+	public static CollectionView[] toArray() {
+		CollectionView tmp[] = new CollectionView[4];
+		tmp[0] = VIEW_ALL;
+		tmp[1] = VIEW_AUDIOS;
+		tmp[2] = VIEW_BOOKS;
+		tmp[3] = VIEW_MOVIES;
 		return tmp;
 	}
 }
