@@ -12,14 +12,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
@@ -47,7 +50,6 @@ import controller.entity.MovieUserSQLFactory;
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private static final Dimension THUMBAILSIZE = new Dimension(190, 220);
 	private static final long serialVersionUID = 4037649477948033295L;
-	private final CollectionMediator mediator = new CollectionMediator();
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
 
@@ -55,6 +57,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private JScrollPane scrollPanel = null;
 	private CollectionView currentView;
 
+	private final ThumbailDescriptor descriptor = new ThumbailDescriptor();
+	private final CollectionMediator mediator = new CollectionMediator();
+	private TreeMap<ImagePanel, BaseTable> thumbToEntity = new TreeMap<>();
+	
 	public MWCollectionView(LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
 		this.initComponents();
@@ -94,8 +100,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
 					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
+					
 				    thumbailsPanel.add(thumb);
-				    
+				    thumb.addPropertyChangeListener(descriptor);
+				    thumbToEntity.put(thumb,a);
 				}
 			}
 			public void printBooks(){
@@ -105,8 +113,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
 					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
 					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-					thumbailsPanel.add(thumb);
 					
+					thumbailsPanel.add(thumb);
+				    thumb.addPropertyChangeListener(descriptor);
+				    thumbToEntity.put(thumb,b);
 				}
 			}
 			public void printMovies(){
@@ -118,6 +128,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
 
 					thumbailsPanel.add(thumb);
+				    thumb.addPropertyChangeListener(descriptor);
+				    thumbToEntity.put(thumb,m);
 				}	
 			}
 		}
@@ -261,6 +273,65 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.reprintCollection(CollectionView.VIEW_ALL);
 	}
 
+	/**
+	 * Klasa tworząca popup z opisem dla danego obiektu kolekcji.
+	 * Nasłuchuje zmian właściwości <b>focusable</b> dla ImagePanel.
+	 * @author kornicameister
+	 * @see ImagePanel
+	 * @see MWCollectionView#thumbToEntity
+	 */
+	class ThumbailDescriptor implements PropertyChangeListener{
+		EntityPopupDescription epd;
+		
+		public ThumbailDescriptor() {
+			this.epd = new EntityPopupDescription();
+			this.epd.setVisible(false);
+		}
+		
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if(evt.getPropertyName().equals("focusable")){
+				boolean hasFocus = (boolean) evt.getNewValue();
+				if(!hasFocus){
+					MabisLogger.getLogger().log(Level.INFO,"No focus at the moment, hiding popup description");
+					this.epd.setVisible(false);
+					return;
+				}
+				final BaseTable bt = thumbToEntity.get((ImagePanel)evt.getSource());
+				epd.tooltipText.setText(bt.toString());
+
+				java.awt.EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						epd.repaint();
+						epd.setVisible(true);
+						MabisLogger.getLogger().log(Level.INFO,"Bringing tooltip for {0}", bt.getTitle());
+					}
+				});
+			}
+		}
+		
+	}
+	
+	class EntityPopupDescription extends JDialog{
+		private static final long serialVersionUID = 4034929368240099039L;
+	    JTextArea tooltipText;
+		
+		public EntityPopupDescription() {
+			super();
+		}
+		
+		@Override
+		protected void dialogInit() {
+			super.dialogInit();
+			this.setMinimumSize(new Dimension(300,200));
+			this.tooltipText = new JTextArea();
+			this.add(this.tooltipText);
+		}
+		
+		
+	}
+	
 	/**
 	 * Klasa której głównym zadaniem jest pośredniczenie między kolekcją
 	 * zlokalizowaną w bazie danych (tj. danymi), a ich wizualną reprezentacją

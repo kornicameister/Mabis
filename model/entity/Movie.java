@@ -151,14 +151,16 @@ public class Movie extends BaseTable implements Serializable {
 		String str = super.toString();
 		str += "----------\n";
 		str += "[TITLE: " + this.getTitle() + "]\n";
-		str += "[DIRECTORS]\n";
-		for (Author a : this.directors) {
-			str += "\t" + a.toString() + "\n";
+		if(this.getSubtitle() != null && !this.getSubtitle().isEmpty()){
+			str+= "[SUBTITLE: " + this.getSubtitle() + "]\n";
 		}
-		str += "[GENRE: " + this.getGenre() + "]\n";
-		str += "[RATING: " + this.getRating() + "]\n";
-		str += "[DURATION: " + this.getDuration() + "]\n";
-		str += "[COVER :" + this.cover.toString() + "]\n";
+//		str += "[DURATION: " + this.getDuration() + "]\n";
+		if(!this.getAuthors().isEmpty()){
+			str += "[DIRECTORS]\n";
+			for(Author a : this.getAuthors()){
+				str += "\t- " + a.getFirstName() + " " + a.getLastName() + "\n";
+			}
+		}
 		return str;
 	}
 

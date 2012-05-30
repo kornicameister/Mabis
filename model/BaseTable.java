@@ -171,7 +171,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	@Override
 	public String toString() {
 		String str = "Table: " + tableType + "\n";
-		str += "[PK: " + this.primaryKey + "]\n";
+		str += "[ID: " + this.primaryKey + "]\n";
 		return str;
 	}
 

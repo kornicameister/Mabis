@@ -27,7 +27,7 @@ import logger.MabisLogger;
  * @see JPanel
  * @version 0.2
  */
-public class ImagePanel extends JPanel implements Accessible {
+public class ImagePanel extends JPanel implements Accessible, Comparable<ImagePanel> {
 	private static final long serialVersionUID = 8841755218083931060L;
 	protected static final Integer padding = 10;
 	protected File imageFile;
@@ -100,11 +100,19 @@ public class ImagePanel extends JPanel implements Accessible {
 	public File getImageFile() {
 		return imageFile;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "ImagePanel [(" + this.getWidth() + "," + this.getHeight()
 				+ ");(" + this.imageFile.getPath() + ")]";
+	}
+
+	@Override
+	public int compareTo(ImagePanel o) {
+		String thisPath = this.imageFile.getName();
+		String oPath = o.imageFile.getName();
+		int res = thisPath.compareTo(oPath);
+		return res;
 	}
 
 	class ImagePanelMouseMotionListener extends MouseAdapter implements
