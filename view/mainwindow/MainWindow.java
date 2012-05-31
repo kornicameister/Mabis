@@ -40,7 +40,7 @@ public class MainWindow extends JFrame {
 	private MWToolBar toolBar;
 	private MWBottomPanel bottomPanel;
 	private MWCollectionView collectionView;
-	private MWItemButtons userListPanel;
+	private MWItemButtons buttonsPanel;
 	private JPanel contentPane = null;
 
 	/**
@@ -61,7 +61,7 @@ public class MainWindow extends JFrame {
 		this.setJMenuBar(new MWMenuBar(this));
 		this.bottomPanel = new MWBottomPanel(this);
 		this.collectionView = new MWCollectionView(this, new BorderLayout(), true);
-		this.userListPanel = new MWItemButtons();
+		this.buttonsPanel = new MWItemButtons();
 		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
 		
 		layoutComponents();
@@ -69,10 +69,11 @@ public class MainWindow extends JFrame {
 		this.toolBar.setEnabled(false);
 		this.collectionView.setEnabled(false);
 		this.bottomPanel.setEnabled(false);
-		this.userListPanel.setEnabled(false);
+		this.buttonsPanel.setEnabled(false);
 
 		this.toolBar.addPropertyChangeListener(this.collectionView);
 		this.addPropertyChangeListener("connectedUser", this.collectionView);
+		this.buttonsPanel.addPropertyChangeListener(this.collectionView);
 		
 		setSize(d);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -170,7 +171,7 @@ public class MainWindow extends JFrame {
 										layout.createParallelGroup(
 												Alignment.TRAILING)
 												.addComponent(
-														this.userListPanel,
+														this.buttonsPanel,
 														GroupLayout.PREFERRED_SIZE,
 														GroupLayout.DEFAULT_SIZE,
 														200)))
@@ -187,7 +188,7 @@ public class MainWindow extends JFrame {
 								.addGroup(
 										layout.createSequentialGroup()
 												.addComponent(
-														this.userListPanel)))
+														this.buttonsPanel)))
 				.addComponent(this.bottomPanel, GroupLayout.PREFERRED_SIZE,
 						GroupLayout.DEFAULT_SIZE, 50));
 
@@ -206,7 +207,7 @@ public class MainWindow extends JFrame {
 		User oldUser = this.getConnectedUser();
 		this.connectedUser = newUser;
 		this.firePropertyChange("connectedUser", oldUser, this.connectedUser);
-		this.userListPanel.setConnectedUser(this.connectedUser);
+		this.buttonsPanel.setConnectedUser(this.connectedUser);
 		java.awt.EventQueue.invokeLater(new Runnable() {
 
 			@Override
@@ -221,7 +222,7 @@ public class MainWindow extends JFrame {
 		this.toolBar.setEnabled(true);
 		this.collectionView.setEnabled(true);
 		this.bottomPanel.setEnabled(true);
-		this.userListPanel.setEnabled(true);
+		this.buttonsPanel.setEnabled(true);
 	}
 
 	public User getConnectedUser() {

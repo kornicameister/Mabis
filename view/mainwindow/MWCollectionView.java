@@ -132,6 +132,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 	private void reprintCollection(CollectionView view) {
 		this.currentView = view;
+		this.clearCollectionView();
 		
 		class SmallPrinter {
 			public void printAudios() {
@@ -176,7 +177,25 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			break;
 		}
 		collectionTable.revalidate();
-		System.out.println(tableModel.getRowCount());
+		Integer params[] = {tableModel.getRowCount(),
+				mediator.collectedAlbums.size(),
+				mediator.collectedBooks.size(),
+				mediator.collectedMovies.size()};
+		MabisLogger.getLogger().log(Level.INFO,
+				"Collected {0} items from database, including {1} audios, {2} books and {3} movies",params);
+	}
+
+	private void clearCollectionView() {
+		if(this.tableModel.getRowCount() > 0){
+			for(int i = this.tableModel.getRowCount() - 1; i != 0 ; i--){
+				this.tableModel.removeRow(i);
+			}
+			this.tableModel.removeRow(0);
+			if(this.tableModel.getRowCount() != 0){
+				MabisLogger.getLogger().log(Level.SEVERE,"Not all rows were removed during collection reprinting");
+			}
+			this.collectionTable.revalidate();
+		}
 	}
 
 	private void groupViewBy(String value) {
@@ -326,6 +345,23 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.statusBar.setMessage("Previewed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 			ItemsPreview preview = new ItemsPreview(bt.getTitle(), bt);
 			preview.setVisible(true);
+		} else if(e.getPropertyName().equals("itemAffected")){
+			BaseTable bt = (BaseTable) e.getNewValue();
+			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
+			switch(bt.getTableType()){
+			case MOVIE:
+				this.mediator.collectedMovies.add((Movie) bt);
+				break;
+			case BOOK:
+				this.mediator.collectedBooks.add((Book) bt);
+				break;
+			case AUDIO_ALBUM:
+				this.mediator.collectedAlbums.add((AudioAlbum) bt);
+				break;
+			default:
+				break;
+			}
+			this.reprintCollection(this.currentView);
 		}
 	}
 

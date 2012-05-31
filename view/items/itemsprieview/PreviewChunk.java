@@ -1,19 +1,15 @@
 package view.items.itemsprieview;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Level;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
-import controller.HTMLDescriptor;
-
-import logger.MabisLogger;
 import model.entity.AudioAlbum;
 import model.entity.Book;
 import model.entity.Movie;
+import controller.HTMLDescriptor;
 
 /**
  * Prosta klasa która wyświetlana jest w {@link ItemsPreview}. Pozwala ona,
@@ -49,13 +45,6 @@ public class PreviewChunk extends JPanel {
 			}
 			description.setEditable(false);
 			this.add(description);
-
-			File tmp = new File(url.toExternalForm().substring(8));
-			if (!tmp.delete()) {
-				MabisLogger.getLogger().log(Level.WARNING,
-						"Failed to remove descriptive file at {0}",
-						url.toExternalForm());
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
