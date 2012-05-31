@@ -106,8 +106,7 @@ public class MovieAPI extends ApiAccess {
 		}
 
 		try {
-			m.setCover(new Picture(new URL(startObject.getString("Poster")),
-					ImageType.FRONT_COVER));
+			m.setCover(new Picture(new URL(startObject.getString("Poster")),ImageType.FRONT_COVER));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

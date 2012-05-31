@@ -89,7 +89,9 @@ public class MovieCreator extends ItemCreator {
 
 		gl.setHorizontalGroup(gl
 				.createSequentialGroup()
-				.addComponent(this.coverPanel, 250, 250, 250)
+				.addGroup(gl.createParallelGroup()
+						.addComponent(this.coverPanel, 220, 220, 220)
+						.addComponent(this.descriptionScrollPane))
 				.addGroup(
 						gl.createParallelGroup()
 								.addGroup(
@@ -102,16 +104,17 @@ public class MovieCreator extends ItemCreator {
 								.addComponent(this.descriptionScrollPane)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
-				.addComponent(this.coverPanel, 250, 250, 250)
+				.addGroup(gl.createSequentialGroup()
+						.addComponent(this.coverPanel, 220, 220, 220)
+						.addComponent(this.descriptionScrollPane))
 				.addGroup(
 						gl.createSequentialGroup()
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titleField,40, 40, 40)
-												.addComponent(this.durationField, 40,40, 40))
+												.addComponent(this.titleField,50, 60, 60)
+												.addComponent(this.durationField, 50, 60, 60))
 								.addComponent(this.directorsPanel)
-								.addComponent(this.tagCloud,90,90,90)
-								.addComponent(this.descriptionScrollPane)));
+								.addComponent(this.tagCloud)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -208,7 +211,6 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected Boolean execute() {
-		
 		try {
 			this.selectedMovie.setTitle(this.titleField.getText());
 			this.selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
@@ -227,16 +229,16 @@ public class MovieCreator extends ItemCreator {
 			}
 		}else{
 			try{
-			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
-			this.selectedMovie.setPrimaryKey(msf.executeSQL(true));
-			
-			MovieUser mu = new MovieUser();
-			mu.addMultiForeignKey(-1,
-					new ForeignKey(this.selectedMovie, "idMovie", this.selectedMovie.getPrimaryKey()),
-					new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
-			
-			MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
-			musf.executeSQL(true);
+				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
+				this.selectedMovie.setPrimaryKey(msf.executeSQL(true));
+				
+				MovieUser mu = new MovieUser();
+				mu.addMultiForeignKey(-1,
+						new ForeignKey(this.selectedMovie, "idMovie", this.selectedMovie.getPrimaryKey()),
+						new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
+				
+				MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
+				musf.executeSQL(true);
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}
@@ -292,8 +294,7 @@ public class MovieCreator extends ItemCreator {
 					String propertyName = evt.getPropertyName();
 					if (propertyName.equals("taskStarted")) {
 						taskSize = (Integer) evt.getNewValue();
-						step = (searchProgressBar.getMaximum() - searchProgressBar
-								.getMinimum()) / taskSize;
+						step = (searchProgressBar.getMaximum() - searchProgressBar.getMinimum()) / taskSize;
 						value = searchProgressBar.getMinimum() + step;
 						setProgress(value);
 						if (taskSize.equals(1)) {
@@ -351,15 +352,15 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-		this.selectedMovie = (Movie) table;
-		this.titleField.setText(this.selectedMovie.getTitle());
-		this.durationField.setText(this.selectedMovie.getDuration());
-		this.descriptionArea.setText(this.selectedMovie.getDescription());
-		this.coverPanel.setImage(this.selectedMovie.getCover().getImageFile());
+		Movie m = (Movie) table;
+		this.titleField.setText(m.getTitle());
+		this.durationField.setText(m.getDuration());
+		this.descriptionArea.setText(m.getDescription());
+		this.coverPanel.setImage(m.getCover().getImageFile());
 
 		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
 		//that can be found in AuthorsMiniPanel
-		for(Author a : this.selectedMovie.getAuthors()){
+		for(Author a : m.getAuthors()){
 			if(this.editingMode){
 				this.directorsPanel.addRow(a);
 			}else{
@@ -387,7 +388,7 @@ public class MovieCreator extends ItemCreator {
 		}
 		
 		//check up - 2, the same thing, but now it does concern genres
-		for(Genre g : this.selectedMovie.getGenres()){
+		for(Genre g : m.getGenres()){
 			if(this.editingMode){
 				this.tagCloud.addRow(g);
 			}else{
