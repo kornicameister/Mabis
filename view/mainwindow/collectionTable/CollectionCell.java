@@ -11,15 +11,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import model.BaseTable;
 import model.entity.Movie;
 import controller.HTMLDescriptor;
 
-public class CollectionCell extends AbstractCellEditor implements
-		TableCellEditor, TableCellRenderer {
+public class CollectionCell extends AbstractCellEditor implements TableCellRenderer {
 	private static final long serialVersionUID = -8470153890083423012L;
 	private JLabel text,image;
 	private JPanel panel;
@@ -37,26 +35,25 @@ public class CollectionCell extends AbstractCellEditor implements
 	}
 
 	private void updateData(BaseTable t, boolean isSelected, JTable table) {
-		if(t != null){
-			this.table = t;
-		}
+
+		this.table = t;
 		
 		File imagePath = ((Movie)t).getCover().getImageFile();
 		
 		try {
 			this.text.setText(HTMLDescriptor.toShortHTML(this.table));
-			ImageIcon ii = new ImageIcon(new ImageIcon(imagePath.getAbsolutePath()).getImage().getScaledInstance(170, 170, Image.SCALE_SMOOTH));
+			ImageIcon i = new ImageIcon(imagePath.getAbsolutePath());
+			
+			final double height = 180.0;
+			double a = height / i.getIconHeight();
+			double newWidth = a * i.getIconWidth();
+			
+			ImageIcon ii = new ImageIcon(i.getImage().getScaledInstance((int) newWidth, (int) height, Image.SCALE_FAST));
+			
 			this.image.setIcon(ii);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public Component getTableCellEditorComponent(JTable table, Object value,
-			boolean isSelected, int row, int column) {
-		BaseTable tt = (BaseTable) value;
-		this.updateData(tt, true, table);
-		return panel;
 	}
 
 	public Object getCellEditorValue() {
@@ -65,8 +62,10 @@ public class CollectionCell extends AbstractCellEditor implements
 
 	public Component getTableCellRendererComponent(JTable table, Object value,
 			boolean isSelected, boolean hasFocus, int row, int column) {
-		BaseTable feed = (BaseTable) value;
-		this.updateData(feed, isSelected, table);
+		this.updateData(
+				(BaseTable) value,
+				isSelected, 
+				table);
 		return panel;
 	}
 

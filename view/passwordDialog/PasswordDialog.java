@@ -31,7 +31,7 @@ public class PasswordDialog extends JDialog implements ActionListener {
 		this.setAlwaysOnTop(true);
 		this.setModal(true);
 
-		this.setSize(250, 100);
+		this.setSize(250, 250);
 		this.setLocationRelativeTo(parent);
 
 	}

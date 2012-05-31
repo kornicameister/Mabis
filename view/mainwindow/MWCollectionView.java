@@ -3,7 +3,6 @@
  */
 package view.mainwindow;
 
-import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -11,7 +10,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
@@ -36,7 +34,6 @@ import model.entity.MovieUser;
 import model.entity.User;
 import model.utilities.ForeignKeyPair;
 import view.enums.CollectionView;
-import view.imagePanel.ImagePanel;
 import view.mainwindow.collectionTable.CollectionCell;
 import view.mainwindow.collectionTable.CollectionTableModel;
 import controller.SQLStamentType;
@@ -49,7 +46,6 @@ import controller.entity.MovieUserSQLFactory;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
-	private static final Dimension THUMBAILSIZE = new Dimension(190, 220);
 	private static final long serialVersionUID = 4037649477948033295L;
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
@@ -57,9 +53,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private JScrollPane scrollPanel = null;
 	private CollectionView currentView;
 
-	private final ThumbailDescriptor descriptor = new ThumbailDescriptor();
 	private final CollectionMediator mediator = new CollectionMediator();
-	private TreeMap<ImagePanel, BaseTable> thumbToEntity = new TreeMap<>();
 	private DefaultTableModel tableModel;
 	private JTable table;
 
@@ -91,7 +85,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		collectionMenu.add(new JMenuItem("Remove"));
 		collectionMenu.add(new JMenuItem("Publish/Unpublish"));
 		collectionMenu.setSelected(this);
-		this.scrollPanel.add(this.collectionMenu);
 	}
 
 	private void reprintCollection(CollectionView view) {
@@ -100,15 +93,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		class SmallPrinter {
 			public void printAudios() {
 				for (AudioAlbum a : mediator.collectedAlbums) {
-
-					ImagePanel thumb = new ImagePanel(a.getCover()
-							.getImageFile(), THUMBAILSIZE);
-					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
-					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
-					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-
-					thumb.addPropertyChangeListener(descriptor);
-					thumbToEntity.put(thumb, a);
 					Object data[] = {a};
 					tableModel.addRow(data);
 				}
@@ -117,14 +101,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			public void printBooks() {
 				for (Book b : mediator.collectedBooks) {
 
-					ImagePanel thumb = new ImagePanel(b.getCover()
-							.getImageFile(), THUMBAILSIZE);
-					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
-					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
-					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-
-					thumb.addPropertyChangeListener(descriptor);
-					thumbToEntity.put(thumb, b);
 					Object data[] = {b};
 					tableModel.addRow(data);
 				}
@@ -132,15 +108,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 			public void printMovies() {
 				for (Movie m : mediator.collectedMovies) {
-
-					ImagePanel thumb = new ImagePanel(m.getCover()
-							.getImageFile(), THUMBAILSIZE);
-					thumb.setPreferredSize(MWCollectionView.THUMBAILSIZE);
-					thumb.setMaximumSize(MWCollectionView.THUMBAILSIZE);
-					thumb.setMinimumSize(MWCollectionView.THUMBAILSIZE);
-
-					thumb.addPropertyChangeListener(descriptor);
-					thumbToEntity.put(thumb, m);
 					Object data[] = {m};
 					tableModel.addRow(data);
 				}
@@ -294,37 +261,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.mediator.loadCollection();
 		this.reprintCollection(CollectionView.VIEW_ALL);
 	}
-
-	/**
-	 * Klasa tworząca popup z opisem dla danego obiektu kolekcji. Nasłuchuje
-	 * zmian właściwości <b>focusable</b> dla ImagePanel.
-	 * 
-	 * @author kornicameister
-	 * @see ImagePanel
-	 * @see MWCollectionView#thumbToEntity
-	 */
-	class ThumbailDescriptor implements PropertyChangeListener {
-
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals("focusable")) {
-				boolean hasFocus = (boolean) evt.getNewValue();
-				if (!hasFocus) {
-					MabisLogger.getLogger().log(Level.INFO,
-							"No focus at the moment, hiding popup description");
-					return;
-				}
-				final BaseTable bt = thumbToEntity.get((ImagePanel) evt
-						.getSource());
-				final ImagePanel panel = (ImagePanel) evt.getSource();
-				panel.setToolTipText(bt.getTitle());
-				MabisLogger.getLogger().log(Level.INFO,
-						"Focus gained, showing popup");
-			}
-		}
-
-	}
-
+	
 	/**
 	 * Klasa której głównym zadaniem jest pośredniczenie między kolekcją
 	 * zlokalizowaną w bazie danych (tj. danymi), a ich wizualną reprezentacją
