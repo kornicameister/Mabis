@@ -15,6 +15,9 @@ import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
@@ -148,12 +151,21 @@ public class PictureSQLFactory extends SQLFactory {
 		// 1. fetch all pictures
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT, problematic);
 		psf.executeSQL(true);
-		for (Picture p : psf.getCovers()) {
-			if (problematic.getCheckSum().equals(p.getCheckSum())) {
-				problematic.setPrimaryKey(p.getPrimaryKey());
-				this.lastAffactedId = problematic.getPrimaryKey();
-				return;
+		
+		ArrayList<Picture> tmp = new ArrayList<>(psf.getCovers());
+		
+		int index = Collections.binarySearch(tmp, problematic,new Comparator<Picture>() {
+
+			@Override
+			public int compare(Picture o1, Picture o2) {
+				return o1.getCheckSum().compareTo(o2.getCheckSum());
 			}
+			
+		});
+		
+		if(index > 0){
+			this.lastAffactedId = tmp.get(index).getPrimaryKey();
+			return;
 		}
 	}
 
