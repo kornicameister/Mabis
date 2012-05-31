@@ -6,6 +6,7 @@ package view.mainwindow;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
@@ -298,12 +299,13 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					return;
 				}
 				final BaseTable bt = thumbToEntity.get((ImagePanel)evt.getSource());
+				final Point position = ((ImagePanel)evt.getSource()).getLocation();
 				epd.tooltipText.setText(bt.toString());
 
 				java.awt.EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						epd.repaint();
+						epd.setLocation(position);
 						epd.setVisible(true);
 						MabisLogger.getLogger().log(Level.INFO,"Bringing tooltip for {0}", bt.getTitle());
 					}
