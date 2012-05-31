@@ -57,6 +57,7 @@ public class ItemsPreview extends JFrame implements ActionListener {
 
 		this.setMinimumSize(dim);
 		this.setSize(dim);
+		this.acceptSelectedButton.setVisible(false);
 	}
 
 	private void layoutComponents() {
@@ -66,12 +67,13 @@ public class ItemsPreview extends JFrame implements ActionListener {
 
 		gl.setAutoCreateGaps(true);
 		gl.setAutoCreateContainerGaps(true);
-
+		
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addComponent(this.tabbedPanel)
 				.addGroup(
 						gl.createSequentialGroup()
+								.addGap(50)
 								.addComponent(this.acceptSelectedButton)
 								.addComponent(this.cancelButton)));
 		gl.setVerticalGroup(gl

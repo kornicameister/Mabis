@@ -61,7 +61,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private static final long serialVersionUID = 4037649477948033295L;
 	private static final String DELETE_CMD = "Delete",
 							    EDIT_CMD = "Edit",
-							    VIEW_CMD = "VieW";
+							    VIEW_CMD = "View";
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
 
@@ -446,6 +446,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	
 	class PopupActionListener implements ActionListener{
 		int currentRow = -1;
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JMenuItem source = (JMenuItem) e.getSource();
@@ -453,10 +454,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			
 			BaseTable bt = (BaseTable) tableModel.getValueAt(currentRow, 0);
 			
-			if(command.equals(VIEW_CMD)){
-				
-			}else if(command.equals(EDIT_CMD)){
-				
+			if(command.equals(VIEW_CMD) || command.equals(EDIT_CMD)){
+				propertyChange(new PropertyChangeEvent(this, command, null, bt));
 			}else if(command.equals(DELETE_CMD)){
 				SQLFactory sf = null;
 				boolean wasDeleted = false;
@@ -484,7 +483,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				case AUDIO_ALBUM:
 					try{
 						sf = new AudioAlbumSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idAudio", bt.getPrimaryKey().toString());
+						sf.addWhereClause("idAudioAlbum", bt.getPrimaryKey().toString());
 						sf.executeSQL(true);
 						wasDeleted = true;
 					}catch(SQLException e1){
@@ -497,7 +496,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				if(wasDeleted){
 					tableModel.removeRow(currentRow);
 					collectionTable.revalidate();
-					firePropertyChange(command, null, bt);
+					propertyChange(new PropertyChangeEvent(this, command, null, bt));
 				}
 			}
 			currentRow = -1;

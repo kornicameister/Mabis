@@ -169,8 +169,8 @@ public abstract class ItemCreator extends JFrame {
 	 * @param bt
 	 */
 	public void setEditableItem(BaseTable bt) {
-		this.fillWithResult(bt);
 		this.editingMode = true;
+		this.fillWithResult(bt);
 	}
 	
 

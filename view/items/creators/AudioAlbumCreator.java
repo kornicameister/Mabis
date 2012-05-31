@@ -351,50 +351,58 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.trackList.setTracks(a.getTrackList());
 		for(Author aa : a.getAuthors()){
 			Band b = (Band)aa;
-			int index = Collections.binarySearch(this.bandMiniPanel.getBands(),
-					b,
-					new Comparator<Author>() {
-						@Override
-						public int compare(Author o1, Author o2) {
-							int result = o1.getLastName().compareTo(o2.getLastName());
-							if(result == 0){
-								result = o1.getFirstName().compareTo(o2.getFirstName());
-							}
-							return result;
-						}
-					});
-			if(index < 0){
+			if(this.editingMode){
 				this.bandMiniPanel.addRow(b);
-				this.bandMiniPanel.getBands().add(b);
-				b.setType(AuthorType.AUDIO_ALBUM_BAND);
 			}else{
-				a.setPrimaryKey(this.bandMiniPanel.getAuthors().get(index).getPrimaryKey());
-				this.bandMiniPanel.addRow(b);
+				int index = Collections.binarySearch(this.bandMiniPanel.getBands(),
+						b,
+						new Comparator<Author>() {
+							@Override
+							public int compare(Author o1, Author o2) {
+								int result = o1.getLastName().compareTo(o2.getLastName());
+								if(result == 0){
+									result = o1.getFirstName().compareTo(o2.getFirstName());
+								}
+								return result;
+							}
+						});
+				if(index < 0){
+					this.bandMiniPanel.addRow(b);
+					this.bandMiniPanel.getBands().add(b);
+					b.setType(AuthorType.AUDIO_ALBUM_BAND);
+				}else{
+					a.setPrimaryKey(this.bandMiniPanel.getAuthors().get(index).getPrimaryKey());
+					this.bandMiniPanel.addRow(b);
+				}
 			}
 		}
 		
 		//check up - 2, the same thing, but now it does concern genres
 		for(Genre g : this.selectedAlbum.getGenres()){
-			int index= Collections.binarySearch(
-					this.tagCloud.getTags(), 
-					g,
-					new Comparator<Genre>() {
-						@Override
-						public int compare(Genre g1, Genre g2) {
-							int result = g1.getType().compareTo(g2.getType());
-							if(result == 0){
-								result = g1.getGenre().compareTo(g2.getGenre());
-							}
-							return result;
-						}
-					});
-			if(index < 0){
+			if(this.editingMode){
 				this.tagCloud.addRow(g);
-				this.tagCloud.getTags().add(g);
-				g.setType(GenreType.AUDIO);
 			}else{
-				g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
-				this.tagCloud.addRow(g);
+				int index= Collections.binarySearch(
+						this.tagCloud.getTags(), 
+						g,
+						new Comparator<Genre>() {
+							@Override
+							public int compare(Genre g1, Genre g2) {
+								int result = g1.getType().compareTo(g2.getType());
+								if(result == 0){
+									result = g1.getGenre().compareTo(g2.getGenre());
+								}
+								return result;
+							}
+						});
+				if(index < 0){
+					this.tagCloud.addRow(g);
+					this.tagCloud.getTags().add(g);
+					g.setType(GenreType.AUDIO);
+				}else{
+					g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+					this.tagCloud.addRow(g);
+				}
 			}
 		}
 	}

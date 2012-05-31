@@ -360,50 +360,58 @@ public class MovieCreator extends ItemCreator {
 		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
 		//that can be found in AuthorsMiniPanel
 		for(Author a : this.selectedMovie.getAuthors()){
-			int index = Collections.binarySearch(this.directorsPanel.getAuthors(),
-					a,
-					new Comparator<Author>() {
-						@Override
-						public int compare(Author o1, Author o2) {
-							int result = o1.getLastName().compareTo(o2.getLastName());
-							if(result == 0){
-								result = o1.getFirstName().compareTo(o2.getFirstName());
-							}
-							return result;
-						}
-					});
-			if(index < 0){
+			if(this.editingMode){
 				this.directorsPanel.addRow(a);
-				this.directorsPanel.getAuthors().add(a);
-				a.setType(AuthorType.MOVIE_DIRECTOR);
 			}else{
-				a.setPrimaryKey(this.directorsPanel.getAuthors().get(index).getPrimaryKey());
-				this.directorsPanel.addRow(a);
+				int index = Collections.binarySearch(this.directorsPanel.getAuthors(),
+						a,
+						new Comparator<Author>() {
+							@Override
+							public int compare(Author o1, Author o2) {
+								int result = o1.getLastName().compareTo(o2.getLastName());
+								if(result == 0){
+									result = o1.getFirstName().compareTo(o2.getFirstName());
+								}
+								return result;
+							}
+						});
+				if(index < 0){
+					this.directorsPanel.addRow(a);
+					this.directorsPanel.getAuthors().add(a);
+					a.setType(AuthorType.MOVIE_DIRECTOR);
+				}else{
+					a.setPrimaryKey(this.directorsPanel.getAuthors().get(index).getPrimaryKey());
+					this.directorsPanel.addRow(a);
+				}
 			}
 		}
 		
 		//check up - 2, the same thing, but now it does concern genres
 		for(Genre g : this.selectedMovie.getGenres()){
-			int index= Collections.binarySearch(
-					this.tagCloud.getTags(), 
-					g,
-					new Comparator<Genre>() {
-						@Override
-						public int compare(Genre g1, Genre g2) {
-							int result = g1.getType().compareTo(g2.getType());
-							if(result == 0){
-								result = g1.getGenre().compareTo(g2.getGenre());
-							}
-							return result;
-						}
-					});
-			if(index < 0){
+			if(this.editingMode){
 				this.tagCloud.addRow(g);
-				this.tagCloud.getTags().add(g);
-				g.setType(GenreType.MOVIE);
 			}else{
-				g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
-				this.tagCloud.addRow(g);
+				int index= Collections.binarySearch(
+						this.tagCloud.getTags(), 
+						g,
+						new Comparator<Genre>() {
+							@Override
+							public int compare(Genre g1, Genre g2) {
+								int result = g1.getType().compareTo(g2.getType());
+								if(result == 0){
+									result = g1.getGenre().compareTo(g2.getGenre());
+								}
+								return result;
+							}
+						});
+				if(index < 0){
+					this.tagCloud.addRow(g);
+					this.tagCloud.getTags().add(g);
+					g.setType(GenreType.MOVIE);
+				}else{
+					g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+					this.tagCloud.addRow(g);
+				}
 			}
 		}
 	}

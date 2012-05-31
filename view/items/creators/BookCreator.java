@@ -381,50 +381,58 @@ public class BookCreator extends ItemCreator {
 		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
 				//that can be found in AuthorsMiniPanel
 				for(Author a : this.selectedBook.getAuthors()){
-					int index = Collections.binarySearch(this.authorsMiniPanel.getAuthors(),
-							a,
-							new Comparator<Author>() {
-								@Override
-								public int compare(Author o1, Author o2) {
-									int result = o1.getLastName().compareTo(o2.getLastName());
-									if(result == 0){
-										result = o1.getFirstName().compareTo(o2.getFirstName());
-									}
-									return result;
-								}
-							});
-					if(index < 0){
+					if(this.editingMode){
 						this.authorsMiniPanel.addRow(a);
-						this.authorsMiniPanel.getAuthors().add(a);
-						a.setType(AuthorType.BOOK_AUTHOR);
 					}else{
-						a.setPrimaryKey(this.authorsMiniPanel.getAuthors().get(index).getPrimaryKey());
-						this.authorsMiniPanel.addRow(a);
+						int index = Collections.binarySearch(this.authorsMiniPanel.getAuthors(),
+								a,
+								new Comparator<Author>() {
+									@Override
+									public int compare(Author o1, Author o2) {
+										int result = o1.getLastName().compareTo(o2.getLastName());
+										if(result == 0){
+											result = o1.getFirstName().compareTo(o2.getFirstName());
+										}
+										return result;
+									}
+								});
+						if(index < 0){
+							this.authorsMiniPanel.addRow(a);
+							this.authorsMiniPanel.getAuthors().add(a);
+							a.setType(AuthorType.BOOK_AUTHOR);
+						}else{
+							a.setPrimaryKey(this.authorsMiniPanel.getAuthors().get(index).getPrimaryKey());
+							this.authorsMiniPanel.addRow(a);
+						}
 					}
 				}
 				
 				//check up - 2, the same thing, but now it does concern genres
 				for(Genre g : this.selectedBook.getGenres()){
-					int index= Collections.binarySearch(
-							this.tagCloud.getTags(), 
-							g,
-							new Comparator<Genre>() {
-								@Override
-								public int compare(Genre g1, Genre g2) {
-									int result = g1.getType().compareTo(g2.getType());
-									if(result == 0){
-										result = g1.getGenre().compareTo(g2.getGenre());
-									}
-									return result;
-								}
-							});
-					if(index < 0){
+					if(this.editingMode){
 						this.tagCloud.addRow(g);
-						this.tagCloud.getTags().add(g);
-						g.setType(GenreType.BOOK);
 					}else{
-						g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
-						this.tagCloud.addRow(g);
+						int index= Collections.binarySearch(
+								this.tagCloud.getTags(), 
+								g,
+								new Comparator<Genre>() {
+									@Override
+									public int compare(Genre g1, Genre g2) {
+										int result = g1.getType().compareTo(g2.getType());
+										if(result == 0){
+											result = g1.getGenre().compareTo(g2.getGenre());
+										}
+										return result;
+									}
+								});
+						if(index < 0){
+							this.tagCloud.addRow(g);
+							this.tagCloud.getTags().add(g);
+							g.setType(GenreType.BOOK);
+						}else{
+							g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+							this.tagCloud.addRow(g);
+						}
 					}
 				}
 	}
