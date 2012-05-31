@@ -4,6 +4,11 @@
 package view.mainwindow;
 
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
@@ -34,8 +39,15 @@ import model.entity.MovieUser;
 import model.entity.User;
 import model.utilities.ForeignKeyPair;
 import view.enums.CollectionView;
+import view.items.ItemCreator;
+import view.items.creators.AudioAlbumCreator;
+import view.items.creators.BookCreator;
+import view.items.creators.MovieCreator;
+import view.items.itemsprieview.ItemsPreview;
 import view.mainwindow.collectionTable.CollectionCell;
 import view.mainwindow.collectionTable.CollectionTableModel;
+import view.utilities.StatusBar;
+import controller.SQLFactory;
 import controller.SQLStamentType;
 import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.AudioUserSQLFactory;
@@ -47,6 +59,9 @@ import controller.entity.MovieUserSQLFactory;
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private static final long serialVersionUID = 4037649477948033295L;
+	private static final String DELETE_CMD = "Delete",
+							    EDIT_CMD = "Edit",
+							    VIEW_CMD = "VieW";
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
 
@@ -55,11 +70,14 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 	private final CollectionMediator mediator = new CollectionMediator();
 	private DefaultTableModel tableModel;
-	private JTable table;
+	private JTable collectionTable;
+	private PopupActionListener collectionMenuListener;
+	private StatusBar statusBar;
 
-	public MWCollectionView(LayoutManager layout, boolean isDoubleBuffered) {
+	public MWCollectionView(MainWindow mw,LayoutManager layout, boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
 		this.initComponents();
+		this.statusBar = mw.getBottomPanel().getStatusBar();
 	}
 
 	private void initComponents() {
@@ -68,10 +86,10 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				"Collection"));
 
 		this.tableModel = new CollectionTableModel();
-		this.table = new JTable(tableModel);
-		this.table.setDefaultRenderer(BaseTable.class, new CollectionCell());
-		this.table.setRowHeight(200);
-		this.scrollPanel = new JScrollPane(this.table,
+		this.collectionTable = new JTable(tableModel);
+		this.collectionTable.setDefaultRenderer(BaseTable.class, new CollectionCell());
+		this.collectionTable.setRowHeight(200);
+		this.scrollPanel = new JScrollPane(this.collectionTable,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -81,10 +99,35 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 	private void initPopupMenu() {
 		this.collectionMenu = new JPopupMenu("Collection popup menu");
-		collectionMenu.add(new JMenuItem("Edit"));
-		collectionMenu.add(new JMenuItem("Remove"));
-		collectionMenu.add(new JMenuItem("Publish/Unpublish"));
-		collectionMenu.setSelected(this);
+		this.collectionMenuListener = new PopupActionListener();
+		
+		class CollectionTableMouseListener extends MouseAdapter implements MouseListener{
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(e.isPopupTrigger()){
+					collectionMenu.show(e.getComponent(),e.getX(),e.getY());
+					collectionMenuListener.currentRow = collectionTable.rowAtPoint(e.getPoint());
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(e.isPopupTrigger()){
+					collectionMenu.show(e.getComponent(),e.getX(),e.getY());
+					collectionMenuListener.currentRow = collectionTable.rowAtPoint(e.getPoint());
+				}
+			}
+			
+		}
+		
+		JMenuItem view = new JMenuItem(VIEW_CMD); 
+		JMenuItem edit = new JMenuItem(EDIT_CMD);
+		JMenuItem remove = new JMenuItem(DELETE_CMD);
+		view.addActionListener(this.collectionMenuListener); this.collectionMenu.add(view);
+		edit.addActionListener(this.collectionMenuListener); this.collectionMenu.add(edit);
+		remove.addActionListener(this.collectionMenuListener); this.collectionMenu.add(remove);
+		this.collectionTable.addMouseListener(new CollectionTableMouseListener());
 	}
 
 	private void reprintCollection(CollectionView view) {
@@ -132,7 +175,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			sm.printMovies();
 			break;
 		}
-		table.revalidate();
+		collectionTable.revalidate();
 		System.out.println(tableModel.getRowCount());
 	}
 
@@ -239,6 +282,50 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.reprintCollection((CollectionView) e.getNewValue());
 		} else if (e.getPropertyName().equals("groupByChanged")) {
 			this.groupViewBy((String) e.getNewValue());
+		} else if (e.getPropertyName().equals(DELETE_CMD)){
+			BaseTable bt = (BaseTable) e.getNewValue();
+			switch(bt.getTableType()){
+			case MOVIE:
+				mediator.collectedMovies.remove(bt);
+				break;
+			case BOOK:
+				mediator.collectedBooks.remove(bt);
+				break;
+			case AUDIO_ALBUM:
+				mediator.collectedAlbums.remove(bt);
+				break;
+			default:
+				break;
+			}
+			this.statusBar.setMessage("Removed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
+		} else if(e.getPropertyName().equals(EDIT_CMD)){
+			BaseTable bt = (BaseTable) e.getNewValue();
+			ItemCreator ic = null;
+			switch(bt.getTableType()){
+			case MOVIE:
+				ic = new MovieCreator(connectedUserReference, bt.getTitle());
+				ic.setEditableItem(bt);
+				ic.setVisible(true);
+				break;
+			case BOOK:
+				ic = new BookCreator(connectedUserReference, bt.getTitle());
+				ic.setEditableItem(bt);
+				ic.setVisible(true);
+				break;
+			case AUDIO_ALBUM:
+				ic = new AudioAlbumCreator(connectedUserReference, bt.getTitle());
+				ic.setEditableItem(bt);
+				ic.setVisible(true);
+				break;
+			default:
+				break;
+			}
+			this.statusBar.setMessage("Editing item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
+		} else if(e.getPropertyName().equals(VIEW_CMD)){
+			BaseTable bt = (BaseTable) e.getNewValue();
+			ItemsPreview preview = new ItemsPreview(bt.getTitle(), bt);
+			preview.setVisible(true);
+			this.statusBar.setMessage("Previewed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 		}
 	}
 
@@ -354,6 +441,66 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					"Succesffuly obtained {0} books for collection view",
 					this.collectedBooks.size());
 		}
-
+	}
+	
+	
+	class PopupActionListener implements ActionListener{
+		int currentRow = -1;
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JMenuItem source = (JMenuItem) e.getSource();
+			String command = source.getActionCommand();
+			
+			BaseTable bt = (BaseTable) tableModel.getValueAt(currentRow, 0);
+			
+			if(command.equals(VIEW_CMD)){
+				
+			}else if(command.equals(EDIT_CMD)){
+				
+			}else if(command.equals(DELETE_CMD)){
+				SQLFactory sf = null;
+				boolean wasDeleted = false;
+				switch(bt.getTableType()){
+				case MOVIE:
+					try{
+						sf = new MovieSQLFactory(SQLStamentType.DELETE, bt);
+						sf.addWhereClause("idMovie", bt.getPrimaryKey().toString());
+						sf.executeSQL(true);
+						wasDeleted = true;
+					}catch(SQLException e1){
+						MabisLogger.getLogger().log(Level.WARNING,"Failed to remove {0}", bt.getTitle());
+					}
+					break;
+				case BOOK:
+					try{
+						sf = new BookSQLFactory(SQLStamentType.DELETE, bt);
+						sf.addWhereClause("idBook", bt.getPrimaryKey().toString());
+						sf.executeSQL(true);
+						wasDeleted = true;
+					}catch(SQLException e1){
+						MabisLogger.getLogger().log(Level.WARNING,"Failed to remove {0}", bt.getTitle());
+					}
+					break;
+				case AUDIO_ALBUM:
+					try{
+						sf = new AudioAlbumSQLFactory(SQLStamentType.DELETE, bt);
+						sf.addWhereClause("idAudio", bt.getPrimaryKey().toString());
+						sf.executeSQL(true);
+						wasDeleted = true;
+					}catch(SQLException e1){
+						MabisLogger.getLogger().log(Level.WARNING,"Failed to remove {0}", bt.getTitle());
+					}
+					break;
+				default:
+					break;
+				}
+				if(wasDeleted){
+					tableModel.removeRow(currentRow);
+					collectionTable.revalidate();
+					firePropertyChange(command, null, bt);
+				}
+			}
+			currentRow = -1;
+		}
 	}
 }

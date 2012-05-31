@@ -77,7 +77,7 @@ public class MovieCreator extends ItemCreator {
 		this.setSize((int) this.getMinimumSize().getWidth() + 190, (int) this
 				.getMinimumSize().getHeight() + 50);
 	}
-
+	
 	@Override
 	protected void layoutComponents() {
 		super.layoutComponents();
@@ -207,7 +207,7 @@ public class MovieCreator extends ItemCreator {
 	}
 
 	@Override
-	protected Boolean createItem() {
+	protected Boolean execute() {
 		
 		try {
 			this.selectedMovie.setTitle(this.titleField.getText());
@@ -218,7 +218,15 @@ public class MovieCreator extends ItemCreator {
 			e1.printStackTrace();
 		}
 		
-		try {
+		if(this.editingMode){
+			try {
+				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, this.selectedMovie);
+				return msf.executeSQL(true) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try{
 			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
 			int movieId = msf.executeSQL(true);
 			int userId = this.selectedUser.getPrimaryKey();
@@ -230,8 +238,9 @@ public class MovieCreator extends ItemCreator {
 			
 			MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
 			return musf.executeSQL(true) > 0;
-		} catch (SQLException e) {
-			e.printStackTrace();
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}

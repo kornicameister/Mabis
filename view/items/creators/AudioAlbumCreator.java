@@ -73,7 +73,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
 				.getMinimumSize().getHeight());
 	}
-
+	
 	@Override
 	protected void layoutComponents() {
 		super.layoutComponents();
@@ -201,7 +201,7 @@ public class AudioAlbumCreator extends ItemCreator {
 	}
 
 	@Override
-	protected Boolean createItem() {
+	protected Boolean execute() {
 		this.selectedAlbum.setTitle(this.titleField.getText());
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		this.selectedAlbum.setTrackList(this.trackList.getTracks());
@@ -212,22 +212,32 @@ public class AudioAlbumCreator extends ItemCreator {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
-		try {
-			AudioUser au = new AudioUser();
-			
-			AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
-			AudioUserSQLFactory ausf = new AudioUserSQLFactory(SQLStamentType.INSERT, au);
-			
-			au.addMultiForeignKey(-1, 
-					new ForeignKey(this.selectedAlbum, "idAudio", aasf.executeSQL(true)), 
-					new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
-			
-			return ausf.executeSQL(true) > 0;
-		} catch (SQLException e) {
-			e.printStackTrace();
+		
+		if(this.editingMode){
+			try {
+				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.UPDATE, this.selectedAlbum);
+				return aasf.executeSQL(true) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				AudioUser au = new AudioUser();
+				
+				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
+				AudioUserSQLFactory ausf = new AudioUserSQLFactory(SQLStamentType.INSERT, au);
+				
+				au.addMultiForeignKey(-1, 
+						new ForeignKey(this.selectedAlbum, "idAudio", aasf.executeSQL(true)), 
+						new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
+				
+				return ausf.executeSQL(true) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return false;
+		
 	}
 
 	/**

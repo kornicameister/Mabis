@@ -1,5 +1,6 @@
 package view.mainwindow.collectionTable;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -23,6 +24,8 @@ public class CollectionCell extends AbstractCellEditor implements TableCellRende
 	private JPanel panel;
 	private BaseTable table;
 
+	private Color selectionColor, backgroundColor;
+	
 	public CollectionCell() {
 		this.text = new JLabel();
 		this.text.setMaximumSize(new Dimension(Short.MAX_VALUE, 80));
@@ -32,6 +35,11 @@ public class CollectionCell extends AbstractCellEditor implements TableCellRende
 
 		this.panel.add(this.text);
 		this.panel.add(this.image);
+		
+
+		this.backgroundColor = this.panel.getBackground();
+		this.selectionColor = this.backgroundColor.brighter();
+		
 	}
 
 	private void updateData(BaseTable t, boolean isSelected, JTable table) {
@@ -53,6 +61,12 @@ public class CollectionCell extends AbstractCellEditor implements TableCellRende
 			this.image.setIcon(ii);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		if(isSelected){
+			this.panel.setBackground(this.selectionColor);
+		}else{
+			this.panel.setBackground(this.backgroundColor);
 		}
 	}
 

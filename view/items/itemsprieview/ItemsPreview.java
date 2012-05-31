@@ -42,7 +42,21 @@ public class ItemsPreview extends JFrame implements ActionListener {
 
 		this.setMinimumSize(dim);
 		this.setSize(dim);
-		// this.setResizable(false);
+	}
+
+	public ItemsPreview(String title, BaseTable bt) {
+		super(title);
+		this.elements = new TreeSet<>();
+		this.elements.add(bt);
+
+		this.setSize(this.getMinimumSize());
+		setDefaultLookAndFeelDecorated(false);
+
+		this.initComponents();
+		this.layoutComponents();
+
+		this.setMinimumSize(dim);
+		this.setSize(dim);
 	}
 
 	private void layoutComponents() {

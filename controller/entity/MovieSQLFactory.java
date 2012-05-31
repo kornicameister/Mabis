@@ -44,7 +44,6 @@ public class MovieSQLFactory extends SQLFactory {
 			this.lastAffactedId = Utilities.lastInsertedId(movie, st);
 			break;
 		case DELETE:
-			st.setInt(1, movie.getPrimaryKey());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		case SELECT:

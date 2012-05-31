@@ -230,7 +230,7 @@ public class BookCreator extends ItemCreator {
 	}
 
 	@Override
-	protected Boolean createItem() {
+	protected Boolean execute() {
 		this.selectedBook.setTitle(this.titleOriginal.getText());
 		this.selectedBook.setSubTitle(this.subTitle.getText());
 		this.selectedBook.getIdentifiers().clear();
@@ -239,23 +239,31 @@ public class BookCreator extends ItemCreator {
 		this.selectedBook.setDescription(this.descriptionArea.getText());
 		this.selectedBook.setGenres(this.tagCloud.getTags());
 
-		try {
-			BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
-			int bookId = bsf.executeSQL(true);
-			int userId = this.selectedUser.getPrimaryKey();
-			
-			BookUser bu = new BookUser();
-			bu.addMultiForeignKey(-1, new ForeignKey(this.selectedBook, "idBook", bookId),
-									  new ForeignKey(this.selectedUser, "idUser", userId));
-			
-			
-			BookUserSQLFactory  busf = new BookUserSQLFactory(SQLStamentType.INSERT, bu);
-			return busf.executeSQL(true) > 0;
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if(this.editingMode){
+			try {
+				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE, this.selectedBook);
+				return bsf.executeSQL(true) > 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
+				int bookId = bsf.executeSQL(true);
+				int userId = this.selectedUser.getPrimaryKey();
+				
+				BookUser bu = new BookUser();
+				bu.addMultiForeignKey(-1, new ForeignKey(this.selectedBook, "idBook", bookId),
+										  new ForeignKey(this.selectedUser, "idUser", userId));
+				
+				
+				BookUserSQLFactory  busf = new BookUserSQLFactory(SQLStamentType.INSERT, bu);
+				return busf.executeSQL(true) > 0;
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
-
 		return false;
 	}
 

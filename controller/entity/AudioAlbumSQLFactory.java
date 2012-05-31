@@ -49,7 +49,6 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 			this.lastAffactedId = Utilities.lastInsertedId(am, st);
 			break;
 		case DELETE:
-			st.setInt(1, am.getPrimaryKey());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		case SELECT:

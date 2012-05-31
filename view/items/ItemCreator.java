@@ -45,6 +45,7 @@ public abstract class ItemCreator extends JFrame {
 	protected ICSearchPanel searchPanel;
 	protected JProgressBar searchProgressBar;
 	protected User selectedUser;
+	protected boolean editingMode;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -57,6 +58,7 @@ public abstract class ItemCreator extends JFrame {
 	public ItemCreator(User u,String title) throws HeadlessException,
 			CreatorContentNullPointerException {
 		super(title);
+		this.editingMode = false;
 		this.selectedUser = u;
 		this.initComponents();
 		this.layoutComponents();
@@ -134,7 +136,7 @@ public abstract class ItemCreator extends JFrame {
 	 * @return true - jeśli item kolekcji został utworzony, false w innym
 	 *         wypadku
 	 */
-	protected abstract Boolean createItem();
+	protected abstract Boolean execute();
 
 	/**
 	 * Metoda wywoływana po kliknięciu na {@link ICButtonPanel#getFromNetButton}
@@ -160,6 +162,17 @@ public abstract class ItemCreator extends JFrame {
 	 *            tabela z danymi
 	 */
 	protected abstract void fillWithResult(BaseTable table);
+	
+	/**
+	 * Prosta metoda do ustawienia obiektu kolekcji.
+	 * Używana głównie jeśli obiekt ma być edytowany !
+	 * @param bt
+	 */
+	public void setEditableItem(BaseTable bt) {
+		this.fillWithResult(bt);
+		this.editingMode = true;
+	}
+	
 
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
@@ -239,7 +252,7 @@ public abstract class ItemCreator extends JFrame {
 			} else if (source.equals(buttonPanel.clearButton)) {
 				clearContentFields();
 			} else if (source.equals(buttonPanel.createButton)) {
-				if (!createItem()) {
+				if (!execute()) {
 					JOptionPane.showMessageDialog(getParent(),
 							"Failed to create new item",
 							"Creation miracle failed",
