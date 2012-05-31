@@ -33,7 +33,7 @@ public class ChoosableImagePanel extends ImagePanel {
 	private Boolean marked;
 	private final MouseListener listener;
 	private Color defaultColor;
-	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
 	public ChoosableImagePanel(File icon, Dimension d) {
 		super();
@@ -74,6 +74,9 @@ public class ChoosableImagePanel extends ImagePanel {
 
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener l) {
+		if(this.pcs == null){
+			pcs = new PropertyChangeSupport(this);
+		}
 		this.pcs.addPropertyChangeListener(l);
 	}
 

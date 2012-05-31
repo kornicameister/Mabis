@@ -39,16 +39,26 @@ public class HTMLDescriptor {
 	 * @throws Exception jeśli nastąpiła próba 
 	 */
 	public static URL toHTML(BaseTable bt) throws Exception{
-		
 		String fullContent = new String();
 		fullContent += "<html><body>";
-		fullContent += HTMLDescriptor.generateBody(bt);
+		fullContent += HTMLDescriptor.generateBody(bt,false);
 		fullContent += "</body></html>";;
 
 		return HTMLDescriptor.saveToFileSystem(fullContent);
 	}
+	
+	public static String toShortHTML(BaseTable bt) throws Exception{
+		String html = new String();
+		html += "<html>";
+		html += HTMLDescriptor.generateBody(bt,true);
+		html += "</html>";
+		return html;
+	}
 
-	private static String generateBody(BaseTable bt) throws Exception {
+	private static String generateBody(BaseTable bt, boolean shortBody) throws Exception {
+		if(shortBody){
+			return generateShortBody(bt);
+		}
 		switch(bt.getTableType()){
 		case AUDIO_ALBUM:
 			return HTMLDescriptor.generateAudioAlbumBody((AudioAlbum)bt);
@@ -59,6 +69,15 @@ public class HTMLDescriptor {
 		default:
 			throw new Exception("Wrong table type provided");
 		}
+	}
+
+	private static String generateShortBody(BaseTable bt) {
+		String bodyPart = new String();
+		bodyPart += "<strong>" + bt.getTitle() + "</strong>";
+		if (bt.getSubtitle() != null && !bt.getSubtitle().isEmpty()) {
+			bodyPart += "<i>" + bt.getSubtitle() + "</i>";
+		}
+		return bodyPart;
 	}
 
 	private static String generateBookBody(Book bt) {
@@ -243,7 +262,7 @@ public class HTMLDescriptor {
 	private static URL saveToFileSystem(String fullContent) {
 		DataOutputStream dos = null;
 		String path = GlobalPaths.TMP
-				+ String.valueOf(Math.random() * Double.MAX_EXPONENT);
+				+ String.valueOf(Math.random() * Double.MAX_EXPONENT * 1000.0);
 		try {
 			dos = new DataOutputStream(new FileOutputStream(new File(path)));
 			dos.writeBytes(fullContent);

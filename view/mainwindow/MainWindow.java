@@ -56,6 +56,8 @@ public class MainWindow extends JFrame {
 	public MainWindow(String title, Dimension d) {
 		super(title);
 
+		
+		
 		this.setJMenuBar(new MWMenuBar(this));
 		this.bottomPanel = new MWBottomPanel(this);
 		this.collectionView = new MWCollectionView(new BorderLayout(), true);
