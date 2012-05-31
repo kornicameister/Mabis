@@ -7,6 +7,7 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeSupport;
 import java.util.TreeSet;
 import java.util.logging.Level;
 

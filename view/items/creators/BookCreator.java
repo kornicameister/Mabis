@@ -249,22 +249,21 @@ public class BookCreator extends ItemCreator {
 		}else{
 			try {
 				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
-				int bookId = bsf.executeSQL(true);
-				int userId = this.selectedUser.getPrimaryKey();
+				this.selectedBook.setPrimaryKey(bsf.executeSQL(true));
 				
 				BookUser bu = new BookUser();
-				bu.addMultiForeignKey(-1, new ForeignKey(this.selectedBook, "idBook", bookId),
-										  new ForeignKey(this.selectedUser, "idUser", userId));
+				bu.addMultiForeignKey(-1, new ForeignKey(this.selectedBook, "idBook", this.selectedBook.getPrimaryKey()),
+										  new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
 				
 				
 				BookUserSQLFactory  busf = new BookUserSQLFactory(SQLStamentType.INSERT, bu);
-				return busf.executeSQL(true) > 0;
-				
+				busf.executeSQL(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return false;
+		this.firePropertyChange("itemAffected", null, this.selectedBook);
+		return true;
 	}
 
 	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {

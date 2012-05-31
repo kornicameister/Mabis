@@ -228,21 +228,21 @@ public class MovieCreator extends ItemCreator {
 		}else{
 			try{
 			MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
-			int movieId = msf.executeSQL(true);
-			int userId = this.selectedUser.getPrimaryKey();
+			this.selectedMovie.setPrimaryKey(msf.executeSQL(true));
 			
 			MovieUser mu = new MovieUser();
 			mu.addMultiForeignKey(-1,
-					new ForeignKey(this.selectedMovie, "idMovie", movieId),
-					new ForeignKey(this.selectedUser, "idUser", userId));
+					new ForeignKey(this.selectedMovie, "idMovie", this.selectedMovie.getPrimaryKey()),
+					new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
 			
 			MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
-			return musf.executeSQL(true) > 0;
+			musf.executeSQL(true);
 			} catch(SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return false;
+		this.firePropertyChange("itemAffected", null, this.selectedMovie);
+		return true;
 	}
 
 	/**

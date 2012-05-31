@@ -227,17 +227,19 @@ public class AudioAlbumCreator extends ItemCreator {
 				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
 				AudioUserSQLFactory ausf = new AudioUserSQLFactory(SQLStamentType.INSERT, au);
 				
+				this.selectedAlbum.setPrimaryKey(aasf.executeSQL(true));
+				
 				au.addMultiForeignKey(-1, 
-						new ForeignKey(this.selectedAlbum, "idAudio", aasf.executeSQL(true)), 
+						new ForeignKey(this.selectedAlbum, "idAudio", this.selectedAlbum.getPrimaryKey()), 
 						new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
 				
-				return ausf.executeSQL(true) > 0;
+				ausf.executeSQL(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return false;
-		
+		this.firePropertyChange("itemAffected", null, this.selectedAlbum);
+		return true;
 	}
 
 	/**
