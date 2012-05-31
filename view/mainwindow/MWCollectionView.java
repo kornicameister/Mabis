@@ -284,6 +284,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.groupViewBy((String) e.getNewValue());
 		} else if (e.getPropertyName().equals(DELETE_CMD)){
 			BaseTable bt = (BaseTable) e.getNewValue();
+			this.statusBar.setMessage("Removed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 			switch(bt.getTableType()){
 			case MOVIE:
 				mediator.collectedMovies.remove(bt);
@@ -297,9 +298,9 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			default:
 				break;
 			}
-			this.statusBar.setMessage("Removed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 		} else if(e.getPropertyName().equals(EDIT_CMD)){
 			BaseTable bt = (BaseTable) e.getNewValue();
+			this.statusBar.setMessage("Editing item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 			ItemCreator ic = null;
 			switch(bt.getTableType()){
 			case MOVIE:
@@ -320,12 +321,11 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			default:
 				break;
 			}
-			this.statusBar.setMessage("Editing item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 		} else if(e.getPropertyName().equals(VIEW_CMD)){
 			BaseTable bt = (BaseTable) e.getNewValue();
+			this.statusBar.setMessage("Previewed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 			ItemsPreview preview = new ItemsPreview(bt.getTitle(), bt);
 			preview.setVisible(true);
-			this.statusBar.setMessage("Previewed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 		}
 	}
 
