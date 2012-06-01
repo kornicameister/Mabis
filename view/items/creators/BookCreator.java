@@ -96,15 +96,19 @@ public class BookCreator extends ItemCreator {
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-								.addComponent(this.coverPanel, 250, 250, 250)
+							.addGroup(
+								gl.createParallelGroup()
+								.addComponent(this.coverPanel, 220, 220, 220)
+								.addComponent(descriptionScrollPane))
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(
-														this.titleOriginal)
-												.addComponent(this.subTitle)
+												.addComponent(this.titleOriginal)
+												.addGroup(
+														gl.createSequentialGroup()
+															.addComponent(this.subTitle)
+															.addComponent(this.pages))
 												.addGap(5)
 												.addComponent(this.isbnField)
-												.addComponent(this.pages)
 												.addGap(5)
 												.addComponent(this.authorsMiniPanel)
 												.addComponent(this.tagCloud)))
@@ -113,24 +117,20 @@ public class BookCreator extends ItemCreator {
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-								.addComponent(this.coverPanel, 250, 250, 250)
+							.addGroup(
+								gl.createSequentialGroup()
+								.addComponent(this.coverPanel, 220, 220, 220)
+								.addComponent(descriptionScrollPane))
 								.addGroup(
 										gl.createSequentialGroup()
-												.addComponent(
-														this.titleOriginal,
-														GroupLayout.DEFAULT_SIZE,
-														60, 80)
-												.addComponent(
-														this.subTitle,
-														GroupLayout.DEFAULT_SIZE,
-														60, 80)
-												.addComponent(this.isbnField,
-														40, 40, 40)
-												.addComponent(this.pages, 40,
-														40, 40)
+												.addComponent(this.titleOriginal,GroupLayout.DEFAULT_SIZE,60, 80)
+												.addGroup(
+														gl.createParallelGroup()
+															.addComponent(this.subTitle,GroupLayout.DEFAULT_SIZE,60, 80)
+															.addComponent(this.pages,GroupLayout.DEFAULT_SIZE,60, 80))
+												.addComponent(this.isbnField,GroupLayout.DEFAULT_SIZE,60, 80)
 												.addComponent(this.authorsMiniPanel)
-												.addComponent(this.tagCloud)))
-				.addComponent(descriptionScrollPane, 140, 140, 140));
+												.addComponent(this.tagCloud))));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -160,6 +160,7 @@ public class BookCreator extends ItemCreator {
 		this.pages = new JTextField();
 		this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
 		this.descriptionArea = new JTextArea();
+		this.descriptionArea.setLineWrap(true);
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
 		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
@@ -191,6 +192,7 @@ public class BookCreator extends ItemCreator {
 			asf.executeSQL(true);
 			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),AuthorType.BOOK_AUTHOR);
 			this.authorsMiniPanel.addPropertyChangeListener("author", this.miniPanelLister);
+			this.authorsMiniPanel.setBorder(BorderFactory.createTitledBorder("Writers"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
