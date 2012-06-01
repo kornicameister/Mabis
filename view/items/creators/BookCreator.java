@@ -33,7 +33,6 @@ import model.entity.BookUser;
 import model.entity.Genre;
 import model.entity.User;
 import model.enums.AuthorType;
-import model.enums.BookIndustryIdentifierType;
 import model.enums.GenreType;
 import model.utilities.ForeignKey;
 import settings.GlobalPaths;
@@ -42,6 +41,7 @@ import view.items.CreatorContentNullPointerException;
 import view.items.ItemCreator;
 import view.items.itemsprieview.ItemsPreview;
 import view.items.minipanels.AuthorMiniPanel;
+import view.items.minipanels.IndustryIdentifiersMiniPanel;
 import view.items.minipanels.TagCloudMiniPanel;
 import controller.SQLStamentType;
 import controller.api.GoogleBookApi;
@@ -60,10 +60,10 @@ public class BookCreator extends ItemCreator {
 	private JTextArea descriptionArea;
 	private JTextField titleOriginal;
 	private JTextField subTitle;
-	private JTextField isbnField;
 	private JTextField pages;
 	private TagCloudMiniPanel tagCloud;
 	private AuthorMiniPanel authorsMiniPanel;
+	private IndustryIdentifiersMiniPanel iiMiniPanel;
 	private JScrollPane descriptionScrollPane;
 	private Book selectedBook = new Book();
 	private LoadFromApi lfa;
@@ -108,8 +108,7 @@ public class BookCreator extends ItemCreator {
 															.addComponent(this.subTitle)
 															.addComponent(this.pages))
 												.addGap(5)
-												.addComponent(this.isbnField)
-												.addGap(5)
+												.addComponent(this.iiMiniPanel)
 												.addComponent(this.authorsMiniPanel)
 												.addComponent(this.tagCloud)))
 				.addComponent(descriptionScrollPane));
@@ -128,7 +127,7 @@ public class BookCreator extends ItemCreator {
 														gl.createParallelGroup()
 															.addComponent(this.subTitle,GroupLayout.DEFAULT_SIZE,60, 80)
 															.addComponent(this.pages,GroupLayout.DEFAULT_SIZE,60, 80))
-												.addComponent(this.isbnField,GroupLayout.DEFAULT_SIZE,60, 80)
+												.addComponent(this.iiMiniPanel)
 												.addComponent(this.authorsMiniPanel)
 												.addComponent(this.tagCloud))));
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -155,8 +154,8 @@ public class BookCreator extends ItemCreator {
 		this.initGenresPanel();
 
 		this.coverPanel = new ImagePanel();
-		this.isbnField = new JTextField();
-		this.isbnField.setBorder(BorderFactory.createTitledBorder("ISBN 13"));
+		this.iiMiniPanel = new IndustryIdentifiersMiniPanel();
+		this.iiMiniPanel.setBorder(BorderFactory.createTitledBorder("ISBN"));
 		this.pages = new JTextField();
 		this.pages.setBorder(BorderFactory.createTitledBorder("Pages"));
 		this.descriptionArea = new JTextArea();
@@ -228,15 +227,15 @@ public class BookCreator extends ItemCreator {
 		this.pages.setText("");
 		this.authorsMiniPanel.clear();
 		this.tagCloud.clear();
-		this.isbnField.setText("");
+		this.iiMiniPanel.clearTable();
 	}
 
 	@Override
 	protected Boolean execute() {
+		this.selectedBook.setIdentifiers(this.iiMiniPanel.getII());
 		this.selectedBook.setTitle(this.titleOriginal.getText());
 		this.selectedBook.setSubTitle(this.subTitle.getText());
 		this.selectedBook.getIdentifiers().clear();
-//		this.selectedBook.addIdentifier(BookIndustryIdentifierType.ISBN_13, this.isbnField.getText());
 		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 		this.selectedBook.setDescription(this.descriptionArea.getText());
 		this.selectedBook.setGenres(this.tagCloud.getDatabaseTags());
@@ -372,69 +371,69 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected void fillWithResult(BaseTable table) {
-		this.selectedBook = (Book) table;
-		this.titleOriginal.setText(this.selectedBook.getTitle());
-		this.subTitle.setText(this.selectedBook.getSubtitle());
-		this.coverPanel.setImage(this.selectedBook.getCover().getImageFile());
-		this.descriptionArea.setText(this.selectedBook.getDescription());
-		this.pages.setText(this.selectedBook.getPages().toString());
+		Book b = (Book) table;
+		this.titleOriginal.setText(b.getTitle());
+		this.subTitle.setText(b.getSubtitle());
+		this.coverPanel.setImage(b.getCover().getImageFile());
+		this.descriptionArea.setText(b.getDescription());
+		this.pages.setText(b.getPages().toString());
+		this.iiMiniPanel.setIIS(b.getIdentifiers());
 		
 		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
 				//that can be found in AuthorsMiniPanel
-				for(Author a : this.selectedBook.getAuthors()){
-					if(this.editingMode){
-						this.authorsMiniPanel.addRow(a);
-					}else{
-						int index = Collections.binarySearch(this.authorsMiniPanel.getDatabaseAuthors(),
-								a,
-								new Comparator<Author>() {
-									@Override
-									public int compare(Author o1, Author o2) {
-										int result = o1.getLastName().compareTo(o2.getLastName());
-										if(result == 0){
-											result = o1.getFirstName().compareTo(o2.getFirstName());
-										}
-										return result;
-									}
-								});
-						if(index < 0){
-							this.authorsMiniPanel.addRow(a);
-							this.authorsMiniPanel.getDatabaseAuthors().add(a);
-							a.setType(AuthorType.BOOK_AUTHOR);
-						}else{
-							a.setPrimaryKey(this.authorsMiniPanel.getDatabaseAuthors().get(index).getPrimaryKey());
-							this.authorsMiniPanel.addRow(a);
-						}
-					}
+		for (Author a : b.getAuthors()) {
+			if (this.editingMode) {
+				this.authorsMiniPanel.addRow(a);
+			} else {
+				int index = Collections.binarySearch(
+						this.authorsMiniPanel.getDatabaseAuthors(), a,
+						new Comparator<Author>() {
+							@Override
+							public int compare(Author o1, Author o2) {
+								int result = o1.getLastName().compareTo(
+										o2.getLastName());
+								if (result == 0) {
+									result = o1.getFirstName().compareTo(
+											o2.getFirstName());
+								}
+								return result;
+							}
+						});
+				if (index < 0) {
+					a.setType(AuthorType.BOOK_AUTHOR);
+					this.authorsMiniPanel.addRow(a);
+				} else {
+					a.setPrimaryKey(this.authorsMiniPanel.getDatabaseAuthors().get(index).getPrimaryKey());
 				}
+			}
+		}
 				
-				//check up - 2, the same thing, but now it does concern genres
-				for(Genre g : this.selectedBook.getGenres()){
-					if(this.editingMode){
-						this.tagCloud.addRow(g);
-					}else{
-						int index= Collections.binarySearch(
-								this.tagCloud.getDatabaseTags(), 
-								g,
-								new Comparator<Genre>() {
-									@Override
-									public int compare(Genre g1, Genre g2) {
-										int result = g1.getType().compareTo(g2.getType());
-										if(result == 0){
-											result = g1.getGenre().compareTo(g2.getGenre());
-										}
-										return result;
-									}
-								});
-						if(index < 0){
-							this.tagCloud.addRow(g);
-							this.tagCloud.getDatabaseTags().add(g);
-							g.setType(GenreType.BOOK);
-						}else{
-							g.setPrimaryKey(this.tagCloud.getDatabaseTags().get(index).getPrimaryKey());
-							this.tagCloud.addRow(g);
-						}
-					}
+		// check up - 2, the same thing, but now it does concern genres
+		for (Genre g : b.getGenres()) {
+			if (this.editingMode) {
+				this.tagCloud.addRow(g);
+			} else {
+				int index = Collections.binarySearch(
+						this.tagCloud.getDatabaseTags(), g,
+						new Comparator<Genre>() {
+							@Override
+							public int compare(Genre g1, Genre g2) {
+								int result = g1.getType().compareTo(
+										g2.getType());
+								if (result == 0) {
+									result = g1.getGenre().compareTo(
+											g2.getGenre());
+								}
+								return result;
+							}
+						});
+				if (index < 0) {
+					g.setType(GenreType.BOOK);
+					this.tagCloud.addRow(g);
+				} else {
+					this.tagCloud.addRow(g);
 				}
+			}
+		}
 	}
 }

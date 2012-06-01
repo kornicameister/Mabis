@@ -1,7 +1,6 @@
 package view.items.minipanels;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -10,26 +9,29 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import model.enums.BookIndustryIdentifierType;
 import model.utilities.BookIndustryIdentifier;
+import settings.GlobalPaths;
 
-public class IndustryIdentifiersMiniPanel extends JPanel implements ActionListener {
+public class IndustryIdentifiersMiniPanel extends JPanel {
 	private static final long serialVersionUID = -3958286587031427043L;
 	private JTable iiTable;
 	private DefaultTableModel iiModel;
 	private TreeMap<Integer,BookIndustryIdentifier> rowToBii = new TreeMap<>();
 	private int currentlySelectedRow = -1;
-	private JButton newIIButton,
-					selectIIButton;
 	private JScrollPane scrollForTable;
+	private JComboBox<BookIndustryIdentifierType> biiCombo;
 	
 	public IndustryIdentifiersMiniPanel() {
 		this.initializeTable();
@@ -38,15 +40,18 @@ public class IndustryIdentifiersMiniPanel extends JPanel implements ActionListen
 	}
 
 	private void initComponents() {
-		this.newIIButton = new JButton("N");
-		this.newIIButton.setName("New industry identifier");
-		this.newIIButton.addActionListener(this);
-
-		this.selectIIButton = new JButton("S");
-		this.selectIIButton.setName("Select industry identifier");
-		this.selectIIButton.addActionListener(this);
-		
 		this.scrollForTable = new JScrollPane(this.iiTable);
+		
+		class ScrollListener extends MouseAdapter implements MouseListener {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				addRow(new BookIndustryIdentifier(BookIndustryIdentifierType.OTHER,""));
+			}
+			
+		}
+		
+		this.scrollForTable.addMouseListener(new ScrollListener());
 	}
 
 	private void layoutComponents() {
@@ -57,17 +62,12 @@ public class IndustryIdentifiersMiniPanel extends JPanel implements ActionListen
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-								.addComponent(this.newIIButton, 50, 50, 50)
-								.addComponent(this.selectIIButton, 50, 50,
-										50)).addGap(5)
-				.addComponent(this.scrollForTable));
+							.addComponent(this.scrollForTable)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-								.addComponent(this.newIIButton)
-								.addComponent(this.selectIIButton))
-				.addComponent(this.scrollForTable, 90, 90, 90));
+							.addComponent(this.scrollForTable, 90, 90, 90)));
 
 		this.iiTable.getColumnModel().getColumn(0).setMaxWidth(40);
 	}
@@ -81,12 +81,19 @@ public class IndustryIdentifiersMiniPanel extends JPanel implements ActionListen
 			public Class<?> getColumnClass(int column) {
 				if(column == 0){
 					return ImageIcon.class;
+				}else if(column == 1){
+					return String.class;
+				}else if(column == 2){
+					return JComboBox.class;
 				}
 				return Object.class;
 			}
 			
 			@Override
 			public boolean isCellEditable(int row, int column) {
+				if(column > 0){
+					return true;
+				}
 				return false;
 			}
 		};
@@ -106,24 +113,50 @@ public class IndustryIdentifiersMiniPanel extends JPanel implements ActionListen
 					rowToBii.remove(new Integer(currentlySelectedRow));
 					iiTable.revalidate();
 					currentlySelectedRow = -1;
+				}else if(e.getKeyChar() == '\n'){
+					String v1 = (String) iiModel.getValueAt(iiModel.getRowCount()-1, 1);
+					BookIndustryIdentifierType v2 = (BookIndustryIdentifierType) iiModel.getValueAt(iiModel.getRowCount()-1, 2);
+					rowToBii.put(iiModel.getRowCount()-1,new BookIndustryIdentifier(v2, v1));
 				}
 			}
 		}
+		
 		this.iiTable.addKeyListener(new TableKeyListener());
 		this.iiTable.addMouseListener(new TableMouseListener());
+		
+		this.biiCombo = new JComboBox<BookIndustryIdentifierType>();
+		for(BookIndustryIdentifierType bii : BookIndustryIdentifierType.values()){
+			this.biiCombo.addItem(bii);
+		}
+		
+		this.iiTable.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(this.biiCombo));
 	}
 	
-	public Collection<BookIndustryIdentifier> getII(){
-		return this.rowToBii.values();
+	public void addRow(BookIndustryIdentifier bii) {
+		Object data[] = { null, bii.getValue() , bii.getType()};
+		ImageIcon tmp = new ImageIcon(GlobalPaths.ISBN_SIGN.toString());
+		data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+		this.iiModel.addRow(data);
+		this.rowToBii.put(this.rowToBii.size(),bii);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		JButton source = (JButton) e.getSource();
-		if(source.equals(this.newIIButton)){
-			
-		}else if(source.equals(this.selectIIButton)){
-			
+	public void setIIS(TreeSet<BookIndustryIdentifier> biis) {
+		this.rowToBii.clear();
+		
+		this.clearTable();
+		for(BookIndustryIdentifier bii : biis){
+			this.addRow(bii);
 		}
+	}
+	
+	public void clearTable() {
+		for(int i = this.iiModel.getRowCount() ; i != 0 ; i--){
+			this.iiModel.removeRow(i);
+		}
+		this.iiTable.revalidate();
+	}
+
+	public Collection<BookIndustryIdentifier> getII(){
+		return this.rowToBii.values();
 	}
 }

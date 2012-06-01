@@ -5,6 +5,7 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.TreeSet;
 
 import model.BaseTable;
@@ -65,6 +66,10 @@ public class Book extends Movie implements Serializable {
 		this.identifiers.add(t);
 	}
 
+	public void setIdentifiers(Collection<BookIndustryIdentifier> ii) {
+		this.identifiers.addAll(ii);
+	}
+	
 	public TreeSet<BookIndustryIdentifier> getIdentifiers() {
 		return this.identifiers;
 	}
