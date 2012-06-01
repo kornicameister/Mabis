@@ -203,6 +203,9 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	@Override
 	public int compareTo(BaseTable o) {
 		int compareValue = 0;
+		if(o == null){
+			return 0;
+		}
 		compareValue = this.getTableType().compareTo(o.getTableType());
 		if (compareValue == 0) {
 			compareValue = this.getPrimaryKey().compareTo(o.getPrimaryKey());

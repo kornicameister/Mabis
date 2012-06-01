@@ -1,5 +1,6 @@
 package view.items.minipanels;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -15,7 +16,6 @@ import java.util.TreeSet;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -51,25 +51,27 @@ public class TagCloudMiniPanel extends JPanel {
 	}
 
 	private void initializeTagTable() {
-		
-		this.tagsTable = new JTable(){
-			private static final long serialVersionUID = 7008651440453021313L;
+		String columnNames[] = { "LP", "ID", "Name" };
+		this.tagsModel = new DefaultTableModel(columnNames, 0);
+
+		this.tagsTable = new JTable(this.tagsModel){
+			private static final long serialVersionUID = 6303631988571439208L;
 
 			@Override
 			public Class<?> getColumnClass(int column) {
 				if(column == 1){
-					return JLabel.class;
+					return ImageIcon.class;
 				}
 				return Object.class;
 			}
 			
-		};
-		
-		String columnNames[] = { "LP", "ID", "Name" };
-		this.tagsModel = new DefaultTableModel(columnNames, 0);
-		this.tagsTable = new JTable(this.tagsModel);
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+			
+		};		
 		this.tagsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		this.tagsTable.setEnabled(false);
 	}
 
 	private void addPropertyListener() {
@@ -106,9 +108,11 @@ public class TagCloudMiniPanel extends JPanel {
 	public void addRow(Genre g) {
 		Object data[] = { this.genreToRow.size()+1, null, g.getGenre() };
 		if(g.getPrimaryKey() < 0){
-			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
+			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}else{
-			data[1] = new JLabel(new ImageIcon(GlobalPaths.OK_SIGN.toString()));
+			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
+			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tagsModel.addRow(data);
 		this.genreToRow.put(g, this.genreToRow.size());

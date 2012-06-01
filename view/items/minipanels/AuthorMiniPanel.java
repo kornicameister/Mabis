@@ -1,5 +1,6 @@
 package view.items.minipanels;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,18 +14,16 @@ import java.util.logging.Level;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import settings.GlobalPaths;
-
 import logger.MabisLogger;
 import model.entity.Author;
 import model.enums.AuthorType;
+import settings.GlobalPaths;
 
 public class AuthorMiniPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 3416144336071217011L;
@@ -68,20 +67,26 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 			@Override
 			public Class<?> getColumnClass(int column) {
 				if(column == 1){
-					return JLabel.class;
+					return ImageIcon.class;
 				}
 				return Object.class;
 			}
-			
+
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
 		};
 	}
 
 	public void addRow(Author a) {
 		Object data[] = { this.authorToRow.size() + 1, null, a.getFirstName(), a.getLastName() };
 		if(a.getPrimaryKey() < 0){
-			data[1] = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
+			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
+			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}else{
-			data[1] = new ImageIcon(GlobalPaths.OK_SIGN.toString());
+			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
+			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
 		this.authorToRow.put(a, this.authorToRow.size());
@@ -169,11 +174,11 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 					}
 				}
 				Author tmp = new Author(firstName, lastName, this.type);
-				if (Collections.binarySearch(this.authors, tmp, comparator) < 0) {
-					this.authors.add(tmp);
-					this.addRow(tmp);
+				int index = Collections.binarySearch(this.authors, tmp, comparator);
+				if (index > 0) {
+					tmp = this.authors.get(index);
 				}
-				this.firePropertyChange("author", null, tmp);
+				this.addRow(tmp);
 			}
 		} else if (source.equals(selectAuthorButton)) {
 			if (authors.size() == 0) {
@@ -185,10 +190,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 					JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 			if (returned != null) {
 				Author tmp = (Author) returned;
-				if (Collections.binarySearch(this.authors, tmp, comparator) < 0) {
-					this.addRow(tmp);
-				}
-				this.firePropertyChange("author", null, tmp);
+				this.addRow(tmp);
 			}
 		}
 		MabisLogger.getLogger().log(Level.INFO,

@@ -108,6 +108,9 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	public int compareTo(BaseTable o) {
+		if(o == null){
+			return 0;
+		}
 		int result = super.compareTo(o);
 		if(result == 0){
 			result = this.getGenre().compareTo(((Genre)o).getGenre());
