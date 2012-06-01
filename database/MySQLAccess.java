@@ -29,17 +29,15 @@ public class MySQLAccess {
 
 	/** The Constant userName. */
 	private final static String userName = "mabisUser";
-	private final static String userName2 = "mabis";
 
 	/** The Constant userPass. */
-	private final static String userPass = "f72158bc8d";
+	private final static String userPass = "mabisPass";
 
 	/** The Constant defaultPort. */
 	private final static Short defaultPort = 3306;
 
 	/** The Constant defaultHost */
 	private final static String host = "localhost";
-	private final static String host2 = "SQL09.FREEMYSQL.NET";
 
 	/** The connection. */
 	private static Connection connection = MySQLAccess.connectLocally();
@@ -94,28 +92,6 @@ public class MySQLAccess {
 		return null;
 	}
 
-	public Connection connectToOnlineDatabase() {
-		Connection c = null;
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			String url = "jdbc:mysql://!:!/!";
-			url = url.replaceFirst("!", MySQLAccess.host2);
-			url = url.replaceFirst("!", MySQLAccess.defaultPort.toString());
-			url = url.replaceFirst("!", MySQLAccess.databaseName);
-			c = DriverManager.getConnection(url, MySQLAccess.userName2,
-					MySQLAccess.userPass);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		return c;
-	}
-
 	public void disconnectFromOnlineDatabase() {
 		try {
 			this.onlineConnection.close();
@@ -162,26 +138,10 @@ public class MySQLAccess {
 
 	/**
 	 * 
-	 * @return host name of the online mabis database
-	 */
-	public static String getOnlinehost() {
-		return host2;
-	}
-
-	/**
-	 * 
 	 * @return username of the local mabis database
 	 */
 	public static String getLocalUser() {
 		return userName;
-	}
-
-	/**
-	 * 
-	 * @return username of the online mabis database
-	 */
-	public static String getOnlineUser() {
-		return userName2;
 	}
 
 	/**

@@ -4,7 +4,11 @@ import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Collection;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.GroupLayout;
@@ -21,13 +25,25 @@ public class TrackListPanel extends JPanel {
 	private static final long serialVersionUID = 4109556422700649333L;
 	private JTable trackListTable;
 	private DefaultTableModel dtm;
-	private TreeSet<AudioAlbumTrack> tracks;
+	private TreeMap<Integer,AudioAlbumTrack> rowToTracks;
 	private JScrollPane scroller;
+	private int currentlySelectedRow = -1;
 
 	public TrackListPanel() {
 		super(true);
-		this.initializeTable(new TreeSet<AudioAlbumTrack>());
+		this.rowToTracks = new TreeMap<>();
+		this.initializeTable();
 		this.makeLayout();
+	}
+
+	public TrackListPanel(TreeSet<AudioAlbumTrack> tracks) {
+		super(true);
+		this.rowToTracks = new TreeMap<>();
+		this.initializeTable();
+		this.makeLayout();
+		for(AudioAlbumTrack aat : tracks){
+			this.addRow(aat); 
+		}
 	}
 
 	private void makeLayout() {
@@ -36,29 +52,15 @@ public class TrackListPanel extends JPanel {
 		
 		gl.setHorizontalGroup(gl.createSequentialGroup().addComponent(this.scroller));
 		gl.setVerticalGroup(gl.createSequentialGroup().addComponent(this.scroller));
+		
+		this.trackListTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		this.trackListTable.getColumnModel().getColumn(0).setMaxWidth(40);
+		this.trackListTable.getColumnModel().getColumn(1).setMaxWidth(40);
 	}
 
-	public TrackListPanel(TreeSet<AudioAlbumTrack> tracks) {
-		super(true);
-		if (tracks == null) {
-			this.initializeTable(new TreeSet<AudioAlbumTrack>());
-		} else {
-			this.initializeTable(tracks);
-			this.tracks = tracks;
-		}
-	}
-
-	private void initializeTable(TreeSet<AudioAlbumTrack> tracks) {
-		String header[] = { "LP", "ID", "Lenght", "Title" };
-		this.dtm = new DefaultTableModel(header, 0);
-		ArrayList<Object> row = new ArrayList<>();
-		for (AudioAlbumTrack a : tracks) {
-			row.add(a.getId());
-			row.add(a.getDuration());
-			row.add(a.getName());
-			this.dtm.addRow(row.toArray());
-			row.clear();
-		}
+	private void initializeTable() {
+		String columnNames[] = {"|","LP","Lenght","Name",};
+		this.dtm = new DefaultTableModel(columnNames, 0);
 		this.trackListTable = new JTable(this.dtm){
 			private static final long serialVersionUID = -4341941906407330416L;
 			@Override
@@ -68,21 +70,46 @@ public class TrackListPanel extends JPanel {
 				}
 				return Object.class;
 			}
-		};
-
-		class TrackListTableKeyLister extends KeyAdapter implements KeyListener{
-
+			
 			@Override
-			public void keyPressed(KeyEvent e) {
-				System.out.println(KeyEvent.getKeyText(e.getKeyCode()));
+			public boolean isCellEditable(int row, int column) {
+				if(column > 1){
+					return true;
+				}
+				return false;
+			}
+		};
+		
+		class TableMouseListener extends MouseAdapter implements MouseListener{
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				currentlySelectedRow = trackListTable.rowAtPoint(e.getPoint());
+				addRow(new AudioAlbumTrack((short) 0, "", ""));
 			}
 		}
-		this.trackListTable.addKeyListener(new TrackListTableKeyLister());
+		
+		class TableKeyListener extends KeyAdapter implements KeyListener{
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if(e.getKeyChar() == KeyEvent.VK_DELETE){
+					dtm.removeRow(currentlySelectedRow);
+					rowToTracks.remove(currentlySelectedRow);
+					trackListTable.revalidate();
+					currentlySelectedRow = -1;
+				}else if(e.getKeyChar() == '\n'){
+					Short id = (Short) dtm.getValueAt(dtm.getRowCount()-1,1);
+					String lenght = (String) dtm.getValueAt(dtm.getRowCount()-1, 2);
+					String name = (String) dtm.getValueAt(dtm.getRowCount()-1, 3);
+					
+					rowToTracks.put(new Integer(dtm.getRowCount()-1),new AudioAlbumTrack(id, name, lenght));
+					
+				}
+			}
+		}
+		
+		this.trackListTable.addKeyListener(new TableKeyListener());
+		this.trackListTable.addMouseListener(new TableMouseListener());
 		this.scroller = new JScrollPane(this.trackListTable);
-	}
-
-	public JTable getTrackListTable() {
-		return trackListTable;
 	}
 
 	public void clear() {
@@ -93,22 +120,23 @@ public class TrackListPanel extends JPanel {
 		}
 	}
 
-	public void setTracks(TreeSet<AudioAlbumTrack> trackList) {
-		ArrayList<Object> row = new ArrayList<>();
-		for (AudioAlbumTrack a : trackList) {
-			ImageIcon tmp = new ImageIcon(GlobalPaths.MUSIC_ICON.toString());
-			row.add(new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST)));
-			row.add(a.getId());
-			row.add(a.getDuration());
-			row.add(a.getName());
-			this.dtm.addRow(row.toArray());
-			row.clear();
-		}
+	public void addRow(AudioAlbumTrack a) {
+		Object data[] = { null, a.getId(), a.getDuration(), a.getName() };
+		ImageIcon tmp = new ImageIcon(GlobalPaths.MUSIC_ICON.toString());
+		data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+		
+		this.dtm.addRow(data);
+		this.rowToTracks.put(this.rowToTracks.size(),a);
 		this.trackListTable.revalidate();
-		this.tracks = trackList;
 	}
 	
-	public TreeSet<AudioAlbumTrack> getTracks() {
-		return tracks;
+	public void setTracks(TreeSet<AudioAlbumTrack> trackList) {
+		for (AudioAlbumTrack a : trackList) {
+			this.addRow(a);
+		}
+	}
+	
+	public Collection<AudioAlbumTrack> getTracks() {
+		return rowToTracks.values();
 	}
 }

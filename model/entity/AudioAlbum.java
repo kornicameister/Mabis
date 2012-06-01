@@ -5,6 +5,7 @@
 package model.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.TreeSet;
 
 import model.BaseTable;
@@ -79,8 +80,8 @@ public class AudioAlbum extends Movie implements Serializable {
 		return this.trackList;
 	}
 
-	public void setTrackList(TreeSet<AudioAlbumTrack> trackList) {
-		this.trackList = trackList;
+	public void setTrackList(Collection<AudioAlbumTrack> collection) {
+		this.trackList = new TreeSet<AudioAlbumTrack>(collection);
 		this.duration = 0l;
 		Long ms = new Long(0l);
 		for (AudioAlbumTrack t : this.trackList) {
