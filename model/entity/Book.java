@@ -5,13 +5,11 @@
 package model.entity;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import model.BaseTable;
-import model.enums.BookIndustryIdentifier;
 import model.enums.TableType;
+import model.utilities.BookIndustryIdentifier;
 import model.utilities.ForeignKey;
 
 /**
@@ -26,7 +24,7 @@ import model.utilities.ForeignKey;
 public class Book extends Movie implements Serializable {
 	private static final long serialVersionUID = -3111018571540665182L;
 	private Integer pages;
-	private TreeMap<BookIndustryIdentifier, String> identifiers;
+	private TreeSet<BookIndustryIdentifier> identifiers;
 
 	public Book() {
 		super();
@@ -60,18 +58,14 @@ public class Book extends Movie implements Serializable {
 		super.initInternalFields();
 		this.setPages(0);
 		this.tableType = TableType.BOOK;
-		this.identifiers = new TreeMap<BookIndustryIdentifier, String>();
+		this.identifiers = new TreeSet<>();
 	}
 
-	public String getIdentifier(BookIndustryIdentifier bii) {
-		return this.identifiers.get(bii);
+	public void addIdentifier(BookIndustryIdentifier t) {
+		this.identifiers.add(t);
 	}
 
-	public void addIdentifier(BookIndustryIdentifier bii, String val) {
-		this.identifiers.put(bii, val);
-	}
-
-	public TreeMap<BookIndustryIdentifier, String> getIdentifiers() {
+	public TreeSet<BookIndustryIdentifier> getIdentifiers() {
 		return this.identifiers;
 	}
 
@@ -89,11 +83,8 @@ public class Book extends Movie implements Serializable {
 		str += "----------\n";
 		str += "[TITLE: " + this.getTitle() + "]\n";
 		str += "[IDENTIFIERS:]\n";
-		Iterator<Map.Entry<BookIndustryIdentifier, String>> it = this.identifiers
-				.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<BookIndustryIdentifier, String> entry = it.next();
-			str += "\t" + entry.getKey() + " -> " + entry.getValue() + "\t";
+		for (BookIndustryIdentifier bii : this.getIdentifiers()) {
+			str += bii.toString();
 		}
 		str += "[PAGES: " + this.getPages() + "]\n";
 		str += "[GENRE: " + this.getGenre() + "]\n";

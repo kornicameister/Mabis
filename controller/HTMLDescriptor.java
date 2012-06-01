@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map.Entry;
 
 import javax.swing.JEditorPane;
 
@@ -17,8 +16,8 @@ import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
 import model.entity.Movie;
-import model.enums.BookIndustryIdentifier;
 import model.utilities.AudioAlbumTrack;
+import model.utilities.BookIndustryIdentifier;
 import settings.GlobalPaths;
 
 /**
@@ -122,8 +121,8 @@ public class HTMLDescriptor {
 			bodyPart += "<td>";
 				bodyPart += "<b>Identifiers:</b>";
 				bodyPart += "<ul>";
-					for (Entry<BookIndustryIdentifier, String> e : bt.getIdentifiers().entrySet()) {
-						bodyPart += "<li><i>" + e.getKey().toString() + "</i><p>" + e.getValue() + "</p></li>";
+					for (BookIndustryIdentifier e : bt.getIdentifiers()) {
+						bodyPart += "<li><i>" + e.getType().toString() + "</i><p>" + e.getValue() + "</p></li>";
 					}
 				bodyPart += "</ul>";
 			bodyPart += "</td>";

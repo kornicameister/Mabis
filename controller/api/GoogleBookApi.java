@@ -13,9 +13,10 @@ import model.entity.Author;
 import model.entity.Book;
 import model.entity.Genre;
 import model.entity.Picture;
-import model.enums.BookIndustryIdentifier;
+import model.enums.BookIndustryIdentifierType;
 import model.enums.GenreType;
 import model.enums.ImageType;
+import model.utilities.BookIndustryIdentifier;
 
 import com.google.api.client.googleapis.services.GoogleKeyInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -92,9 +93,9 @@ public class GoogleBookApi extends ApiAccess {
 				.getIndustryIdentifiers();
 		if (ii != null && !ii.isEmpty()) {
 			for (IndustryIdentifiers identifier : ii) {
-				book.addIdentifier(
-						BookIndustryIdentifier.findType(identifier.getType()),
-						identifier.getIdentifier());
+				book.addIdentifier(new BookIndustryIdentifier(
+						BookIndustryIdentifierType.findType(identifier.getType()),
+						identifier.getIdentifier()));
 			}
 		}
 
