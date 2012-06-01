@@ -114,11 +114,10 @@ public class PictureSQLFactory extends SQLFactory {
 				this.syncCacheToDB();
 				return;
 			}
+			p.setPrimaryKey(Utilities.lastInsertedId(p, st)+1);
 			st.setObject(1, p);
 			st.execute();
-			// getting last inserted it
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(p, st);
+			this.lastAffactedId = p.getPrimaryKey();
 			break;
 		case DELETE:
 			try {

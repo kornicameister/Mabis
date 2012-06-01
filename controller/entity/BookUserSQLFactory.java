@@ -24,15 +24,14 @@ public class BookUserSQLFactory extends SQLFactory {
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
-		BookUser au = null;
 		switch (this.type) {
 		case INSERT:
-			au = (BookUser) this.table;
+			BookUser au = (BookUser) this.table;
+			au.setPrimaryKey(Utilities.lastInsertedId(au, st)+1);
 			st.setInt(1, au.getMultiForeing(-1).getKey("idBook").getValue());
 			st.setInt(2, au.getMultiForeing(-1).getKey("idUser").getValue());
 			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			this.lastAffactedId = au.getPrimaryKey();
 			break;
 		case DELETE:
 		case SELECT:

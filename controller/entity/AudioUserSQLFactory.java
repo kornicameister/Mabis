@@ -41,11 +41,11 @@ public class AudioUserSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			au = (AudioUser) this.table;
+			au.setPrimaryKey(Utilities.lastInsertedId(au, st)+1);
 			st.setInt(1, au.getMultiForeing(-1).getKey("idAudio").getValue());
 			st.setInt(2, au.getMultiForeing(-1).getKey("idUser").getValue());
 			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			this.lastAffactedId = au.getPrimaryKey();
 			break;
 		case DELETE:
 		case SELECT:

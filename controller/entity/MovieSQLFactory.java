@@ -33,6 +33,7 @@ public class MovieSQLFactory extends SQLFactory {
 			if(this.checkIfInserted()){
 				break;
 			}
+			movie.setPrimaryKey(Utilities.lastInsertedId(movie, st) + 1);
 			short parameterIndex = 1;
 			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
 			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
@@ -40,8 +41,7 @@ public class MovieSQLFactory extends SQLFactory {
 			st.setObject(parameterIndex++, movie);
 			st.setString(parameterIndex++, movie.getTitle());
 			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(movie, st);
+			this.lastAffactedId = movie.getPrimaryKey();
 			break;
 		case DELETE:
 			this.parseDeleteSet(st.executeUpdate());
@@ -82,7 +82,6 @@ public class MovieSQLFactory extends SQLFactory {
 	protected Integer insertCover(Picture cover) throws SQLException {
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT, cover);
 		this.lastAffactedId = psf.executeSQL(false);
-		cover.setPrimaryKey(this.lastAffactedId);
 		return lastAffactedId;
 	}
 
@@ -103,13 +102,13 @@ public class MovieSQLFactory extends SQLFactory {
 				AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.INSERT, director);
 				if(this.lastAffactedId < 0){
 					this.lastAffactedId = asf.executeSQL(false);
-					director.setPrimaryKey(this.lastAffactedId);
 				}else{
-					director.setPrimaryKey(asf.executeSQL(false));
+					asf.executeSQL(false);
 				}
-			}else{
-				this.lastAffactedId = director.getPrimaryKey();
 			}
+		}
+		if(lastAffactedId < 0){
+			this.lastAffactedId = ((Author)directors.toArray()[0]).getPrimaryKey();
 		}
 		return this.lastAffactedId;
 	}
@@ -130,17 +129,15 @@ public class MovieSQLFactory extends SQLFactory {
 		for(Genre genre: genres){
 			if(genre.getPrimaryKey() < 0){
 				GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.INSERT, genre);
-				gsf.setStatementType(SQLStamentType.INSERT);
 				if(this.lastAffactedId < 0){
 					this.lastAffactedId = gsf.executeSQL(false);
-					genre.setPrimaryKey(this.lastAffactedId);
 				}else{
-					genre.setPrimaryKey(gsf.executeSQL(true));
+					gsf.executeSQL(false);
 				}
-			}else{
-				this.lastAffactedId = genre.getPrimaryKey();
-				break;
 			}
+		}
+		if(lastAffactedId < 0){
+			this.lastAffactedId = ((Genre)genres.toArray()[0]).getPrimaryKey();
 		}
 		return this.lastAffactedId;
 	}

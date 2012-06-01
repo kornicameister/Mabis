@@ -24,15 +24,14 @@ public class MovieUserSQLFactory extends SQLFactory {
 	@Override
 	protected void executeByTableAndType(PreparedStatement st)
 			throws SQLException {
-		MovieUser au = null;
 		switch (this.type) {
 		case INSERT:
-			au = (MovieUser) this.table;
+			MovieUser au = (MovieUser) this.table;
+			au.setPrimaryKey(Utilities.lastInsertedId(au, st)+1);
 			st.setInt(2, au.getMultiForeing(-1).getKey("idMovie").getValue());
 			st.setInt(1, au.getMultiForeing(-1).getKey("idUser").getValue());
 			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			this.lastAffactedId = au.getPrimaryKey();
 			break;
 		case DELETE:
 		case SELECT:

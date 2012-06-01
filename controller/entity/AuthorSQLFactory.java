@@ -99,6 +99,7 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	protected void insertEntity(Author entity, PreparedStatement st)
 			throws SQLException {
+		entity.setPrimaryKey(Utilities.lastInsertedId(entity, st)+1);
 		if(!entity.getTableType().equals(TableType.USER)){
 			st.setString(1, entity.getType().toString());
 			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
@@ -109,7 +110,7 @@ public class AuthorSQLFactory extends SQLFactory {
 		}
 		st.execute();
 		st.clearParameters();
-		this.lastAffactedId = Utilities.lastInsertedId(entity, st);
+		this.lastAffactedId = entity.getPrimaryKey();
 	}
 
 	/**
@@ -123,7 +124,6 @@ public class AuthorSQLFactory extends SQLFactory {
 		if (picture != null) {
 			PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT, picture);
 			this.lastAffactedId = psf.executeSQL(false);
-			picture.setPrimaryKey(this.lastAffactedId);
 			return lastAffactedId;
 		}else{
 			return 0;

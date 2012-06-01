@@ -29,11 +29,11 @@ public class GenreSQLFactory extends SQLFactory {
 		Genre genre = (Genre) this.table;
 		switch (this.type) {
 		case INSERT:
+			genre.setPrimaryKey(Utilities.lastInsertedId(genre, st)+1);
 			st.setString(1, genre.getType().toString());
 			st.setObject(2, genre);
 			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(genre, st);
+			this.lastAffactedId = genre.getPrimaryKey();
 			break;
 		case DELETE:
 			st.setInt(1, genre.getPrimaryKey());
