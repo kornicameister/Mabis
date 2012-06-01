@@ -5,7 +5,6 @@
 package model.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import model.enums.TableType;
 
@@ -82,29 +81,4 @@ public class User extends Author implements Serializable {
 		super.initInternalFields();
 		this.tableType = TableType.USER;
 	}
-	
-	@Override
-	public Object[] toColumnIdentifiers() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
-			data.add(d);
-		}
-		//have content from Author class inserting login and email
-		data.add(1, "Login");
-		data.add(2, "Email");
-		return data.toArray();
-	}
-
-	@Override
-	public Object[] toRowData() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for(Object d : super.toColumnIdentifiers()){
-			data.add(d);
-		}
-		//have content from Author class inserting login and email
-		data.add(1, this.getLogin());
-		data.add(2, this.getEmail());
-		return data.toArray();
-	}
-
 }

@@ -13,9 +13,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
 
 import model.BaseTable;
 import model.enums.ImageType;
@@ -189,29 +186,5 @@ public class Picture extends BaseTable implements Serializable {
 		str += "[TYPE: " + this.getType() + "]\n";
 		str += "[CHCSM: " + this.getCheckSum() + "]\n";
 		return str;
-	}
-
-	@Override
-	public Object[] toColumnIdentifiers() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for (Object d : super.toColumnIdentifiers()) {
-			data.add(d);
-		}
-		data.add("Picture");
-		data.add("Hash");
-		data.add("Path");
-		return data.toArray();
-	}
-
-	@Override
-	public Object[] toRowData() {
-		ArrayList<Object> data = new ArrayList<Object>();
-		for (Object d : super.toColumnIdentifiers()) {
-			data.add(d);
-		}
-		data.add(new ImageIcon(this.imageFilePath));
-		data.add(this.titles[0]);
-		data.add(this.imageFilePath);
-		return data.toArray();
 	}
 }
