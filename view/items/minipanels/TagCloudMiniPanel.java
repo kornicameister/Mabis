@@ -57,14 +57,14 @@ public class TagCloudMiniPanel extends JPanel {
 	}
 
 	private void initializeTagTable() {
-		String columnNames[] = { "LP", "ID", "Name" };
+		String columnNames[] = { "ID", "Name" };
 		this.tagsModel = new DefaultTableModel(columnNames, 0);
 		this.tagsTable = new JTable(this.tagsModel){
 			private static final long serialVersionUID = 6303631988571439208L;
 
 			@Override
 			public Class<?> getColumnClass(int column) {
-				if(column == 1){
+				if(column == 0){
 					return ImageIcon.class;
 				}
 				return Object.class;
@@ -128,17 +128,16 @@ public class TagCloudMiniPanel extends JPanel {
 				.addComponent(this.scrollForTable, 80, 80, 80));
 
 		this.tagsTable.getColumnModel().getColumn(0).setMaxWidth(40);
-		this.tagsTable.getColumnModel().getColumn(1).setMaxWidth(40);
 	}
 
 	public void addRow(Genre g) {
-		Object data[] = { this.rowToGenre.size()+1, null, g.getGenre() };
+		Object data[] = { null, g.getGenre() };
 		if(g.getPrimaryKey() < 0){
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
-			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}else{
 			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
-			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tagsModel.addRow(data);
 		this.rowToGenre.put(this.rowToGenre.size(), g);

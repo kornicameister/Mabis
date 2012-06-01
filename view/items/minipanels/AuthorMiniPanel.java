@@ -66,14 +66,14 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	}
 
 	protected void initTable() {
-		String columnNames[] = { "LP", "ID", "First Name", "Last Name" };
+		String columnNames[] = { "ID", "First Name", "Last Name" };
 		this.tableModel = new DefaultTableModel(columnNames, 0);
 		this.table = new JTable(tableModel){
 			private static final long serialVersionUID = 6303631988571439208L;
 
 			@Override
 			public Class<?> getColumnClass(int column) {
-				if(column == 1){
+				if(column == 0){
 					return ImageIcon.class;
 				}
 				return Object.class;
@@ -108,13 +108,13 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	}
 
 	public void addRow(Author a) {
-		Object data[] = { this.rowToAuthor.size() + 1, null, a.getFirstName(), a.getLastName() };
+		Object data[] = { this.rowToAuthor.size() + 1, a.getFirstName(), a.getLastName() };
 		if(a.getPrimaryKey() < 0){
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
-			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}else{
 			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
-			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
 		this.rowToAuthor.put(this.rowToAuthor.size(),a);
@@ -165,7 +165,6 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 				.addComponent(this.scrollForTable, 90, 90, 90));
 
 		this.table.getColumnModel().getColumn(0).setMaxWidth(40);
-		this.table.getColumnModel().getColumn(1).setMaxWidth(40);
 	}
 
 	@Override
