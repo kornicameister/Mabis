@@ -1,5 +1,6 @@
 package view.items.minipanels;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,17 +10,15 @@ import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
-import settings.GlobalPaths;
 
 import logger.MabisLogger;
 import model.entity.Author;
 import model.entity.Band;
 import model.enums.AuthorType;
+import settings.GlobalPaths;
 
 public class BandMiniPanel extends AuthorMiniPanel {
 	private static final long serialVersionUID = -7769648241373563025L;
@@ -33,15 +32,16 @@ public class BandMiniPanel extends AuthorMiniPanel {
 	@Override
 	public void addRow(Author a) {
 		Band b = (Band) a;
-		Object data[] = { this.authorToRow.size() + 1, null,
-				b.getName() };
-		if(a.getPrimaryKey() < 0){
-			data[1] = new JLabel(new ImageIcon(GlobalPaths.CROSS_SIGN.toString()));
+		Object data[] = { this.rowToAuthor.size() + 1, null,b.getName() };
+		if(b.getPrimaryKey() < 0){
+			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
+			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}else{
-			data[1] = new JLabel(new ImageIcon(GlobalPaths.OK_SIGN.toString()));
+			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
+			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
-		this.authorToRow.put(a, this.authorToRow.size());
+		this.rowToAuthor.put(this.rowToAuthor.size(), a);
 	}
 
 	@Override

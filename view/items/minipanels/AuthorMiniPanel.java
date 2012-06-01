@@ -3,10 +3,16 @@ package view.items.minipanels;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -35,8 +41,9 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	protected JTable table;
 	protected DefaultTableModel tableModel;
 	private JScrollPane scrollForTable;
-	protected TreeMap<Author, Integer> authorToRow = new TreeMap<>();
+	protected TreeMap<Integer, Author> rowToAuthor = new TreeMap<>();
 	protected AuthorType type;
+	private int currentlySelectedRow = -1;
 
 	public AuthorMiniPanel(TreeSet<Author> authors, AuthorType type) {
 		this.authors.addAll(authors);
@@ -77,10 +84,31 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 				return false;
 			}
 		};
+		
+		class TableMouseListener extends MouseAdapter implements MouseListener{
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				currentlySelectedRow = table.rowAtPoint(e.getPoint());
+			}
+		}
+		
+		class TableKeyListener extends KeyAdapter implements KeyListener{
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyChar() == KeyEvent.VK_DELETE){
+					tableModel.removeRow(currentlySelectedRow);
+					rowToAuthor.remove(new Integer(currentlySelectedRow));
+					table.revalidate();
+					currentlySelectedRow = -1;
+				}
+			}
+		}
+		this.table.addKeyListener(new TableKeyListener());
+		this.table.addMouseListener(new TableMouseListener());
 	}
 
 	public void addRow(Author a) {
-		Object data[] = { this.authorToRow.size() + 1, null, a.getFirstName(), a.getLastName() };
+		Object data[] = { this.rowToAuthor.size() + 1, null, a.getFirstName(), a.getLastName() };
 		if(a.getPrimaryKey() < 0){
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
 			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
@@ -89,14 +117,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
-		this.authorToRow.put(a, this.authorToRow.size());
-	}
-
-	public void removeRow(Author a) {
-		this.authors.remove(a);
-		this.tableModel.removeRow(this.authorToRow.get(a));
-		this.authorToRow.remove(a);
-		this.table.revalidate();
+		this.rowToAuthor.put(this.rowToAuthor.size(),a);
 	}
 
 	public void setAuthors(TreeSet<Author> authors) {
@@ -119,8 +140,8 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 		return authors;
 	}
 	
-	public Set<Author> getAuthors(){
-		return this.authorToRow.keySet();
+	public Collection<Author> getAuthors(){
+		return this.rowToAuthor.values();
 	}
 
 	private void layoutComponents() {
@@ -200,7 +221,7 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	public void clear() {
 		this.clearTable();
 		this.authors.clear();
-		this.authorToRow.clear();
+		this.rowToAuthor.clear();
 	}
 
 }

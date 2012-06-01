@@ -3,13 +3,18 @@ package view.items.minipanels;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -38,10 +43,11 @@ import settings.GlobalPaths;
 public class TagCloudMiniPanel extends JPanel {
 	private static final long serialVersionUID = -8170767178911147951L;
 	private JTable tagsTable;
-	private TreeMap<Genre, Integer> genreToRow = new TreeMap<Genre, Integer>();
+	private TreeMap<Integer, Genre> rowToGenre = new TreeMap<>();
 	private DefaultTableModel tagsModel;
 	private GenreMiniPanel gmp;
 	private JScrollPane scrollForTable;
+	private int currentlySelectedRow = -1;
 
 	public TagCloudMiniPanel(TreeSet<Genre> genres, GenreType type) {
 		gmp = new GenreMiniPanel(genres, type);
@@ -53,7 +59,6 @@ public class TagCloudMiniPanel extends JPanel {
 	private void initializeTagTable() {
 		String columnNames[] = { "LP", "ID", "Name" };
 		this.tagsModel = new DefaultTableModel(columnNames, 0);
-
 		this.tagsTable = new JTable(this.tagsModel){
 			private static final long serialVersionUID = 6303631988571439208L;
 
@@ -72,6 +77,27 @@ public class TagCloudMiniPanel extends JPanel {
 			
 		};		
 		this.tagsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		
+		class TableMouseListener extends MouseAdapter implements MouseListener{
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				currentlySelectedRow = tagsTable.rowAtPoint(e.getPoint());
+			}
+		}
+		
+		class TableKeyListener extends KeyAdapter implements KeyListener{
+			@Override
+			public void keyTyped(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyChar() == KeyEvent.VK_DELETE){
+					tagsModel.removeRow(currentlySelectedRow);
+					rowToGenre.remove(new Integer(currentlySelectedRow));
+					tagsTable.revalidate();
+					currentlySelectedRow = -1;
+				}
+			}
+		}
+		this.tagsTable.addKeyListener(new TableKeyListener());
+		this.tagsTable.addMouseListener(new TableMouseListener());
 	}
 
 	private void addPropertyListener() {
@@ -106,7 +132,7 @@ public class TagCloudMiniPanel extends JPanel {
 	}
 
 	public void addRow(Genre g) {
-		Object data[] = { this.genreToRow.size()+1, null, g.getGenre() };
+		Object data[] = { this.rowToGenre.size()+1, null, g.getGenre() };
 		if(g.getPrimaryKey() < 0){
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
 			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
@@ -115,7 +141,7 @@ public class TagCloudMiniPanel extends JPanel {
 			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tagsModel.addRow(data);
-		this.genreToRow.put(g, this.genreToRow.size());
+		this.rowToGenre.put(this.rowToGenre.size(), g);
 	}
 
 	public void setTags(Collection<Genre> genres) {
@@ -127,17 +153,10 @@ public class TagCloudMiniPanel extends JPanel {
 		this.tagsTable.revalidate();
 	}
 
-	public void removeTag(Genre g) {
-		gmp.tags.remove(g);
-		this.tagsModel.removeRow(this.genreToRow.get(g));
-		this.genreToRow.remove(g);
-		this.tagsTable.revalidate();
-	}
-
 	public void clear() {
 		gmp.tags.clear();
 		this.clearTable();
-		this.genreToRow.clear();
+		this.rowToGenre.clear();
 	}
 
 	private void clearTable(){
@@ -151,8 +170,8 @@ public class TagCloudMiniPanel extends JPanel {
 		return gmp.tags;
 	}
 	
-	public Set<Genre> getTags(){
-		return genreToRow.keySet();
+	public Collection<Genre> getTags(){
+		return rowToGenre.values();
 	}
 
 	/**
