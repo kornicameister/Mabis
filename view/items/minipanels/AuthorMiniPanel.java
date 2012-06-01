@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -109,8 +110,12 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 		this.table.revalidate();
 	}
 
-	public ArrayList<Author> getAuthors() {
+	public ArrayList<Author> getDatabaseAuthors() {
 		return authors;
+	}
+	
+	public Set<Author> getAuthors(){
+		return this.authorToRow.keySet();
 	}
 
 	private void layoutComponents() {

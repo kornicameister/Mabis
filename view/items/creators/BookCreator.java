@@ -237,7 +237,7 @@ public class BookCreator extends ItemCreator {
 		this.selectedBook.addIdentifier(BookIndustryIdentifier.ISBN_13, this.isbnField.getText());
 		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 		this.selectedBook.setDescription(this.descriptionArea.getText());
-		this.selectedBook.setGenres(this.tagCloud.getTags());
+		this.selectedBook.setGenres(this.tagCloud.getDatabaseTags());
 
 		if(this.editingMode){
 			try {
@@ -383,7 +383,7 @@ public class BookCreator extends ItemCreator {
 					if(this.editingMode){
 						this.authorsMiniPanel.addRow(a);
 					}else{
-						int index = Collections.binarySearch(this.authorsMiniPanel.getAuthors(),
+						int index = Collections.binarySearch(this.authorsMiniPanel.getDatabaseAuthors(),
 								a,
 								new Comparator<Author>() {
 									@Override
@@ -397,10 +397,10 @@ public class BookCreator extends ItemCreator {
 								});
 						if(index < 0){
 							this.authorsMiniPanel.addRow(a);
-							this.authorsMiniPanel.getAuthors().add(a);
+							this.authorsMiniPanel.getDatabaseAuthors().add(a);
 							a.setType(AuthorType.BOOK_AUTHOR);
 						}else{
-							a.setPrimaryKey(this.authorsMiniPanel.getAuthors().get(index).getPrimaryKey());
+							a.setPrimaryKey(this.authorsMiniPanel.getDatabaseAuthors().get(index).getPrimaryKey());
 							this.authorsMiniPanel.addRow(a);
 						}
 					}
@@ -412,7 +412,7 @@ public class BookCreator extends ItemCreator {
 						this.tagCloud.addRow(g);
 					}else{
 						int index= Collections.binarySearch(
-								this.tagCloud.getTags(), 
+								this.tagCloud.getDatabaseTags(), 
 								g,
 								new Comparator<Genre>() {
 									@Override
@@ -426,10 +426,10 @@ public class BookCreator extends ItemCreator {
 								});
 						if(index < 0){
 							this.tagCloud.addRow(g);
-							this.tagCloud.getTags().add(g);
+							this.tagCloud.getDatabaseTags().add(g);
 							g.setType(GenreType.BOOK);
 						}else{
-							g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+							g.setPrimaryKey(this.tagCloud.getDatabaseTags().get(index).getPrimaryKey());
 							this.tagCloud.addRow(g);
 						}
 					}

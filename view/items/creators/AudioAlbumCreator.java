@@ -206,7 +206,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		this.selectedAlbum.setTrackList(this.trackList.getTracks());
 		this.selectedAlbum.setBand((Band) this.bandMiniPanel.getBands().toArray()[0]);
-		this.selectedAlbum.setGenres(this.tagCloud.getTags());
+		this.selectedAlbum.setGenres(this.tagCloud.getDatabaseTags());
 		try {
 			this.selectedAlbum.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
 		} catch (IOException e1) {
@@ -373,7 +373,7 @@ public class AudioAlbumCreator extends ItemCreator {
 					this.bandMiniPanel.getBands().add(b);
 					b.setType(AuthorType.AUDIO_ALBUM_BAND);
 				}else{
-					a.setPrimaryKey(this.bandMiniPanel.getAuthors().get(index).getPrimaryKey());
+					a.setPrimaryKey(this.bandMiniPanel.getDatabaseAuthors().get(index).getPrimaryKey());
 					this.bandMiniPanel.addRow(b);
 				}
 			}
@@ -385,7 +385,7 @@ public class AudioAlbumCreator extends ItemCreator {
 				this.tagCloud.addRow(g);
 			}else{
 				int index= Collections.binarySearch(
-						this.tagCloud.getTags(), 
+						this.tagCloud.getDatabaseTags(), 
 						g,
 						new Comparator<Genre>() {
 							@Override
@@ -399,10 +399,10 @@ public class AudioAlbumCreator extends ItemCreator {
 						});
 				if(index < 0){
 					this.tagCloud.addRow(g);
-					this.tagCloud.getTags().add(g);
+					this.tagCloud.getDatabaseTags().add(g);
 					g.setType(GenreType.AUDIO);
 				}else{
-					g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
+					g.setPrimaryKey(this.tagCloud.getDatabaseTags().get(index).getPrimaryKey());
 					this.tagCloud.addRow(g);
 				}
 			}

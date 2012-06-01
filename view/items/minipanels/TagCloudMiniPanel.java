@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -142,8 +143,12 @@ public class TagCloudMiniPanel extends JPanel {
 		this.tagsTable.revalidate();
 	}
 
-	public ArrayList<Genre> getTags() {
+	public ArrayList<Genre> getDatabaseTags() {
 		return gmp.tags;
+	}
+	
+	public Set<Genre> getTags(){
+		return genreToRow.keySet();
 	}
 
 	/**
@@ -210,9 +215,8 @@ public class TagCloudMiniPanel extends JPanel {
 								}
 							});
 					if (found < 0) {
-						this.tags.add(tmp);
+						this.firePropertyChange("genreCreated", null, tmp);
 					}
-					this.firePropertyChange("genreCreated", null, tmp);
 					this.firePropertyChange("tag", null, tmp);
 				}
 			} else if (source.equals(selectGenreButton)) {

@@ -65,11 +65,9 @@ public class MovieCreator extends ItemCreator {
 	private TagCloudMiniPanel tagCloud;
 	private AuthorMiniPanel directorsPanel;
 	private JFormattedTextField durationField;
-	private Movie selectedMovie;
 	private JTextArea descriptionArea;
 	private JScrollPane descriptionScrollPane;
 	private LoadFromApi lfa;
-	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
 	public MovieCreator(User u, String title) throws HeadlessException,
 			CreatorContentNullPointerException {
@@ -158,7 +156,6 @@ public class MovieCreator extends ItemCreator {
 			asf.executeSQL(true);
 			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.MOVIE_DIRECTOR);
 			this.directorsPanel.setBorder(BorderFactory.createTitledBorder("Authors"));
-			this.directorsPanel.addPropertyChangeListener("author", this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -173,29 +170,9 @@ public class MovieCreator extends ItemCreator {
 			gsf.executeSQL(true);
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.MOVIE);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
-			this.tagCloud.addPropertyChangeListener("tag", this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	class MiniPanelsListener implements PropertyChangeListener{
-
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if(evt.getPropertyName().equals("author")){
-				Author tmp = (Author) evt.getNewValue();
-				if(!selectedMovie.getAuthors().contains(tmp)){
-					selectedMovie.addAuthor(tmp);
-				}
-			}else if(evt.getPropertyName().equals("tag")){
-				Genre tmp = (Genre) evt.getNewValue();
-				if(!selectedMovie.getGenres().contains(tmp)){
-					selectedMovie.addGenre(tmp);
-				}
-			}
-		}
-		
 	}
 
 	@Override
@@ -211,30 +188,34 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected Boolean execute() {
+		final Movie selectedMovie = new Movie();
 		try {
-			this.selectedMovie.setTitle(this.titleField.getText());
-			this.selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
-			this.selectedMovie.setDescription(this.descriptionArea.getText());
-			this.selectedMovie.setDuration((Long) this.durationField.getValue());
+			selectedMovie.setTitle(this.titleField.getText());
+			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
+			selectedMovie.setDescription(this.descriptionArea.getText());
+			// TODO -> this shit aint working
+			selectedMovie.setDuration((Long) this.durationField.getValue());
+			selectedMovie.setGenres(this.tagCloud.getTags());
+			selectedMovie.setDirectors(this.directorsPanel.getAuthors());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		
 		if(this.editingMode){
 			try {
-				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, this.selectedMovie);
+				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, selectedMovie);
 				return msf.executeSQL(true) > 0;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}else{
 			try{
-				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, this.selectedMovie);
-				this.selectedMovie.setPrimaryKey(msf.executeSQL(true));
+				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, selectedMovie);
+				msf.executeSQL(true);
 				
 				MovieUser mu = new MovieUser();
 				mu.addMultiForeignKey(-1,
-						new ForeignKey(this.selectedMovie, "idMovie", this.selectedMovie.getPrimaryKey()),
+						new ForeignKey(selectedMovie, "idMovie",    selectedMovie.getPrimaryKey()),
 						new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
 				
 				MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
@@ -243,7 +224,7 @@ public class MovieCreator extends ItemCreator {
 				e.printStackTrace();
 			}
 		}
-		this.firePropertyChange("itemAffected", null, this.selectedMovie);
+		this.firePropertyChange("itemAffected", null, selectedMovie);
 		return true;
 	}
 
@@ -364,7 +345,7 @@ public class MovieCreator extends ItemCreator {
 			if(this.editingMode){
 				this.directorsPanel.addRow(a);
 			}else{
-				int index = Collections.binarySearch(this.directorsPanel.getAuthors(),
+				int index = Collections.binarySearch(this.directorsPanel.getDatabaseAuthors(),
 						a,
 						new Comparator<Author>() {
 							@Override
@@ -377,12 +358,10 @@ public class MovieCreator extends ItemCreator {
 							}
 						});
 				if(index < 0){
-					this.directorsPanel.addRow(a);
-					this.directorsPanel.getAuthors().add(a);
 					a.setType(AuthorType.MOVIE_DIRECTOR);
-				}else{
-					a.setPrimaryKey(this.directorsPanel.getAuthors().get(index).getPrimaryKey());
 					this.directorsPanel.addRow(a);
+				}else{
+					this.directorsPanel.addRow(this.directorsPanel.getDatabaseAuthors().get(index));
 				}
 			}
 		}
@@ -393,7 +372,7 @@ public class MovieCreator extends ItemCreator {
 				this.tagCloud.addRow(g);
 			}else{
 				int index= Collections.binarySearch(
-						this.tagCloud.getTags(), 
+						this.tagCloud.getDatabaseTags(), 
 						g,
 						new Comparator<Genre>() {
 							@Override
@@ -406,12 +385,10 @@ public class MovieCreator extends ItemCreator {
 							}
 						});
 				if(index < 0){
-					this.tagCloud.addRow(g);
-					this.tagCloud.getTags().add(g);
 					g.setType(GenreType.MOVIE);
-				}else{
-					g.setPrimaryKey(this.tagCloud.getTags().get(index).getPrimaryKey());
 					this.tagCloud.addRow(g);
+				}else{
+					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(index));
 				}
 			}
 		}
