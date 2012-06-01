@@ -65,7 +65,6 @@ public class AudioAlbumCreator extends ItemCreator {
 	private TrackListPanel trackList;
 	private AudioAlbum selectedAlbum = new AudioAlbum();
 	private LoadFromApi lfa;
-	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
 	public AudioAlbumCreator(User u, String title)
 			throws CreatorContentNullPointerException {
@@ -151,7 +150,6 @@ public class AudioAlbumCreator extends ItemCreator {
 			asf.executeSQL(true);
 			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),AuthorType.AUDIO_ALBUM_BAND);
 			this.bandMiniPanel.setBorder(BorderFactory.createTitledBorder("Bands"));
-			this.bandMiniPanel.addPropertyChangeListener("band",this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -165,29 +163,9 @@ public class AudioAlbumCreator extends ItemCreator {
 			gsf.executeSQL(true);
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.AUDIO);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
-			this.tagCloud.addPropertyChangeListener("tag",this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	class MiniPanelsListener implements PropertyChangeListener{
-
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if(evt.getPropertyName().equals("band")){
-				Band tmp = (Band) evt.getNewValue();
-				if(!selectedAlbum.getBand().equals(tmp)){
-					selectedAlbum.setBand(tmp);
-				}
-			}else if(evt.getPropertyName().equals("tag")){
-				Genre tmp = (Genre) evt.getNewValue();
-				if(!selectedAlbum.getGenres().contains(tmp)){
-					selectedAlbum.addGenre(tmp);
-				}
-			}
-		}
-		
 	}
 
 	@Override
@@ -369,12 +347,10 @@ public class AudioAlbumCreator extends ItemCreator {
 							}
 						});
 				if(index < 0){
-					this.bandMiniPanel.addRow(b);
-					this.bandMiniPanel.getBands().add(b);
 					b.setType(AuthorType.AUDIO_ALBUM_BAND);
-				}else{
-					a.setPrimaryKey(this.bandMiniPanel.getDatabaseAuthors().get(index).getPrimaryKey());
 					this.bandMiniPanel.addRow(b);
+				}else{
+					this.bandMiniPanel.addRow(this.bandMiniPanel.getDatabaseAuthors().get(index));
 				}
 			}
 		}
@@ -398,12 +374,10 @@ public class AudioAlbumCreator extends ItemCreator {
 							}
 						});
 				if(index < 0){
-					this.tagCloud.addRow(g);
-					this.tagCloud.getDatabaseTags().add(g);
 					g.setType(GenreType.AUDIO);
-				}else{
-					g.setPrimaryKey(this.tagCloud.getDatabaseTags().get(index).getPrimaryKey());
 					this.tagCloud.addRow(g);
+				}else{
+					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(index));
 				}
 			}
 		}

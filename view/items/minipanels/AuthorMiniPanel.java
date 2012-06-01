@@ -33,7 +33,7 @@ import settings.GlobalPaths;
 
 public class AuthorMiniPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 3416144336071217011L;
-	private ArrayList<Author> authors = new ArrayList<>();
+	protected ArrayList<Author> authors = new ArrayList<>();
 
 	protected final JButton newAuthorButton = new JButton("N");
 	protected final JButton selectAuthorButton = new JButton("S");
