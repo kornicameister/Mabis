@@ -73,20 +73,12 @@ public class TrackListPanel extends JPanel {
 			
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				if(column > 1){
+				if(column > 0){
 					return true;
 				}
 				return false;
 			}
 		};
-		
-		class TableMouseListener extends MouseAdapter implements MouseListener{
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				currentlySelectedRow = trackListTable.rowAtPoint(e.getPoint());
-				addRow(new AudioAlbumTrack((short) 0, "", ""));
-			}
-		}
 		
 		class TableKeyListener extends KeyAdapter implements KeyListener{
 			@Override
@@ -97,7 +89,7 @@ public class TrackListPanel extends JPanel {
 					trackListTable.revalidate();
 					currentlySelectedRow = -1;
 				}else if(e.getKeyChar() == '\n'){
-					Short id = (Short) dtm.getValueAt(dtm.getRowCount()-1,1);
+					Integer id = (Integer) dtm.getValueAt(dtm.getRowCount()-1,1);
 					String lenght = (String) dtm.getValueAt(dtm.getRowCount()-1, 2);
 					String name = (String) dtm.getValueAt(dtm.getRowCount()-1, 3);
 					
@@ -107,9 +99,25 @@ public class TrackListPanel extends JPanel {
 			}
 		}
 		
+		class TableMouseListener extends MouseAdapter implements MouseListener{
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				currentlySelectedRow = trackListTable.rowAtPoint(e.getPoint());
+			}
+		}
+		
+		class ScrollerListener extends MouseAdapter implements MouseListener{
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				currentlySelectedRow = trackListTable.rowAtPoint(e.getPoint());
+				addRow(new AudioAlbumTrack(rowToTracks.size()+1, "", ""));
+			}
+		}
+		
+		this.scroller = new JScrollPane(this.trackListTable);
+		this.scroller.addMouseListener(new ScrollerListener());
 		this.trackListTable.addKeyListener(new TableKeyListener());
 		this.trackListTable.addMouseListener(new TableMouseListener());
-		this.scroller = new JScrollPane(this.trackListTable);
 	}
 
 	public void clear() {

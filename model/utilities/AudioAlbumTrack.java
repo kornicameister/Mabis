@@ -7,12 +7,12 @@ public class AudioAlbumTrack implements Serializable,
 		Comparable<AudioAlbumTrack> {
 	private static final long serialVersionUID = -7691994149397894841L;
 	private Long duration;
-	private Short id;
+	private Integer id;
 	private String name;
 	private URL lastFMUrl;
 	private Double rating;
 
-	public AudioAlbumTrack(Short id, String name, String dur) {
+	public AudioAlbumTrack(Integer id, String name, String dur) {
 		this.id = id;
 		this.name = name;
 		if(dur.isEmpty()){
@@ -38,11 +38,11 @@ public class AudioAlbumTrack implements Serializable,
 		this.duration = Long.valueOf(dur);
 	}
 
-	public Short getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Short id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
