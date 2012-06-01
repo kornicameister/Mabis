@@ -13,7 +13,9 @@ public enum GlobalPaths {
 			"./cache/bands/"), AUTHOR_CACHE_PATH("./cache/authors/"), MEDIA_CACHE_PATH(
 			"./cache/media/"), TMP(System.getProperty("java.io.tmpdir")
 			+ "/mabis/"), CROSS_SIGN("src/resources/cross_sign.png"), OK_SIGN(
-			("src/resources/ok_sign.png")), ISBN_SIGN("src/resources/isbn_sign.jpg");
+			("src/resources/ok_sign.png")), ISBN_SIGN(
+			"src/resources/isbn_sign.jpg"), MUSIC_ICON(
+			"src/resources/music_note.gif");
 
 	private final String path;
 
