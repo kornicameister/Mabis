@@ -122,6 +122,10 @@ public class Movie extends BaseTable implements Serializable {
 		this.directors.add(author);
 	}
 
+	public void setDirectors(Collection<Author> authors) {
+		this.directors = new TreeSet<>(authors);
+	}
+
 	public Genre getGenre() {
 		return genres.first();
 	}
@@ -135,7 +139,7 @@ public class Movie extends BaseTable implements Serializable {
 	}
 
 	public void setGenres(Collection<Genre> g) {
-		this.genres.addAll(g);
+		this.genres = new TreeSet<>(g);
 	}
 
 	public void setRating(Double averageRating) {
