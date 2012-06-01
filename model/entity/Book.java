@@ -89,13 +89,17 @@ public class Book extends Movie implements Serializable {
 		str += "[TITLE: " + this.getTitle() + "]\n";
 		str += "[IDENTIFIERS:]\n";
 		for (BookIndustryIdentifier bii : this.getIdentifiers()) {
-			str += bii.toString();
+			str += "\t" + bii.toString();
 		}
 		str += "[PAGES: " + this.getPages() + "]\n";
-		str += "[GENRE: " + this.getGenre() + "]\n";
+		str += "[GENRES:]\n";
+		for(Genre g : this.genres){
+			str += "\t" + g.toString();
+		}
 		str += "[RATING: " + this.getRating() + "]\n";
+		str += "[AUTHORS:]\n";
 		for (Author a : this.directors) {
-			str += "\t" + a.toString() + "\n";
+			str += "\t" + a.toString();
 		}
 		str += "[PICTURE: " + this.getCover() + "]\n";
 		return str;

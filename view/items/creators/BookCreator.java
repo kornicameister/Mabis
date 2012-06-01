@@ -31,9 +31,11 @@ import model.entity.Author;
 import model.entity.Book;
 import model.entity.BookUser;
 import model.entity.Genre;
+import model.entity.Picture;
 import model.entity.User;
 import model.enums.AuthorType;
 import model.enums.GenreType;
+import model.enums.ImageType;
 import model.utilities.ForeignKey;
 import settings.GlobalPaths;
 import view.imagePanel.ImagePanel;
@@ -58,16 +60,14 @@ public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
 	private ImagePanel coverPanel;
 	private JTextArea descriptionArea;
-	private JTextField titleOriginal;
-	private JTextField subTitle;
-	private JTextField pages;
+	private JTextField 	titleOriginal,
+						subTitle,
+						pages;
 	private TagCloudMiniPanel tagCloud;
 	private AuthorMiniPanel authorsMiniPanel;
 	private IndustryIdentifiersMiniPanel iiMiniPanel;
 	private JScrollPane descriptionScrollPane;
-	private Book selectedBook = new Book();
 	private LoadFromApi lfa;
-	private PropertyChangeListener miniPanelLister = new MiniPanelsListener();
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -177,7 +177,6 @@ public class BookCreator extends ItemCreator {
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
 					GenreType.BOOK);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Genres"));
-			this.tagCloud.addPropertyChangeListener("tag",this.miniPanelLister);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -190,33 +189,12 @@ public class BookCreator extends ItemCreator {
 			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
 			asf.executeSQL(true);
 			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),AuthorType.BOOK_AUTHOR);
-			this.authorsMiniPanel.addPropertyChangeListener("author", this.miniPanelLister);
 			this.authorsMiniPanel.setBorder(BorderFactory.createTitledBorder("Writers"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	class MiniPanelsListener implements PropertyChangeListener{
-
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if(evt.getPropertyName().equals("author")){
-				Author tmp = (Author) evt.getNewValue();
-				if(!selectedBook.getAuthors().contains(tmp)){
-					selectedBook.addAuthor(tmp);
-				}
-			}else if(evt.getPropertyName().equals("tag")){
-				Genre tmp = (Genre) evt.getNewValue();
-				if(!selectedBook.getGenres().contains(tmp)){
-					selectedBook.addGenre(tmp);
-				}
-			}
-		}
-		
-	}
-	
-
 	@Override
 	protected void clearContentFields() {
 		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
@@ -232,29 +210,35 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected Boolean execute() {
-		this.selectedBook.setIdentifiers(this.iiMiniPanel.getII());
-		this.selectedBook.setTitle(this.titleOriginal.getText());
-		this.selectedBook.setSubTitle(this.subTitle.getText());
-		this.selectedBook.getIdentifiers().clear();
-		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
-		this.selectedBook.setDescription(this.descriptionArea.getText());
-		this.selectedBook.setGenres(this.tagCloud.getDatabaseTags());
+		final Book selectedBook = new Book();
+		selectedBook.setIdentifiers(this.iiMiniPanel.getII());
+		selectedBook.setTitle(this.titleOriginal.getText());
+		selectedBook.setSubTitle(this.subTitle.getText());
+		selectedBook.setPages(Integer.valueOf(this.pages.getText()));
+		selectedBook.setDescription(this.descriptionArea.getText());
+		selectedBook.setGenres(this.tagCloud.getTags());
+		selectedBook.setDirectors(this.authorsMiniPanel.getAuthors());
+		try {
+			selectedBook.setCover(new Picture(this.coverPanel.getImageFile(), ImageType.FRONT_COVER));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		if(this.editingMode){
 			try {
-				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE, this.selectedBook);
+				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE, selectedBook);
 				return bsf.executeSQL(true) > 0;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}else{
 			try {
-				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, this.selectedBook);
-				this.selectedBook.setPrimaryKey(bsf.executeSQL(true));
+				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, selectedBook);
+				bsf.executeSQL(true);
 				
 				BookUser bu = new BookUser();
-				bu.addMultiForeignKey(-1, new ForeignKey(this.selectedBook, "idBook", this.selectedBook.getPrimaryKey()),
-										  new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
+				bu.addMultiForeignKey(-1, new ForeignKey(selectedBook, "idBook", selectedBook.getPrimaryKey()),
+										  new ForeignKey(this.selectedUser, "idUser", selectedUser.getPrimaryKey()));
 				
 				
 				BookUserSQLFactory  busf = new BookUserSQLFactory(SQLStamentType.INSERT, bu);
@@ -263,7 +247,7 @@ public class BookCreator extends ItemCreator {
 				e.printStackTrace();
 			}
 		}
-		this.firePropertyChange("itemAffected", null, this.selectedBook);
+		this.firePropertyChange("itemAffected", null, selectedBook);
 		return true;
 	}
 
@@ -403,7 +387,7 @@ public class BookCreator extends ItemCreator {
 					a.setType(AuthorType.BOOK_AUTHOR);
 					this.authorsMiniPanel.addRow(a);
 				} else {
-					a.setPrimaryKey(this.authorsMiniPanel.getDatabaseAuthors().get(index).getPrimaryKey());
+					this.authorsMiniPanel.addRow(this.authorsMiniPanel.getDatabaseAuthors().get(index));
 				}
 			}
 		}
@@ -431,7 +415,7 @@ public class BookCreator extends ItemCreator {
 					g.setType(GenreType.BOOK);
 					this.tagCloud.addRow(g);
 				} else {
-					this.tagCloud.addRow(g);
+					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(index));
 				}
 			}
 		}
