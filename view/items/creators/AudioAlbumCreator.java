@@ -85,32 +85,32 @@ public class AudioAlbumCreator extends ItemCreator {
 
 		gl.setHorizontalGroup(gl
 				.createSequentialGroup()
-				.addComponent(this.coverPanel, 250, 250, 250)
+				.addGroup(
+						gl.createParallelGroup()
+							.addComponent(this.coverPanel,220,220,220)
+							.addComponent(this.tagCloud,220,220,220))
 				.addGroup(
 						gl.createParallelGroup()
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(this.titleField)
-												.addComponent(
-														this.durationField))
+												.addComponent(this.durationField))
 								.addComponent(this.bandMiniPanel)
-								.addComponent(this.trackList)
-								.addComponent(this.tagCloud)));
+								.addComponent(this.trackList)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
-				.addComponent(this.coverPanel, 250, 250, 250)
+				.addGroup(
+						gl.createSequentialGroup()
+							.addComponent(this.coverPanel, 220, 220, 220)
+							.addComponent(this.tagCloud))
 				.addGroup(
 						gl.createSequentialGroup()
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titleField,
-														35, 35, 35)
-												.addComponent(
-														this.durationField, 35,
-														35, 35))
-								.addComponent(this.bandMiniPanel, 120, 120, 120)
-								.addComponent(this.trackList, 120, 120, 120)
-								.addComponent(this.tagCloud, 100, 100, 100)));
+												.addComponent(this.titleField,60, 60, 60)
+												.addComponent(this.durationField,60, 60, 60))
+								.addComponent(this.bandMiniPanel, 120, 140, 150)
+								.addComponent(this.trackList, 120, 140, 150)));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {

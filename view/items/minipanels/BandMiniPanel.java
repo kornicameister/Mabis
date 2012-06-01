@@ -32,13 +32,13 @@ public class BandMiniPanel extends AuthorMiniPanel {
 	@Override
 	public void addRow(Author a) {
 		Band b = (Band) a;
-		Object data[] = { this.rowToAuthor.size() + 1, null,b.getName() };
+		Object data[] = { null, b.getName() };
 		if(b.getPrimaryKey() < 0){
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
-			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}else{
 			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
-			data[1] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
 		this.rowToAuthor.put(this.rowToAuthor.size(), a);
@@ -46,9 +46,18 @@ public class BandMiniPanel extends AuthorMiniPanel {
 
 	@Override
 	protected void initTable() {
-		String columnNames[] = { "LP", "ID", "Name" };
+		String columnNames[] = { "LP", "Name" };
 		this.tableModel = new DefaultTableModel(columnNames, 0);
-		this.table = new JTable(tableModel);
+		this.table = new JTable(tableModel){
+			private static final long serialVersionUID = -4341941906407330416L;
+			@Override
+			public Class<?> getColumnClass(int column) {
+				if(column == 0){
+					return ImageIcon.class;
+				}
+				return Object.class;
+			}
+		};
 	}
 
 	@Override

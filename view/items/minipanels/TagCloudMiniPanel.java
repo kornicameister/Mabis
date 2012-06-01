@@ -121,7 +121,7 @@ public class TagCloudMiniPanel extends JPanel {
 		this.setLayout(gl);
 
 		gl.setHorizontalGroup(gl.createSequentialGroup()
-				.addComponent(this.gmp, 100, 100, 100).addGap(5)
+				.addComponent(this.gmp, 60, 60, 60).addGap(5)
 				.addComponent(this.scrollForTable));
 
 		gl.setVerticalGroup(gl.createParallelGroup().addComponent(this.gmp)
