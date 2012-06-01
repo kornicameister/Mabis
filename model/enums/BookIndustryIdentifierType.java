@@ -3,10 +3,10 @@ package model.enums;
 /**
  * Enum opisuje typ numeru identyfikacyjnego jaki może być do książki
  */
-public enum BookIndustryIdentifier {
+public enum BookIndustryIdentifierType {
 	ISBN_10, ISBN_13, OCLC, UOM, OTHER;
 
-	public static BookIndustryIdentifier findType(String str) {
+	public static BookIndustryIdentifierType findType(String str) {
 		if (str.equals(ISBN_10.toString())
 				|| str.equals(ISBN_10.toString().toLowerCase())) {
 			return ISBN_10;
