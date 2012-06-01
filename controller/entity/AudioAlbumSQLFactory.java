@@ -38,7 +38,6 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 			if(this.checkIfInserted()){
 				break;
 			}
-			am.setPrimaryKey(Utilities.lastInsertedId(am, st) + 1);
 			short parameterIndex = 1;
 			st.setInt(parameterIndex++, this.insertGenres(am.getGenres()));
 			st.setInt(parameterIndex++, this.insertCover(am.getCover()));
@@ -47,7 +46,8 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 			st.setObject(parameterIndex++, am);
 			st.execute();
 			st.clearParameters();
-			this.lastAffactedId = am.getPrimaryKey();
+			this.lastAffactedId = Utilities.lastInsertedId(am, st);
+			am.setPrimaryKey(this.lastAffactedId);
 			break;
 		case DELETE:
 			this.parseDeleteSet(st.executeUpdate());

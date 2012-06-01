@@ -183,8 +183,8 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setTitle(this.titleField.getText());
 		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
 		this.selectedAlbum.setTrackList(this.trackList.getTracks());
-		this.selectedAlbum.setBand((Band) this.bandMiniPanel.getBands().toArray()[0]);
-		this.selectedAlbum.setGenres(this.tagCloud.getDatabaseTags());
+		this.selectedAlbum.setDirectors(this.bandMiniPanel.getAuthors());
+		this.selectedAlbum.setGenres(this.tagCloud.getTags());
 		try {
 			this.selectedAlbum.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
 		} catch (IOException e1) {
@@ -334,7 +334,7 @@ public class AudioAlbumCreator extends ItemCreator {
 			if(this.editingMode){
 				this.bandMiniPanel.addRow(b);
 			}else{
-				int index = Collections.binarySearch(this.bandMiniPanel.getBands(),
+				int index = Collections.binarySearch(this.bandMiniPanel.getDatabaseAuthors(),
 						b,
 						new Comparator<Author>() {
 							@Override
@@ -356,7 +356,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		}
 		
 		//check up - 2, the same thing, but now it does concern genres
-		for(Genre g : this.selectedAlbum.getGenres()){
+		for(Genre g : a.getGenres()){
 			if(this.editingMode){
 				this.tagCloud.addRow(g);
 			}else{

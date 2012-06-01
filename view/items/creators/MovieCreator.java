@@ -162,7 +162,6 @@ public class MovieCreator extends ItemCreator {
 	}
 
 	private void initializeTagCloud() {
-		// loading genres
 		try {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
 					new Genre());
@@ -248,6 +247,12 @@ public class MovieCreator extends ItemCreator {
 		@Override
 		protected void done() {
 			try {
+				
+				if(this.get().size() == 1){
+					fillWithResult((BaseTable) this.get().toArray()[0]);
+					return;
+				}
+				
 				ItemsPreview ip = new ItemsPreview("Collected movies",this.get());
 				ip.addPropertyChangeListener("selectedItem",
 						new PropertyChangeListener() {

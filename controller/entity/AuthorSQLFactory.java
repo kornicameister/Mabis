@@ -99,7 +99,6 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	protected void insertEntity(Author entity, PreparedStatement st)
 			throws SQLException {
-		entity.setPrimaryKey(Utilities.lastInsertedId(entity, st)+1);
 		if(!entity.getTableType().equals(TableType.USER)){
 			st.setString(1, entity.getType().toString());
 			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
@@ -110,7 +109,8 @@ public class AuthorSQLFactory extends SQLFactory {
 		}
 		st.execute();
 		st.clearParameters();
-		this.lastAffactedId = entity.getPrimaryKey();
+		this.lastAffactedId = Utilities.lastInsertedId(entity, st);
+		entity.setPrimaryKey(this.lastAffactedId);
 	}
 
 	/**

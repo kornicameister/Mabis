@@ -25,8 +25,7 @@ public class BandMiniPanel extends AuthorMiniPanel {
 	private final ArrayList<Band> bands = new ArrayList<>();
 
 	public BandMiniPanel(TreeSet<Band> bands, AuthorType type) {
-		super(new TreeSet<Author>(), type);
-		this.bands.addAll(bands);
+		super(new TreeSet<Author>(bands), type);
 	}
 
 	@Override
@@ -102,9 +101,5 @@ public class BandMiniPanel extends AuthorMiniPanel {
 		}
 		MabisLogger.getLogger().log(Level.INFO,
 				"Action called by clicking at {0}", source.getName());
-	}
-
-	public ArrayList<Band> getBands() {
-		return bands;
 	}
 }
