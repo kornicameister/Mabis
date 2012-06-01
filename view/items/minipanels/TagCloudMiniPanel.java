@@ -223,19 +223,22 @@ public class TagCloudMiniPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton) e.getSource();
+			
+			class GenreComparator implements Comparator<Genre> {
+				@Override
+				public int compare(Genre o1, Genre o2) {
+					return o1.getGenre().compareTo(
+							o2.getGenre());
+				}
+			}
+			Collections.sort(this.tags,new GenreComparator());
+			
 			if (source.equals(newGenreButton)) {
 				String returned = JOptionPane.showInputDialog(null, "Input:",
 						source.getName(), JOptionPane.PLAIN_MESSAGE);
 				if (returned != null) {
 					Genre tmp = new Genre(returned, this.type);
-					int found = Collections.binarySearch(this.tags, tmp,
-							new Comparator<Genre>() {
-								@Override
-								public int compare(Genre o1, Genre o2) {
-									return o1.getGenre().compareTo(
-											o2.getGenre());
-								}
-							});
+					int found = Collections.binarySearch(this.tags, tmp,new GenreComparator());
 					if (found < 0) {
 						this.firePropertyChange("genreCreated", null, tmp);
 					}
@@ -251,18 +254,8 @@ public class TagCloudMiniPanel extends JPanel {
 						JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 				if (returned != null) {
 					Genre tmp = (Genre) returned;
-					int found = Collections.binarySearch(this.tags, tmp,
-							new Comparator<Genre>() {
-								@Override
-								public int compare(Genre o1, Genre o2) {
-									return o1.getGenre().compareTo(
-											o2.getGenre());
-								}
-							});
-					if(found > 0){
-						this.firePropertyChange("genreSelected", null, tmp);
-						this.firePropertyChange("tag", null, tmp);
-					}
+					this.firePropertyChange("genreSelected", null, tmp);
+					this.firePropertyChange("tag", null, tmp);
 				}
 			}
 		}

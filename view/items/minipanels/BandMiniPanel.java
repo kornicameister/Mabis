@@ -84,9 +84,7 @@ public class BandMiniPanel extends AuthorMiniPanel {
 			if (returned != null) {
 				Band tmp = new Band(returned, this.type);
 				if (Collections.binarySearch(this.bands, tmp, comparator) < 0) {
-					this.bands.add(tmp);
 					this.addRow(tmp);
-					this.firePropertyChange("band", null, tmp);
 				}
 			}
 		} else if (source.equals(selectAuthorButton)) {
@@ -98,11 +96,8 @@ public class BandMiniPanel extends AuthorMiniPanel {
 					"Select one from following box", source.getName(),
 					JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 			if (returned != null) {
-				Band tmp = (Band) returned;
-				if (Collections.binarySearch(this.bands, tmp, comparator) < 0) {
-					this.addRow(tmp);
-					this.firePropertyChange("band", null, tmp);
-				}
+				Band tmp = (Band) returned;					
+				this.addRow(tmp);
 			}
 		}
 		MabisLogger.getLogger().log(Level.INFO,
