@@ -15,11 +15,13 @@ public class AudioAlbumTrack implements Serializable,
 	public AudioAlbumTrack(Integer id, String name, String dur) {
 		this.id = id;
 		this.name = name;
-		if(dur.isEmpty()){
-			this.duration = 0l;
-		}else{
-			this.duration = Long.valueOf(dur);
-		}
+
+		this.duration = 0l;
+//		if(dur.isEmpty()){
+//			this.duration = 0l;
+//		}else{
+//			this.duration = Long.valueOf(dur);
+//		}
 		this.lastFMUrl = null;
 		this.rating = 0.0;
 	}

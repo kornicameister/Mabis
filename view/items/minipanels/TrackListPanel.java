@@ -1,67 +1,48 @@
 package view.items.minipanels;
 
 import java.awt.Image;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import model.utilities.AudioAlbumTrack;
 import settings.GlobalPaths;
 
-public class TrackListPanel extends JPanel {
+public class TrackListPanel extends MiniPanel {
 	private static final long serialVersionUID = 4109556422700649333L;
-	private JTable trackListTable;
-	private DefaultTableModel dtm;
-	private TreeMap<Integer,AudioAlbumTrack> rowToTracks;
-	private JScrollPane scroller;
-	private int currentlySelectedRow = -1;
 
 	public TrackListPanel() {
-		super(true);
-		this.rowToTracks = new TreeMap<>();
-		this.initializeTable();
-		this.makeLayout();
+		super();
 	}
 
 	public TrackListPanel(TreeSet<AudioAlbumTrack> tracks) {
-		super(true);
-		this.rowToTracks = new TreeMap<>();
-		this.initializeTable();
-		this.makeLayout();
+		super();
 		for(AudioAlbumTrack aat : tracks){
 			this.addRow(aat); 
 		}
 	}
 
-	private void makeLayout() {
-		GroupLayout gl = new GroupLayout(this);
-		this.setLayout(gl);
-		
-		gl.setHorizontalGroup(gl.createSequentialGroup().addComponent(this.scroller));
-		gl.setVerticalGroup(gl.createSequentialGroup().addComponent(this.scroller));
-		
-		this.trackListTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		this.trackListTable.getColumnModel().getColumn(0).setMaxWidth(40);
-		this.trackListTable.getColumnModel().getColumn(1).setMaxWidth(40);
+	@Override
+	protected void makeLayout() {
+		super.makeLayout();
+		this.contentTable.getColumnModel().getColumn(0).setMaxWidth(40);
+		this.contentTable.getColumnModel().getColumn(1).setMaxWidth(40);
 	}
 
-	private void initializeTable() {
+	@Override
+	protected void initTable() {
 		String columnNames[] = {"|","LP","Lenght","Name",};
-		this.dtm = new DefaultTableModel(columnNames, 0);
-		this.trackListTable = new JTable(this.dtm){
+		this.tableModel = new DefaultTableModel(columnNames, 0);
+		this.contentTable = new JTable(this.tableModel){
 			private static final long serialVersionUID = -4341941906407330416L;
 			@Override
 			public Class<?> getColumnClass(int column) {
@@ -79,63 +60,68 @@ public class TrackListPanel extends JPanel {
 				return false;
 			}
 		};
-		
-		class TableKeyListener extends KeyAdapter implements KeyListener{
+	}
+	
+	@Override
+	protected TableModelListener initTableModelListener() {
+		return new TableModelListener() {
 			@Override
-			public void keyTyped(KeyEvent e) {
-				if(e.getKeyChar() == KeyEvent.VK_DELETE){
-					dtm.removeRow(currentlySelectedRow);
-					rowToTracks.remove(currentlySelectedRow);
-					trackListTable.revalidate();
-					currentlySelectedRow = -1;
-				}else if(e.getKeyChar() == '\n'){
-					Integer id = (Integer) dtm.getValueAt(dtm.getRowCount()-1,1);
-					String lenght = (String) dtm.getValueAt(dtm.getRowCount()-1, 2);
-					String name = (String) dtm.getValueAt(dtm.getRowCount()-1, 3);
-					
-					rowToTracks.put(new Integer(dtm.getRowCount()-1),new AudioAlbumTrack(id, name, lenght));
-					
+			public void tableChanged(TableModelEvent e) {
+				int eRow = e.getLastRow(),
+					eCol = e.getColumn();
+				switch(e.getType()){
+				case TableModelEvent.INSERT:
+					Integer id = (Integer) tableModel.getValueAt(eRow, 1);
+					String dur = (String) tableModel.getValueAt(eRow, 2);
+					String name = (String) tableModel.getValueAt(eRow, 3);
+					rowToEntity.put(eRow, new AudioAlbumTrack(id, name, dur));
+					System.out.println("New row inserted at " + eRow);
+					break;
+				case TableModelEvent.UPDATE:
+					System.out.println("Update at [" + eRow + "," + eCol + "]");
+					AudioAlbumTrack a = (AudioAlbumTrack) rowToEntity.get(e.getLastRow());
+					Object val = tableModel.getValueAt(eRow,eCol);
+					switch(e.getColumn()){
+					case 1:
+						a.setId(Integer.valueOf(((String)val)));
+						break;
+					case 2:
+						a.setDuration((String) val);
+						break;
+					case 3:
+						a.setName((String) val);
+						break;
+					}
+					break;
+				case TableModelEvent.DELETE:
+					System.out.println("Row " + eRow + " deleted");
+					rowToEntity.remove(eRow);
+					contentTable.revalidate();
+					break;
 				}
 			}
-		}
-		
-		class TableMouseListener extends MouseAdapter implements MouseListener{
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				currentlySelectedRow = trackListTable.rowAtPoint(e.getPoint());
-			}
-		}
-		
+		};
+	}
+	
+	@Override
+	protected MouseListener initScrollMouseListener() {
 		class ScrollerListener extends MouseAdapter implements MouseListener{
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				currentlySelectedRow = trackListTable.rowAtPoint(e.getPoint());
-				addRow(new AudioAlbumTrack(rowToTracks.size()+1, "", ""));
+				addRow(new AudioAlbumTrack(rowToEntity.size(), "", ""));
 			}
 		}
-		
-		this.scroller = new JScrollPane(this.trackListTable);
-		this.scroller.addMouseListener(new ScrollerListener());
-		this.trackListTable.addKeyListener(new TableKeyListener());
-		this.trackListTable.addMouseListener(new TableMouseListener());
+		return new ScrollerListener();
 	}
 
-	public void clear() {
-		int numRows = dtm.getRowCount();
-		for (int i = numRows; i >= 0; i++) {
-			this.dtm.removeRow(i);
-			this.trackListTable.revalidate();
-		}
-	}
-
-	public void addRow(AudioAlbumTrack a) {
-		Object data[] = { null, a.getId(), a.getDuration(), a.getName() };
+	@Override
+	protected void addRow(Object bt) {
+		final AudioAlbumTrack a = (AudioAlbumTrack) bt;
+		Object data[] = { null, 0, a.getDuration(), a.getName() };
 		ImageIcon tmp = new ImageIcon(GlobalPaths.MUSIC_ICON.toString());
 		data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		
-		this.dtm.addRow(data);
-		this.rowToTracks.put(this.rowToTracks.size(),a);
-		this.trackListTable.revalidate();
+		this.tableModel.addRow(data);
 	}
 	
 	public void setTracks(TreeSet<AudioAlbumTrack> trackList) {
@@ -145,6 +131,11 @@ public class TrackListPanel extends JPanel {
 	}
 	
 	public Collection<AudioAlbumTrack> getTracks() {
-		return rowToTracks.values();
+		ArrayList<AudioAlbumTrack> tmp = new ArrayList<>();
+		for(Object a : this.rowToEntity.values()){
+			tmp.add((AudioAlbumTrack) a);
+		}
+		return tmp;
 	}
+	
 }
