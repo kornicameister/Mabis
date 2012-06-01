@@ -33,7 +33,7 @@ import model.entity.BookUser;
 import model.entity.Genre;
 import model.entity.User;
 import model.enums.AuthorType;
-import model.enums.BookIndustryIdentifier;
+import model.enums.BookIndustryIdentifierType;
 import model.enums.GenreType;
 import model.utilities.ForeignKey;
 import settings.GlobalPaths;
@@ -236,7 +236,7 @@ public class BookCreator extends ItemCreator {
 		this.selectedBook.setTitle(this.titleOriginal.getText());
 		this.selectedBook.setSubTitle(this.subTitle.getText());
 		this.selectedBook.getIdentifiers().clear();
-		this.selectedBook.addIdentifier(BookIndustryIdentifier.ISBN_13, this.isbnField.getText());
+//		this.selectedBook.addIdentifier(BookIndustryIdentifierType.ISBN_13, this.isbnField.getText());
 		this.selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 		this.selectedBook.setDescription(this.descriptionArea.getText());
 		this.selectedBook.setGenres(this.tagCloud.getDatabaseTags());
