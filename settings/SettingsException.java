@@ -6,5 +6,9 @@ public class SettingsException extends Exception {
 	public SettingsException(final Settings s,String message) {
 		super(s.getClass().getSimpleName() + "::" + message);
 	}
+	
+	public SettingsException(String message) {
+		super(message);
+	}
 
 }

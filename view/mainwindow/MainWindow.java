@@ -53,17 +53,16 @@ public class MainWindow extends JFrame {
 	 *            dimension of the window
 	 * @see Dimension
 	 */
-	public MainWindow(String title, Dimension d) {
+	public MainWindow(String title) {
 		super(title);
 
-		
-		
 		this.setJMenuBar(new MWMenuBar(this));
 		this.bottomPanel = new MWBottomPanel(this);
-		this.collectionView = new MWCollectionView(this, new BorderLayout(), true);
+		this.collectionView = new MWCollectionView(this, new BorderLayout(),
+				true);
 		this.buttonsPanel = new MWItemButtons();
 		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
-		
+
 		layoutComponents();
 
 		this.toolBar.setEnabled(false);
@@ -74,11 +73,8 @@ public class MainWindow extends JFrame {
 		this.toolBar.addPropertyChangeListener(this.collectionView);
 		this.addPropertyChangeListener("connectedUser", this.collectionView);
 		this.buttonsPanel.addPropertyChangeListener(this.collectionView);
-		
-		setSize(d);
+
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setDefaultLookAndFeelDecorated(false);
-		setLocationRelativeTo(null); // centering on the screen
 
 		this.initConnection();
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -88,13 +84,12 @@ public class MainWindow extends JFrame {
 				checkForUsers();
 			}
 		});
-		
+
 	}
 
 	private void checkForUsers() {
 		// check for any user, if none print NewUserDialog
-		UserSQLFactory f = new UserSQLFactory(SQLStamentType.SELECT,
-				new User());
+		UserSQLFactory f = new UserSQLFactory(SQLStamentType.SELECT, new User());
 		try {
 			f.executeSQL(true);
 		} catch (SQLException e) {
@@ -187,8 +182,7 @@ public class MainWindow extends JFrame {
 								.addComponent(this.collectionView)
 								.addGroup(
 										layout.createSequentialGroup()
-												.addComponent(
-														this.buttonsPanel)))
+												.addComponent(this.buttonsPanel)))
 				.addComponent(this.bottomPanel, GroupLayout.PREFERRED_SIZE,
 						GroupLayout.DEFAULT_SIZE, 50));
 
@@ -201,7 +195,8 @@ public class MainWindow extends JFrame {
 	}
 
 	public void setConnectedUser(User newUser) {
-		if(this.connectedUser != null && this.connectedUser.getLogin().equals(newUser.getLogin())){
+		if (this.connectedUser != null
+				&& this.connectedUser.getLogin().equals(newUser.getLogin())) {
 			return;
 		}
 		User oldUser = this.getConnectedUser();

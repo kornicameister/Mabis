@@ -2,53 +2,59 @@ package settings;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.TreeMap;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import view.mainwindow.MainWindow;
 
 public class SettingsLoader extends Settings {
-	private SAXParser saxParser;
-
-	public SettingsLoader() throws SettingsException {
-		super();
-		try {
-			this.saxParser = SAXParserFactory.newInstance().newSAXParser();
-		} catch (ParserConfigurationException | SAXException e) {
-			throw new SettingsException(this, e.getMessage());
-		}
-	}
-
-	private DefaultHandler initHandler() {
-		return new DefaultHandler(){
-			@Override
-			public void startElement(String uri, String localName,
-					String qName, Attributes attributes) throws SAXException {
-			}
-			
-			@Override
-			public void endElement(String uri, String localName, String qName)
-					throws SAXException {
-			}
-			
-			@Override
-			public void characters(char[] ch, int start, int length)
-					throws SAXException {
-			}
-		};
-	}
 
 	@Override
-	public void execute() throws SettingsParseException {
+	public void execute() {
+		return;
+	}
+	
+	public static TreeMap<String, String> loadPaths() throws SettingsException{
+		TreeMap<String, String> tmp = new TreeMap<>();
 		try {
-			this.saxParser.parse(new File(Settings.pathToXML), this.initHandler());
-		} catch (SAXException | IOException e) {
-			throw new SettingsParseException(this, e.getMessage());
+			Element root = ((Document) new SAXBuilder().build(new File(SettingsLoader.pathToXML))).getRootElement();
+			
+			List<?> paths = root.getChildren("paths");
+			
+			for(short i = 0 ; i < paths.size() ; i++){
+				Element node = (Element) paths.get(i);
+				tmp.put(node.getAttributeValue("path"), node.getChildText("path"));
+			}
+		} catch (JDOMException | IOException e) {
+			throw new SettingsException(e.getMessage());
+		}
+		return tmp;
+	}
+	
+	public static void loadMainWindow(MainWindow mw) throws SettingsException{
+		try {
+			Element root = ((Document) new SAXBuilder().build(new File(SettingsLoader.pathToXML))).getRootElement();
+			
+			List<?> paths = root.getChildren("main_window");
+			
+			for(short i = 0 ; i < paths.size() ; i++){
+				Element node = (Element) paths.get(i);
+				mw.setTitle(node.getChildText("title"));
+				mw.setSize(
+						Integer.valueOf(node.getChildText("width")),
+						Integer.valueOf(node.getChildText("height")));
+				mw.setLocation(
+						Integer.valueOf(node.getChildText("xPos")),
+						Integer.valueOf(node.getChildText("yPos")));
+			}
+		} catch (JDOMException | IOException e) {
+			throw new SettingsException(e.getMessage());
 		}
 	}
-
+	
 }
