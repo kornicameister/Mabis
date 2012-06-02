@@ -70,13 +70,14 @@ public class MWToolBar extends JToolBar implements ActionListener {
 		String bookGroup[] = { "Author", "ISBN" };
 		String movieGroup[] = { "Director" };
 		String audioGroup[] = { "Band" };
-		String mutualGroup[] = { "No group", "Title"};
+		String mutualGroup[] = { "No group", "Title" };
 		this.groups.put(CollectionView.VIEW_BOOKS, bookGroup);
 		this.groups.put(CollectionView.VIEW_MOVIES, movieGroup);
 		this.groups.put(CollectionView.VIEW_AUDIOS, audioGroup);
 		this.groups.put(CollectionView.VIEW_ALL, mutualGroup);
 		this.selectedGroupBy = CollectionView.VIEW_ALL;
-		this.groupBy = new JComboBox<String>(this.groups.get(this.selectedGroupBy));
+		this.groupBy = new JComboBox<String>(
+				this.groups.get(this.selectedGroupBy));
 		JLabel groupByLabel = new JLabel("Group by : ");
 		groupByLabel.setLabelFor(this.groupBy);
 		this.add(groupByLabel);
@@ -94,30 +95,46 @@ public class MWToolBar extends JToolBar implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		JComboBox<?> source = (JComboBox<?>) e.getSource();
-		if(source.equals(this.zoomContent)){
-			Double factor = (double)((10.0 - this.zoomContent.getSelectedIndex())) / 10.0;
+		if (source.equals(this.zoomContent)) {
+			Double factor = (double) ((10.0 - this.zoomContent
+					.getSelectedIndex())) / 10.0;
 			this.firePropertyChange("zoomChanged", new Double(0.0), factor);
-			MabisLogger.getLogger().log(Level.INFO,"Zoom set to {0}%",(factor*100.0));
-		}else if(source.equals(this.viewModeContent)){
-			//changing viewModeContent required updating groupBy
-			CollectionView newViewMode = (CollectionView) this.viewModeContent.getSelectedItem();
-			CollectionView oldViewMode = (CollectionView) this.selectedGroupBy;
-			
-			if(newViewMode.equals(oldViewMode)){
+			MabisLogger.getLogger().log(Level.INFO, "Zoom set to {0}%",
+					(factor * 100.0));
+		} else if (source.equals(this.viewModeContent)) {
+			// changing viewModeContent required updating groupBy
+			final CollectionView newViewMode = (CollectionView) this.viewModeContent
+					.getSelectedItem();
+			final CollectionView oldViewMode = (CollectionView) this.selectedGroupBy;
+
+			if (newViewMode.equals(oldViewMode)) {
 				return;
 			}
-			
+			MabisLogger.getLogger().log(Level.INFO, "Content set to {0}",
+					newViewMode);
+
 			this.groupBy.removeAllItems();
-			for(String s : this.groups.get(newViewMode)){
+			for (String s : this.groups.get(newViewMode)) {
 				this.groupBy.addItem(s);
 			}
-	
+
+			final MWToolBar mwb = this;
+
 			this.selectedGroupBy = newViewMode;
-			this.firePropertyChange("contentChanged", oldViewMode, newViewMode);
-			MabisLogger.getLogger().log(Level.INFO,"Content set to {0}",newViewMode);
-		}else if(source.equals(this.groupBy)){
-			this.firePropertyChange("groupByChanged", null, this.groupBy.getSelectedItem());
-			MabisLogger.getLogger().log(Level.INFO,"GroupBy set to {0}",this.groupBy.getSelectedItem());
+			java.awt.EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					mwb.firePropertyChange("contentChanged", oldViewMode,
+							newViewMode);
+				}
+			});
+		} else if (source.equals(this.groupBy)) {
+			if (this.groupBy.getSelectedItem() != null) {
+				MabisLogger.getLogger().log(Level.INFO, "GroupBy set to {0}",
+						this.groupBy.getSelectedItem());
+				this.firePropertyChange("groupByChanged", null,
+						this.groupBy.getSelectedItem());
+			}
 		}
 	}
 }
