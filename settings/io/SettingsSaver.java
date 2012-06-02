@@ -2,6 +2,8 @@ package settings.io;
 
 import java.io.IOException;
 
+import javax.swing.JFrame;
+
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -9,8 +11,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import settings.GlobalPaths;
-import settings.SettingDataType;
-import view.mainwindow.MainWindow;
 
 public class SettingsSaver extends Settings {
 
@@ -34,14 +34,17 @@ public class SettingsSaver extends Settings {
 	}
 
 	private Element saveWindowPosition() {
-		MainWindow mw = (MainWindow) SettingsSaver.data.get(SettingDataType.MAIN_WINDOW);
-			Element window = new Element("main_window");
-			window.addContent(new Element("title").setText(mw.getTitle()));
-			window.addContent(new Element("width").setText(String.valueOf(mw.getWidth())));
-			window.addContent(new Element("height").setText(String.valueOf(mw.getHeight())));
-			window.addContent(new Element("xPos").setText(String.valueOf(mw.getX())));
-			window.addContent(new Element("yPos").setText(String.valueOf(mw.getY())));
-		return window;
+		Element frames = new Element("frames");
+		for(JFrame f : SettingsSaver.frames){
+			Element window = new Element(f.getClass().getSimpleName().replaceAll(" ","_"));
+			window.addContent(new Element("title").setText(f.getTitle()));
+			window.addContent(new Element("width").setText(String.valueOf(f.getWidth())));
+			window.addContent(new Element("height").setText(String.valueOf(f.getHeight())));
+			window.addContent(new Element("xPos").setText(String.valueOf(f.getX())));
+			window.addContent(new Element("yPos").setText(String.valueOf(f.getY())));
+			frames.addContent(window);
+		}
+		return frames;
 	}
 
 	private Element saveGlobalPaths() {

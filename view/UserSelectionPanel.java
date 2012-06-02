@@ -23,6 +23,8 @@ import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
 import model.entity.User;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
 import utilities.Hasher;
 import view.imagePanel.ChoosableImagePanel;
 import view.mainwindow.MainWindow;
@@ -73,7 +75,15 @@ public class UserSelectionPanel extends JFrame implements
 
 		this.obtainUsers();
 		this.initThumbailList();
-
+		this.addWindowListener(new WindowClosedListener());
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			e.printStackTrace();		
+			this.setTitle("Choose user");
+			this.setLocation(this.mw.getX() + this.mw.getWidth() / 4, this.mw.getY() + 25);
+			this.setSize(new Dimension(500, 280));
+		}
 	}
 
 	public UserSelectionPanel(HashMap<Integer, User> users, Frame owner) {
@@ -84,6 +94,12 @@ public class UserSelectionPanel extends JFrame implements
 
 		this.parseUsers();
 		this.initThumbailList();
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			e.printStackTrace();
+		}
+		this.addWindowListener(new WindowClosedListener());
 	}
 
 	protected void init() {
@@ -122,12 +138,7 @@ public class UserSelectionPanel extends JFrame implements
 	}
 
 	private void initMeta() {
-		this.setSize(new Dimension(500, 280));
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setTitle("Connect as...");
-		this.setLocation(this.mw.getX() + this.mw.getWidth() / 4,
-				this.mw.getY() + 25);
-		this.setAlwaysOnTop(false);
 	}
 
 	/**
@@ -245,17 +256,13 @@ public class UserSelectionPanel extends JFrame implements
 				String password = pd.getPassword();
 
 				if (!u.getPassword().equals(Hasher.hashPassword(password))) {
-					JOptionPane.showMessageDialog(null,
+					JOptionPane.showMessageDialog(usp,
 							"This is not valid password of " + u.getLogin()
 									+ " user", "Wrong password",
 							JOptionPane.ERROR_MESSAGE);
 					MabisLogger.getLogger().log(Level.INFO,
 							"Wrong credentials provided, password differs");
 				} else {
-					JOptionPane.showMessageDialog(null,
-							"Connected as " + u.getLogin(),
-							"God In Da House ;-)",
-							JOptionPane.INFORMATION_MESSAGE);
 					connectWithUser(u);
 					setVisible(false);
 					dispose();

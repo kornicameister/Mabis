@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-
-import view.mainwindow.MainWindow;
 
 public class SettingsLoader extends Settings {
 
@@ -37,21 +37,27 @@ public class SettingsLoader extends Settings {
 		return "";
 	}
 	
-	public static void loadMainWindow(MainWindow mw) throws SettingsException{
+	public static void loadFrame(JFrame f) throws SettingsException{
 		try {
 			Element root = ((Document) new SAXBuilder().build(new File(SettingsLoader.pathToXML))).getRootElement();
 			
-			List<?> paths = root.getChildren("main_window");
+			List<?> paths = root.getChildren("frames");
 			
 			for(short i = 0 ; i < paths.size() ; i++){
 				Element node = (Element) paths.get(i);
-				mw.setTitle(node.getChildText("title"));
-				mw.setSize(
-						Integer.valueOf(node.getChildText("width")),
-						Integer.valueOf(node.getChildText("height")));
-				mw.setLocation(
-						Integer.valueOf(node.getChildText("xPos")),
-						Integer.valueOf(node.getChildText("yPos")));
+				
+				List<?> frames = node.getChildren(f.getClass().getSimpleName().replaceAll(" ","_"));
+				for(short j = 0 ; j < frames.size() ; j++){
+					node = (Element) frames.get(j);
+					f.setTitle(node.getChildText("title"));
+					f.setSize(
+							Integer.valueOf(node.getChildText("width")),
+							Integer.valueOf(node.getChildText("height")));
+					f.setLocation(
+							Integer.valueOf(node.getChildText("xPos")),
+							Integer.valueOf(node.getChildText("yPos")));
+				}
+				
 			}
 		} catch (JDOMException | IOException e) {
 			throw new SettingsException(e.getMessage());

@@ -18,6 +18,7 @@ import javax.swing.border.EtchedBorder;
 
 import model.entity.User;
 import view.UserSelectionPanel;
+import view.WindowClosedListener;
 import view.newUser.NewUserDialog;
 import controller.SQLStamentType;
 import controller.entity.UserSQLFactory;
@@ -84,7 +85,7 @@ public class MainWindow extends JFrame {
 				checkForUsers();
 			}
 		});
-
+		this.addWindowListener(new WindowClosedListener());
 	}
 
 	private void checkForUsers() {

@@ -7,7 +7,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import settings.GlobalPaths;
-import settings.SettingDataType;
 import settings.io.SettingsException;
 import settings.io.SettingsLoader;
 import settings.io.SettingsSaver;
@@ -36,22 +35,21 @@ public class Mabis {
 			public void run() {
 				final MainWindow mw = new MainWindow("Mabis");
 				try {
-					SettingsLoader.loadMainWindow(mw);
+					SettingsLoader.loadFrame(mw);
 				} catch (SettingsException e) {
 					e.printStackTrace();
 				}
 				mw.setVisible(true);
 				
-				class MainWindowClosingListener extends WindowAdapter implements WindowListener{
+				class ApplicationExiting extends WindowAdapter implements WindowListener{
 					@Override
 					public void windowClosed(WindowEvent e) {
-						SettingsSaver.addData(SettingDataType.MAIN_WINDOW,mw);
 						SettingsSaver ss = new SettingsSaver();
 						ss.execute();
 					}
 				}
 				
-				mw.addWindowListener(new MainWindowClosingListener());
+				mw.addWindowListener(new ApplicationExiting());
 			}
 		});
 	}
