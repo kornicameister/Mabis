@@ -8,9 +8,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import settings.GlobalPaths;
 import settings.SettingDataType;
-import settings.SettingsException;
-import settings.SettingsLoader;
-import settings.SettingsSaver;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
+import settings.io.SettingsSaver;
 import view.mainwindow.MainWindow;
 
 public class Mabis {

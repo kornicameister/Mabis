@@ -1,5 +1,8 @@
 package settings;
 
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
+
 /**
  * This enum contains paths to all fixed directories used by mabis
  * 
@@ -7,20 +10,30 @@ package settings;
  * 
  */
 public enum GlobalPaths {
-	AVATAR_CACHE_PATH("./cache/avatars/"), DEFAULT_COVER_PATH(
-			"src/resources/defaultCover.png"), DEFAULT_AVATAR_PATH(
-			"src/resources/defaultAvatar.png"), BAND_CACHE_PATH(
-			"./cache/bands/"), AUTHOR_CACHE_PATH("./cache/authors/"), MEDIA_CACHE_PATH(
-			"./cache/media/"), TMP(System.getProperty("java.io.tmpdir")
-			+ "/mabis/"), CROSS_SIGN("src/resources/cross_sign.png"), OK_SIGN(
-			("src/resources/ok_sign.png")), ISBN_SIGN(
-			"src/resources/isbn_sign.jpg"), MUSIC_ICON(
-			"src/resources/music_note.gif");
+	AVATAR_CACHE_PATH, 
+	DEFAULT_COVER_PATH, 
+	DEFAULT_AVATAR_PATH, 
+	BAND_CACHE_PATH, 
+	AUTHOR_CACHE_PATH,
+	MEDIA_CACHE_PATH, 
+	TMP,
+	CROSS_SIGN,
+	OK_SIGN,
+	ISBN_SIGN,
+	MUSIC_ICON;
 
-	private final String path;
+	private String path = null;
 
-	private GlobalPaths(String path) {
-		this.path = path;
+	private GlobalPaths() {
+		try {
+			this.path = SettingsLoader.loadPath(this.name());
+		} catch (SettingsException e) {
+			e.printStackTrace();
+		} finally {
+			if(path == null){
+				path = "";
+			}
+		}
 	}
 
 	@Override
