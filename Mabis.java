@@ -34,7 +34,7 @@ public class Mabis {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				final MainWindow mw = new MainWindow("MABIS");
+				final MainWindow mw = new MainWindow("Mabis");
 				try {
 					SettingsLoader.loadMainWindow(mw);
 				} catch (SettingsException e) {
