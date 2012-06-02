@@ -55,13 +55,13 @@ import controller.entity.BookSQLFactory;
 import controller.entity.BookUserSQLFactory;
 import controller.entity.MovieSQLFactory;
 import controller.entity.MovieUserSQLFactory;
+import controller.exceptions.SQLEntityExistsException;
 
 //TODO add comments
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private static final long serialVersionUID = 4037649477948033295L;
-	private static final String DELETE_CMD = "Delete",
-							    EDIT_CMD = "Edit",
-							    VIEW_CMD = "View";
+	private static final String DELETE_CMD = "Delete", EDIT_CMD = "Edit",
+			VIEW_CMD = "View";
 	private JPopupMenu collectionMenu;
 	private User connectedUserReference;
 
@@ -74,7 +74,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private PopupActionListener collectionMenuListener;
 	private StatusBar statusBar;
 
-	public MWCollectionView(MainWindow mw,LayoutManager layout, boolean isDoubleBuffered) {
+	public MWCollectionView(MainWindow mw, LayoutManager layout,
+			boolean isDoubleBuffered) {
 		super(layout, isDoubleBuffered);
 		this.initComponents();
 		this.statusBar = mw.getBottomPanel().getStatusBar();
@@ -87,7 +88,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 		this.tableModel = new CollectionTableModel();
 		this.collectionTable = new JTable(tableModel);
-		this.collectionTable.setDefaultRenderer(BaseTable.class, new CollectionCell());
+		this.collectionTable.setDefaultRenderer(BaseTable.class,
+				new CollectionCell());
 		this.collectionTable.setRowHeight(200);
 		this.scrollPanel = new JScrollPane(this.collectionTable,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -100,44 +102,51 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private void initPopupMenu() {
 		this.collectionMenu = new JPopupMenu("Collection popup menu");
 		this.collectionMenuListener = new PopupActionListener();
-		
-		class CollectionTableMouseListener extends MouseAdapter implements MouseListener{
-			
+
+		class CollectionTableMouseListener extends MouseAdapter implements
+				MouseListener {
+
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if(e.isPopupTrigger()){
-					collectionMenu.show(e.getComponent(),e.getX(),e.getY());
-					collectionMenuListener.currentRow = collectionTable.rowAtPoint(e.getPoint());
+				if (e.isPopupTrigger()) {
+					collectionMenu.show(e.getComponent(), e.getX(), e.getY());
+					collectionMenuListener.currentRow = collectionTable
+							.rowAtPoint(e.getPoint());
 				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(e.isPopupTrigger()){
-					collectionMenu.show(e.getComponent(),e.getX(),e.getY());
-					collectionMenuListener.currentRow = collectionTable.rowAtPoint(e.getPoint());
+				if (e.isPopupTrigger()) {
+					collectionMenu.show(e.getComponent(), e.getX(), e.getY());
+					collectionMenuListener.currentRow = collectionTable
+							.rowAtPoint(e.getPoint());
 				}
 			}
-			
+
 		}
-		
-		JMenuItem view = new JMenuItem(VIEW_CMD); 
+
+		JMenuItem view = new JMenuItem(VIEW_CMD);
 		JMenuItem edit = new JMenuItem(EDIT_CMD);
 		JMenuItem remove = new JMenuItem(DELETE_CMD);
-		view.addActionListener(this.collectionMenuListener); this.collectionMenu.add(view);
-		edit.addActionListener(this.collectionMenuListener); this.collectionMenu.add(edit);
-		remove.addActionListener(this.collectionMenuListener); this.collectionMenu.add(remove);
-		this.collectionTable.addMouseListener(new CollectionTableMouseListener());
+		view.addActionListener(this.collectionMenuListener);
+		this.collectionMenu.add(view);
+		edit.addActionListener(this.collectionMenuListener);
+		this.collectionMenu.add(edit);
+		remove.addActionListener(this.collectionMenuListener);
+		this.collectionMenu.add(remove);
+		this.collectionTable
+				.addMouseListener(new CollectionTableMouseListener());
 	}
 
 	private void reprintCollection(CollectionView view) {
 		this.currentView = view;
 		this.clearCollectionView();
-		
+
 		class SmallPrinter {
 			public void printAudios() {
 				for (AudioAlbum a : mediator.collectedAlbums) {
-					Object data[] = {a};
+					Object data[] = { a };
 					tableModel.addRow(data);
 				}
 			}
@@ -145,14 +154,14 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			public void printBooks() {
 				for (Book b : mediator.collectedBooks) {
 
-					Object data[] = {b};
+					Object data[] = { b };
 					tableModel.addRow(data);
 				}
 			}
 
 			public void printMovies() {
 				for (Movie m : mediator.collectedMovies) {
-					Object data[] = {m};
+					Object data[] = { m };
 					tableModel.addRow(data);
 				}
 			}
@@ -177,22 +186,27 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			break;
 		}
 		collectionTable.revalidate();
-		Integer params[] = {tableModel.getRowCount(),
+		Integer params[] = { tableModel.getRowCount(),
 				mediator.collectedAlbums.size(),
-				mediator.collectedBooks.size(),
-				mediator.collectedMovies.size()};
-		MabisLogger.getLogger().log(Level.INFO,
-				"Collected {0} items from database, including {1} audios, {2} books and {3} movies",params);
+				mediator.collectedBooks.size(), mediator.collectedMovies.size() };
+		MabisLogger
+				.getLogger()
+				.log(Level.INFO,
+						"Collected {0} items from database, including {1} audios, {2} books and {3} movies",
+						params);
 	}
 
 	private void clearCollectionView() {
-		if(this.tableModel.getRowCount() > 0){
-			for(int i = this.tableModel.getRowCount() - 1; i != 0 ; i--){
+		if (this.tableModel.getRowCount() > 0) {
+			for (int i = this.tableModel.getRowCount() - 1; i != 0; i--) {
 				this.tableModel.removeRow(i);
 			}
 			this.tableModel.removeRow(0);
-			if(this.tableModel.getRowCount() != 0){
-				MabisLogger.getLogger().log(Level.SEVERE,"Not all rows were removed during collection reprinting");
+			if (this.tableModel.getRowCount() != 0) {
+				MabisLogger
+						.getLogger()
+						.log(Level.SEVERE,
+								"Not all rows were removed during collection reprinting");
 			}
 			this.collectionTable.revalidate();
 		}
@@ -301,10 +315,11 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.reprintCollection((CollectionView) e.getNewValue());
 		} else if (e.getPropertyName().equals("groupByChanged")) {
 			this.groupViewBy((String) e.getNewValue());
-		} else if (e.getPropertyName().equals(DELETE_CMD)){
+		} else if (e.getPropertyName().equals(DELETE_CMD)) {
 			BaseTable bt = (BaseTable) e.getNewValue();
-			this.statusBar.setMessage("Removed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
-			switch(bt.getTableType()){
+			this.statusBar.setMessage("Removed item :[" + bt.getPrimaryKey()
+					+ "] -> " + bt.getTitle());
+			switch (bt.getTableType()) {
 			case MOVIE:
 				mediator.collectedMovies.remove(bt);
 				break;
@@ -317,11 +332,12 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			default:
 				break;
 			}
-		} else if(e.getPropertyName().equals(EDIT_CMD)){
+		} else if (e.getPropertyName().equals(EDIT_CMD)) {
 			BaseTable bt = (BaseTable) e.getNewValue();
-			this.statusBar.setMessage("Editing item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
+			this.statusBar.setMessage("Editing item :[" + bt.getPrimaryKey()
+					+ "] -> " + bt.getTitle());
 			ItemCreator ic = null;
-			switch(bt.getTableType()){
+			switch (bt.getTableType()) {
 			case MOVIE:
 				ic = new MovieCreator(connectedUserReference, bt.getTitle());
 				ic.setEditableItem(bt);
@@ -333,22 +349,25 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				ic.setVisible(true);
 				break;
 			case AUDIO_ALBUM:
-				ic = new AudioAlbumCreator(connectedUserReference, bt.getTitle());
+				ic = new AudioAlbumCreator(connectedUserReference,
+						bt.getTitle());
 				ic.setEditableItem(bt);
 				ic.setVisible(true);
 				break;
 			default:
 				break;
 			}
-		} else if(e.getPropertyName().equals(VIEW_CMD)){
+		} else if (e.getPropertyName().equals(VIEW_CMD)) {
 			BaseTable bt = (BaseTable) e.getNewValue();
-			this.statusBar.setMessage("Previewed item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
+			this.statusBar.setMessage("Previewed item :[" + bt.getPrimaryKey()
+					+ "] -> " + bt.getTitle());
 			ItemsPreview preview = new ItemsPreview(bt.getTitle(), bt);
 			preview.setVisible(true);
-		} else if(e.getPropertyName().equals("itemAffected")){
+		} else if (e.getPropertyName().equals("itemAffected")) {
 			BaseTable bt = (BaseTable) e.getNewValue();
-			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
-			switch(bt.getTableType()){
+			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey()
+					+ "] -> " + bt.getTitle());
+			switch (bt.getTableType()) {
 			case MOVIE:
 				this.mediator.collectedMovies.add((Movie) bt);
 				break;
@@ -381,10 +400,14 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	 */
 	// TODO dodać ładowania według predefiniowanych ustawień !!!
 	public void loadCollection() throws SQLException {
-		this.mediator.loadCollection();
+		try {
+			this.mediator.loadCollection();
+		} catch (SQLEntityExistsException e) {
+			e.printStackTrace();
+		}
 		this.reprintCollection(CollectionView.VIEW_ALL);
 	}
-	
+
 	/**
 	 * Klasa której głównym zadaniem jest pośredniczenie między kolekcją
 	 * zlokalizowaną w bazie danych (tj. danymi), a ich wizualną reprezentacją
@@ -399,13 +422,13 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		private ArrayList<Book> collectedBooks = new ArrayList<>();
 		private ArrayList<AudioAlbum> collectedAlbums = new ArrayList<>();
 
-		void loadCollection() throws SQLException {
+		void loadCollection() throws SQLException, SQLEntityExistsException {
 			loadAudios();
 			loadBooks();
 			loadMovies();
 		}
 
-		private void loadMovies() throws SQLException {
+		private void loadMovies() throws SQLException, SQLEntityExistsException {
 			MovieUserSQLFactory musf = new MovieUserSQLFactory(
 					SQLStamentType.SELECT, new MovieUser());
 			musf.addWhereClause("idUser", connectedUserReference
@@ -428,7 +451,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					this.collectedMovies.size());
 		}
 
-		private void loadAudios() throws SQLException {
+		private void loadAudios() throws SQLException, SQLEntityExistsException {
 			AudioUserSQLFactory ausf = new AudioUserSQLFactory(
 					SQLStamentType.SELECT, new AudioUser());
 			ausf.addWhereClause("idUser", connectedUserReference
@@ -454,7 +477,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 							this.collectedAlbums.size());
 		}
 
-		private void loadBooks() throws SQLException {
+		private void loadBooks() throws SQLException, SQLEntityExistsException {
 			BookUserSQLFactory ausf = new BookUserSQLFactory(
 					SQLStamentType.SELECT, new BookUser());
 			ausf.addWhereClause("idUser", connectedUserReference
@@ -478,61 +501,57 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					this.collectedBooks.size());
 		}
 	}
-	
-	
-	class PopupActionListener implements ActionListener{
+
+	class PopupActionListener implements ActionListener {
 		int currentRow = -1;
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JMenuItem source = (JMenuItem) e.getSource();
 			String command = source.getActionCommand();
-			
+
 			BaseTable bt = (BaseTable) tableModel.getValueAt(currentRow, 0);
-			
-			if(command.equals(VIEW_CMD) || command.equals(EDIT_CMD)){
+
+			if (command.equals(VIEW_CMD) || command.equals(EDIT_CMD)) {
 				propertyChange(new PropertyChangeEvent(this, command, null, bt));
-			}else if(command.equals(DELETE_CMD)){
+			} else if (command.equals(DELETE_CMD)) {
 				SQLFactory sf = null;
 				boolean wasDeleted = false;
-				switch(bt.getTableType()){
-				case MOVIE:
-					try{
+				try {
+					switch (bt.getTableType()) {
+					case MOVIE:
 						sf = new MovieSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idMovie", bt.getPrimaryKey().toString());
+						sf.addWhereClause("idMovie", bt.getPrimaryKey()
+								.toString());
 						sf.executeSQL(true);
 						wasDeleted = true;
-					}catch(SQLException e1){
-						MabisLogger.getLogger().log(Level.WARNING,"Failed to remove {0}", bt.getTitle());
-					}
-					break;
-				case BOOK:
-					try{
+						break;
+					case BOOK:
 						sf = new BookSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idBook", bt.getPrimaryKey().toString());
+						sf.addWhereClause("idBook", bt.getPrimaryKey()
+								.toString());
 						sf.executeSQL(true);
 						wasDeleted = true;
-					}catch(SQLException e1){
-						MabisLogger.getLogger().log(Level.WARNING,"Failed to remove {0}", bt.getTitle());
-					}
-					break;
-				case AUDIO_ALBUM:
-					try{
+						break;
+					case AUDIO_ALBUM:
 						sf = new AudioAlbumSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idAudioAlbum", bt.getPrimaryKey().toString());
+						sf.addWhereClause("idAudioAlbum", bt.getPrimaryKey()
+								.toString());
 						sf.executeSQL(true);
 						wasDeleted = true;
-					}catch(SQLException e1){
-						MabisLogger.getLogger().log(Level.WARNING,"Failed to remove {0}", bt.getTitle());
+						break;
+					default:
+						break;
 					}
-					break;
-				default:
-					break;
+				} catch (SQLException | SQLEntityExistsException e1) {
+					MabisLogger.getLogger().log(Level.WARNING,
+							"Failed to remove {0}", bt.getTitle());
 				}
-				if(wasDeleted){
+				if (wasDeleted) {
 					tableModel.removeRow(currentRow);
 					collectionTable.revalidate();
-					propertyChange(new PropertyChangeEvent(this, command, null, bt));
+					propertyChange(new PropertyChangeEvent(this, command, null,
+							bt));
 				}
 			}
 			currentRow = -1;

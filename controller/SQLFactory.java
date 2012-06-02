@@ -13,7 +13,8 @@ import java.util.logging.Level;
 
 import logger.MabisLogger;
 import model.BaseTable;
-import database.MySQLAccess;
+import controller.database.MySQLAccess;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * Abstract class defining only common methods that allows to build valid SQL
@@ -30,7 +31,7 @@ public abstract class SQLFactory implements StatementFactory {
 	private TreeSet<WhereClause> wheres = null;
 	protected String questionMarkFieldList = null;
 	protected BaseTable table = null;
-	protected boolean localDatabase = false;
+	protected boolean entityAlreadyInserted = false;
 	protected Integer lastAffactedId = 0;
 
 	/**
@@ -115,7 +116,7 @@ public abstract class SQLFactory implements StatementFactory {
 	}
 
 	@Override
-	public Integer executeSQL(boolean noAutoCommit) throws SQLException {
+	public Integer executeSQL(boolean noAutoCommit) throws SQLException, SQLEntityExistsException{
 		try {
 			if (!MySQLAccess.getConnection().isValid(1000)) {
 				MabisLogger.getLogger().log(Level.SEVERE,
@@ -126,17 +127,14 @@ public abstract class SQLFactory implements StatementFactory {
 			e1.printStackTrace();
 		}
 
-		PreparedStatement st = null;
-		this.sqlQuery = this.createSQL();
-
-		st = MySQLAccess.getConnection().prepareStatement(this.sqlQuery,
-				Statement.RETURN_GENERATED_KEYS);
-		
+		PreparedStatement st = MySQLAccess.getConnection().prepareStatement(this.createSQL(),Statement.RETURN_GENERATED_KEYS);
 		this.executeByTableAndType(st);
-		
 		st.close();
-		st = null;
-
+		
+		if(entityAlreadyInserted){
+			throw new SQLEntityExistsException(this.table, this.table.getTitle() + " already exists");
+		}
+		
 		System.gc();
 		return lastAffactedId;
 	}
@@ -160,6 +158,7 @@ public abstract class SQLFactory implements StatementFactory {
 	 *             if anything goes wrong, exception is thrown and caught in
 	 *             propagation way by upper calling method
 	 *             {@link SQLFactory#executeSQL(boolean)}
+	 * @throws SQLEntityExistsException 
 	 */
 	protected abstract void executeByTableAndType(PreparedStatement st)
 			throws SQLException;

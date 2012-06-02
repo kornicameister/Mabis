@@ -2,7 +2,7 @@
  * package database in MABIS
  * by kornicameister
  */
-package database;
+package controller.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -41,7 +41,6 @@ public class MySQLAccess {
 
 	/** The connection. */
 	private static Connection connection = MySQLAccess.connectLocally();
-	private Connection onlineConnection = null;
 
 	/**
 	 * Instantiates a new my sql access.
@@ -92,20 +91,11 @@ public class MySQLAccess {
 		return null;
 	}
 
-	public void disconnectFromOnlineDatabase() {
-		try {
-			this.onlineConnection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		this.onlineConnection = null;
-	}
-
 	/**
 	 * <b>Disconnect</b> safely closses up the existing connection to database
 	 * identified by {@link MySQLAccess#databaseName}
 	 */
-	public void disconnect() {
+	public static void disconnect() {
 		if (MySQLAccess.connection != null) {
 			try {
 				MySQLAccess.connection.close();
@@ -176,7 +166,7 @@ public class MySQLAccess {
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
-		this.disconnect();
+		MySQLAccess.disconnect();
 	}
 
 }

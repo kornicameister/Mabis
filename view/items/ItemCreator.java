@@ -21,6 +21,10 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
+import view.WindowClosedListener;
+
 import logger.MabisLogger;
 import model.BaseTable;
 import model.entity.User;
@@ -55,8 +59,7 @@ public abstract class ItemCreator extends JFrame {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public ItemCreator(User u,String title) throws HeadlessException,
-			CreatorContentNullPointerException {
+	public ItemCreator(User u,String title) {
 		super(title);
 		this.editingMode = false;
 		this.selectedUser = u;
@@ -64,8 +67,13 @@ public abstract class ItemCreator extends JFrame {
 		this.layoutComponents();
 
 		setDefaultLookAndFeelDecorated(true);
-		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.addWindowListener(new WindowClosedListener());
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

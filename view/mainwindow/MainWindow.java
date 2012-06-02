@@ -21,8 +21,9 @@ import view.UserSelectionPanel;
 import view.WindowClosedListener;
 import view.newUser.NewUserDialog;
 import controller.SQLStamentType;
+import controller.database.MySQLAccess;
 import controller.entity.UserSQLFactory;
-import database.MySQLAccess;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * This is the main window class that presented to the user in the beginning and
@@ -75,7 +76,7 @@ public class MainWindow extends JFrame {
 		this.addPropertyChangeListener("connectedUser", this.collectionView);
 		this.buttonsPanel.addPropertyChangeListener(this.collectionView);
 
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		this.initConnection();
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -93,7 +94,7 @@ public class MainWindow extends JFrame {
 		UserSQLFactory f = new UserSQLFactory(SQLStamentType.SELECT, new User());
 		try {
 			f.executeSQL(true);
-		} catch (SQLException e) {
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 		if (!f.getUsers().isEmpty()) {

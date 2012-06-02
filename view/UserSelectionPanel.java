@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
@@ -30,8 +31,9 @@ import view.imagePanel.ChoosableImagePanel;
 import view.mainwindow.MainWindow;
 import view.passwordDialog.PasswordDialog;
 import controller.SQLStamentType;
+import controller.database.MySQLAccess;
 import controller.entity.UserSQLFactory;
-import database.MySQLAccess;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * Klasa dziedzicz�c z JDialog jest oknem typu dialogowego (modalnego) kt�re
@@ -138,7 +140,7 @@ public class UserSelectionPanel extends JFrame implements
 	}
 
 	private void initMeta() {
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
 	/**
@@ -155,7 +157,7 @@ public class UserSelectionPanel extends JFrame implements
 			this.userFactory.executeSQL(true);
 			this.users = this.userFactory.getUsers();
 			this.parseUsers();
-		} catch (SQLException e) {
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}

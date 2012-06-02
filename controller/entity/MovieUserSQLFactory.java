@@ -66,10 +66,10 @@ public class MovieUserSQLFactory extends SQLFactory {
 	public TreeSet<ForeignKeyPair> getMovieUserKeys() {
 		return values;
 	}
-
+	
 	@Override
-	public Boolean checkIfInserted() throws SQLException {
-		return true;
+	public BaseTable checkIfInserted() throws SQLException {
+		return this.table;
 	}
 
 }

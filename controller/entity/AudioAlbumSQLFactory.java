@@ -15,6 +15,7 @@ import model.BaseTable;
 import model.entity.AudioAlbum;
 import utilities.Utilities;
 import controller.SQLStamentType;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * @author kornicameister
@@ -35,8 +36,11 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 		case UPDATE:
 			break;
 		case INSERT:
-			if(this.checkIfInserted()){
-				break;
+			AudioAlbum tmp = (AudioAlbum) this.checkIfInserted();
+			if(tmp != null){
+				this.lastAffactedId = tmp.getPrimaryKey();
+				this.entityAlreadyInserted = true;
+				return;
 			}
 			short parameterIndex = 1;
 			st.setInt(parameterIndex++, this.insertGenres(am.getGenres()));
@@ -94,15 +98,18 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 	}
 
 	@Override
-	public Boolean checkIfInserted() throws SQLException {
+	public BaseTable checkIfInserted() throws SQLException {
 		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.SELECT, this.table);
 		aasf.addWhereClause("title", this.table.getTitle());
-		aasf.executeSQL(true);
-		for(AudioAlbum mm : aasf.getValues()){
-			this.lastAffactedId = mm.getPrimaryKey();
-			return true;
+		try {
+			aasf.executeSQL(true);
+		} catch (SQLEntityExistsException e) {
+			e.printStackTrace();
 		}
-		return false;
+		for(AudioAlbum mm : aasf.getValues()){
+			return mm;
+		}
+		return null;
 	}
 
 }

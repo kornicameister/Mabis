@@ -18,7 +18,9 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
@@ -50,6 +52,7 @@ import controller.entity.AudioAlbumSQLFactory;
 import controller.entity.AudioUserSQLFactory;
 import controller.entity.BandSQLFactory;
 import controller.entity.GenreSQLFactory;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * @author kornicameister
@@ -72,7 +75,7 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
 				.getMinimumSize().getHeight());
 	}
-	
+
 	@Override
 	protected void layoutComponents() {
 		super.layoutComponents();
@@ -86,28 +89,32 @@ public class AudioAlbumCreator extends ItemCreator {
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-							.addComponent(this.coverPanel,220,220,220)
-							.addComponent(this.tagCloud,220,220,220))
+								.addComponent(this.coverPanel, 220, 220, 220)
+								.addComponent(this.tagCloud, 220, 220, 220))
 				.addGroup(
 						gl.createParallelGroup()
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(this.titleField)
-												.addComponent(this.durationField))
+												.addComponent(
+														this.durationField))
 								.addComponent(this.bandMiniPanel)
 								.addComponent(this.trackList)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-							.addComponent(this.coverPanel, 220, 220, 220)
-							.addComponent(this.tagCloud))
+								.addComponent(this.coverPanel, 220, 220, 220)
+								.addComponent(this.tagCloud))
 				.addGroup(
 						gl.createSequentialGroup()
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titleField,60, 60, 60)
-												.addComponent(this.durationField,60, 60, 60))
+												.addComponent(this.titleField,
+														60, 60, 60)
+												.addComponent(
+														this.durationField, 60,
+														60, 60))
 								.addComponent(this.bandMiniPanel, 120, 140, 150)
 								.addComponent(this.trackList, 120, 140, 150)));
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -148,9 +155,11 @@ public class AudioAlbumCreator extends ItemCreator {
 					new Band());
 			asf.addWhereClause("type", AuthorType.AUDIO_ALBUM_BAND.toString());
 			asf.executeSQL(true);
-			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),AuthorType.AUDIO_ALBUM_BAND);
-			this.bandMiniPanel.setBorder(BorderFactory.createTitledBorder("Bands"));
-		} catch (SQLException e) {
+			this.bandMiniPanel = new BandMiniPanel(asf.getBands(),
+					AuthorType.AUDIO_ALBUM_BAND);
+			this.bandMiniPanel.setBorder(BorderFactory
+					.createTitledBorder("Bands"));
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}
@@ -161,9 +170,11 @@ public class AudioAlbumCreator extends ItemCreator {
 					new Genre());
 			gsf.addWhereClause("type", GenreType.AUDIO.toString());
 			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.AUDIO);
-			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
-		} catch (SQLException e) {
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
+					GenreType.AUDIO);
+			this.tagCloud.setBorder(BorderFactory
+					.createTitledBorder("Tag cloud"));
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}
@@ -186,34 +197,44 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.selectedAlbum.setDirectors(this.bandMiniPanel.getAuthors());
 		this.selectedAlbum.setGenres(this.tagCloud.getTags());
 		try {
-			this.selectedAlbum.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
+			this.selectedAlbum.setCover(new Picture(this.coverPanel
+					.getImageFile(), ImageType.FRONT_COVER));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		if(this.editingMode){
+
+		if (this.editingMode) {
 			try {
-				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.UPDATE, this.selectedAlbum);
+				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
+						SQLStamentType.UPDATE, this.selectedAlbum);
 				return aasf.executeSQL(true) > 0;
-			} catch (SQLException e) {
+			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
 			}
-		}else{
+		} else {
 			try {
 				AudioUser au = new AudioUser();
-				
-				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.INSERT, this.selectedAlbum);
-				AudioUserSQLFactory ausf = new AudioUserSQLFactory(SQLStamentType.INSERT, au);
-				
+
+				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
+						SQLStamentType.INSERT, this.selectedAlbum);
+				AudioUserSQLFactory ausf = new AudioUserSQLFactory(
+						SQLStamentType.INSERT, au);
+
 				this.selectedAlbum.setPrimaryKey(aasf.executeSQL(true));
-				
-				au.addMultiForeignKey(-1, 
-						new ForeignKey(this.selectedAlbum, "idAudio", this.selectedAlbum.getPrimaryKey()), 
-						new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
-				
+
+				au.addMultiForeignKey(-1, new ForeignKey(this.selectedAlbum,
+						"idAudio", this.selectedAlbum.getPrimaryKey()),
+						new ForeignKey(this.selectedUser, "idUser",
+								this.selectedUser.getPrimaryKey()));
+
 				ausf.executeSQL(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} catch (SQLEntityExistsException e) {
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Match",
+						JOptionPane.INFORMATION_MESSAGE, new ImageIcon(
+								GlobalPaths.OK_SIGN.toString()));
+				return true;
 			}
 		}
 		this.firePropertyChange("itemAffected", null, this.selectedAlbum);
@@ -281,10 +302,10 @@ public class AudioAlbumCreator extends ItemCreator {
 
 			try {
 				setProgress(searchProgressBar.getMinimum());
-					TreeMap<String, String> params = new TreeMap<String, String>();
-						params.put("album", query);
-						aaa.query(params);
-					setProgress(searchProgressBar.getMaximum());
+				TreeMap<String, String> params = new TreeMap<String, String>();
+				params.put("album", query);
+				aaa.query(params);
+				setProgress(searchProgressBar.getMaximum());
 				return aaa.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -329,55 +350,60 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.durationField.setText(a.getDuration());
 		this.coverPanel.setImage(a.getCover().getImageFile());
 		this.trackList.setTracks(a.getTrackList());
-		for(Author aa : a.getAuthors()){
-			Band b = (Band)aa;
-			if(this.editingMode){
+		for (Author aa : a.getAuthors()) {
+			Band b = (Band) aa;
+			if (this.editingMode) {
 				this.bandMiniPanel.addRow(b);
-			}else{
-				int index = Collections.binarySearch(this.bandMiniPanel.getDatabaseAuthors(),
-						b,
+			} else {
+				int index = Collections.binarySearch(
+						this.bandMiniPanel.getDatabaseAuthors(), b,
 						new Comparator<Author>() {
 							@Override
 							public int compare(Author o1, Author o2) {
-								int result = o1.getLastName().compareTo(o2.getLastName());
-								if(result == 0){
-									result = o1.getFirstName().compareTo(o2.getFirstName());
+								int result = o1.getLastName().compareTo(
+										o2.getLastName());
+								if (result == 0) {
+									result = o1.getFirstName().compareTo(
+											o2.getFirstName());
 								}
 								return result;
 							}
 						});
-				if(index < 0){
+				if (index < 0) {
 					b.setType(AuthorType.AUDIO_ALBUM_BAND);
 					this.bandMiniPanel.addRow(b);
-				}else{
-					this.bandMiniPanel.addRow(this.bandMiniPanel.getDatabaseAuthors().get(index));
+				} else {
+					this.bandMiniPanel.addRow(this.bandMiniPanel
+							.getDatabaseAuthors().get(index));
 				}
 			}
 		}
-		
-		//check up - 2, the same thing, but now it does concern genres
-		for(Genre g : a.getGenres()){
-			if(this.editingMode){
+
+		// check up - 2, the same thing, but now it does concern genres
+		for (Genre g : a.getGenres()) {
+			if (this.editingMode) {
 				this.tagCloud.addRow(g);
-			}else{
-				int index= Collections.binarySearch(
-						this.tagCloud.getDatabaseTags(), 
-						g,
+			} else {
+				int index = Collections.binarySearch(
+						this.tagCloud.getDatabaseTags(), g,
 						new Comparator<Genre>() {
 							@Override
 							public int compare(Genre g1, Genre g2) {
-								int result = g1.getType().compareTo(g2.getType());
-								if(result == 0){
-									result = g1.getGenre().compareTo(g2.getGenre());
+								int result = g1.getType().compareTo(
+										g2.getType());
+								if (result == 0) {
+									result = g1.getGenre().compareTo(
+											g2.getGenre());
 								}
 								return result;
 							}
 						});
-				if(index < 0){
+				if (index < 0) {
 					g.setType(GenreType.AUDIO);
 					this.tagCloud.addRow(g);
-				}else{
-					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(index));
+				} else {
+					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(
+							index));
 				}
 			}
 		}

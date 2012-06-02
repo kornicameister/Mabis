@@ -20,6 +20,9 @@ public class SettingsLoader extends Settings {
 	
 	@SuppressWarnings("unchecked")
 	public static String loadPath(String pathName) throws SettingsException{
+		if(pathName.equals("TMP")){
+			return System.getProperty("java.io.tmpdir") + "/";
+		}
 		try {
 			Element root = ((Document) new SAXBuilder().build(new File(SettingsLoader.pathToXML))).getRootElement();
 			

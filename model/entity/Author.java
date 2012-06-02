@@ -111,13 +111,13 @@ public class Author extends BaseTable implements Serializable {
 		if(o == null){
 			return 0;
 		}
-		int result = super.compareTo(o);
 		Author tmp = (Author) o;
-		if (result == 0) {
-			result = this.getLastName().compareTo(tmp.getLastName());
-		}
+		int result = this.getLastName().compareTo(tmp.getLastName());
 		if (result == 0) {
 			result = this.getFirstName().compareTo(tmp.getFirstName());
+		}
+		if(result == 0){
+			result = super.compareTo(o);
 		}
 		return result;
 	}

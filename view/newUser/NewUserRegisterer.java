@@ -5,10 +5,11 @@ import java.sql.SQLException;
 import model.entity.User;
 import controller.SQLStamentType;
 import controller.entity.UserSQLFactory;
+import controller.exceptions.SQLEntityExistsException;
 
 public class NewUserRegisterer {
 
-	public static void saveToLocalDatabase(User user) throws SQLException {
+	public static void saveToLocalDatabase(User user) throws SQLException, SQLEntityExistsException {
 		UserSQLFactory factory = new UserSQLFactory(SQLStamentType.INSERT, user);
 		factory.executeSQL(true);
 	}

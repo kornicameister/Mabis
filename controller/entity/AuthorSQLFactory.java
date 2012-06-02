@@ -18,6 +18,7 @@ import model.enums.TableType;
 import utilities.Utilities;
 import controller.SQLFactory;
 import controller.SQLStamentType;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * @author kornicameister
@@ -123,7 +124,11 @@ public class AuthorSQLFactory extends SQLFactory {
 	private Integer insertAvatar(Picture picture) throws SQLException {
 		if (picture != null) {
 			PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT, picture);
-			this.lastAffactedId = psf.executeSQL(false);
+			try {
+				this.lastAffactedId = psf.executeSQL(false);
+			} catch (SQLEntityExistsException e) {
+				e.printStackTrace();
+			}
 			return lastAffactedId;
 		}else{
 			return 0;
@@ -140,7 +145,7 @@ public class AuthorSQLFactory extends SQLFactory {
 	}
 
 	@Override
-	public Boolean checkIfInserted() throws SQLException {
-		return true;
+	public BaseTable checkIfInserted() throws SQLException {
+		return this.table;
 	}
 }

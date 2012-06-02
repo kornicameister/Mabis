@@ -1,6 +1,5 @@
 package view.items.creators;
 
-import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -16,7 +15,9 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -49,6 +50,7 @@ import controller.entity.AuthorSQLFactory;
 import controller.entity.GenreSQLFactory;
 import controller.entity.MovieSQLFactory;
 import controller.entity.MovieUserSQLFactory;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * 
@@ -69,8 +71,7 @@ public class MovieCreator extends ItemCreator {
 	private JScrollPane descriptionScrollPane;
 	private LoadFromApi lfa;
 
-	public MovieCreator(User u, String title) throws HeadlessException,
-			CreatorContentNullPointerException {
+	public MovieCreator(User u, String title) {
 		super(u, title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 190, (int) this
 				.getMinimumSize().getHeight() + 50);
@@ -156,7 +157,7 @@ public class MovieCreator extends ItemCreator {
 			asf.executeSQL(true);
 			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.MOVIE_DIRECTOR);
 			this.directorsPanel.setBorder(BorderFactory.createTitledBorder("Authors"));
-		} catch (SQLException e) {
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}
@@ -169,7 +170,7 @@ public class MovieCreator extends ItemCreator {
 			gsf.executeSQL(true);
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.MOVIE);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
-		} catch (SQLException e) {
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}
@@ -187,7 +188,7 @@ public class MovieCreator extends ItemCreator {
 
 	@Override
 	protected Boolean execute() {
-		final Movie selectedMovie = new Movie();
+		Movie selectedMovie = new Movie();
 		try {
 			selectedMovie.setTitle(this.titleField.getText());
 			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
@@ -204,7 +205,7 @@ public class MovieCreator extends ItemCreator {
 			try {
 				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, selectedMovie);
 				return msf.executeSQL(true) > 0;
-			} catch (SQLException e) {
+			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
 			}
 		}else{
@@ -219,12 +220,18 @@ public class MovieCreator extends ItemCreator {
 				
 				MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
 				musf.executeSQL(true);
+				this.firePropertyChange("itemAffected", null, selectedMovie);
+				return true;
 			} catch(SQLException e) {
 				e.printStackTrace();
+			} catch (SQLEntityExistsException e) {
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Match", JOptionPane.INFORMATION_MESSAGE, 
+						new ImageIcon(GlobalPaths.OK_SIGN.toString()));
+				return true;
 			}
 		}
 		this.firePropertyChange("itemAffected", null, selectedMovie);
-		return true;
+		return false;
 	}
 
 	/**

@@ -30,10 +30,12 @@ import logger.MabisLogger;
 import model.entity.Picture;
 import model.entity.User;
 import model.enums.ImageType;
+import settings.GlobalPaths;
 import view.imagePanel.ImageFileFilter;
 import view.imagePanel.ImageFilePreview;
 import view.imagePanel.ImagePanel;
 import view.mainwindow.MainWindow;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * @author kornicameister
@@ -294,6 +296,9 @@ public class NewUserDialog extends JDialog {
 					NewUserRegisterer.saveToOnlineDatabase(user);
 				} catch (SQLException e1) {
 					e1.printStackTrace();
+				} catch (SQLEntityExistsException e1) {
+					JOptionPane.showMessageDialog(null, "Following user was found", "Match", JOptionPane.INFORMATION_MESSAGE,
+							new ImageIcon(GlobalPaths.OK_SIGN.toString()));
 				} finally {
 					if (isDisplayable()) {
 						setVisible(false);

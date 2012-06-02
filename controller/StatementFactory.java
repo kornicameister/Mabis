@@ -3,6 +3,9 @@ package controller;
 import java.sql.SQLException;
 
 import model.BaseTable;
+import controller.exceptions.SQLEntityExistsException;
+
+
 
 public interface StatementFactory {
 	/**
@@ -146,8 +149,9 @@ public interface StatementFactory {
 	 *            database, otherwise upon online database
 	 * @return numer ostatnio wrzuconej pozycji
 	 * @throws SQLException
+	 * @throws SQLEntityExistsException 
 	 */
-	abstract Integer executeSQL(boolean local) throws SQLException;
+	abstract Integer executeSQL(boolean local) throws SQLException, SQLEntityExistsException;
 	
 	/**
 	 * Metoda wykonując odpowiedni kod sql, sprawdza czy dana krotka znajduje się
@@ -155,5 +159,5 @@ public interface StatementFactory {
 	 * @return prawda, jeśli krotka jest w bazie
 	 * @throws SQLException
 	 */
-	abstract Boolean checkIfInserted() throws SQLException;
+	abstract BaseTable checkIfInserted() throws SQLException;
 }

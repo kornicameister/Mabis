@@ -18,6 +18,8 @@ import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -51,6 +53,7 @@ import controller.entity.AuthorSQLFactory;
 import controller.entity.BookSQLFactory;
 import controller.entity.BookUserSQLFactory;
 import controller.entity.GenreSQLFactory;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * @authorBox kornicameister
@@ -60,9 +63,7 @@ public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
 	private ImagePanel coverPanel;
 	private JTextArea descriptionArea;
-	private JTextField 	titleOriginal,
-						subTitle,
-						pages;
+	private JTextField titleOriginal, subTitle, pages;
 	private TagCloudMiniPanel tagCloud;
 	private AuthorMiniPanel authorsMiniPanel;
 	private IndustryIdentifiersMiniPanel iiMiniPanel;
@@ -76,7 +77,8 @@ public class BookCreator extends ItemCreator {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public BookCreator(User u, String title) throws CreatorContentNullPointerException {
+	public BookCreator(User u, String title)
+			throws CreatorContentNullPointerException {
 		super(u, title);
 		this.setSize((int) this.getMinimumSize().getWidth() + 220, (int) this
 				.getMinimumSize().getHeight());
@@ -96,39 +98,57 @@ public class BookCreator extends ItemCreator {
 				.createParallelGroup()
 				.addGroup(
 						gl.createSequentialGroup()
-							.addGroup(
-								gl.createParallelGroup()
-								.addComponent(this.coverPanel, 220, 220, 220)
-								.addComponent(descriptionScrollPane))
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titleOriginal)
+												.addComponent(this.coverPanel,
+														220, 220, 220)
+												.addComponent(
+														descriptionScrollPane))
+								.addGroup(
+										gl.createParallelGroup()
+												.addComponent(
+														this.titleOriginal)
 												.addGroup(
 														gl.createSequentialGroup()
-															.addComponent(this.subTitle)
-															.addComponent(this.pages))
+																.addComponent(
+																		this.subTitle)
+																.addComponent(
+																		this.pages))
 												.addGap(5)
 												.addComponent(this.iiMiniPanel)
-												.addComponent(this.authorsMiniPanel)
+												.addComponent(
+														this.authorsMiniPanel)
 												.addComponent(this.tagCloud)))
 				.addComponent(descriptionScrollPane));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
 				.addGroup(
 						gl.createParallelGroup()
-							.addGroup(
-								gl.createSequentialGroup()
-								.addComponent(this.coverPanel, 220, 220, 220)
-								.addComponent(descriptionScrollPane))
 								.addGroup(
 										gl.createSequentialGroup()
-												.addComponent(this.titleOriginal,GroupLayout.DEFAULT_SIZE,60, 80)
+												.addComponent(this.coverPanel,
+														220, 220, 220)
+												.addComponent(
+														descriptionScrollPane))
+								.addGroup(
+										gl.createSequentialGroup()
+												.addComponent(
+														this.titleOriginal,
+														GroupLayout.DEFAULT_SIZE,
+														60, 80)
 												.addGroup(
 														gl.createParallelGroup()
-															.addComponent(this.subTitle,GroupLayout.DEFAULT_SIZE,60, 80)
-															.addComponent(this.pages,GroupLayout.DEFAULT_SIZE,60, 80))
+																.addComponent(
+																		this.subTitle,
+																		GroupLayout.DEFAULT_SIZE,
+																		60, 80)
+																.addComponent(
+																		this.pages,
+																		GroupLayout.DEFAULT_SIZE,
+																		60, 80))
 												.addComponent(this.iiMiniPanel)
-												.addComponent(this.authorsMiniPanel)
+												.addComponent(
+														this.authorsMiniPanel)
 												.addComponent(this.tagCloud))));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -177,7 +197,7 @@ public class BookCreator extends ItemCreator {
 			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
 					GenreType.BOOK);
 			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Genres"));
-		} catch (SQLException e) {
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}
@@ -188,13 +208,15 @@ public class BookCreator extends ItemCreator {
 					new Author());
 			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
 			asf.executeSQL(true);
-			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),AuthorType.BOOK_AUTHOR);
-			this.authorsMiniPanel.setBorder(BorderFactory.createTitledBorder("Writers"));
-		} catch (SQLException e) {
+			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),
+					AuthorType.BOOK_AUTHOR);
+			this.authorsMiniPanel.setBorder(BorderFactory
+					.createTitledBorder("Writers"));
+		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	protected void clearContentFields() {
 		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
@@ -219,32 +241,42 @@ public class BookCreator extends ItemCreator {
 		selectedBook.setGenres(this.tagCloud.getTags());
 		selectedBook.setDirectors(this.authorsMiniPanel.getAuthors());
 		try {
-			selectedBook.setCover(new Picture(this.coverPanel.getImageFile(), ImageType.FRONT_COVER));
+			selectedBook.setCover(new Picture(this.coverPanel.getImageFile(),
+					ImageType.FRONT_COVER));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
-		if(this.editingMode){
+		if (this.editingMode) {
 			try {
-				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE, selectedBook);
+				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE,
+						selectedBook);
 				return bsf.executeSQL(true) > 0;
-			} catch (SQLException e) {
+			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
 			}
-		}else{
+		} else {
 			try {
-				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT, selectedBook);
+				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.INSERT,
+						selectedBook);
 				bsf.executeSQL(true);
-				
+
 				BookUser bu = new BookUser();
-				bu.addMultiForeignKey(-1, new ForeignKey(selectedBook, "idBook", selectedBook.getPrimaryKey()),
-										  new ForeignKey(this.selectedUser, "idUser", selectedUser.getPrimaryKey()));
-				
-				
-				BookUserSQLFactory  busf = new BookUserSQLFactory(SQLStamentType.INSERT, bu);
+				bu.addMultiForeignKey(-1, new ForeignKey(selectedBook,
+						"idBook", selectedBook.getPrimaryKey()),
+						new ForeignKey(this.selectedUser, "idUser",
+								selectedUser.getPrimaryKey()));
+
+				BookUserSQLFactory busf = new BookUserSQLFactory(
+						SQLStamentType.INSERT, bu);
 				busf.executeSQL(true);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} catch (SQLEntityExistsException e) {
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Match",
+						JOptionPane.INFORMATION_MESSAGE, new ImageIcon(
+								GlobalPaths.OK_SIGN.toString()));
+				return true;
 			}
 		}
 		this.firePropertyChange("itemAffected", null, selectedBook);
@@ -362,9 +394,10 @@ public class BookCreator extends ItemCreator {
 		this.descriptionArea.setText(b.getDescription());
 		this.pages.setText(b.getPages().toString());
 		this.iiMiniPanel.setIIS(b.getIdentifiers());
-		
-		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
-				//that can be found in AuthorsMiniPanel
+
+		// check up - 1, if loaded directors are the same (in terms of first
+		// name/last name) as those
+		// that can be found in AuthorsMiniPanel
 		for (Author a : b.getAuthors()) {
 			if (this.editingMode) {
 				this.authorsMiniPanel.addRow(a);
@@ -387,11 +420,12 @@ public class BookCreator extends ItemCreator {
 					a.setType(AuthorType.BOOK_AUTHOR);
 					this.authorsMiniPanel.addRow(a);
 				} else {
-					this.authorsMiniPanel.addRow(this.authorsMiniPanel.getDatabaseAuthors().get(index));
+					this.authorsMiniPanel.addRow(this.authorsMiniPanel
+							.getDatabaseAuthors().get(index));
 				}
 			}
 		}
-				
+
 		// check up - 2, the same thing, but now it does concern genres
 		for (Genre g : b.getGenres()) {
 			if (this.editingMode) {
@@ -415,7 +449,8 @@ public class BookCreator extends ItemCreator {
 					g.setType(GenreType.BOOK);
 					this.tagCloud.addRow(g);
 				} else {
-					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(index));
+					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(
+							index));
 				}
 			}
 		}

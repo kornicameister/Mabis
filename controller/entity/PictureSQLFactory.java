@@ -22,12 +22,14 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
+import model.BaseTable;
 import model.entity.Picture;
 import settings.GlobalPaths;
 import utilities.Utilities;
 import controller.SQLFactory;
 import controller.SQLStamentType;
 import controller.exceptions.PictureCacheException;
+import controller.exceptions.SQLEntityExistsException;
 
 /**
  * @author kornicameister
@@ -44,25 +46,7 @@ public class PictureSQLFactory extends SQLFactory {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
 
-		File newPicture = null;
-		switch (pp.getType()) {
-		case AVATAR:
-			newPicture = new File(GlobalPaths.AVATAR_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		case AUTHOR:
-			newPicture = new File(GlobalPaths.AUTHOR_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		case BAND:
-			newPicture = new File(GlobalPaths.BAND_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		default:
-			newPicture = new File(GlobalPaths.MEDIA_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		}
+		File newPicture = createNewPictureFile(pp);
 
 		if (newPicture.exists()) {
 			return false; // that means that cover was found in cache !!!
@@ -93,6 +77,29 @@ public class PictureSQLFactory extends SQLFactory {
 		return true;
 	}
 
+	private File createNewPictureFile(Picture pp) {
+		File newPicture = null;
+		switch (pp.getType()) {
+		case AVATAR:
+			newPicture = new File(GlobalPaths.AVATAR_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		case AUTHOR:
+			newPicture = new File(GlobalPaths.AUTHOR_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		case BAND:
+			newPicture = new File(GlobalPaths.BAND_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		default:
+			newPicture = new File(GlobalPaths.MEDIA_CACHE_PATH
+					+ pp.getCheckSum());
+			break;
+		}
+		return newPicture;
+	}
+
 	private void deletePictureFromCache() throws PictureCacheException {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
@@ -110,9 +117,10 @@ public class PictureSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			if (!this.movePictureToCache()) {
-				// picture found in cache, internally changing the plan
-				this.syncCacheToDB();
-				return;
+				if(this.syncCacheToDB()){
+					p.setPrimaryKey(this.lastAffactedId);
+					return;
+				}
 			}
 			st.setObject(1, p);
 			st.execute();
@@ -145,13 +153,27 @@ public class PictureSQLFactory extends SQLFactory {
 	 * 
 	 * @throws SQLException
 	 */
-	private void syncCacheToDB() throws SQLException {
+	private boolean syncCacheToDB() throws SQLException {
 		Picture problematic = (Picture) this.table;
 		// 1. fetch all pictures
 		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT, problematic);
-		psf.executeSQL(true);
+		try {
+			psf.executeSQL(true);
+		} catch (SQLEntityExistsException e1) {
+			e1.printStackTrace();
+		}
 		
 		ArrayList<Picture> tmp = new ArrayList<>(psf.getCovers());
+		Collections.sort(tmp,new Comparator<Picture>() {
+			@Override
+			public int compare(Picture p, Picture pp) {
+				int res = p.getCheckSum().compareTo(pp.getCheckSum());
+				if(res == 0){
+					res = p.getImagePath().compareTo(pp.getImagePath());
+				}
+				return res;
+			}
+		});
 		
 		int index = Collections.binarySearch(tmp, problematic,new Comparator<Picture>() {
 
@@ -164,8 +186,14 @@ public class PictureSQLFactory extends SQLFactory {
 		
 		if(index > 0){
 			this.lastAffactedId = tmp.get(index).getPrimaryKey();
-			return;
+			return true;
 		}
+		try {
+			problematic.setImageFile(this.createNewPictureFile(problematic));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	@Override
@@ -210,8 +238,8 @@ public class PictureSQLFactory extends SQLFactory {
 	}
 
 	@Override
-	public Boolean checkIfInserted() throws SQLException {
-		return true;
+	public BaseTable checkIfInserted() throws SQLException {
+		return this.table;
 	}
 
 }

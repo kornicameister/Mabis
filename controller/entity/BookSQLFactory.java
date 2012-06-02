@@ -26,8 +26,11 @@ public class BookSQLFactory extends MovieSQLFactory {
 		Book book = (Book) this.table;
 		switch (this.type) {
 		case INSERT:
-			if(this.checkIfInserted()){
-				break;
+			Book bb = (Book) this.checkIfInserted();
+			if(bb != null){
+				this.lastAffactedId = bb.getPrimaryKey();
+				this.entityAlreadyInserted = true;
+				return;
 			}
 			short parameterIndex = 1;
 			st.setInt(parameterIndex++, this.insertGenres(book.getGenres()));
