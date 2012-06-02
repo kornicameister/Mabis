@@ -27,11 +27,11 @@ public class MovieUserSQLFactory extends SQLFactory {
 		switch (this.type) {
 		case INSERT:
 			MovieUser au = (MovieUser) this.table;
-			au.setPrimaryKey(Utilities.lastInsertedId(au, st)+1);
 			st.setInt(2, au.getMultiForeing(-1).getKey("idMovie").getValue());
 			st.setInt(1, au.getMultiForeing(-1).getKey("idUser").getValue());
 			st.execute();
-			this.lastAffactedId = au.getPrimaryKey();
+			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			au.setPrimaryKey(this.lastAffactedId);
 			break;
 		case DELETE:
 		case SELECT:

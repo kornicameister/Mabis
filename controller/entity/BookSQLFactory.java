@@ -29,7 +29,6 @@ public class BookSQLFactory extends MovieSQLFactory {
 			if(this.checkIfInserted()){
 				break;
 			}
-			book.setPrimaryKey(Utilities.lastInsertedId(book, st)+1);
 			short parameterIndex = 1;
 			st.setInt(parameterIndex++, this.insertGenres(book.getGenres()));
 			st.setInt(parameterIndex++, this.insertCover(book.getCover()));
@@ -37,7 +36,8 @@ public class BookSQLFactory extends MovieSQLFactory {
 			st.setString(parameterIndex++, book.getTitle());
 			st.setObject(parameterIndex++, book);
 			st.execute();
-			this.lastAffactedId = book.getPrimaryKey();
+			this.lastAffactedId = Utilities.lastInsertedId(book, st);
+			book.setPrimaryKey(this.lastAffactedId);
 			break;
 		case DELETE:
 			this.parseDeleteSet(st.executeUpdate());

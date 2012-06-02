@@ -31,7 +31,8 @@ public class BookUserSQLFactory extends SQLFactory {
 			st.setInt(1, au.getMultiForeing(-1).getKey("idBook").getValue());
 			st.setInt(2, au.getMultiForeing(-1).getKey("idUser").getValue());
 			st.execute();
-			this.lastAffactedId = au.getPrimaryKey();
+			this.lastAffactedId = Utilities.lastInsertedId(au, st);
+			au.setPrimaryKey(this.lastAffactedId);
 			break;
 		case DELETE:
 		case SELECT:
