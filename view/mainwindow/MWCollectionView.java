@@ -217,12 +217,17 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		class TitleComparator implements Comparator<BaseTable> {
 			@Override
 			public int compare(BaseTable a, BaseTable b) {
-				return a.getTitle().compareTo(b.getTitle()) * -1;
+				System.out.println(a.getTitle() + " vs " + b.getTitle() + " --> " + a.getTitle().compareTo(b.getTitle()));
+				return a.getTitle().compareTo(b.getTitle());
 			}
 		}
-
+		System.out.println(this.currentView.toString() + "::" + value);
 		switch (this.currentView) {
 		case VIEW_AUDIOS:
+			System.out.println("Before");
+			for(BaseTable aa : mediator.collectedAlbums){
+				System.out.println(aa.getPrimaryKey());
+			}
 			if (value.equals("Band")) {
 				Collections.sort(mediator.collectedAlbums,
 						new Comparator<AudioAlbum>() {
@@ -232,12 +237,19 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 								return a0.getBand().compareTo(a1.getBand());
 							}
 						});
-			} else if (value.equals("Title")) {
-				Collections.sort(mediator.collectedAlbums,
-						new TitleComparator());
+			}else if (value.equals("Title")) {
+				Collections.sort(mediator.collectedAlbums,new TitleComparator());
+			}
+			System.out.println("After");
+			for(BaseTable aa : mediator.collectedAlbums){
+				System.out.println(aa.getPrimaryKey());
 			}
 			break;
 		case VIEW_BOOKS:
+			System.out.println("Before");
+			for(BaseTable aa : mediator.collectedBooks){
+				System.out.println(aa.getPrimaryKey());
+			}
 			if (value.equals("Author")) {
 				Collections.sort(mediator.collectedBooks,
 						new Comparator<Book>() {
@@ -278,11 +290,19 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 								return res;
 							}
 						});
-			} else if (value.equals("Title")) {
-				Collections.sort(mediator.collectedBooks, new TitleComparator());
+			}else if (value.equals("Title")) {
+				Collections.sort(mediator.collectedBooks,new TitleComparator());
+			}
+			System.out.println("After");
+			for(BaseTable aa : mediator.collectedBooks){
+				System.out.println(aa.getPrimaryKey());
 			}
 			break;
 		case VIEW_MOVIES:
+			System.out.println("Before ");
+			for(BaseTable aa : mediator.collectedMovies){
+				System.out.println(aa.getPrimaryKey());
+			}
 			if (value.equals("Director")) {
 				Collections.sort(mediator.collectedMovies,
 						new Comparator<Movie>() {
@@ -302,15 +322,30 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 								return res;
 							}
 						});
-			} else if (value.equals("title")) {
-				Collections.sort(mediator.collectedMovies,
-						new TitleComparator());
+			}else if (value.equals("Title")) {
+				Collections.sort(mediator.collectedMovies,new TitleComparator());
+			}
+			System.out.println("After");
+			for(BaseTable aa : mediator.collectedMovies){
+				System.out.println(aa.getPrimaryKey());
 			}
 			break;
 		default:
-			Collections.sort(mediator.collectedAlbums);
-			Collections.sort(mediator.collectedBooks);
-			Collections.sort(mediator.collectedMovies);
+			if (value.equals("Title")) {
+				Collections.sort(mediator.collectedBooks,new TitleComparator());
+			}else{
+				Collections.sort(mediator.collectedBooks);
+			}
+			if (value.equals("Title")) {
+				Collections.sort(mediator.collectedMovies,new TitleComparator());
+			}else{
+				Collections.sort(mediator.collectedMovies);
+			}
+			if (value.equals("Title")) {
+				Collections.sort(mediator.collectedAlbums,new TitleComparator());
+			}else{
+				Collections.sort(mediator.collectedAlbums);
+			}
 			break;
 		}
 		reprintCollection(currentView);
