@@ -3,6 +3,7 @@
  */
 package view.mainwindow;
 
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +21,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -74,6 +77,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private JTable collectionTable;
 	private PopupActionListener collectionMenuListener;
 	private StatusBar statusBar;
+	private String currentGroupBy;
 
 	public MWCollectionView(MainWindow mw, LayoutManager layout,
 			boolean isDoubleBuffered) {
@@ -89,9 +93,12 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 
 		this.tableModel = new CollectionTableModel();
 		this.collectionTable = new JTable(tableModel);
-		this.collectionTable.setDefaultRenderer(BaseTable.class,
-				new CollectionCell());
+		this.collectionTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		this.collectionTable.getColumnModel().getColumn(0).setMaxWidth(220);
+		this.collectionTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+		this.collectionTable.getColumnModel().getColumn(0).setMinWidth(180);
 		this.collectionTable.setRowHeight(200);
+		this.collectionTable.setDefaultRenderer(BaseTable.class,new CollectionCell());
 		this.scrollPanel = new JScrollPane(this.collectionTable,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -147,7 +154,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		class SmallPrinter {
 			public void printAudios() {
 				for (AudioAlbum a : mediator.collectedAlbums) {
-					Object data[] = { a };
+					Object data[] = { this.getScaledImage(a) ,a};
 					tableModel.addRow(data);
 				}
 			}
@@ -155,16 +162,27 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			public void printBooks() {
 				for (Book b : mediator.collectedBooks) {
 
-					Object data[] = { b };
+					Object data[] = {this.getScaledImage(b), b};
 					tableModel.addRow(data);
 				}
 			}
 
 			public void printMovies() {
 				for (Movie m : mediator.collectedMovies) {
-					Object data[] = { m };
+					Object data[] = {this.getScaledImage(m), m};
 					tableModel.addRow(data);
 				}
+			}
+
+			private ImageIcon getScaledImage(BaseTable t) {
+				File imagePath = ((Movie)t).getCover().getImageFile();
+				ImageIcon i = new ImageIcon(imagePath.getAbsolutePath());
+				
+				final double height = 180.0;
+				double a = height / i.getIconHeight();
+				double newWidth = a * i.getIconWidth();
+				
+				return new ImageIcon(i.getImage().getScaledInstance((int) newWidth, (int) height, Image.SCALE_FAST));
 			}
 		}
 
@@ -221,7 +239,9 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				return a.getTitle().compareTo(b.getTitle());
 			}
 		}
-		System.out.println(this.currentView.toString() + "::" + value);
+		
+		this.currentGroupBy = value;
+		
 		switch (this.currentView) {
 		case VIEW_AUDIOS:
 			System.out.println("Before");
@@ -436,6 +456,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				break;
 			}
 			this.reprintCollection(this.currentView);
+			this.groupViewBy(this.currentGroupBy);
 		}
 	}
 
@@ -565,7 +586,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			JMenuItem source = (JMenuItem) e.getSource();
 			String command = source.getActionCommand();
 
-			BaseTable bt = (BaseTable) tableModel.getValueAt(currentRow, 0);
+			BaseTable bt = (BaseTable) tableModel.getValueAt(currentRow, 1);
 
 			if (command.equals(VIEW_CMD) || command.equals(EDIT_CMD)) {
 				propertyChange(new PropertyChangeEvent(this, command, null, bt));

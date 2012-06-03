@@ -39,11 +39,7 @@ public class BookIndustryIdentifier implements Serializable, Comparable<BookIndu
 
 	@Override
 	public int compareTo(BookIndustryIdentifier o) {
-		int res = o.type.compareTo(this.type);
-		if(res == 0){
-			res = o.value.compareTo(o.value);
-		}
-		return res;
+		return o.value.compareTo(o.value);
 	}
 	
 	@Override
