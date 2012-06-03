@@ -54,6 +54,7 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 			am.setPrimaryKey(this.lastAffactedId);
 			break;
 		case DELETE:
+			this.deletePicture(am.getCover());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		case SELECT:

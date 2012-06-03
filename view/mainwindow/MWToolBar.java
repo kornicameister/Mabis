@@ -117,6 +117,13 @@ public class MWToolBar extends JToolBar implements ActionListener {
 			for (String s : this.groups.get(newViewMode)) {
 				this.groupBy.addItem(s);
 			}
+			if (newViewMode != CollectionView.VIEW_ALL) {
+				for (String s : this.groups.get(CollectionView.VIEW_ALL)) {
+					if (!s.equals("No group")) {
+						this.groupBy.addItem(s);
+					}
+				}
+			}
 
 			final MWToolBar mwb = this;
 

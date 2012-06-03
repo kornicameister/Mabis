@@ -88,7 +88,7 @@ public class Author extends BaseTable implements Serializable {
 		this.pictureFile = f;
 	}
 
-	public Picture getPictureFile() {
+	public Picture getAvatar() {
 		return pictureFile;
 	}
 

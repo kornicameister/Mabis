@@ -47,7 +47,7 @@ public class AuthorSQLFactory extends SQLFactory {
 			this.parseResultSet(st.executeQuery());
 			break;
 		case DELETE:
-			st.setInt(1, author.getPrimaryKey());
+			this.deletePicture(author.getAvatar());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		default:
@@ -102,11 +102,11 @@ public class AuthorSQLFactory extends SQLFactory {
 			throws SQLException {
 		if(!entity.getTableType().equals(TableType.USER)){
 			st.setString(1, entity.getType().toString());
-			st.setInt(2, this.insertAvatar(entity.getPictureFile()));
+			st.setInt(2, this.insertAvatar(entity.getAvatar()));
 			st.setObject(3, entity);
 		}else{
 			st.setObject(2, entity);
-			st.setInt(1, this.insertAvatar(entity.getPictureFile()));
+			st.setInt(1, this.insertAvatar(entity.getAvatar()));
 		}
 		st.execute();
 		st.clearParameters();

@@ -43,7 +43,7 @@ public class UserSQLFactory extends AuthorSQLFactory {
 			this.parseResultSet(st.executeQuery());
 			break;
 		case DELETE:
-			st.setInt(1, user.getPrimaryKey());
+			this.deletePicture(user.getAvatar());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		default:

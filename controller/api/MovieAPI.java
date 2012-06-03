@@ -99,7 +99,7 @@ public class MovieAPI extends ApiAccess {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if (tmp.getPictureFile() == null) {
+				if (tmp.getAvatar() == null) {
 					tmp.setPicture(null);
 				}
 			}

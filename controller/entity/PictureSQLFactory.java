@@ -133,7 +133,6 @@ public class PictureSQLFactory extends SQLFactory {
 			} catch (PictureCacheException e) {
 				e.printStackTrace();
 			}
-			st.setInt(1, p.getPrimaryKey());
 			this.parseDeleteSet(st.executeUpdate());
 			break;
 		case UPDATE:

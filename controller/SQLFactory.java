@@ -13,7 +13,9 @@ import java.util.logging.Level;
 
 import logger.MabisLogger;
 import model.BaseTable;
+import model.entity.Picture;
 import controller.database.MySQLAccess;
+import controller.entity.PictureSQLFactory;
 import controller.exceptions.SQLEntityExistsException;
 
 /**
@@ -138,6 +140,16 @@ public abstract class SQLFactory implements StatementFactory {
 		System.gc();
 		return lastAffactedId;
 	}
+	
+	protected void deletePicture(Picture p) {
+		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.DELETE, p);
+		psf.addWhereClause("idPicture", String.valueOf(p.getPrimaryKey()));
+		try {
+			psf.executeSQL(true);
+		} catch (SQLException | SQLEntityExistsException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * This method is always called by extended class. This is caused by further
@@ -186,14 +198,13 @@ public abstract class SQLFactory implements StatementFactory {
 	 */
 	protected void parseDeleteSet(int executeUpdate) {
 		if (executeUpdate > 0) {
-			Object params[] = { executeUpdate, this.table.getTableType() };
+			Object params[] = { this.table.getPrimaryKey(), this.table.getTableType() };
 			MabisLogger.getLogger().log(Level.INFO,
-					"Successfully deleted {0} rows from {1}", params);
+					"Successfully deleted row ID=[{0}] from {1}", params);
 		} else {
 			MabisLogger.getLogger()
 					.log(Level.SEVERE, "Failed to delete rows from {0}",
 							this.table.getTableType());
-			// TODO dodać wyjątek
 		}
 	}
 

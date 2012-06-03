@@ -37,6 +37,7 @@ import model.entity.BookUser;
 import model.entity.Movie;
 import model.entity.MovieUser;
 import model.entity.User;
+import model.utilities.BookIndustryIdentifier;
 import model.utilities.ForeignKeyPair;
 import view.enums.CollectionView;
 import view.items.ItemCreator;
@@ -213,6 +214,13 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	}
 
 	private void groupViewBy(String value) {
+		class TitleComparator implements Comparator<BaseTable> {
+			@Override
+			public int compare(BaseTable a, BaseTable b) {
+				return a.getTitle().compareTo(b.getTitle()) * -1;
+			}
+		}
+
 		switch (this.currentView) {
 		case VIEW_AUDIOS:
 			if (value.equals("Band")) {
@@ -224,6 +232,9 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 								return a0.getBand().compareTo(a1.getBand());
 							}
 						});
+			} else if (value.equals("Title")) {
+				Collections.sort(mediator.collectedAlbums,
+						new TitleComparator());
 			}
 			break;
 		case VIEW_BOOKS:
@@ -247,7 +258,28 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 							}
 						});
 			} else if (value.equals("ISBN")) {
-				return;
+				Collections.sort(mediator.collectedBooks,
+						new Comparator<Book>() {
+							private BookIndustryIdentifier bii2, bii1;
+
+							@Override
+							public int compare(Book o1, Book o2) {
+								Object[] b1 = o1.getIdentifiers().toArray();
+								Object[] b2 = o2.getIdentifiers().toArray();
+								int res = 0;
+								for (int i = 0 ; i < (b1.length > b2.length ? b2.length : b1.length) ; i++) {
+									bii1 = (BookIndustryIdentifier) b1[i];
+									bii2 = (BookIndustryIdentifier) b2[i];
+									res = bii1.compareTo(bii2);
+									if(res != 0){
+										return res;
+									}
+								}
+								return res;
+							}
+						});
+			} else if (value.equals("Title")) {
+				Collections.sort(mediator.collectedBooks, new TitleComparator());
 			}
 			break;
 		case VIEW_MOVIES:
@@ -270,27 +302,15 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 								return res;
 							}
 						});
+			} else if (value.equals("title")) {
+				Collections.sort(mediator.collectedMovies,
+						new TitleComparator());
 			}
 			break;
 		default:
-			if (value.equals("Title")) {
-				class TitleComparator implements Comparator<BaseTable> {
-					@Override
-					public int compare(BaseTable a, BaseTable b) {
-						return a.getTitle().compareTo(b.getTitle()) * -1;
-					}
-				}
-				Collections.sort(mediator.collectedAlbums,
-						new TitleComparator());
-				Collections
-						.sort(mediator.collectedBooks, new TitleComparator());
-				Collections.sort(mediator.collectedMovies,
-						new TitleComparator());
-			} else {
-				Collections.sort(mediator.collectedAlbums);
-				Collections.sort(mediator.collectedBooks);
-				Collections.sort(mediator.collectedMovies);
-			}
+			Collections.sort(mediator.collectedAlbums);
+			Collections.sort(mediator.collectedBooks);
+			Collections.sort(mediator.collectedMovies);
 			break;
 		}
 		reprintCollection(currentView);

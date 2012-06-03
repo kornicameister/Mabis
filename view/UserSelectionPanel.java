@@ -120,7 +120,7 @@ public class UserSelectionPanel extends JFrame implements
 
 	private void parseUsers() {
 		for (User u : this.users.values()) {
-			ChoosableImagePanel p = new ChoosableImagePanel(u.getPictureFile()
+			ChoosableImagePanel p = new ChoosableImagePanel(u.getAvatar()
 					.getImageFile(), avatarSize);
 			p.addPropertyChangeListener(this);
 			thumbails.put(u, p);
