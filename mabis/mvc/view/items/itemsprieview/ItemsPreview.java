@@ -14,6 +14,9 @@ import javax.swing.JTabbedPane;
 
 import logger.MabisLogger;
 import mvc.model.BaseTable;
+import mvc.view.WindowClosedListener;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
 
 /**
  * Klasa jest okienkiem w którym umieszczane są elementy kolekcji. Służy jako
@@ -31,33 +34,41 @@ public class ItemsPreview extends JFrame implements ActionListener {
 	private static Dimension dim = new Dimension(620, 470);
 
 	public ItemsPreview(String title, TreeSet<BaseTable> elements) {
-		super(title);
+		super();
 		this.elements = elements;
-
-		this.setSize(this.getMinimumSize());
-		setDefaultLookAndFeelDecorated(false);
-
 		this.initComponents();
 		this.layoutComponents();
-
-		this.setMinimumSize(dim);
-		this.setSize(dim);
+		this.addWindowListener(new WindowClosedListener());
+		
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			e.printStackTrace();
+			this.setSize(this.getMinimumSize());
+			this.setMinimumSize(dim);
+			this.setSize(dim);
+		}
+		this.setTitle(title);
 	}
 
 	public ItemsPreview(String title, BaseTable bt) {
-		super(title);
+		super();
 		this.elements = new TreeSet<>();
 		this.elements.add(bt);
-
-		this.setSize(this.getMinimumSize());
-		setDefaultLookAndFeelDecorated(false);
-
+		
 		this.initComponents();
 		this.layoutComponents();
-
-		this.setMinimumSize(dim);
-		this.setSize(dim);
+		this.addWindowListener(new WindowClosedListener());
+		
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			this.setSize(this.getMinimumSize());
+			this.setMinimumSize(dim);
+			this.setSize(dim);
+		}
 		this.acceptSelectedButton.setVisible(false);
+		this.setTitle(title);
 	}
 
 	private void layoutComponents() {

@@ -80,6 +80,9 @@ public class SettingsLoader extends Settings {
 				Element node = (Element) paths.get(i);
 
 				List<?> frames = node.getChildren(f.getClass().getName());
+				if(frames.size()  == 0){
+					throw new SettingsException("No such frame in settings file");
+				}
 				for (short j = 0; j < frames.size(); j++) {
 					node = (Element) frames.get(j);
 					f.setTitle(node.getChildText("title"));
