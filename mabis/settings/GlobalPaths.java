@@ -1,5 +1,7 @@
 package settings;
 
+import java.io.File;
+
 import settings.io.SettingsException;
 import settings.io.SettingsLoader;
 
@@ -20,6 +22,10 @@ public enum GlobalPaths {
 	private GlobalPaths() {
 		try {
 			this.path = SettingsLoader.loadPath(this.name());
+			File tmp = new File(path);
+			if (!tmp.exists() && this.path != "TMP") {
+				tmp.mkdir();
+			}
 		} catch (SettingsException e) {
 			e.printStackTrace();
 		} finally {
