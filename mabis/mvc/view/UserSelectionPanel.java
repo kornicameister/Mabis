@@ -36,19 +36,16 @@ import settings.io.SettingsLoader;
 import utilities.Hasher;
 
 /**
- * Klasa dziedzicz�c z JDialog jest oknem typu dialogowego (modalnego) kt�re
- * pozwala na wyb�r u�ytkownika, kt�ry b�dzie korzysta� z programu. </br>
- * U�ytkowniky pobierani s� z lokalnie zlokalizowanej bazy danych. Klasa
- * implementuje interfejs {@link PropertyChangeListener} aby umo�liwi�
- * dynamiczne pod�wietlanie wybranego u�ytkownika. Opisana funkcjonalno�� dzia�a
- * w po��czeniu z {@link ChoosableImagePanel}.
+ * Klasa dziedzicząc z JFrame jest okienkiem które pozwala na wybór użytkownika,
+ * który będzie korzystać z programu. Użytkownicy pobierani są z bazy danych.
  * 
  * @author kornicameister
  * @version 0.2
  * @see java.beans.PropertyChangeListener
  */
-public class UserSelectionPanel extends JFrame implements
-		PropertyChangeListener {
+public class UserSelectionPanel extends JFrame
+		implements
+			PropertyChangeListener {
 
 	private static final long serialVersionUID = -3642888588569732458L;
 	private static final Dimension avatarSize = new Dimension(150, 150);
@@ -81,9 +78,10 @@ public class UserSelectionPanel extends JFrame implements
 		try {
 			SettingsLoader.loadFrame(this);
 		} catch (SettingsException e) {
-			e.printStackTrace();		
+			e.printStackTrace();
 			this.setTitle("Choose user");
-			this.setLocation(this.mw.getX() + this.mw.getWidth() / 4, this.mw.getY() + 25);
+			this.setLocation(this.mw.getX() + this.mw.getWidth() / 4,
+					this.mw.getY() + 25);
 			this.setSize(new Dimension(500, 280));
 		}
 	}

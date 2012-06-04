@@ -38,6 +38,9 @@ import mvc.view.mainwindow.MainWindow;
 import settings.GlobalPaths;
 
 /**
+ * Dialog który pozwala na utworzenie nowego użytkownika i dodanie go do bazy
+ * danych.
+ * 
  * @author kornicameister
  * 
  */
@@ -296,8 +299,10 @@ public class NewUserDialog extends JDialog {
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				} catch (SQLEntityExistsException e1) {
-					JOptionPane.showMessageDialog(null, "Following user was found", "Match", JOptionPane.INFORMATION_MESSAGE,
-							new ImageIcon(GlobalPaths.OK_SIGN.toString()));
+					JOptionPane.showMessageDialog(null,
+							"Following user was found", "Match",
+							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(
+									GlobalPaths.OK_SIGN.toString()));
 				} finally {
 					if (isDisplayable()) {
 						setVisible(false);

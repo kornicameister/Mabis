@@ -18,8 +18,6 @@ import java.sql.SQLException;
  * </ul>
  * 
  * @author kornicameister
- * @see mysql java driver
- * @see ConnectionData#setPassword(String)
  * @version 0.2
  */
 public class MySQLAccess {

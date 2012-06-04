@@ -27,20 +27,17 @@ public abstract class Hasher {
 	 * com.google.common.hash.
 	 * 
 	 * @see Hashing
+	 * @return hash hasła jako String
 	 */
 	final static public String hashPassword(String password) {
 		return Hashing.md5().hashString(password).toString();
 	}
 
 	/**
-	 * Metoda oblicza sum� SHA dla podanego w parametrze strumienia wej�ciowego.
-	 * Mo�e to by� plik lub inny dowolny strumie� kt�ry dziedziczy z
-	 * InputStream.
+	 * Metoda hashuje podany jako parametr strumień wejściowy.
 	 * 
 	 * @param fis
-	 *            strumie� wej�cia
-	 * @return String suma kontrolna (liczba z podstaw� szesnastkow�) jako
-	 *         String
+	 * @return hash zawartości strumienia
 	 */
 	static public String hashStream(InputStream fis) {
 		String hashword = null;
@@ -55,6 +52,7 @@ public abstract class Hasher {
 
 			BigInteger hash = new BigInteger(1, md5.digest());
 			hashword = hash.toString(16).substring(0, 36);
+			fis.close();
 		} catch (NoSuchAlgorithmException e1) {
 			e1.printStackTrace();
 		} catch (IOException e) {

@@ -53,10 +53,26 @@ import mvc.view.items.minipanels.BandMiniPanel;
 import mvc.view.items.minipanels.TagCloudMiniPanel;
 import mvc.view.items.minipanels.TrackListPanel;
 import settings.GlobalPaths;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
 
 /**
- * @author kornicameister
+ * Klasa definiuje Creator/Editor dla obiektu kolekcji jakim jest
+ * {@link AudioAlbum}. Rozszerza abstrakcyjną klasą {@link ItemCreator}
+ * definiując content adekwatny do utworzenia/edycji albumu muzycznego.
+ * Umożliwia również dostęp do {@link AudioAlbumAPI}. Korzysta z następujących
+ * mini paneli:
+ * <ul>
+ * <li> {@link TagCloudMiniPanel}</li>
+ * <li> {@link BandMiniPanel}</li>
+ * <li> {@link TrackListPanel}</li>
+ * </ul>
  * 
+ * @author kornicameister
+ * @see AudioAlbumAPI
+ * @see BandMiniPanel
+ * @see TrackListPanel
+ * @see TagCloudMiniPanel
  */
 public class AudioAlbumCreator extends ItemCreator {
 	private static final long serialVersionUID = 4214813665020457959L;
@@ -67,13 +83,19 @@ public class AudioAlbumCreator extends ItemCreator {
 	private ImagePanel coverPanel;
 	private TrackListPanel trackList;
 	private AudioAlbum selectedAlbum = new AudioAlbum();
-	private LoadFromApi lfa;
+	private LoadFromAudioAlbumApi lfa;
 
 	public AudioAlbumCreator(User u, String title)
 			throws CreatorContentNullPointerException {
 		super(u, title);
-		this.setSize((int) this.getMinimumSize().getWidth() + 200, (int) this
-				.getMinimumSize().getHeight());
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			MabisLogger.getLogger().log(Level.WARNING,
+					"Failed to load frame {0} from settigns", this.getName());
+			this.setSize((int) this.getMinimumSize().getWidth() + 200,
+					(int) this.getMinimumSize().getHeight());
+		}
 	}
 
 	@Override
@@ -145,10 +167,14 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.durationField.setBorder(BorderFactory
 				.createTitledBorder("Duration"));
 		this.coverPanel = new ImagePanel();
-		String arrayOfCriteria[] = { "by album" };
+		String arrayOfCriteria[] = {"by album"};
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
 
+	/**
+	 * Inicjalizuje {@link BandMiniPanel} pobierając dane o wykonawcach albumów
+	 * muzycznych z bazy danych.
+	 */
 	private void initializeBandMiniPanel() {
 		try {
 			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT,
@@ -164,6 +190,10 @@ public class AudioAlbumCreator extends ItemCreator {
 		}
 	}
 
+	/**
+	 * Inicjalzuje chmurę tagów, tj. {@link TagCloudMiniPanel}, pobierając
+	 * informacje o gatunkach dla konkretnego typu obiektów.
+	 */
 	private void initializeTagCloud() {
 		try {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
@@ -243,12 +273,13 @@ public class AudioAlbumCreator extends ItemCreator {
 
 	/**
 	 * Podklasa SwingWorkera, pozwala na wykonanie całej łączności z API poprzez
-	 * wątek działający w tle
+	 * wątek działający w tle. Skonfigurowana aby pobrać dane przez
+	 * {@link AudioAlbumAPI}.
 	 * 
 	 * @author kornicameister
-	 * 
+	 * @see AudioAlbumAPI
 	 */
-	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {
+	class LoadFromAudioAlbumApi extends SwingWorker<TreeSet<BaseTable>, Void> {
 		private String query;
 		private Integer taskSize;
 		private int step, value;
@@ -320,7 +351,7 @@ public class AudioAlbumCreator extends ItemCreator {
 			this.collectedItems.clear();
 		}
 
-		lfa = new LoadFromApi();
+		lfa = new LoadFromAudioAlbumApi();
 		lfa.setQuery(query);
 		lfa.addPropertyChangeListener(new PropertyChangeListener() {
 

@@ -19,14 +19,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
 import mvc.model.BaseTable;
 import mvc.model.entity.User;
 import mvc.view.WindowClosedListener;
-import settings.io.SettingsException;
-import settings.io.SettingsLoader;
 
 /**
  * Klasa bazowa kreatora nowego obiektu dla kolekcji. Definiuje podstawową
@@ -58,7 +57,7 @@ public abstract class ItemCreator extends JFrame {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public ItemCreator(User u,String title) {
+	public ItemCreator(User u, String title) {
 		super(title);
 		this.editingMode = false;
 		this.selectedUser = u;
@@ -68,11 +67,6 @@ public abstract class ItemCreator extends JFrame {
 		setDefaultLookAndFeelDecorated(true);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.addWindowListener(new WindowClosedListener());
-		try {
-			SettingsLoader.loadFrame(this);
-		} catch (SettingsException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -148,14 +142,18 @@ public abstract class ItemCreator extends JFrame {
 	/**
 	 * Metoda wywoływana po kliknięciu na {@link ICButtonPanel#getFromNetButton}
 	 * . Po wywołeniu akcji, podejmowana jest próba pobrania informacji o danym
-	 * obiekcie kolekcji przez publiczne API.
+	 * obiekcie kolekcji przez publiczne API. Wszystkie reimplementacje tej
+	 * metody używają klasy {@link SwingWorker} aby nie blokować głównego okna i
+	 * cały proces pobierania danych wykonać w tle.
 	 * 
 	 * @param query
-	 * 
+	 *            o co pytamy api
+	 * @param criteria
+	 *            typ zapytania, może to być np. szukaj <b>query</b> po autorach
 	 * 
 	 */
 	protected abstract void fetchFromAPI(String query, String criteria);
-	
+
 	/**
 	 * Metoda pozwala na zakończenie procesu wyszukiwania.
 	 */
@@ -169,17 +167,17 @@ public abstract class ItemCreator extends JFrame {
 	 *            tabela z danymi
 	 */
 	protected abstract void fillWithResult(BaseTable table);
-	
+
 	/**
-	 * Prosta metoda do ustawienia obiektu kolekcji.
-	 * Używana głównie jeśli obiekt ma być edytowany !
+	 * Prosta metoda do ustawienia obiektu kolekcji. Używana głównie jeśli
+	 * obiekt ma być edytowany !
+	 * 
 	 * @param bt
 	 */
 	public void setEditableItem(BaseTable bt) {
 		this.editingMode = true;
 		this.fillWithResult(bt);
 	}
-	
 
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
@@ -221,12 +219,13 @@ public abstract class ItemCreator extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					fetchFromAPI(searchQuery.getText(), (String) criteria.getSelectedItem());
+					fetchFromAPI(searchQuery.getText(),
+							(String) criteria.getSelectedItem());
 				}
 			});
-			
+
 			this.cancelButton.addActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					cancelAPISearch();

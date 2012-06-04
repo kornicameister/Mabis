@@ -54,10 +54,25 @@ import mvc.view.items.minipanels.AuthorMiniPanel;
 import mvc.view.items.minipanels.IndustryIdentifiersMiniPanel;
 import mvc.view.items.minipanels.TagCloudMiniPanel;
 import settings.GlobalPaths;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
 
 /**
- * @authorBox kornicameister
+ * Klasa definiuje Creator/Editor dla obiektu kolekcji jakim jest {@link Book}.
+ * Rozszerza abstrakcyjną klasą {@link ItemCreator} definiując content adekwatny
+ * do utworzenia/edycji albumu muzycznego. Umożliwia również dostęp do
+ * {@link GoogleBookApi}. Korzysta z następujących mini paneli:
+ * <ul>
+ * <li> {@link TagCloudMiniPanel}</li>
+ * <li> {@link AuthorMiniPanel}</li>
+ * <li> {@link IndustryIdentifiersMiniPanel}</li>
+ * </ul>
  * 
+ * @author kornicameister
+ * @see GoogleBookApi
+ * @see AuthorMiniPanel
+ * @see IndustryIdentifiersMiniPanel
+ * @see TagCloudMiniPanel
  */
 public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
@@ -68,7 +83,7 @@ public class BookCreator extends ItemCreator {
 	private AuthorMiniPanel authorsMiniPanel;
 	private IndustryIdentifiersMiniPanel iiMiniPanel;
 	private JScrollPane descriptionScrollPane;
-	private LoadFromApi lfa;
+	private LoadFromGoogleBookAPI lfa;
 
 	/**
 	 * Tworzy kreator/edytor dla nowych książek.
@@ -80,8 +95,14 @@ public class BookCreator extends ItemCreator {
 	public BookCreator(User u, String title)
 			throws CreatorContentNullPointerException {
 		super(u, title);
-		this.setSize((int) this.getMinimumSize().getWidth() + 220, (int) this
-				.getMinimumSize().getHeight());
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			MabisLogger.getLogger().log(Level.WARNING,
+					"Failed to load frame {0} from settigns", this.getName());
+			this.setSize((int) this.getMinimumSize().getWidth() + 220,
+					(int) this.getMinimumSize().getHeight());
+		}
 	}
 
 	@Override
@@ -184,10 +205,14 @@ public class BookCreator extends ItemCreator {
 		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 				"Descripion"));
-		String arrayOfCriteria[] = { "by author", "by title" };
+		String arrayOfCriteria[] = {"by author", "by title"};
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
 
+	/**
+	 * Inicjalzuje chmurę tagów, tj. {@link TagCloudMiniPanel}, pobierając
+	 * informacje o gatunkach dla konkretnego typu obiektów.
+	 */
 	private void initGenresPanel() {
 		try {
 			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
@@ -202,14 +227,17 @@ public class BookCreator extends ItemCreator {
 		}
 	}
 
+	/**
+	 * Inicjalizuje {@link AuthorMiniPanel} pobierając dane o wykonawcach o
+	 * autorach z bazy danych
+	 */
 	private void initAuthorsMiniPanel() {
 		try {
 			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
 					new Author());
 			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
 			asf.executeSQL(true);
-			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),
-					AuthorType.BOOK_AUTHOR);
+			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.BOOK_AUTHOR);
 			this.authorsMiniPanel.setBorder(BorderFactory
 					.createTitledBorder("Writers"));
 		} catch (SQLException | SQLEntityExistsException e) {
@@ -283,7 +311,14 @@ public class BookCreator extends ItemCreator {
 		return true;
 	}
 
-	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {
+	/**
+	 * Podklasa {@link SwingWorker} która implementuje zachowanie właściwe do
+	 * wykonania procesu pobierania danych z {@link GoogleBookApi} w tle.
+	 * 
+	 * @author tomasz
+	 * @see GoogleBookApi
+	 */
+	class LoadFromGoogleBookAPI extends SwingWorker<TreeSet<BaseTable>, Void> {
 		private String query, criteria;
 		private Integer taskSize;
 		private int step, value;
@@ -361,7 +396,7 @@ public class BookCreator extends ItemCreator {
 			this.collectedItems.clear();
 		}
 
-		lfa = new LoadFromApi();
+		lfa = new LoadFromGoogleBookAPI();
 		lfa.setQuery(query);
 		lfa.setCriteria(criteria);
 		lfa.addPropertyChangeListener(new PropertyChangeListener() {

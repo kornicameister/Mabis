@@ -51,14 +51,23 @@ import mvc.view.items.itemsprieview.ItemsPreview;
 import mvc.view.items.minipanels.AuthorMiniPanel;
 import mvc.view.items.minipanels.TagCloudMiniPanel;
 import settings.GlobalPaths;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
 
 /**
- * 
- * Klasa która definiuje strukturę okienka zapewniającego miejsce do
- * definiowanie nowego filmu.
+ * Klasa definiuje Creator/Editor dla obiektu kolekcji jakim jest {@link Movie}.
+ * Rozszerza abstrakcyjną klasą {@link ItemCreator} definiując content adekwatny
+ * do utworzenia/edycji albumu muzycznego. Umożliwia również dostęp do
+ * {@link MovieAPI}. Korzysta z następujących mini paneli:
+ * <ul>
+ * <li> {@link TagCloudMiniPanel}</li>
+ * <li> {@link AuthorMiniPanel}</li>
+ * </ul>
  * 
  * @author kornicameister
- * 
+ * @see MovieAPI
+ * @see AuthorMiniPanel
+ * @see TagCloudMiniPanel
  */
 public class MovieCreator extends ItemCreator {
 	private static final long serialVersionUID = -8029181092669910824L;
@@ -69,14 +78,20 @@ public class MovieCreator extends ItemCreator {
 	private JFormattedTextField durationField;
 	private JTextArea descriptionArea;
 	private JScrollPane descriptionScrollPane;
-	private LoadFromApi lfa;
+	private LoadFromMovieApi lfa;
 
 	public MovieCreator(User u, String title) {
 		super(u, title);
-		this.setSize((int) this.getMinimumSize().getWidth() + 190, (int) this
-				.getMinimumSize().getHeight() + 50);
+		try {
+			SettingsLoader.loadFrame(this);
+		} catch (SettingsException e) {
+			MabisLogger.getLogger().log(Level.WARNING,
+					"Failed to load frame {0} from settigns", this.getName());
+			this.setSize((int) this.getMinimumSize().getWidth() + 190,
+					(int) this.getMinimumSize().getHeight() + 50);
+		}
 	}
-	
+
 	@Override
 	protected void layoutComponents() {
 		super.layoutComponents();
@@ -88,9 +103,10 @@ public class MovieCreator extends ItemCreator {
 
 		gl.setHorizontalGroup(gl
 				.createSequentialGroup()
-				.addGroup(gl.createParallelGroup()
-						.addComponent(this.coverPanel, 220, 220, 220)
-						.addComponent(this.descriptionScrollPane))
+				.addGroup(
+						gl.createParallelGroup()
+								.addComponent(this.coverPanel, 220, 220, 220)
+								.addComponent(this.descriptionScrollPane))
 				.addGroup(
 						gl.createParallelGroup()
 								.addGroup(
@@ -103,15 +119,19 @@ public class MovieCreator extends ItemCreator {
 								.addComponent(this.descriptionScrollPane)));
 		gl.setVerticalGroup(gl
 				.createParallelGroup()
-				.addGroup(gl.createSequentialGroup()
-						.addComponent(this.coverPanel, 220, 220, 220)
-						.addComponent(this.descriptionScrollPane))
+				.addGroup(
+						gl.createSequentialGroup()
+								.addComponent(this.coverPanel, 220, 220, 220)
+								.addComponent(this.descriptionScrollPane))
 				.addGroup(
 						gl.createSequentialGroup()
 								.addGroup(
 										gl.createParallelGroup()
-												.addComponent(this.titleField,50, 60, 60)
-												.addComponent(this.durationField, 50, 60, 60))
+												.addComponent(this.titleField,
+														50, 60, 60)
+												.addComponent(
+														this.durationField, 50,
+														60, 60))
 								.addComponent(this.directorsPanel)
 								.addComponent(this.tagCloud)));
 
@@ -146,17 +166,20 @@ public class MovieCreator extends ItemCreator {
 		this.initializeAuthorsMiniPanel();
 		this.initializeTagCloud();
 
-		String arr[] = { "by title" };
+		String arr[] = {"by title"};
 		this.searchPanel.setSearchCriteria(arr);
 	}
 
 	private void initializeAuthorsMiniPanel() {
 		try {
-			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT, new Author());
+			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
+					new Author());
 			asf.addWhereClause("type", AuthorType.MOVIE_DIRECTOR.toString());
 			asf.executeSQL(true);
-			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.MOVIE_DIRECTOR);
-			this.directorsPanel.setBorder(BorderFactory.createTitledBorder("Authors"));
+			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(),
+					AuthorType.MOVIE_DIRECTOR);
+			this.directorsPanel.setBorder(BorderFactory
+					.createTitledBorder("Authors"));
 		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
@@ -168,8 +191,10 @@ public class MovieCreator extends ItemCreator {
 					new Genre());
 			gsf.addWhereClause("type", GenreType.MOVIE.toString());
 			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),GenreType.MOVIE);
-			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Tag cloud"));
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
+					GenreType.MOVIE);
+			this.tagCloud.setBorder(BorderFactory
+					.createTitledBorder("Tag cloud"));
 		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
@@ -191,7 +216,8 @@ public class MovieCreator extends ItemCreator {
 		Movie selectedMovie = new Movie();
 		try {
 			selectedMovie.setTitle(this.titleField.getText());
-			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
+			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),
+					ImageType.FRONT_COVER));
 			selectedMovie.setDescription(this.descriptionArea.getText());
 			// TODO -> this shit aint working
 			selectedMovie.setDuration((Long) this.durationField.getValue());
@@ -200,33 +226,38 @@ public class MovieCreator extends ItemCreator {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		if(this.editingMode){
+
+		if (this.editingMode) {
 			try {
-				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, selectedMovie);
+				MovieSQLFactory msf = new MovieSQLFactory(
+						SQLStamentType.UPDATE, selectedMovie);
 				return msf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
 			}
-		}else{
-			try{
-				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.INSERT, selectedMovie);
+		} else {
+			try {
+				MovieSQLFactory msf = new MovieSQLFactory(
+						SQLStamentType.INSERT, selectedMovie);
 				msf.executeSQL(true);
-				
+
 				MovieUser mu = new MovieUser();
-				mu.addMultiForeignKey(-1,
-						new ForeignKey(selectedMovie, "idMovie",    selectedMovie.getPrimaryKey()),
-						new ForeignKey(this.selectedUser, "idUser", this.selectedUser.getPrimaryKey()));
-				
-				MovieUserSQLFactory musf = new MovieUserSQLFactory(SQLStamentType.INSERT, mu);
+				mu.addMultiForeignKey(-1, new ForeignKey(selectedMovie,
+						"idMovie", selectedMovie.getPrimaryKey()),
+						new ForeignKey(this.selectedUser, "idUser",
+								this.selectedUser.getPrimaryKey()));
+
+				MovieUserSQLFactory musf = new MovieUserSQLFactory(
+						SQLStamentType.INSERT, mu);
 				musf.executeSQL(true);
 				this.firePropertyChange("itemAffected", null, selectedMovie);
 				return true;
-			} catch(SQLException e) {
+			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (SQLEntityExistsException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), "Match", JOptionPane.INFORMATION_MESSAGE, 
-						new ImageIcon(GlobalPaths.OK_SIGN.toString()));
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Match",
+						JOptionPane.INFORMATION_MESSAGE, new ImageIcon(
+								GlobalPaths.OK_SIGN.toString()));
 				return true;
 			}
 		}
@@ -240,9 +271,9 @@ public class MovieCreator extends ItemCreator {
 	 * filmów.
 	 * 
 	 * @author kornicameister
-	 * 
+	 * @see MovieAPI
 	 */
-	class LoadFromApi extends SwingWorker<TreeSet<BaseTable>, Void> {
+	class LoadFromMovieApi extends SwingWorker<TreeSet<BaseTable>, Void> {
 		private String query;
 		private Integer taskSize;
 		private int step, value;
@@ -254,13 +285,14 @@ public class MovieCreator extends ItemCreator {
 		@Override
 		protected void done() {
 			try {
-				
-				if(this.get().size() == 1){
+
+				if (this.get().size() == 1) {
 					fillWithResult((BaseTable) this.get().toArray()[0]);
 					return;
 				}
-				
-				ItemsPreview ip = new ItemsPreview("Collected movies",this.get());
+
+				ItemsPreview ip = new ItemsPreview("Collected movies",
+						this.get());
 				ip.addPropertyChangeListener("selectedItem",
 						new PropertyChangeListener() {
 							@Override
@@ -287,7 +319,8 @@ public class MovieCreator extends ItemCreator {
 					String propertyName = evt.getPropertyName();
 					if (propertyName.equals("taskStarted")) {
 						taskSize = (Integer) evt.getNewValue();
-						step = (searchProgressBar.getMaximum() - searchProgressBar.getMinimum()) / taskSize;
+						step = (searchProgressBar.getMaximum() - searchProgressBar
+								.getMinimum()) / taskSize;
 						value = searchProgressBar.getMinimum() + step;
 						setProgress(value);
 						if (taskSize.equals(1)) {
@@ -302,9 +335,9 @@ public class MovieCreator extends ItemCreator {
 
 			try {
 				setProgress(searchProgressBar.getMinimum());
-					TreeMap<String, String> params = new TreeMap<>();
-					params.put("movie", query);
-					ma.query(params);
+				TreeMap<String, String> params = new TreeMap<>();
+				params.put("movie", query);
+				ma.query(params);
 				setProgress(searchProgressBar.getMaximum());
 				return ma.getResult();
 			} catch (IOException e) {
@@ -320,7 +353,7 @@ public class MovieCreator extends ItemCreator {
 			this.collectedItems.clear();
 		}
 
-		lfa = new LoadFromApi();
+		lfa = new LoadFromMovieApi();
 		lfa.setQuery(query);
 		lfa.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -351,56 +384,62 @@ public class MovieCreator extends ItemCreator {
 		this.descriptionArea.setText(m.getDescription());
 		this.coverPanel.setImage(m.getCover().getImageFile());
 
-		//check up - 1, if loaded directors are the same (in terms of first name/last name) as those
-		//that can be found in AuthorsMiniPanel
-		for(Author a : m.getAuthors()){
-			if(this.editingMode){
+		// check up - 1, if loaded directors are the same (in terms of first
+		// name/last name) as those
+		// that can be found in AuthorsMiniPanel
+		for (Author a : m.getAuthors()) {
+			if (this.editingMode) {
 				this.directorsPanel.addRow(a);
-			}else{
-				int index = Collections.binarySearch(this.directorsPanel.getDatabaseAuthors(),
-						a,
+			} else {
+				int index = Collections.binarySearch(
+						this.directorsPanel.getDatabaseAuthors(), a,
 						new Comparator<Author>() {
 							@Override
 							public int compare(Author o1, Author o2) {
-								int result = o1.getLastName().compareTo(o2.getLastName());
-								if(result == 0){
-									result = o1.getFirstName().compareTo(o2.getFirstName());
+								int result = o1.getLastName().compareTo(
+										o2.getLastName());
+								if (result == 0) {
+									result = o1.getFirstName().compareTo(
+											o2.getFirstName());
 								}
 								return result;
 							}
 						});
-				if(index < 0){
+				if (index < 0) {
 					a.setType(AuthorType.MOVIE_DIRECTOR);
 					this.directorsPanel.addRow(a);
-				}else{
-					this.directorsPanel.addRow(this.directorsPanel.getDatabaseAuthors().get(index));
+				} else {
+					this.directorsPanel.addRow(this.directorsPanel
+							.getDatabaseAuthors().get(index));
 				}
 			}
 		}
-		
-		//check up - 2, the same thing, but now it does concern genres
-		for(Genre g : m.getGenres()){
-			if(this.editingMode){
+
+		// check up - 2, the same thing, but now it does concern genres
+		for (Genre g : m.getGenres()) {
+			if (this.editingMode) {
 				this.tagCloud.addRow(g);
-			}else{
-				int index= Collections.binarySearch(
-						this.tagCloud.getDatabaseTags(), 
-						g,
+			} else {
+				int index = Collections.binarySearch(
+						this.tagCloud.getDatabaseTags(), g,
 						new Comparator<Genre>() {
 							@Override
 							public int compare(Genre g1, Genre g2) {
-								int result = g1.getType().compareTo(g2.getType());
-								if(result == 0){
-									result = g1.getGenre().compareTo(g2.getGenre());
+								int result = g1.getType().compareTo(
+										g2.getType());
+								if (result == 0) {
+									result = g1.getGenre().compareTo(
+											g2.getGenre());
 								}
 								return result;
 							}
 						});
-				if(index < 0){
+				if (index < 0) {
 					g.setType(GenreType.MOVIE);
 					this.tagCloud.addRow(g);
-				}else{
-					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(index));
+				} else {
+					this.tagCloud.addRow(this.tagCloud.getDatabaseTags().get(
+							index));
 				}
 			}
 		}

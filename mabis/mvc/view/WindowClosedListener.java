@@ -8,8 +8,16 @@ import javax.swing.JFrame;
 
 import settings.io.SettingsSaver;
 
-
-public class WindowClosedListener extends WindowAdapter implements WindowListener{
+/**
+ * Prosty {@link WindowAdapter} który odwołuje się do statycznej metody
+ * {@link SettingsSaver} zapisująć weń framkę. Jest to jednoznaczne z faktrem,
+ * że konfiguracja okienka zostanie zapisana do pliku XML.
+ * 
+ * @author tomasz
+ * @see WindowListener
+ */
+public class WindowClosedListener extends WindowAdapter implements
+		WindowListener {
 	@Override
 	public void windowClosed(WindowEvent e) {
 		super.windowClosed(e);

@@ -86,7 +86,8 @@ public class Picture extends BaseTable implements Serializable {
 		this.saveHash(url);
 		URLConnection urlConn = url.openConnection();
 		urlConn.addRequestProperty("Referer", "www.google.com");
-		urlConn.setRequestProperty("User-Agent","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		urlConn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		urlConn.connect();
 
 		// saving file
@@ -144,7 +145,7 @@ public class Picture extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idCover", "object" };
+		String tmp[] = {"idCover", "object"};
 		return tmp;
 	}
 
@@ -164,8 +165,8 @@ public class Picture extends BaseTable implements Serializable {
 	 * Method opens an image, and generates hash checksum basing of image file
 	 * binary content <b>Notice</> that this.checkSum will always be 36b lenght
 	 * 
-	 * @param checkSum
-	 *            the checkSum to set
+	 * @param f
+	 *            plik, dla którego zostanie wygenerowana suma kontrolna
 	 * @throws FileNotFoundException
 	 */
 	private void generateCheckSum(File f) throws FileNotFoundException {

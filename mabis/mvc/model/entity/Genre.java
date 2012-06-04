@@ -38,29 +38,29 @@ public class Genre extends BaseTable implements Serializable {
 	}
 
 	/**
-	 * Construct new Genre with genres value
+	 * Tworzy nowy gatunek z nazwą genre.
 	 * 
-	 * @param genres
+	 * @param genre
 	 */
 	public Genre(String genre) {
 		super(genre);
 	}
-	
-	public Genre(String genre,GenreType t) {
+
+	public Genre(String genre, GenreType t) {
 		super(genre);
 		this.gType = t;
 	}
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idGenre", "object", "type"};
+		String tmp[] = {"idGenre", "object", "type"};
 		return tmp;
 	}
 
 	/**
-	 * wraps {@link BaseTable#setTitle(String)}
+	 * Metoda ustawia nazwę gatunku
 	 * 
-	 * @param genres
+	 * @param genre
 	 */
 	public void setGenre(String genre) {
 		this.titles[0] = genre;
@@ -82,17 +82,18 @@ public class Genre extends BaseTable implements Serializable {
 
 	@Override
 	public String toString() {
-		return this.getPrimaryKey() + ": " + this.getGenre() + ": -> " + this.getType() + "\n";
+		return this.getPrimaryKey() + ": " + this.getGenre() + ": -> "
+				+ this.getType() + "\n";
 	}
 
 	@Override
 	public int compareTo(BaseTable o) {
-		if(o == null){
+		if (o == null) {
 			return 0;
 		}
 		int result = super.compareTo(o);
-		if(result == 0){
-			result = this.getGenre().compareTo(((Genre)o).getGenre());
+		if (result == 0) {
+			result = this.getGenre().compareTo(((Genre) o).getGenre());
 		}
 		return result;
 	}

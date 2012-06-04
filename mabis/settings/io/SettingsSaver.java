@@ -1,8 +1,11 @@
 package settings.io;
 
 import java.io.IOException;
+import java.util.TreeSet;
 
 import javax.swing.JFrame;
+
+import mvc.view.WindowClosedListener;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -12,7 +15,15 @@ import org.jdom.output.XMLOutputter;
 
 import settings.GlobalPaths;
 
-
+/**
+ * Klasa, której głównym zadaniem jest zapis ustawień aplikacji do pliku XML.
+ * Skalowalna, ponieważ rozszerzenie jej możliwości polega jedynie na dopisaniu
+ * linijki kodu dodającego do elementu głównego drzewa XML podrzewo opisujące
+ * konkretną grupę ustawień. Wewnętrznie korzysta z JDom
+ * 
+ * @author tomasz
+ * @see Element
+ */
 public class SettingsSaver extends Settings {
 
 	public SettingsSaver() {
@@ -23,10 +34,10 @@ public class SettingsSaver extends Settings {
 	public void execute() {
 		try {
 			Document doc = new Document(new Element("mabis"));
-			
+
 			doc.getRootElement().addContent(this.saveWindowPosition());
 			doc.getRootElement().addContent(this.saveGlobalPaths());
-			
+
 			XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
 			outputter.output(doc, this.initOutput());
 		} catch (IOException | SettingsException e) {
@@ -34,23 +45,51 @@ public class SettingsSaver extends Settings {
 		}
 	}
 
+	/**
+	 * Metoda generuje drzewo XML, tj. Element, opisujące następujące atrybuty
+	 * kolejnych okien
+	 * <ul>
+	 * <li>tytuł</li>
+	 * <li>wysokość <em>x</em> szerokość</li>
+	 * <li>xPos <em>x</em> yPos</li>
+	 * </ul>
+	 * Okienka, przeznaczone do umieszczenia w pliku konfiguracyjnym dodawania
+	 * są w trakcie działania programu do statycznego {@link TreeSet}
+	 * 
+	 * @return podrzewo XML opisujące kolejne oienka
+	 * @see WindowClosedListener
+	 */
 	private Element saveWindowPosition() {
 		Element frames = new Element("frames");
-		for(JFrame f : SettingsSaver.frames){
-			Element window = new Element(f.getClass().getSimpleName().replaceAll(" ","_"));
+		for (JFrame f : SettingsSaver.frames) {
+			Element window = new Element(f.getClass().getName());
 			window.addContent(new Element("title").setText(f.getTitle()));
-			window.addContent(new Element("width").setText(String.valueOf(f.getWidth())));
-			window.addContent(new Element("height").setText(String.valueOf(f.getHeight())));
-			window.addContent(new Element("xPos").setText(String.valueOf(f.getX())));
-			window.addContent(new Element("yPos").setText(String.valueOf(f.getY())));
+			window.addContent(new Element("width").setText(String.valueOf(f
+					.getWidth())));
+			window.addContent(new Element("height").setText(String.valueOf(f
+					.getHeight())));
+			window.addContent(new Element("xPos").setText(String.valueOf(f
+					.getX())));
+			window.addContent(new Element("yPos").setText(String.valueOf(f
+					.getY())));
 			frames.addContent(window);
 		}
 		return frames;
 	}
 
+	/**
+	 * Zapisuje globalne ścieżki, których używa program, a które znajdują się w
+	 * {@link GlobalPaths}. Ścieżka zapisywana jest jako :
+	 * <p>
+	 * <strong>typ</strong> : <i>ścieżka</i>
+	 * </p>
+	 * 
+	 * @return element XML z podrzewem opisującym kolejne ścieżki.
+	 * @see GlobalPaths
+	 */
 	private Element saveGlobalPaths() {
 		Element e = new Element("paths");
-		for(GlobalPaths p : GlobalPaths.values()){
+		for (GlobalPaths p : GlobalPaths.values()) {
 			Element pp = new Element("path");
 			pp.setAttribute(new Attribute("type", p.name()));
 			pp.setText(p.toString());

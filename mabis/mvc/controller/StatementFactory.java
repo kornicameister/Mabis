@@ -5,8 +5,6 @@ import java.sql.SQLException;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.BaseTable;
 
-
-
 public interface StatementFactory {
 	/**
 	 * ! marks, in following order, stands for:
@@ -149,13 +147,15 @@ public interface StatementFactory {
 	 *            database, otherwise upon online database
 	 * @return numer ostatnio wrzuconej pozycji
 	 * @throws SQLException
-	 * @throws SQLEntityExistsException 
+	 * @throws SQLEntityExistsException
 	 */
-	abstract Integer executeSQL(boolean local) throws SQLException, SQLEntityExistsException;
-	
+	abstract Integer executeSQL(boolean local) throws SQLException,
+			SQLEntityExistsException;
+
 	/**
-	 * Metoda wykonując odpowiedni kod sql, sprawdza czy dana krotka znajduje się
-	 * już w bazie danych !
+	 * Metoda wykonując odpowiedni kod sql, sprawdza czy dana krotka znajduje
+	 * się już w bazie danych !
+	 * 
 	 * @return prawda, jeśli krotka jest w bazie
 	 * @throws SQLException
 	 */
