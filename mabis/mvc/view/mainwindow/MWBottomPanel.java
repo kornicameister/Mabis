@@ -16,121 +16,135 @@ import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
 import logger.MabisLogger;
-import mvc.view.AboutMabis;
+import mvc.model.entity.User;
+import mvc.view.items.creators.AudioAlbumCreator;
+import mvc.view.items.creators.BookCreator;
+import mvc.view.items.creators.MovieCreator;
 import mvc.view.utilities.StatusBar;
 
 /**
- * @author kornicameister contains: <ul> <li> {@link MainWindow#statusBar}</li>
- * <li> {@link MainWindow#databaseStatusBar}</li> <li> {@link MainWindow#publishButton}</li>
- * <ul>
+ * @author kornicameister contains:
+ *         <ul>
+ *         <li> {@link MainWindow#statusBar}</li>
+ *         <li> {@link MainWindow#databaseStatusBar}</li>
+ *         <li> {@link MainWindow#publishButton}</li>
+ *         <ul>
  */
 public class MWBottomPanel extends JPanel {
 
-    private static final long serialVersionUID = 7673272237316575906L;
-    private StatusBar statusBar;
-    private JPanel actionsPanel;
-    private JButton toogleConnection;
-    private JButton newItem;
-    private JButton editButton;
-    private JButton aboutMe;
-    private JButton exitButton;
-    private JButton publishButton;
-    private MainWindowBottomPanelListener listener;
-    private final MainWindow mwParent;
+	private static final long serialVersionUID = 7673272237316575906L;
+	private StatusBar statusBar;
+	private JPanel actionsPanel;
 
-    /**
-     * Creates MWBottomPanel (MainWindowBottomPanel) with MainWindow as it's
-     * parent By parent reference MWBottomPanel has ability to control
-     * MainWindow and therefore application at the whole
-     *
-     * @param parent
-     */
-    public MWBottomPanel(MainWindow parent) {
-        super();
+	private JButton newBookButton;
+	private JButton newMovieButton;
+	private JButton newAudioAlbumButton;
 
-        this.mwParent = parent;
-        this.setDoubleBuffered(true);
-        this.setBorder(BorderFactory.createEmptyBorder());
-        this.listener = new MainWindowBottomPanelListener();
-        this.initComponents();
-    }
+	private JButton exitButton;
+	private MainWindowBottomPanelListener listener;
+	private final MainWindow mwParent;
 
-    private void initComponents() {
-        this.statusBar = new StatusBar();
-        this.statusBar.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+	private User connectedUser;
 
-        this.actionsPanel = new JPanel(new FlowLayout());
-        this.actionsPanel.setBorder(BorderFactory.createEmptyBorder());
+	/**
+	 * Creates MWBottomPanel (MainWindowBottomPanel) with MainWindow as it's
+	 * parent By parent reference MWBottomPanel has ability to control
+	 * MainWindow and therefore application at the whole
+	 * 
+	 * @param parent
+	 */
+	public MWBottomPanel(MainWindow parent) {
+		super();
 
-        this.toogleConnection = new JButton("Connect");
-        this.newItem = new JButton("New");
-        this.editButton = new JButton("Edit");
-        this.exitButton = new JButton("Exit");
-        this.aboutMe = new JButton("User");
-        this.publishButton = new JButton("Sync up");
+		this.mwParent = parent;
+		this.setDoubleBuffered(true);
+		this.setBorder(BorderFactory.createEmptyBorder());
+		this.listener = new MainWindowBottomPanelListener();
+		this.initComponents();
+	}
 
-        this.actionsPanel.add(this.aboutMe);
-        this.actionsPanel.add(new JLabel("|"));
-        this.actionsPanel.add(this.newItem);
-        this.actionsPanel.add(this.editButton);
-        this.actionsPanel.add(new JLabel("|"));
-        this.actionsPanel.add(this.toogleConnection);
-        this.actionsPanel.add(this.exitButton);
+	private void initComponents() {
+		this.statusBar = new StatusBar();
+		this.statusBar.setBorder(BorderFactory
+				.createBevelBorder(BevelBorder.LOWERED));
 
-        // adding listeners
-        this.aboutMe.addActionListener(this.listener);
-        this.editButton.addActionListener(this.listener);
-        this.exitButton.addActionListener(this.listener);
-        this.newItem.addActionListener(this.listener);
-        this.publishButton.addActionListener(this.listener);
-        this.toogleConnection.addActionListener(this.listener);
+		this.actionsPanel = new JPanel(new FlowLayout());
+		this.actionsPanel.setBorder(BorderFactory.createEmptyBorder());
 
-        // organizing into the layout
-        GroupLayout layout = new GroupLayout(this);
-        this.setLayout(layout);
+		this.exitButton = new JButton("Exit");
+		this.newAudioAlbumButton = new JButton("New audio");
+		this.newBookButton = new JButton("New book");
+		this.newMovieButton = new JButton("New movie");
 
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
+		this.actionsPanel.add(this.newAudioAlbumButton);
+		this.actionsPanel.add(this.newBookButton);
+		this.actionsPanel.add(this.newMovieButton);
+		this.actionsPanel.add(new JLabel("|"));
+		this.actionsPanel.add(this.exitButton);
 
-        layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(
-                layout.createParallelGroup().addComponent(this.actionsPanel,
-                GroupLayout.DEFAULT_SIZE,
-                GroupLayout.PREFERRED_SIZE,
-                Short.MAX_VALUE).addComponent(this.statusBar,
-                GroupLayout.DEFAULT_SIZE,
-                GroupLayout.PREFERRED_SIZE,
-                Short.MAX_VALUE)).addComponent(this.publishButton, GroupLayout.DEFAULT_SIZE,
-                140, GroupLayout.PREFERRED_SIZE));
+		// adding listeners
+		this.exitButton.addActionListener(this.listener);
+		this.newAudioAlbumButton.addActionListener(this.listener);
+		this.newBookButton.addActionListener(this.listener);
+		this.newMovieButton.addActionListener(this.listener);
 
-        layout.setVerticalGroup(layout.createSequentialGroup().addGroup(
-                layout.createParallelGroup().addGroup(
-                layout.createSequentialGroup().addComponent(this.actionsPanel).addComponent(this.statusBar)).addComponent(this.publishButton,
-                GroupLayout.DEFAULT_SIZE, 62,
-                GroupLayout.PREFERRED_SIZE)));
-    }
+		// organizing into the layout
+		GroupLayout layout = new GroupLayout(this);
+		this.setLayout(layout);
 
-    class MainWindowBottomPanelListener implements ActionListener {
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
 
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            Object s = arg0.getSource();
-            if (s.equals(aboutMe)) {
-                AboutMabis w = new AboutMabis();
-                w.setVisible(true);
-            } else if (s.equals(editButton)) {
-            } else if (s.equals(exitButton)) {
-                mwParent.setVisible(false);
-                mwParent.dispose();
-            } else if (s.equals(newItem)) {
-            } else if (s.equals(publishButton)) {
-            } else if (s.equals(toogleConnection)) {
-            }
-            MabisLogger.getLogger().log(Level.INFO,
-                    ((JButton) s).getActionCommand());
-        }
-    }
+		layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(
+				layout.createParallelGroup()
+						.addComponent(this.actionsPanel,
+								GroupLayout.DEFAULT_SIZE,
+								GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)
+						.addComponent(this.statusBar, GroupLayout.DEFAULT_SIZE,
+								GroupLayout.PREFERRED_SIZE, Short.MAX_VALUE)));
 
-    public StatusBar getStatusBar() {
-        return this.statusBar;
-    }
+		layout.setVerticalGroup(layout.createSequentialGroup().addGroup(
+				layout.createParallelGroup().addGroup(
+						layout.createSequentialGroup()
+								.addComponent(this.actionsPanel)
+								.addComponent(this.statusBar))));
+	}
+
+	class MainWindowBottomPanelListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			Object s = arg0.getSource();
+			if (s.equals(exitButton)) {
+				mwParent.setVisible(false);
+				mwParent.dispose();
+			} else if (s.equals(newAudioAlbumButton)) {
+				AudioAlbumCreator aac = new AudioAlbumCreator(connectedUser,
+						"New album");
+				aac.setVisible(true);
+			} else if (s.equals(newBookButton)) {
+				BookCreator aac = new BookCreator(connectedUser, "New book");
+				aac.setVisible(true);
+			} else if (s.equals(newMovieButton)) {
+				MovieCreator aac = new MovieCreator(connectedUser, "New album");
+				aac.setVisible(true);
+			}
+			MabisLogger.getLogger().log(Level.INFO,
+					((JButton) s).getActionCommand());
+		}
+	}
+
+	public StatusBar getStatusBar() {
+		return this.statusBar;
+	}
+
+	/**
+	 * Metoda ustawia użytkownika, który właśnie połączył się z bazą danych, a
+	 * który jest delegowany do kreatorów obiektów kolekcji.
+	 * 
+	 * @param us
+	 */
+	public void setConnectedUser(User us) {
+		this.connectedUser = us;
+	}
 }

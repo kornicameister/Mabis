@@ -42,7 +42,6 @@ public class MainWindow extends JFrame {
 	private MWToolBar toolBar;
 	private MWBottomPanel bottomPanel;
 	private MWCollectionView collectionView;
-	private MWItemButtons buttonsPanel;
 	private JPanel contentPane = null;
 
 	/**
@@ -62,7 +61,6 @@ public class MainWindow extends JFrame {
 		this.bottomPanel = new MWBottomPanel(this);
 		this.collectionView = new MWCollectionView(this, new BorderLayout(),
 				true);
-		this.buttonsPanel = new MWItemButtons();
 		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
 
 		layoutComponents();
@@ -70,11 +68,10 @@ public class MainWindow extends JFrame {
 		this.toolBar.setEnabled(false);
 		this.collectionView.setEnabled(false);
 		this.bottomPanel.setEnabled(false);
-		this.buttonsPanel.setEnabled(false);
 
 		this.toolBar.addPropertyChangeListener(this.collectionView);
 		this.addPropertyChangeListener("connectedUser", this.collectionView);
-		this.buttonsPanel.addPropertyChangeListener(this.collectionView);
+		this.bottomPanel.addPropertyChangeListener(this.collectionView);
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -159,19 +156,10 @@ public class MainWindow extends JFrame {
 				.addComponent(this.toolBar, GroupLayout.DEFAULT_SIZE,
 						GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 				.addGroup(
-						layout.createSequentialGroup()
-								.addComponent(this.collectionView,
-										GroupLayout.PREFERRED_SIZE,
-										GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE)
-								.addGroup(
-										layout.createParallelGroup(
-												Alignment.TRAILING)
-												.addComponent(
-														this.buttonsPanel,
-														GroupLayout.PREFERRED_SIZE,
-														GroupLayout.DEFAULT_SIZE,
-														200)))
+						layout.createSequentialGroup().addComponent(
+								this.collectionView,
+								GroupLayout.PREFERRED_SIZE,
+								GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				.addComponent(this.bottomPanel, GroupLayout.DEFAULT_SIZE,
 						GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
 
@@ -181,10 +169,7 @@ public class MainWindow extends JFrame {
 						GroupLayout.PREFERRED_SIZE)
 				.addGroup(
 						layout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(this.collectionView)
-								.addGroup(
-										layout.createSequentialGroup()
-												.addComponent(this.buttonsPanel)))
+								.addComponent(this.collectionView))
 				.addComponent(this.bottomPanel, GroupLayout.PREFERRED_SIZE,
 						GroupLayout.DEFAULT_SIZE, 50));
 
@@ -204,7 +189,7 @@ public class MainWindow extends JFrame {
 		User oldUser = this.getConnectedUser();
 		this.connectedUser = newUser;
 		this.firePropertyChange("connectedUser", oldUser, this.connectedUser);
-		this.buttonsPanel.setConnectedUser(this.connectedUser);
+		this.bottomPanel.setConnectedUser(this.connectedUser);
 		java.awt.EventQueue.invokeLater(new Runnable() {
 
 			@Override
@@ -219,7 +204,6 @@ public class MainWindow extends JFrame {
 		this.toolBar.setEnabled(true);
 		this.collectionView.setEnabled(true);
 		this.bottomPanel.setEnabled(true);
-		this.buttonsPanel.setEnabled(true);
 	}
 
 	public User getConnectedUser() {

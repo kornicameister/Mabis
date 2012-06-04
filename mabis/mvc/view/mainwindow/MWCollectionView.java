@@ -141,8 +141,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.collectionMenu.add(edit);
 		remove.addActionListener(this.collectionMenuListener);
 		this.collectionMenu.add(remove);
-		this.collectionTable
-				.addMouseListener(new CollectionTableMouseListener());
+		this.collectionTable.addMouseListener(new CollectionTableMouseListener());
 	}
 
 	private void reprintCollection(CollectionView view) {
@@ -203,14 +202,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			break;
 		}
 		collectionTable.revalidate();
-		Integer params[] = { tableModel.getRowCount(),
-				mediator.collectedAlbums.size(),
-				mediator.collectedBooks.size(), mediator.collectedMovies.size() };
-		MabisLogger
-				.getLogger()
-				.log(Level.INFO,
-						"Collected {0} items from database, including {1} audios, {2} books and {3} movies",
-						params);
 	}
 
 	private void clearCollectionView() {
@@ -245,10 +236,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		
 		switch (this.currentView) {
 		case VIEW_AUDIOS:
-			System.out.println("Before");
-			for(BaseTable aa : mediator.collectedAlbums){
-				System.out.println(aa.getPrimaryKey());
-			}
 			if (value.equals("Band")) {
 				Collections.sort(mediator.collectedAlbums,
 						new Comparator<AudioAlbum>() {
@@ -261,16 +248,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}else if (value.equals("Title")) {
 				Collections.sort(mediator.collectedAlbums,new TitleComparator());
 			}
-			System.out.println("After");
-			for(BaseTable aa : mediator.collectedAlbums){
-				System.out.println(aa.getPrimaryKey());
-			}
 			break;
 		case VIEW_BOOKS:
-			System.out.println("Before");
-			for(BaseTable aa : mediator.collectedBooks){
-				System.out.println(aa.getPrimaryKey());
-			}
 			if (value.equals("Author")) {
 				Collections.sort(mediator.collectedBooks,
 						new Comparator<Book>() {
@@ -314,16 +293,8 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}else if (value.equals("Title")) {
 				Collections.sort(mediator.collectedBooks,new TitleComparator());
 			}
-			System.out.println("After");
-			for(BaseTable aa : mediator.collectedBooks){
-				System.out.println(aa.getPrimaryKey());
-			}
 			break;
 		case VIEW_MOVIES:
-			System.out.println("Before ");
-			for(BaseTable aa : mediator.collectedMovies){
-				System.out.println(aa.getPrimaryKey());
-			}
 			if (value.equals("Director")) {
 				Collections.sort(mediator.collectedMovies,
 						new Comparator<Movie>() {
@@ -345,10 +316,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 						});
 			}else if (value.equals("Title")) {
 				Collections.sort(mediator.collectedMovies,new TitleComparator());
-			}
-			System.out.println("After");
-			for(BaseTable aa : mediator.collectedMovies){
-				System.out.println(aa.getPrimaryKey());
 			}
 			break;
 		default:
@@ -441,8 +408,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			preview.setVisible(true);
 		} else if (e.getPropertyName().equals("itemAffected")) {
 			BaseTable bt = (BaseTable) e.getNewValue();
-			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey()
-					+ "] -> " + bt.getTitle());
+			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
 			switch (bt.getTableType()) {
 			case MOVIE:
 				this.mediator.collectedMovies.add((Movie) bt);
@@ -503,6 +469,16 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			loadAudios();
 			loadBooks();
 			loadMovies();
+			Integer params[] = { 
+					tableModel.getRowCount(),
+					this.collectedAlbums.size(),
+					this.collectedBooks.size(),
+					this.collectedMovies.size() };
+			MabisLogger
+					.getLogger()
+					.log(Level.INFO,
+							"Collected {0} items from database, including {1} audios, {2} books and {3} movies",
+							params);
 		}
 
 		private void loadMovies() throws SQLException, SQLEntityExistsException {
@@ -523,9 +499,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}
 			msf.executeSQL(true);
 			this.collectedMovies.addAll(msf.getMovies());
-			MabisLogger.getLogger().log(Level.INFO,
-					"Succesffuly obtained {0} movies for collection mabis.mvc.view",
-					this.collectedMovies.size());
 		}
 
 		private void loadAudios() throws SQLException, SQLEntityExistsException {
@@ -547,11 +520,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}
 			aasf.executeSQL(true);
 			this.collectedAlbums.addAll(aasf.getValues());
-			MabisLogger
-					.getLogger()
-					.log(Level.INFO,
-							"Succesffuly obtained {0} audio albums for collection mabis.mvc.view",
-							this.collectedAlbums.size());
 		}
 
 		private void loadBooks() throws SQLException, SQLEntityExistsException {
@@ -573,9 +541,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}
 			aasf.executeSQL(true);
 			this.collectedBooks.addAll(aasf.getBooks());
-			MabisLogger.getLogger().log(Level.INFO,
-					"Succesffuly obtained {0} books for collection mabis.mvc.view",
-					this.collectedBooks.size());
 		}
 	}
 
