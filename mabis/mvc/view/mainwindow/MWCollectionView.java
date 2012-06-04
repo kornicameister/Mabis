@@ -99,9 +99,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.collectionTable.getColumnModel().getColumn(0).setMinWidth(180);
 		this.collectionTable.setRowHeight(200);
 		this.collectionTable.setDefaultRenderer(BaseTable.class,new CollectionCell());
-		this.scrollPanel = new JScrollPane(this.collectionTable,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		this.scrollPanel = new JScrollPane(this.collectionTable);
 
 		this.add(this.scrollPanel);
 		initPopupMenu();
