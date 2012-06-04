@@ -33,4 +33,8 @@ public enum GlobalPaths {
 	public String toString() {
 		return this.path;
 	}
+
+	public void setPath(String pathContent) {
+		this.path = pathContent;
+	}
 }

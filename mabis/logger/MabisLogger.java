@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.XMLFormatter;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Mabis wrapper for Logger functionality.</b> This particular wrapper uses
@@ -27,7 +27,7 @@ public class MabisLogger {
 		try {
 			h1 = new FileHandler("./mabisLog.xml", true);
 			h1.setLevel(Level.ALL);
-			h1.setFormatter(new XMLFormatter());
+			h1.setFormatter(new SimpleFormatter());
 			logger.addHandler(h1);
 		} catch (SecurityException | IOException e) {
 			e.printStackTrace();
