@@ -42,7 +42,6 @@ import mvc.model.enums.AuthorType;
 import mvc.model.enums.GenreType;
 import mvc.model.enums.ImageType;
 import mvc.model.utilities.ForeignKey;
-import mvc.view.imagePanel.ImagePanel;
 import mvc.view.items.CreatorContentNullPointerException;
 import mvc.view.items.ItemCreator;
 import mvc.view.items.itemsprieview.ItemsPreview;
@@ -70,7 +69,6 @@ import settings.io.SettingsLoader;
 public class MovieCreator extends ItemCreator {
 	private static final long serialVersionUID = -8029181092669910824L;
 	private JTextField titleField;
-	private ImagePanel coverPanel;
 	private TagCloudMiniPanel tagCloud;
 	private AuthorMiniPanel directorsPanel;
 	private JTextField durationField;
@@ -161,7 +159,6 @@ public class MovieCreator extends ItemCreator {
 		this.durationField = new JTextField();
 		this.durationField.setBorder(BorderFactory
 				.createTitledBorder("Duration"));
-		this.coverPanel = new ImagePanel();
 
 		this.initializeAuthorsMiniPanel();
 		this.initializeTagCloud();

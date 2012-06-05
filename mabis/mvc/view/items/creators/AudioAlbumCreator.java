@@ -45,7 +45,6 @@ import mvc.model.enums.AuthorType;
 import mvc.model.enums.GenreType;
 import mvc.model.enums.ImageType;
 import mvc.model.utilities.ForeignKey;
-import mvc.view.imagePanel.ImagePanel;
 import mvc.view.items.CreatorContentNullPointerException;
 import mvc.view.items.ItemCreator;
 import mvc.view.items.itemsprieview.ItemsPreview;
@@ -80,7 +79,6 @@ public class AudioAlbumCreator extends ItemCreator {
 	private TagCloudMiniPanel tagCloud;
 	private BandMiniPanel bandMiniPanel;
 	private JFormattedTextField durationField;
-	private ImagePanel coverPanel;
 	private TrackListPanel trackList;
 	private LoadFromAudioAlbumApi lfa;
 
@@ -168,7 +166,6 @@ public class AudioAlbumCreator extends ItemCreator {
 				"hh:mm"));
 		this.durationField.setBorder(BorderFactory
 				.createTitledBorder("Duration"));
-		this.coverPanel = new ImagePanel();
 		String arrayOfCriteria[] = {"by album"};
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}

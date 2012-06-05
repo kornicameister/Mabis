@@ -46,7 +46,6 @@ import mvc.model.enums.AuthorType;
 import mvc.model.enums.GenreType;
 import mvc.model.enums.ImageType;
 import mvc.model.utilities.ForeignKey;
-import mvc.view.imagePanel.ImagePanel;
 import mvc.view.items.CreatorContentNullPointerException;
 import mvc.view.items.ItemCreator;
 import mvc.view.items.itemsprieview.ItemsPreview;
@@ -76,7 +75,6 @@ import settings.io.SettingsLoader;
  */
 public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
-	private ImagePanel coverPanel;
 	private JTextArea descriptionArea;
 	private JTextField titleOriginal, subTitle, pages;
 	private TagCloudMiniPanel tagCloud;
@@ -196,7 +194,6 @@ public class BookCreator extends ItemCreator {
 		this.initAuthorsMiniPanel();
 		this.initGenresPanel();
 
-		this.coverPanel = new ImagePanel();
 		this.iiMiniPanel = new IndustryIdentifiersMiniPanel();
 		this.iiMiniPanel.setBorder(BorderFactory.createTitledBorder("ISBN"));
 		this.pages = new JTextField();

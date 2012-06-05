@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
@@ -14,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,6 +29,9 @@ import logger.MabisLogger;
 import mvc.model.BaseTable;
 import mvc.model.entity.User;
 import mvc.view.WindowClosedListener;
+import mvc.view.imagePanel.ImageFileFilter;
+import mvc.view.imagePanel.ImageFilePreview;
+import mvc.view.imagePanel.ImagePanel;
 
 /**
  * Klasa bazowa kreatora nowego obiektu dla kolekcji. Definiuje podstawową
@@ -49,6 +55,7 @@ public abstract class ItemCreator extends JFrame {
 	protected User selectedUser;
 	protected boolean editingMode;
 	protected BaseTable editedItem;
+	protected ImagePanel coverPanel;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -119,6 +126,33 @@ public abstract class ItemCreator extends JFrame {
 		this.searchProgressBar.setMinimum(0);
 		this.searchProgressBar.setMaximum(100);
 		this.searchProgressBar.setStringPainted(true);
+		this.coverPanel = new ImagePanel();
+
+		this.coverPanel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				if (e.getButton() == MouseEvent.BUTTON1
+						&& e.getClickCount() > 1) {
+					JFileChooser imageChooser = new JFileChooser();
+					imageChooser.setFileFilter(new ImageFileFilter());
+					imageChooser
+							.setAccessory(new ImageFilePreview(imageChooser));
+					if (imageChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+						coverPanel.setImage(imageChooser.getSelectedFile());
+					}
+				}
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				super.mouseEntered(e);
+				if (coverPanel.getImageFile() != null) {
+					coverPanel.setToolTipText("<html><body><b>Cover:</b></br>"
+							+ coverPanel.getImageFile().getName() + "</body></html>");
+				}
+			}
+		});
 	}
 
 	/**
