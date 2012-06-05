@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.TreeMap;
@@ -16,7 +15,6 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -75,7 +73,7 @@ public class MovieCreator extends ItemCreator {
 	private ImagePanel coverPanel;
 	private TagCloudMiniPanel tagCloud;
 	private AuthorMiniPanel directorsPanel;
-	private JFormattedTextField durationField;
+	private JTextField durationField;
 	private JTextArea descriptionArea;
 	private JScrollPane descriptionScrollPane;
 	private LoadFromMovieApi lfa;
@@ -85,10 +83,10 @@ public class MovieCreator extends ItemCreator {
 		try {
 			SettingsLoader.loadFrame(this);
 		} catch (SettingsException e) {
-			MabisLogger.getLogger().log(Level.WARNING,
-					"Failed to load frame {0} from settigns", this.getName());
+			MabisLogger.getLogger().log(Level.WARNING, "Failed to load frame {0} from settings", this.getName());
 			this.setSize((int) this.getMinimumSize().getWidth() + 190,
 					(int) this.getMinimumSize().getHeight() + 50);
+			this.setTitle(title);
 		}
 	}
 
@@ -154,11 +152,9 @@ public class MovieCreator extends ItemCreator {
 		this.descriptionArea = new JTextArea();
 		this.descriptionArea.setLineWrap(true);
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
-		this.descriptionScrollPane.setBorder(BorderFactory
-				.createTitledBorder("Plot"));
+		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder("Plot"));
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
-		this.durationField = new JFormattedTextField(new SimpleDateFormat(
-				"hh:mm"));
+		this.durationField = new JTextField();
 		this.durationField.setBorder(BorderFactory
 				.createTitledBorder("Duration"));
 		this.coverPanel = new ImagePanel();
@@ -219,8 +215,7 @@ public class MovieCreator extends ItemCreator {
 			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),
 					ImageType.FRONT_COVER));
 			selectedMovie.setDescription(this.descriptionArea.getText());
-			// TODO -> this shit aint working
-			selectedMovie.setDuration((Long) this.durationField.getValue());
+			selectedMovie.setDuration(Long.valueOf(this.durationField.getText())*3600);
 			selectedMovie.setGenres(this.tagCloud.getTags());
 			selectedMovie.setDirectors(this.directorsPanel.getAuthors());
 		} catch (IOException e1) {

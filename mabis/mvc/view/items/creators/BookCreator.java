@@ -92,8 +92,7 @@ public class BookCreator extends ItemCreator {
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public BookCreator(User u, String title)
-			throws CreatorContentNullPointerException {
+	public BookCreator(User u, String title) {
 		super(u, title);
 		try {
 			SettingsLoader.loadFrame(this);
@@ -102,6 +101,7 @@ public class BookCreator extends ItemCreator {
 					"Failed to load frame {0} from settigns", this.getName());
 			this.setSize((int) this.getMinimumSize().getWidth() + 220,
 					(int) this.getMinimumSize().getHeight());
+			this.setTitle(title);
 		}
 	}
 
@@ -237,7 +237,8 @@ public class BookCreator extends ItemCreator {
 					new Author());
 			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
 			asf.executeSQL(true);
-			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(), AuthorType.BOOK_AUTHOR);
+			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),
+					AuthorType.BOOK_AUTHOR);
 			this.authorsMiniPanel.setBorder(BorderFactory
 					.createTitledBorder("Writers"));
 		} catch (SQLException | SQLEntityExistsException e) {

@@ -1,10 +1,9 @@
 package mvc.model.entity;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import mvc.model.BaseTable;
 import mvc.model.enums.TableType;
@@ -49,12 +48,8 @@ public class Movie extends BaseTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idBook",
-						 "title",
-						 "object", 
-						 "directorFK", 
-						 "coverFK", 
-						 "genreFK" };
+		String tmp[] = {"idBook", "title", "object", "directorFK", "coverFK",
+				"genreFK"};
 		return tmp;
 	}
 
@@ -67,7 +62,7 @@ public class Movie extends BaseTable implements Serializable {
 		this.genres = new TreeSet<>();
 		this.yearOfRelease = new String();
 	}
-	
+
 	public String getYearOfRelease() {
 		return yearOfRelease;
 	}
@@ -75,18 +70,19 @@ public class Movie extends BaseTable implements Serializable {
 	public void setYearOfRelease(String yearOfRelease) {
 		this.yearOfRelease = yearOfRelease;
 	}
-	
+
 	public Long getLongDuration() {
 		return duration;
 	}
 
 	public String getDuration() {
-		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
-		return sdf.format(new Date(this.duration));
+		String s = String.format("%d",
+				TimeUnit.SECONDS.toMinutes(this.duration / 60));
+		return s;
 	}
 
-	public void setDuration(Long duration) {
-		this.duration = duration;
+	public void setDuration(Long milis) {
+		this.duration = milis;
 	}
 
 	public String getDescription() {
@@ -146,13 +142,13 @@ public class Movie extends BaseTable implements Serializable {
 		String str = super.toString();
 		str += "----------\n";
 		str += "[TITLE: " + this.getTitle() + "]\n";
-		if(this.getSubtitle() != null && !this.getSubtitle().isEmpty()){
-			str+= "[SUBTITLE: " + this.getSubtitle() + "]\n";
+		if (this.getSubtitle() != null && !this.getSubtitle().isEmpty()) {
+			str += "[SUBTITLE: " + this.getSubtitle() + "]\n";
 		}
-//		str += "[DURATION: " + this.getDuration() + "]\n";
-		if(!this.getAuthors().isEmpty()){
+		// str += "[DURATION: " + this.getDuration() + "]\n";
+		if (!this.getAuthors().isEmpty()) {
 			str += "[DIRECTORS]\n";
-			for(Author a : this.getAuthors()){
+			for (Author a : this.getAuthors()) {
 				str += "\t- " + a.getFirstName() + " " + a.getLastName() + "\n";
 			}
 		}

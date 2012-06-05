@@ -95,6 +95,7 @@ public class AudioAlbumCreator extends ItemCreator {
 					"Failed to load frame {0} from settigns", this.getName());
 			this.setSize((int) this.getMinimumSize().getWidth() + 200,
 					(int) this.getMinimumSize().getHeight());
+			this.setTitle(title);
 		}
 	}
 

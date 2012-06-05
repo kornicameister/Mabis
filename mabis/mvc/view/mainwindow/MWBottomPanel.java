@@ -6,6 +6,8 @@ package mvc.view.mainwindow;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -30,7 +32,10 @@ import mvc.view.utilities.StatusBar;
  *         <li> {@link MainWindow#publishButton}</li>
  *         <ul>
  */
-public class MWBottomPanel extends JPanel {
+public class MWBottomPanel extends JPanel
+		implements
+			PropertyChangeListener,
+			ActionListener {
 
 	private static final long serialVersionUID = 7673272237316575906L;
 	private StatusBar statusBar;
@@ -41,7 +46,6 @@ public class MWBottomPanel extends JPanel {
 	private JButton newAudioAlbumButton;
 
 	private JButton exitButton;
-	private MainWindowBottomPanelListener listener;
 	private final MainWindow mwParent;
 
 	private User connectedUser;
@@ -59,7 +63,6 @@ public class MWBottomPanel extends JPanel {
 		this.mwParent = parent;
 		this.setDoubleBuffered(true);
 		this.setBorder(BorderFactory.createEmptyBorder());
-		this.listener = new MainWindowBottomPanelListener();
 		this.initComponents();
 	}
 
@@ -83,10 +86,10 @@ public class MWBottomPanel extends JPanel {
 		this.actionsPanel.add(this.exitButton);
 
 		// adding listeners
-		this.exitButton.addActionListener(this.listener);
-		this.newAudioAlbumButton.addActionListener(this.listener);
-		this.newBookButton.addActionListener(this.listener);
-		this.newMovieButton.addActionListener(this.listener);
+		this.exitButton.addActionListener(this);
+		this.newAudioAlbumButton.addActionListener(this);
+		this.newBookButton.addActionListener(this);
+		this.newMovieButton.addActionListener(this);
 
 		// organizing into the layout
 		GroupLayout layout = new GroupLayout(this);
@@ -110,28 +113,28 @@ public class MWBottomPanel extends JPanel {
 								.addComponent(this.statusBar))));
 	}
 
-	class MainWindowBottomPanelListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			Object s = arg0.getSource();
-			if (s.equals(exitButton)) {
-				mwParent.setVisible(false);
-				mwParent.dispose();
-			} else if (s.equals(newAudioAlbumButton)) {
-				AudioAlbumCreator aac = new AudioAlbumCreator(connectedUser,
-						"New album");
-				aac.setVisible(true);
-			} else if (s.equals(newBookButton)) {
-				BookCreator aac = new BookCreator(connectedUser, "New book");
-				aac.setVisible(true);
-			} else if (s.equals(newMovieButton)) {
-				MovieCreator aac = new MovieCreator(connectedUser, "New album");
-				aac.setVisible(true);
-			}
-			MabisLogger.getLogger().log(Level.INFO,
-					((JButton) s).getActionCommand());
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		Object s = arg0.getSource();
+		if (s.equals(exitButton)) {
+			mwParent.setVisible(false);
+			mwParent.dispose();
+		} else if (s.equals(newAudioAlbumButton)) {
+			AudioAlbumCreator aac = new AudioAlbumCreator(connectedUser,
+					"New album");
+			aac.addPropertyChangeListener(this);
+			aac.setVisible(true);
+		} else if (s.equals(newBookButton)) {
+			BookCreator aac = new BookCreator(connectedUser, "New book");
+			aac.addPropertyChangeListener(this);
+			aac.setVisible(true);
+		} else if (s.equals(newMovieButton)) {
+			MovieCreator aac = new MovieCreator(connectedUser, "New movie");
+			aac.addPropertyChangeListener(this);
+			aac.setVisible(true);
 		}
+		MabisLogger.getLogger().log(Level.INFO,
+				((JButton) s).getActionCommand());
 	}
 
 	public StatusBar getStatusBar() {
@@ -146,5 +149,13 @@ public class MWBottomPanel extends JPanel {
 	 */
 	public void setConnectedUser(User us) {
 		this.connectedUser = us;
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getPropertyName().equals("itemAffected")) {
+			this.firePropertyChange(evt.getPropertyName(), evt.getOldValue(),
+					evt.getNewValue());
+		}
 	}
 }

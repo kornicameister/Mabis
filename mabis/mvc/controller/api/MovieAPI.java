@@ -122,7 +122,7 @@ public class MovieAPI extends ApiAccess {
 				res += Long.valueOf(arr[i - 1]) * 3600;
 			}
 		}
-		m.setDuration(res);
+		m.setDuration(res *60);
 		this.result.add(m);
 		this.pcs.firePropertyChange("taskStep", 0, 1);
 	}

@@ -33,7 +33,7 @@ public abstract class Settings {
 			new Comparator<JFrame>() {
 				@Override
 				public int compare(JFrame f1, JFrame f2) {
-					int res = f1.getTitle().compareTo(f2.getTitle());
+					int res = f1.getClass().getName().compareTo(f2.getClass().getName());
 					if (res == 0) {
 						Double w1 = (double) f1.getWidth();
 						Double w2 = (double) f2.getWidth();
