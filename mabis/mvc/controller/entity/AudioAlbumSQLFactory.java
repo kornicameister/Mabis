@@ -33,35 +33,42 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 			throws SQLException {
 		AudioAlbum am = (AudioAlbum) this.table;
 		switch (this.type) {
-		case UPDATE:
-			break;
-		case INSERT:
-			AudioAlbum tmp = (AudioAlbum) this.checkIfInserted();
-			if(tmp != null){
-				this.lastAffactedId = tmp.getPrimaryKey();
-				this.entityAlreadyInserted = true;
-				return;
-			}
-			short parameterIndex = 1;
-			st.setInt(parameterIndex++, this.insertGenres(am.getGenres()));
-			st.setInt(parameterIndex++, this.insertCover(am.getCover()));
-			st.setInt(parameterIndex++, this.insertDirectors(am.getAuthors()));
-			st.setString(parameterIndex++, am.getTitle());
-			st.setObject(parameterIndex++, am);
-			st.execute();
-			st.clearParameters();
-			this.lastAffactedId = Utilities.lastInsertedId(am, st);
-			am.setPrimaryKey(this.lastAffactedId);
-			break;
-		case DELETE:
-			this.deletePicture(am.getCover());
-			this.parseDeleteSet(st.executeUpdate());
-			break;
-		case SELECT:
-			this.parseResultSet(st.executeQuery());
-			break;
-		default:
-			break;
+			case INSERT :
+				try {
+					AudioAlbum tmp = (AudioAlbum) this.checkIfInserted();
+					if (tmp != null) {
+						this.lastAffactedId = tmp.getPrimaryKey();
+						this.entityAlreadyInserted = true;
+						return;
+					}
+				} catch (SQLEntityExistsException e) {
+					e.printStackTrace();
+				}
+			case UPDATE :
+				short parameterIndex = 1;
+				st.setInt(parameterIndex++, this.insertGenres(am.getGenres()));
+				st.setInt(parameterIndex++, this.insertCover(am.getCover()));
+				st.setInt(parameterIndex++,
+						this.insertDirectors(am.getAuthors()));
+				st.setObject(parameterIndex++, am);
+				st.setString(parameterIndex++, am.getTitle());
+				if (this.type == SQLStamentType.INSERT) {
+					st.execute();
+					this.lastAffactedId = Utilities.lastInsertedId(am, st);
+					am.setPrimaryKey(this.lastAffactedId);
+				} else {
+					this.lastAffactedId = st.executeUpdate();
+				}
+				break;
+			case DELETE :
+				this.deletePicture(am.getCover());
+				this.parseDeleteSet(st.executeUpdate());
+				break;
+			case SELECT :
+				this.parseResultSet(st.executeQuery());
+				break;
+			default :
+				break;
 		}
 	}
 
@@ -69,27 +76,28 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		AudioAlbum audioAlbum = null;
 		switch (this.type) {
-		case SELECT:
-			while (set.next()) {
-				byte[] buf = set.getBytes("object");
-				if (buf != null) {
-					try {
-						ObjectInputStream objectIn = new ObjectInputStream(
-								new ByteArrayInputStream(buf));
-						audioAlbum = (AudioAlbum) objectIn.readObject();
-						audioAlbum.setPrimaryKey(set.getInt("idAudioAlbum"));
-						this.audioAlbums.add(audioAlbum);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+			case SELECT :
+				while (set.next()) {
+					byte[] buf = set.getBytes("object");
+					if (buf != null) {
+						try {
+							ObjectInputStream objectIn = new ObjectInputStream(
+									new ByteArrayInputStream(buf));
+							audioAlbum = (AudioAlbum) objectIn.readObject();
+							audioAlbum
+									.setPrimaryKey(set.getInt("idAudioAlbum"));
+							this.audioAlbums.add(audioAlbum);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
+					audioAlbum = null;
 				}
-				audioAlbum = null;
-			}
-			break;
-		default:
-			break;
+				break;
+			default :
+				break;
 		}
 		set.close();
 	}
@@ -99,15 +107,13 @@ public class AudioAlbumSQLFactory extends MovieSQLFactory {
 	}
 
 	@Override
-	public BaseTable checkIfInserted() throws SQLException {
-		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.SELECT, this.table);
+	public BaseTable checkIfInserted() throws SQLException,
+			SQLEntityExistsException {
+		AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
+				SQLStamentType.SELECT, this.table);
 		aasf.addWhereClause("title", this.table.getTitle());
-		try {
-			aasf.executeSQL(true);
-		} catch (SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
-		for(AudioAlbum mm : aasf.getValues()){
+		aasf.executeSQL(true);
+		for (AudioAlbum mm : aasf.getValues()) {
 			return mm;
 		}
 		return null;

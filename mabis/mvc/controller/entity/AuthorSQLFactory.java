@@ -18,6 +18,7 @@ import mvc.model.BaseTable;
 import mvc.model.entity.Author;
 import mvc.model.entity.Picture;
 import mvc.model.enums.TableType;
+import utilities.Hasher;
 import utilities.Utilities;
 
 /**
@@ -36,22 +37,22 @@ public class AuthorSQLFactory extends SQLFactory {
 			throws SQLException {
 		Author author = (Author) this.table;
 		switch (this.type) {
-		case UPDATE:
-			st.setInt(1, author.getPrimaryKey());
-			this.parseDeleteSet(st.executeUpdate());
-			break;
-		case INSERT:
-			this.insertEntity(author, st);
-			break;
-		case SELECT:
-			this.parseResultSet(st.executeQuery());
-			break;
-		case DELETE:
-			this.deletePicture(author.getAvatar());
-			this.parseDeleteSet(st.executeUpdate());
-			break;
-		default:
-			break;
+			case UPDATE :
+				st.setInt(1, author.getPrimaryKey());
+				this.parseDeleteSet(st.executeUpdate());
+				break;
+			case INSERT :
+				this.insertEntity(author, st);
+				break;
+			case SELECT :
+				this.parseResultSet(st.executeQuery());
+				break;
+			case DELETE :
+				this.deletePicture(author.getAvatar());
+				this.parseDeleteSet(st.executeUpdate());
+				break;
+			default :
+				break;
 		}
 	}
 
@@ -59,29 +60,29 @@ public class AuthorSQLFactory extends SQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		Author author = null;
 		switch (this.type) {
-		case UPDATE:
-			break;
-		case SELECT:
-			while (set.next()) {
-				byte[] buf = set.getBytes("object");
-				if (buf != null) {
-					try {
-						ObjectInputStream objectIn = new ObjectInputStream(
-								new ByteArrayInputStream(buf));
-						author = (Author) objectIn.readObject();
-						author.setPrimaryKey(set.getInt("idAuthor"));
-						this.authors.add(author);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+			case UPDATE :
+				break;
+			case SELECT :
+				while (set.next()) {
+					byte[] buf = set.getBytes("object");
+					if (buf != null) {
+						try {
+							ObjectInputStream objectIn = new ObjectInputStream(
+									new ByteArrayInputStream(buf));
+							author = (Author) objectIn.readObject();
+							author.setPrimaryKey(set.getInt("idAuthor"));
+							this.authors.add(author);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
+					author = null;
 				}
-				author = null;
-			}
-			break;
-		default:
-			break;
+				break;
+			default :
+				break;
 		}
 		set.close();
 	}
@@ -100,11 +101,21 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	protected void insertEntity(Author entity, PreparedStatement st)
 			throws SQLException {
-		if(!entity.getTableType().equals(TableType.USER)){
-			st.setString(1, entity.getType().toString());
-			st.setInt(2, this.insertAvatar(entity.getAvatar()));
-			st.setObject(3, entity);
-		}else{
+		try {
+			BaseTable tmp = this.checkIfInserted();
+			if(tmp != null){
+				this.lastAffactedId = tmp.getPrimaryKey();
+				return;
+			}
+		} catch (SQLEntityExistsException e) {
+			e.printStackTrace();
+		}
+		if (!entity.getTableType().equals(TableType.USER)) {
+			st.setString(1, Hasher.hashString(entity.getTitle()));
+			st.setString(2, entity.getType().toString());
+			st.setInt(3, this.insertAvatar(entity.getAvatar()));
+			st.setObject(4, entity);
+		} else {
 			st.setObject(2, entity);
 			st.setInt(1, this.insertAvatar(entity.getAvatar()));
 		}
@@ -123,14 +134,15 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	private Integer insertAvatar(Picture picture) throws SQLException {
 		if (picture != null) {
-			PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.INSERT, picture);
+			PictureSQLFactory psf = new PictureSQLFactory(
+					SQLStamentType.INSERT, picture);
 			try {
 				this.lastAffactedId = psf.executeSQL(false);
 			} catch (SQLEntityExistsException e) {
 				e.printStackTrace();
 			}
 			return lastAffactedId;
-		}else{
+		} else {
 			return 0;
 		}
 	}
@@ -145,7 +157,15 @@ public class AuthorSQLFactory extends SQLFactory {
 	}
 
 	@Override
-	public BaseTable checkIfInserted() throws SQLException {
-		return this.table;
+	public BaseTable checkIfInserted() throws SQLException,
+			SQLEntityExistsException {
+		AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
+				this.table);
+		asf.addWhereClause("hash", Hasher.hashString(this.table.getTitle()));
+		asf.executeSQL(true);
+		for (Author a : asf.getAuthors()) {
+			return a;
+		}
+		return null;
 	}
 }

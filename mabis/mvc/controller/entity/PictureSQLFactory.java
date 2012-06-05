@@ -46,7 +46,7 @@ public class PictureSQLFactory extends SQLFactory {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
 
-		File newPicture = createNewPictureFile(pp);
+		File newPicture = this.createNewPictureFile(pp);
 
 		if (newPicture.exists()) {
 			return false; // that means that cover was found in cache !!!

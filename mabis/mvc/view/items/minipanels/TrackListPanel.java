@@ -78,7 +78,7 @@ public class TrackListPanel extends MiniPanel {
 //					System.out.println("New row inserted at " + eRow);
 					break;
 				case TableModelEvent.UPDATE:
-					System.out.println("Update at [" + eRow + "," + eCol + "]");
+//					System.out.println("Update at [" + eRow + "," + eCol + "]");
 					AudioAlbumTrack a = (AudioAlbumTrack) rowToEntity.get(e.getLastRow());
 					Object val = tableModel.getValueAt(eRow,eCol);
 					switch(e.getColumn()){

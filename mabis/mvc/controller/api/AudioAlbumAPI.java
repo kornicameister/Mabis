@@ -182,7 +182,7 @@ public class AudioAlbumAPI extends ApiAccess {
 				artistObject = artistMatches.getJSONObject(i);
 				if (artistObject.getString("name").equals(band)) {
 					b.setPicture(this.parseImage(artistObject.getJSONArray("image")));
-					b.getAvatar().setType(ImageType.AVATAR);
+					b.getAvatar().setType(ImageType.BAND);
 					return b;
 				}
 			}

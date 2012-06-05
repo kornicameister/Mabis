@@ -41,6 +41,7 @@ create table if not exists mabis.author (
     object longblob not null,
     avatarFK int(11) null default '0',
     type varchar(35) not null,
+    hash varchar(60) not null,
     primary key (idAuthor),
     key avatarAuthorKey (avatarFK) using btree,
     constraint avatarAuthorRef foreign key (avatarFK)

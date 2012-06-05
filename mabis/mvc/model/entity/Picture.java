@@ -109,8 +109,7 @@ public class Picture extends BaseTable implements Serializable {
 
 	private void saveHash(URL imageUrl) throws IOException {
 		URLConnection conn = imageUrl.openConnection();
-		conn.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		conn.connect();
 		try {
 			this.titles[0] = Hasher.hashStream(conn.getInputStream());
@@ -183,9 +182,9 @@ public class Picture extends BaseTable implements Serializable {
 	@Override
 	public String toString() {
 		String str = super.toString();
-		str += "----------\n";
 		str += "[TYPE: " + this.getType() + "]\n";
 		str += "[CHCSM: " + this.getCheckSum() + "]\n";
+		str += "[PATH: " + this.getImagePath() + "]\n";
 		return str;
 	}
 }

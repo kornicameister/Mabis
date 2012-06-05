@@ -241,10 +241,8 @@ public class AudioAlbumCreator extends ItemCreator {
 
 		if (this.editingMode) {
 			try {
-				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
-						SQLStamentType.UPDATE, selectedAlbum);
-				aasf.addWhereClause("idAudioAlbum", selectedAlbum
-						.getPrimaryKey().toString());
+				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(SQLStamentType.UPDATE, selectedAlbum);
+				aasf.addWhereClause("idAudioAlbum", selectedAlbum.getPrimaryKey().toString());
 				return aasf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
@@ -258,7 +256,7 @@ public class AudioAlbumCreator extends ItemCreator {
 				AudioUserSQLFactory ausf = new AudioUserSQLFactory(
 						SQLStamentType.INSERT, au);
 
-				selectedAlbum.setPrimaryKey(aasf.executeSQL(true));
+				aasf.executeSQL(true);
 
 				au.addMultiForeignKey(-1, new ForeignKey(selectedAlbum,
 						"idAudio", selectedAlbum.getPrimaryKey()),

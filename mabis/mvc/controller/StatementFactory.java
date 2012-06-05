@@ -158,6 +158,7 @@ public interface StatementFactory {
 	 * 
 	 * @return prawda, jeśli krotka jest w bazie
 	 * @throws SQLException
+	 * @throws SQLEntityExistsException 
 	 */
-	abstract BaseTable checkIfInserted() throws SQLException;
+	abstract BaseTable checkIfInserted() throws SQLException, SQLEntityExistsException;
 }

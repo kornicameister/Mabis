@@ -74,7 +74,7 @@ public class User extends Author implements Serializable {
 	}
 
 	public void setPassword(String password) {
-		this.password = Hasher.hashPassword(password);
+		this.password = Hasher.hashString(password);
 	}
 
 	@Override

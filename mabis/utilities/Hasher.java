@@ -29,7 +29,7 @@ public abstract class Hasher {
 	 * @see Hashing
 	 * @return hash hasła jako String
 	 */
-	final static public String hashPassword(String password) {
+	final static public String hashString(String password) {
 		return Hashing.md5().hashString(password).toString();
 	}
 

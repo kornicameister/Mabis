@@ -30,55 +30,60 @@ public class MovieSQLFactory extends SQLFactory {
 			throws SQLException {
 		Movie movie = (Movie) this.table;
 		switch (this.type) {
-		case INSERT:
-			Movie tmp = (Movie) this.checkIfInserted();
-			if (tmp != null) {
-				this.lastAffactedId = tmp.getPrimaryKey();
-				this.entityAlreadyInserted = true;
-				return;
-			}
-			short parameterIndex = 1;
-			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
-			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
-			st.setInt(parameterIndex++,
-					this.insertDirectors(movie.getAuthors()));
-			st.setObject(parameterIndex++, movie);
-			st.setString(parameterIndex++, movie.getTitle());
-			st.execute();
-			this.lastAffactedId = Utilities.lastInsertedId(movie, st);
-			movie.setPrimaryKey(this.lastAffactedId);
-			break;
-		case UPDATE:
-			parameterIndex = 1;
-			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
-			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
-			st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
-			st.setObject(parameterIndex++, movie);
-			st.setString(parameterIndex++, movie.getTitle());
-			this.lastAffactedId = st.executeUpdate();
-			break;
-		case DELETE:
-			this.deletePicture(movie.getCover());
-			this.parseDeleteSet(st.executeUpdate());
-			break;
-		case SELECT:
-			this.parseResultSet(st.executeQuery());
-			break;
-		default:
-			break;
+			case INSERT :
+				try {
+					Movie tmp = (Movie) this.checkIfInserted();
+					if (tmp != null) {
+						this.lastAffactedId = tmp.getPrimaryKey();
+						this.entityAlreadyInserted = true;
+						return;
+					}
+				} catch (SQLEntityExistsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				short parameterIndex = 1;
+				st.setInt(parameterIndex++,
+						this.insertGenres(movie.getGenres()));
+				st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
+				st.setInt(parameterIndex++,
+						this.insertDirectors(movie.getAuthors()));
+				st.setObject(parameterIndex++, movie);
+				st.setString(parameterIndex++, movie.getTitle());
+				st.execute();
+				this.lastAffactedId = Utilities.lastInsertedId(movie, st);
+				movie.setPrimaryKey(this.lastAffactedId);
+				break;
+			case UPDATE :
+				parameterIndex = 1;
+				st.setInt(parameterIndex++,
+						this.insertGenres(movie.getGenres()));
+				st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
+				st.setInt(parameterIndex++,
+						this.insertDirectors(movie.getAuthors()));
+				st.setObject(parameterIndex++, movie);
+				st.setString(parameterIndex++, movie.getTitle());
+				this.lastAffactedId = st.executeUpdate();
+				break;
+			case DELETE :
+				this.deletePicture(movie.getCover());
+				this.parseDeleteSet(st.executeUpdate());
+				break;
+			case SELECT :
+				this.parseResultSet(st.executeQuery());
+				break;
+			default :
+				break;
 		}
 	}
 
 	@Override
-	public BaseTable checkIfInserted() throws SQLException {
+	public BaseTable checkIfInserted() throws SQLException,
+			SQLEntityExistsException {
 		MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.SELECT,
 				this.table);
 		msf.addWhereClause("title", this.table.getTitle());
-		try {
-			msf.executeSQL(true);
-		} catch (SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
+		msf.executeSQL(true);
 		for (Movie mm : msf.getMovies()) {
 			return mm;
 		}
@@ -183,27 +188,27 @@ public class MovieSQLFactory extends SQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		Movie movie = null;
 		switch (this.type) {
-		case SELECT:
-			while (set.next()) {
-				byte[] buf = set.getBytes("object");
-				if (buf != null) {
-					try {
-						ObjectInputStream objectIn = new ObjectInputStream(
-								new ByteArrayInputStream(buf));
-						movie = (Movie) objectIn.readObject();
-						movie.setPrimaryKey(set.getInt(("idMovie")));
-						this.movies.add(movie);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+			case SELECT :
+				while (set.next()) {
+					byte[] buf = set.getBytes("object");
+					if (buf != null) {
+						try {
+							ObjectInputStream objectIn = new ObjectInputStream(
+									new ByteArrayInputStream(buf));
+							movie = (Movie) objectIn.readObject();
+							movie.setPrimaryKey(set.getInt(("idMovie")));
+							this.movies.add(movie);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
+					movie = null;
 				}
-				movie = null;
-			}
-			break;
-		default:
-			break;
+				break;
+			default :
+				break;
 		}
 		set.close();
 	}

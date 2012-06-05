@@ -258,6 +258,9 @@ public abstract class ItemCreator extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent s) {
 			JButton source = (JButton) s.getSource();
+			MabisLogger.getLogger().log(Level.INFO,
+					"ItemCreator action called :: {0}",
+					source.getActionCommand());
 			if (source.equals(buttonPanel.cancelButton)) {
 				setVisible(false);
 				dispose();

@@ -255,7 +255,7 @@ public class UserSelectionPanel extends JFrame
 				// while(pd.isVisible());
 				String password = pd.getPassword();
 
-				if (!u.getPassword().equals(Hasher.hashPassword(password))) {
+				if (!u.getPassword().equals(Hasher.hashString(password))) {
 					JOptionPane.showMessageDialog(usp,
 							"This is not valid password of " + u.getLogin()
 									+ " user", "Wrong password",

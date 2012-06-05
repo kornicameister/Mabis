@@ -38,8 +38,8 @@ public class Author extends BaseTable implements Serializable {
 	 */
 	public Author(String fName, String lName) {
 		super();
-		this.setTitle(fName);
-		this.setSubTitle(lName);
+		this.setSubTitle(fName);
+		this.setTitle(lName);
 	}
 
 	/**
@@ -52,14 +52,14 @@ public class Author extends BaseTable implements Serializable {
 
 	public Author(String fName, String lName, AuthorType type) {
 		super();
-		this.setTitle(fName);
-		this.setSubTitle(lName);
+		this.setSubTitle(fName);
+		this.setTitle(lName);
 		this.type = type;
 	}
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idAuthor", "object", "avatarFK", "type"};
+		String tmp[] = { "idAuthor", "object", "avatarFK", "type", "hash"};
 		return tmp;
 	}
 
@@ -69,19 +69,19 @@ public class Author extends BaseTable implements Serializable {
 	}
 
 	public String getFirstName() {
-		return this.getTitle();
-	}
-
-	public void setFirstName(String firstName) {
-		this.setTitle(firstName);
-	}
-
-	public String getLastName() {
 		return this.getSubtitle();
 	}
 
+	public void setFirstName(String firstName) {
+		this.setSubTitle(firstName);
+	}
+
+	public String getLastName() {
+		return this.getTitle();
+	}
+
 	public void setLastName(String lastName) {
-		this.setSubTitle(lastName);
+		this.setTitle(lastName);
 	}
 
 	public void setPicture(Picture f) {
