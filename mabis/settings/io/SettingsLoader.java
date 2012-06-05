@@ -114,26 +114,21 @@ public class SettingsLoader extends Settings {
 					SettingsLoader.pathToXML))).getRootElement();
 
 			List<?> runs = root.getChildren("runs");
-			if(runs.size() == 0){
+			if (runs.size() == 0) {
 				throw new SettingsException("No such element in XML config");
 			}
 
-			for (short i = 0; i < runs.size(); i++) {
-				Element node = (Element) runs.get(i);
+			Element node = (Element) runs.get(0);
+			int count = Integer.decode(node.getChildText("count"));
+			SettingsLoader.RUN_COUNT = count;
+			boolean status = Boolean.valueOf(node.getChildText("errorFree"));
+			Date date = Date.valueOf(node.getChildText("lastRun"));
 
-				int count = Integer.decode(node.getChildText("count"));
-				SettingsLoader.RUN_COUNT = count;
-				boolean status = Boolean
-						.valueOf(node.getChildText("errorFree"));
-				Date date = Date.valueOf(node.getChildText("lastRun"));
+			return new LastRunDescription(count, status, date);
 
-				return new LastRunDescription(count, status, date);
-
-			}
 		} catch (JDOMException | IOException e) {
 			throw new SettingsException(e.getMessage());
 		}
-		return null;
 	}
 
 }

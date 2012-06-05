@@ -1,5 +1,6 @@
 package settings.io;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 public class LastRunDescription {
@@ -23,6 +24,13 @@ public class LastRunDescription {
 
 	public Date getLastRunDate() {
 		return this.lastRunDate;
+	}
+
+	@Override
+	public String toString() {
+		return "Program statistics:\n\tRun Count = " + this.lastRunId
+				+ "\n\tLast run = "
+				+ DateFormat.getDateInstance().format(this.lastRunDate);
 	}
 
 }

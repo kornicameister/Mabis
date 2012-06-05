@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu.Separator;
 import javax.swing.KeyStroke;
 
@@ -26,6 +27,8 @@ import mvc.view.items.creators.BookCreator;
 import mvc.view.items.creators.MovieCreator;
 import mvc.view.newUser.NewUserDialog;
 import mvc.view.settings.SettingsExplorer;
+import settings.io.SettingsException;
+import settings.io.SettingsLoader;
 
 /**
  * Class nicely and logically group the functionality related to menu bar that
@@ -98,13 +101,16 @@ public class MWMenuBar extends JMenuBar
 	}
 
 	private void initHelpMenu() {
-		JMenuItem about = help.add("About");
-		about.addActionListener(this);
-
 		JMenuItem settings = help.add("Settings");
 		settings.addActionListener(this);
 		settings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,
 				ActionEvent.CTRL_MASK)); // ALT+N
+
+		JMenuItem runDesc = help.add("Last run");
+		runDesc.addActionListener(this);
+
+		JMenuItem about = help.add("About");
+		about.addActionListener(this);
 	}
 
 	private void initCollectionMenu() {
@@ -175,6 +181,14 @@ public class MWMenuBar extends JMenuBar
 		} else if (action.equals("About")) {
 			AboutMabis am = new AboutMabis();
 			am.setVisible(true);
+		} else if (action.equals("Last run")) {
+			try {
+				JOptionPane.showMessageDialog(null, SettingsLoader
+						.loadLastRun().toString(), "Last run",
+						JOptionPane.INFORMATION_MESSAGE, null);
+			} catch (HeadlessException | SettingsException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 

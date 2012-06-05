@@ -1,15 +1,18 @@
 package startPoint;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import mvc.view.firstrun.FirstRunWizard;
+import mvc.view.mainwindow.MainWindow;
 import settings.GlobalPaths;
-import settings.io.LastRunDescription;
 import settings.io.SettingsException;
 import settings.io.SettingsLoader;
+import settings.io.SettingsSaver;
 
 public class Mabis {
 	public static void main(String[] args) {
@@ -28,23 +31,34 @@ public class Mabis {
 		if (!f.exists()) {
 			f.mkdir();
 		}
+		
+		final MainWindow mw = new MainWindow("Mabis");
+		
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					SettingsLoader.loadFrame(mw);
+				} catch (SettingsException e) {
+					e.printStackTrace();
+				}
+				mw.setVisible(true);
 
-		// loading last run
-		try {
-			LastRunDescription lrd = SettingsLoader.loadLastRun();
-			if (lrd.getLastRunId() == 0) {
-				FirstRunWizard frw = new FirstRunWizard();
-				frw.addPropertyChangeListener(new GUILoader());
-				frw.setVisible(true);
-			} else {
-				GUILoader loader = new GUILoader();
-				loader.loadGUI();
+				class ApplicationExiting extends WindowAdapter
+						implements
+							WindowListener {
+					@Override
+					public void windowClosed(WindowEvent e) {
+						SettingsSaver.incrementRunCount();
+						SettingsSaver.setRunStatus(true);
+						SettingsSaver ss = new SettingsSaver();
+						ss.execute();
+					}
+				}
+
+				mw.addWindowListener(new ApplicationExiting());
 			}
-		} catch (SettingsException e1) {
-			e1.printStackTrace();
-			GUILoader loader = new GUILoader();
-			loader.loadGUI();
-		}
+		});
 
 	}
 }
