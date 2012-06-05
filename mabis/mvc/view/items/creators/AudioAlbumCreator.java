@@ -82,7 +82,6 @@ public class AudioAlbumCreator extends ItemCreator {
 	private JFormattedTextField durationField;
 	private ImagePanel coverPanel;
 	private TrackListPanel trackList;
-	private AudioAlbum selectedAlbum = new AudioAlbum();
 	private LoadFromAudioAlbumApi lfa;
 
 	public AudioAlbumCreator(User u, String title)
@@ -143,8 +142,10 @@ public class AudioAlbumCreator extends ItemCreator {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-						.toString()));
+				if (!editingMode) {
+					coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+							.toString()));
+				}
 			}
 		});
 		this.revalidate();
@@ -217,19 +218,23 @@ public class AudioAlbumCreator extends ItemCreator {
 		this.tagCloud.clear();
 		this.durationField.setText("");
 		this.bandMiniPanel.clear();
-		this.selectedAlbum = new AudioAlbum();
 	}
 
 	@Override
 	protected Boolean execute() {
-		this.selectedAlbum.setTitle(this.titleField.getText());
-		this.selectedAlbum.setDuration((Long) this.durationField.getValue());
-		this.selectedAlbum.setTrackList(this.trackList.getTracks());
-		this.selectedAlbum.setDirectors(this.bandMiniPanel.getAuthors());
-		this.selectedAlbum.setGenres(this.tagCloud.getTags());
+		AudioAlbum selectedAlbum = new AudioAlbum();
+
+		if (editingMode) {
+			selectedAlbum = (AudioAlbum) this.editedItem;
+		}
+
 		try {
-			this.selectedAlbum.setCover(new Picture(this.coverPanel
-					.getImageFile(), ImageType.FRONT_COVER));
+			selectedAlbum.setTitle(this.titleField.getText());
+			selectedAlbum.setDuration((Long) this.durationField.getValue());
+			selectedAlbum.setTrackList(this.trackList.getTracks());
+			selectedAlbum.setDirectors(this.bandMiniPanel.getAuthors());
+			selectedAlbum.setGenres(this.tagCloud.getTags());
+			selectedAlbum.setCover(new Picture(this.coverPanel.getImageFile(),ImageType.FRONT_COVER));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -237,7 +242,9 @@ public class AudioAlbumCreator extends ItemCreator {
 		if (this.editingMode) {
 			try {
 				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
-						SQLStamentType.UPDATE, this.selectedAlbum);
+						SQLStamentType.UPDATE, selectedAlbum);
+				aasf.addWhereClause("idAudioAlbum", selectedAlbum
+						.getPrimaryKey().toString());
 				return aasf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
@@ -247,14 +254,14 @@ public class AudioAlbumCreator extends ItemCreator {
 				AudioUser au = new AudioUser();
 
 				AudioAlbumSQLFactory aasf = new AudioAlbumSQLFactory(
-						SQLStamentType.INSERT, this.selectedAlbum);
+						SQLStamentType.INSERT, selectedAlbum);
 				AudioUserSQLFactory ausf = new AudioUserSQLFactory(
 						SQLStamentType.INSERT, au);
 
-				this.selectedAlbum.setPrimaryKey(aasf.executeSQL(true));
+				selectedAlbum.setPrimaryKey(aasf.executeSQL(true));
 
-				au.addMultiForeignKey(-1, new ForeignKey(this.selectedAlbum,
-						"idAudio", this.selectedAlbum.getPrimaryKey()),
+				au.addMultiForeignKey(-1, new ForeignKey(selectedAlbum,
+						"idAudio", selectedAlbum.getPrimaryKey()),
 						new ForeignKey(this.selectedUser, "idUser",
 								this.selectedUser.getPrimaryKey()));
 
@@ -268,7 +275,7 @@ public class AudioAlbumCreator extends ItemCreator {
 				return true;
 			}
 		}
-		this.firePropertyChange("itemAffected", null, this.selectedAlbum);
+		this.firePropertyChange("itemAffected", null, selectedAlbum);
 		return true;
 	}
 

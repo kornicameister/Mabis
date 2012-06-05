@@ -48,6 +48,15 @@ public class MovieSQLFactory extends SQLFactory {
 			this.lastAffactedId = Utilities.lastInsertedId(movie, st);
 			movie.setPrimaryKey(this.lastAffactedId);
 			break;
+		case UPDATE:
+			parameterIndex = 1;
+			st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
+			st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
+			st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
+			st.setObject(parameterIndex++, movie);
+			st.setString(parameterIndex++, movie.getTitle());
+			this.lastAffactedId = st.executeUpdate();
+			break;
 		case DELETE:
 			this.deletePicture(movie.getCover());
 			this.parseDeleteSet(st.executeUpdate());

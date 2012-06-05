@@ -90,6 +90,8 @@ public abstract class SQLFactory implements StatementFactory {
 		case UPDATE:
 			rawQueryCopy = rawQueryCopy.replaceFirst("!", this.buildFieldList(this.table.metaData()));
 			rawQueryCopy = rawQueryCopy.replaceAll(",", " = ?, ");
+			rawQueryCopy = rawQueryCopy.substring(0,rawQueryCopy.lastIndexOf(","));
+			rawQueryCopy += ", title = ? where !";
 			break;
 		default:
 			break;
@@ -98,8 +100,7 @@ public abstract class SQLFactory implements StatementFactory {
 		switch (this.type) {
 		case UPDATE:
 		case DELETE:
-			rawQueryCopy = rawQueryCopy.replaceFirst("!",
-					this.buildWhereChunk());
+			rawQueryCopy = rawQueryCopy.replaceFirst("!", this.buildWhereChunk());
 			break;
 		case SELECT:
 			String where = this.buildWhereChunk();

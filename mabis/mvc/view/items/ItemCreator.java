@@ -48,6 +48,7 @@ public abstract class ItemCreator extends JFrame {
 	protected JProgressBar searchProgressBar;
 	protected User selectedUser;
 	protected boolean editingMode;
+	protected BaseTable editedItem;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
@@ -177,6 +178,11 @@ public abstract class ItemCreator extends JFrame {
 	public void setEditableItem(BaseTable bt) {
 		this.editingMode = true;
 		this.fillWithResult(bt);
+		this.searchPanel.setVisible(false);
+		this.buttonPanel.createButton.setText("Update");
+		this.buttonPanel.clearButton.setVisible(false);
+		this.searchProgressBar.setVisible(false);
+		this.editedItem = bt;
 	}
 
 	private class ICButtonPanel extends JPanel {

@@ -83,16 +83,20 @@ public class ImagePanel extends JPanel
 	public void setSize(int w, int h) {
 		super.setSize(w, h);
 	}
+	
+	private ImageIcon getScaledImage(File f) {
+		ImageIcon i = new ImageIcon(f.getAbsolutePath());
+		
+		final double height = 180.0;
+		double a = height / i.getIconHeight();
+		double newWidth = a * i.getIconWidth();
+		
+		return new ImageIcon(i.getImage().getScaledInstance((int) newWidth, (int) height, Image.SCALE_FAST));
+	}
 
 	public void setImage(File f) {
 		this.imageFile = f;
-		ImageIcon tmp = new ImageIcon(f.getAbsolutePath());
-		if (tmp.getIconHeight() > this.getHeight()
-				&& tmp.getIconWidth() > this.getWidth()) {
-			tmp = new ImageIcon(tmp.getImage().getScaledInstance(
-					this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH));
-		}
-		this.contentLabel.setIcon(tmp);
+		this.contentLabel.setIcon(this.getScaledImage(f));
 	}
 
 	public ImageIcon getImage() {

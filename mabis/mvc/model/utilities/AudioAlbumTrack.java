@@ -19,14 +19,23 @@ public class AudioAlbumTrack implements Serializable,
 
 		this.duration = 0l;
 		if(!dur.isEmpty()){
-			this.duration = Long.valueOf(dur)*60;
+			this.duration = Long.valueOf(dur);
 		}
 		this.lastFMUrl = null;
 		this.rating = 0.0;
 	}
 
+	public AudioAlbumTrack(int id, String name, Long durr) {
+		this.id = id;
+		this.name = name;
+
+		this.duration = durr;
+		this.lastFMUrl = null;
+		this.rating = 0.0;
+	}
+
 	public String getDuration() {
-		String res = String.format("%d: %d",
+		String res = String.format("%d:%d",
 				TimeUnit.SECONDS.toHours(this.duration),
 				TimeUnit.SECONDS.toMinutes(this.duration) - (TimeUnit.SECONDS.toHours(this.duration)*60));
 		return res;
@@ -38,6 +47,10 @@ public class AudioAlbumTrack implements Serializable,
 
 	public void setDuration(String dur) {
 		this.duration = Long.valueOf(dur);
+	}
+	
+	public void setDuration(Long l){
+		this.duration = l;
 	}
 
 	public Integer getId() {

@@ -161,9 +161,8 @@ public class AudioAlbumAPI extends ApiAccess {
 			JSONObject track = null;
 			for (int i = 0; i < tracks.length(); i++) {
 				track = tracks.getJSONObject(i);
-				trackList.add(new AudioAlbumTrack((int) track.getJSONObject(
-						"@attr").getInt("rank"), track.getString("name"), track
-						.getString("duration")));
+				Long durr = track.getLong("duration")*60;
+				trackList.add(new AudioAlbumTrack((int) track.getJSONObject("@attr").getInt("rank"), track.getString("name"), durr));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

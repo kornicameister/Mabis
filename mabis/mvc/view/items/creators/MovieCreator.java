@@ -83,7 +83,8 @@ public class MovieCreator extends ItemCreator {
 		try {
 			SettingsLoader.loadFrame(this);
 		} catch (SettingsException e) {
-			MabisLogger.getLogger().log(Level.WARNING, "Failed to load frame {0} from settings", this.getName());
+			MabisLogger.getLogger().log(Level.WARNING,
+					"Failed to load frame {0} from settings", this.getName());
 			this.setSize((int) this.getMinimumSize().getWidth() + 190,
 					(int) this.getMinimumSize().getHeight() + 50);
 			this.setTitle(title);
@@ -136,8 +137,10 @@ public class MovieCreator extends ItemCreator {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-						.toString()));
+				if (!editingMode) {
+					coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+							.toString()));
+				}
 			}
 		});
 		this.revalidate();
@@ -152,7 +155,8 @@ public class MovieCreator extends ItemCreator {
 		this.descriptionArea = new JTextArea();
 		this.descriptionArea.setLineWrap(true);
 		this.descriptionScrollPane = new JScrollPane(this.descriptionArea);
-		this.descriptionScrollPane.setBorder(BorderFactory.createTitledBorder("Plot"));
+		this.descriptionScrollPane.setBorder(BorderFactory
+				.createTitledBorder("Plot"));
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.durationField = new JTextField();
 		this.durationField.setBorder(BorderFactory
@@ -210,12 +214,15 @@ public class MovieCreator extends ItemCreator {
 	@Override
 	protected Boolean execute() {
 		Movie selectedMovie = new Movie();
+		if (editingMode) {
+			selectedMovie = (Movie) this.editedItem;
+		}
+
 		try {
 			selectedMovie.setTitle(this.titleField.getText());
-			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),
-					ImageType.FRONT_COVER));
+			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(), ImageType.FRONT_COVER));
 			selectedMovie.setDescription(this.descriptionArea.getText());
-			selectedMovie.setDuration(Long.valueOf(this.durationField.getText())*3600);
+			selectedMovie.setDuration(Long.valueOf(this.durationField.getText()) * 3600);
 			selectedMovie.setGenres(this.tagCloud.getTags());
 			selectedMovie.setDirectors(this.directorsPanel.getAuthors());
 		} catch (IOException e1) {
@@ -224,8 +231,8 @@ public class MovieCreator extends ItemCreator {
 
 		if (this.editingMode) {
 			try {
-				MovieSQLFactory msf = new MovieSQLFactory(
-						SQLStamentType.UPDATE, selectedMovie);
+				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, selectedMovie);
+				msf.addWhereClause("idMovie", selectedMovie.getPrimaryKey().toString());
 				return msf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();

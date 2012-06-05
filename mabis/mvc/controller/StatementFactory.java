@@ -42,7 +42,7 @@ public interface StatementFactory {
 	 * </b>
 	 * </pre>
 	 */
-	static final String updatePattern = "update ! set (!) where !";
+	static final String updatePattern = "update ! set ! where !";
 
 	/**
 	 * ! marks, in following order, stands for:

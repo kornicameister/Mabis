@@ -174,8 +174,10 @@ public class BookCreator extends ItemCreator {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
-						.toString()));
+				if (!editingMode) {
+					coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
+							.toString()));
+				}
 			}
 		});
 		this.revalidate();
@@ -261,15 +263,20 @@ public class BookCreator extends ItemCreator {
 
 	@Override
 	protected Boolean execute() {
-		final Book selectedBook = new Book();
-		selectedBook.setIdentifiers(this.iiMiniPanel.getII());
-		selectedBook.setTitle(this.titleOriginal.getText());
-		selectedBook.setSubTitle(this.subTitle.getText());
-		selectedBook.setPages(Integer.valueOf(this.pages.getText()));
-		selectedBook.setDescription(this.descriptionArea.getText());
-		selectedBook.setGenres(this.tagCloud.getTags());
-		selectedBook.setDirectors(this.authorsMiniPanel.getAuthors());
+		Book selectedBook = new Book();
+
+		if (editingMode) {
+			selectedBook = (Book) this.editedItem;
+		}
+
 		try {
+			selectedBook.setIdentifiers(this.iiMiniPanel.getII());
+			selectedBook.setTitle(this.titleOriginal.getText());
+			selectedBook.setSubTitle(this.subTitle.getText());
+			selectedBook.setPages(Integer.valueOf(this.pages.getText()));
+			selectedBook.setDescription(this.descriptionArea.getText());
+			selectedBook.setGenres(this.tagCloud.getTags());
+			selectedBook.setDirectors(this.authorsMiniPanel.getAuthors());
 			selectedBook.setCover(new Picture(this.coverPanel.getImageFile(),
 					ImageType.FRONT_COVER));
 		} catch (IOException e1) {
@@ -280,6 +287,7 @@ public class BookCreator extends ItemCreator {
 			try {
 				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE,
 						selectedBook);
+				bsf.addWhereClause("idBook", selectedBook.getPrimaryKey().toString());
 				return bsf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();

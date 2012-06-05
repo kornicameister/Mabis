@@ -40,7 +40,7 @@ public class TrackListPanel extends MiniPanel {
 
 	@Override
 	protected void initTable() {
-		String columnNames[] = {"|","LP","Lenght","Name",};
+		String columnNames[] = {"||","LP","Lenght","Name",};
 		this.tableModel = new DefaultTableModel(columnNames, 0);
 		this.contentTable = new JTable(this.tableModel){
 			private static final long serialVersionUID = -4341941906407330416L;
@@ -71,11 +71,11 @@ public class TrackListPanel extends MiniPanel {
 					eCol = e.getColumn();
 				switch(e.getType()){
 				case TableModelEvent.INSERT:
-					Integer id = (Integer) tableModel.getValueAt(eRow, 1);
-					String dur = (String) tableModel.getValueAt(eRow, 2);
-					String name = (String) tableModel.getValueAt(eRow, 3);
-					rowToEntity.put(eRow, new AudioAlbumTrack(id, name, dur));
-					System.out.println("New row inserted at " + eRow);
+					rowToEntity.put(eRow, new AudioAlbumTrack(
+							(Integer) tableModel.getValueAt(eRow, 1), 
+							(String) tableModel.getValueAt(eRow, 3), 
+							durationToLong((String) tableModel.getValueAt(eRow, 2)).toString()));
+//					System.out.println("New row inserted at " + eRow);
 					break;
 				case TableModelEvent.UPDATE:
 					System.out.println("Update at [" + eRow + "," + eCol + "]");
@@ -86,7 +86,7 @@ public class TrackListPanel extends MiniPanel {
 						a.setId(Integer.valueOf(((String)val)));
 						break;
 					case 2:
-						a.setDuration((String) val);
+						a.setDuration(this.durationToLong((String) val));
 						break;
 					case 3:
 						a.setName((String) val);
@@ -94,11 +94,22 @@ public class TrackListPanel extends MiniPanel {
 					}
 					break;
 				case TableModelEvent.DELETE:
-					System.out.println("Row " + eRow + " deleted");
+//					System.out.println("Row " + eRow + " deleted");
 					rowToEntity.remove(eRow);
 					contentTable.revalidate();
 					break;
 				}
+			}
+
+			private Long durationToLong(String dur) {
+				String tmp[] = dur.split(":");
+				Long ll = 0l;
+				int multiplier = 60;
+				for(int i = tmp.length -1 ; i != -1 ; i--){
+					ll += Long.valueOf(tmp[i])*multiplier;
+					multiplier *= 60;
+				}
+				return ll;
 			}
 		};
 	}
@@ -117,7 +128,7 @@ public class TrackListPanel extends MiniPanel {
 	@Override
 	protected void addRow(Object bt) {
 		final AudioAlbumTrack a = (AudioAlbumTrack) bt;
-		Object data[] = { null, 0, a.getDuration(), a.getName() };
+		Object data[] = { null, a.getId(), a.getDuration(), a.getName() };
 		ImageIcon tmp = new ImageIcon(GlobalPaths.MUSIC_ICON.toString());
 		data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
 		
