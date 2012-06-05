@@ -113,7 +113,12 @@ public class AuthorSQLFactory extends SQLFactory {
 			}
 			st.setString(1, Hasher.hashString(entity.getTitle()));
 			st.setString(2, entity.getType().toString());
-			st.setInt(3, this.insertAvatar(entity.getAvatar()));
+			Integer pictureID = this.insertAvatar(entity.getAvatar());
+			if (pictureID != null) {
+				st.setInt(3, pictureID);
+			}else{
+				st.setString(3, null);
+			}
 			st.setObject(4, entity);
 		} else {
 			st.setObject(2, entity);
@@ -142,9 +147,8 @@ public class AuthorSQLFactory extends SQLFactory {
 				e.printStackTrace();
 			}
 			return lastAffactedId;
-		} else {
-			return 0;
 		}
+		return null;
 	}
 
 	/**

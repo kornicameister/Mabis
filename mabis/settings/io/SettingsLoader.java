@@ -108,14 +108,14 @@ public class SettingsLoader extends Settings {
 	 *         uruchomienie programu
 	 * @throws SettingsException
 	 */
-	public static LastRunDescription loadLastRun() throws SettingsException {
+	public static LastRunDescription loadLastRun() {
+		Element root;
 		try {
-			Element root = ((Document) new SAXBuilder().build(new File(
+			root = ((Document) new SAXBuilder().build(new File(
 					SettingsLoader.pathToXML))).getRootElement();
-
 			List<?> runs = root.getChildren("runs");
 			if (runs.size() == 0) {
-				throw new SettingsException("No such element in XML config");
+				return new LastRunDescription(0, true, new Date(0));
 			}
 
 			Element node = (Element) runs.get(0);
@@ -125,10 +125,10 @@ public class SettingsLoader extends Settings {
 			Date date = Date.valueOf(node.getChildText("lastRun"));
 
 			return new LastRunDescription(count, status, date);
-
 		} catch (JDOMException | IOException e) {
-			throw new SettingsException(e.getMessage());
+			e.printStackTrace();
 		}
+		return new LastRunDescription(0, true, new Date(0));
 	}
 
 }

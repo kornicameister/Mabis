@@ -43,11 +43,9 @@ public class MovieSQLFactory extends SQLFactory {
 					e.printStackTrace();
 				}
 				short parameterIndex = 1;
-				st.setInt(parameterIndex++,
-						this.insertGenres(movie.getGenres()));
+				st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
 				st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
-				st.setInt(parameterIndex++,
-						this.insertDirectors(movie.getAuthors()));
+				st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
 				st.setObject(parameterIndex++, movie);
 				st.setString(parameterIndex++, movie.getTitle());
 				st.execute();

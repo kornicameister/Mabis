@@ -27,7 +27,7 @@ import mvc.view.items.creators.BookCreator;
 import mvc.view.items.creators.MovieCreator;
 import mvc.view.newUser.NewUserDialog;
 import mvc.view.settings.SettingsExplorer;
-import settings.io.SettingsException;
+import settings.io.LastRunDescription;
 import settings.io.SettingsLoader;
 
 /**
@@ -45,12 +45,9 @@ public class MWMenuBar extends JMenuBar
 	private JMenu collection;
 	private JMenu data;
 	private JMenu help;
-	/**
-	 * this is a reference to main window allowing {@link MWMenuBar} to pass
-	 * actions againt class to mainWindow
-	 */
 	private MainWindow mw;
 	private User connectedUser;
+	private final static LastRunDescription LSR = SettingsLoader.loadLastRun();
 
 	public MWMenuBar(MainWindow parent) throws HeadlessException {
 		super();// file menu
@@ -182,16 +179,10 @@ public class MWMenuBar extends JMenuBar
 			AboutMabis am = new AboutMabis();
 			am.setVisible(true);
 		} else if (action.equals("Last run")) {
-			try {
-				JOptionPane.showMessageDialog(null, SettingsLoader
-						.loadLastRun().toString(), "Last run",
-						JOptionPane.INFORMATION_MESSAGE, null);
-			} catch (HeadlessException | SettingsException e1) {
-				e1.printStackTrace();
-			}
+			JOptionPane.showMessageDialog(null, LSR.toString(), "Last run",
+					JOptionPane.INFORMATION_MESSAGE, null);
 		}
 	}
-
 	public void setConnectedUser(User connectedUser) {
 		this.connectedUser = connectedUser;
 	}
