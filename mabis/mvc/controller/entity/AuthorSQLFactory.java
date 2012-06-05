@@ -101,16 +101,16 @@ public class AuthorSQLFactory extends SQLFactory {
 	 */
 	protected void insertEntity(Author entity, PreparedStatement st)
 			throws SQLException {
-		try {
-			BaseTable tmp = this.checkIfInserted();
-			if(tmp != null){
-				this.lastAffactedId = tmp.getPrimaryKey();
-				return;
-			}
-		} catch (SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
 		if (!entity.getTableType().equals(TableType.USER)) {
+			try {
+				BaseTable tmp = this.checkIfInserted();
+				if (tmp != null) {
+					this.lastAffactedId = tmp.getPrimaryKey();
+					return;
+				}
+			} catch (SQLEntityExistsException e) {
+				e.printStackTrace();
+			}
 			st.setString(1, Hasher.hashString(entity.getTitle()));
 			st.setString(2, entity.getType().toString());
 			st.setInt(3, this.insertAvatar(entity.getAvatar()));
