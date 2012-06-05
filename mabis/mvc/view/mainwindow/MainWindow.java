@@ -43,6 +43,7 @@ public class MainWindow extends JFrame {
 	private MWBottomPanel bottomPanel;
 	private MWCollectionView collectionView;
 	private JPanel contentPane = null;
+	private MWMenuBar menuBar = null;
 
 	/**
 	 * Constructor of the main windows, calls for all private method to
@@ -57,7 +58,8 @@ public class MainWindow extends JFrame {
 	public MainWindow(String title) {
 		super(title);
 
-		this.setJMenuBar(new MWMenuBar(this));
+		this.menuBar = new MWMenuBar(this);
+		this.setJMenuBar(this.menuBar);
 		this.bottomPanel = new MWBottomPanel(this);
 		this.collectionView = new MWCollectionView(this, new BorderLayout(),
 				true);
@@ -72,6 +74,7 @@ public class MainWindow extends JFrame {
 		this.toolBar.addPropertyChangeListener(this.collectionView);
 		this.addPropertyChangeListener("connectedUser", this.collectionView);
 		this.bottomPanel.addPropertyChangeListener(this.collectionView);
+		this.menuBar.addPropertyChangeListener(this.collectionView);
 
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -190,6 +193,7 @@ public class MainWindow extends JFrame {
 		this.connectedUser = newUser;
 		this.firePropertyChange("connectedUser", oldUser, this.connectedUser);
 		this.bottomPanel.setConnectedUser(this.connectedUser);
+		this.menuBar.setConnectedUser(this.connectedUser);
 		java.awt.EventQueue.invokeLater(new Runnable() {
 
 			@Override
