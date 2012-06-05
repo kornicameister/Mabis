@@ -76,8 +76,7 @@ public class Movie extends BaseTable implements Serializable {
 	}
 
 	public String getDuration() {
-		String s = String.format("%d",
-				TimeUnit.SECONDS.toMinutes(this.duration / 60));
+		String s = String.format("%d", TimeUnit.SECONDS.toMinutes(this.duration / 60));
 		return s;
 	}
 
