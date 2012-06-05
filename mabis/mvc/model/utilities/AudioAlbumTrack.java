@@ -2,6 +2,7 @@ package mvc.model.utilities;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class AudioAlbumTrack implements Serializable,
 		Comparable<AudioAlbumTrack> {
@@ -17,19 +18,18 @@ public class AudioAlbumTrack implements Serializable,
 		this.name = name;
 
 		this.duration = 0l;
-//		if(dur.isEmpty()){
-//			this.duration = 0l;
-//		}else{
-//			this.duration = Long.valueOf(dur);
-//		}
+		if(!dur.isEmpty()){
+			this.duration = Long.valueOf(dur)*60;
+		}
 		this.lastFMUrl = null;
 		this.rating = 0.0;
 	}
 
 	public String getDuration() {
-		int minutes = (int) (this.duration / 60);
-		int leftSeconds = (int) (this.duration - (minutes * 60));
-		return minutes + ":" + leftSeconds;
+		String res = String.format("%d: %d",
+				TimeUnit.SECONDS.toHours(this.duration),
+				TimeUnit.SECONDS.toMinutes(this.duration) - (TimeUnit.SECONDS.toHours(this.duration)*60));
+		return res;
 	}
 
 	public Long getLongDuration() {
