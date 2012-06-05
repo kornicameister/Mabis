@@ -2,6 +2,7 @@ package settings.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -80,8 +81,9 @@ public class SettingsLoader extends Settings {
 				Element node = (Element) paths.get(i);
 
 				List<?> frames = node.getChildren(f.getClass().getName());
-				if(frames.size()  == 0){
-					throw new SettingsException("No such frame in settings file");
+				if (frames.size() == 0) {
+					throw new SettingsException(
+							"No such frame in settings file");
 				}
 				for (short j = 0; j < frames.size(); j++) {
 					node = (Element) frames.get(j);
@@ -96,6 +98,42 @@ public class SettingsLoader extends Settings {
 		} catch (JDOMException | IOException e) {
 			throw new SettingsException(e.getMessage());
 		}
+	}
+
+	/**
+	 * Ładuje opis ostatniego uruchomienia aplikacji i zapisuje do obiektu klasy
+	 * {@link LastRunDescription}
+	 * 
+	 * @return obiekt klasy {@link LastRunDescription} opisujący ostatnie
+	 *         uruchomienie programu
+	 * @throws SettingsException
+	 */
+	public static LastRunDescription loadLastRun() throws SettingsException {
+		try {
+			Element root = ((Document) new SAXBuilder().build(new File(
+					SettingsLoader.pathToXML))).getRootElement();
+
+			List<?> runs = root.getChildren("runs");
+			if(runs.size() == 0){
+				throw new SettingsException("No such element in XML config");
+			}
+
+			for (short i = 0; i < runs.size(); i++) {
+				Element node = (Element) runs.get(i);
+
+				int count = Integer.decode(node.getChildText("count"));
+				SettingsLoader.RUN_COUNT = count;
+				boolean status = Boolean
+						.valueOf(node.getChildText("errorFree"));
+				Date date = Date.valueOf(node.getChildText("lastRun"));
+
+				return new LastRunDescription(count, status, date);
+
+			}
+		} catch (JDOMException | IOException e) {
+			throw new SettingsException(e.getMessage());
+		}
+		return null;
 	}
 
 }

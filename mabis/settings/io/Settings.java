@@ -48,6 +48,8 @@ public abstract class Settings {
 				}
 			});
 	protected File xmlFile;
+	protected static Integer RUN_COUNT = new Integer(0);
+	protected static Boolean RUN_ERROR_FREE = new Boolean(false);
 
 	public Settings() {
 		this.xmlFile = new File(Settings.pathToXML);
@@ -76,6 +78,14 @@ public abstract class Settings {
 		}
 	}
 
+	public static void setRunStatus(boolean status){
+		Settings.RUN_ERROR_FREE = status;
+	}
+	
+	public static void incrementRunCount() {
+		Settings.RUN_COUNT += 1;
+	}
+	
 	public abstract void execute() throws SettingsParseException,
 			SettingsException;
 

@@ -1,6 +1,8 @@
 package settings.io;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.TreeSet;
 
 import javax.swing.JFrame;
@@ -35,6 +37,7 @@ public class SettingsSaver extends Settings {
 		try {
 			Document doc = new Document(new Element("mabis"));
 
+			doc.getRootElement().addContent(this.saveRunCountBlock());
 			doc.getRootElement().addContent(this.saveWindowPosition());
 			doc.getRootElement().addContent(this.saveGlobalPaths());
 
@@ -43,6 +46,14 @@ public class SettingsSaver extends Settings {
 		} catch (IOException | SettingsException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private Element saveRunCountBlock() {
+		Element r = new Element("runs");
+		r.addContent(new Element("count").setText(SettingsSaver.RUN_COUNT.toString()));
+		r.addContent(new Element("lastRun").setText(DateFormat.getDateInstance().format(new Date())));
+		r.addContent(new Element("errorFree").setText(SettingsSaver.RUN_ERROR_FREE.toString()));
+		return r;
 	}
 
 	/**
