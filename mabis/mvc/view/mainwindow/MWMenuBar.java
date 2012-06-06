@@ -21,12 +21,12 @@ import javax.swing.KeyStroke;
 import logger.MabisLogger;
 import mvc.model.entity.User;
 import mvc.view.AboutMabis;
-import mvc.view.UserSelectionPanel;
 import mvc.view.items.creators.AudioAlbumCreator;
 import mvc.view.items.creators.BookCreator;
 import mvc.view.items.creators.MovieCreator;
-import mvc.view.newUser.NewUserDialog;
 import mvc.view.settings.SettingsExplorer;
+import mvc.view.user.NewUserDialog;
+import mvc.view.user.UserSelectionPanel;
 import settings.io.LastRunDescription;
 import settings.io.SettingsLoader;
 

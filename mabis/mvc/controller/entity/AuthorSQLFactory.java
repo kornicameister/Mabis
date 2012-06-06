@@ -138,7 +138,7 @@ public class AuthorSQLFactory extends SQLFactory {
 	 * Metoda umieszcza w bazie danych informacje o avatarze danego autora
 	 * 
 	 * @param picture
-	 * @return
+	 * @return klucz glowny ostatnio wrzuconego zdjecia
 	 * @throws SQLException
 	 */
 	private Integer insertAvatar(Picture picture) throws SQLException {

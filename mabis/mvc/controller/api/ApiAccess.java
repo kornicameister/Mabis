@@ -27,9 +27,14 @@ public abstract class ApiAccess {
 	}
 
 	/**
-	 * Metoda abstrakcyjna. Powinna określać, definiować szereg czynności
-	 * związanych z wykonaniem zapytania przez API celem stworzenia pełnego
-	 * obiektu kolekcji.
+	 * Metoda abstrakcyjna. Powinna okreslac szereg czynnosci, jakie musza
+	 * zostac wykonane aby pobrac dane o obiekcie kolekcji zgodnym z typem klasy
+	 * API dla ktorego ta metoda zostala wywolana. I tak wlasciwe bedzie
+	 * stwierdzenie, ze
+	 * <p>
+	 * metoda pobierze informacje o pisarzu, okladce oraz ilosci stron, jesli
+	 * zostanie wywolana na rzecz obiektu {@link GoogleBookApi}
+	 * </p>
 	 * 
 	 * @param question
 	 *            zapytanie do bazy

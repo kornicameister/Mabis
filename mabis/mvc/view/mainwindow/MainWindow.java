@@ -21,9 +21,9 @@ import mvc.controller.entity.UserSQLFactory;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.entity.User;
 import mvc.view.MabisFrameInterface;
-import mvc.view.UserSelectionPanel;
 import mvc.view.WindowClosedListener;
-import mvc.view.newUser.NewUserDialog;
+import mvc.view.user.NewUserDialog;
+import mvc.view.user.UserSelectionPanel;
 
 /**
  * Klasa glownego okna. Dzieki modularnej budowie glownego okna w kontekscie
