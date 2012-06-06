@@ -20,24 +20,35 @@ import mvc.model.entity.Band;
 import mvc.model.enums.AuthorType;
 import settings.GlobalPaths;
 
+/**
+ * {@link MiniPanel} który rozszerzając {@link AuthorMiniPanel} stanowi
+ * wyspecjalizowaną jego wersję przystosowaną do działania z {@link Band} -
+ * tworcami albumow muzycznych
+ * 
+ * @author tomasz
+ * @see Band
+ */
 public class BandMiniPanel extends AuthorMiniPanel {
 	private static final long serialVersionUID = -7769648241373563025L;
-	private final ArrayList<Band> bands = new ArrayList<>();
+	private ArrayList<Band> bands = new ArrayList<>();
 
 	public BandMiniPanel(TreeSet<Band> bands, AuthorType type) {
 		super(new TreeSet<Author>(bands), type);
+		this.bands = new ArrayList<>(bands);
 	}
 
 	@Override
 	public void addRow(Author a) {
 		Band b = (Band) a;
-		Object data[] = { null, b.getName() };
-		if(b.getPrimaryKey() < 0){
+		Object data[] = {null, b.getName()};
+		if (b.getPrimaryKey() < 0) {
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
-			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
-		}else{
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10,
+					Image.SCALE_FAST));
+		} else {
 			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
-			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10,
+					Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
 		this.rowToAuthor.put(this.rowToAuthor.size(), a);
@@ -45,13 +56,13 @@ public class BandMiniPanel extends AuthorMiniPanel {
 
 	@Override
 	protected void initTable() {
-		String columnNames[] = { "LP", "Name" };
+		String columnNames[] = {"LP", "Name"};
 		this.tableModel = new DefaultTableModel(columnNames, 0);
-		this.table = new JTable(tableModel){
+		this.table = new JTable(tableModel) {
 			private static final long serialVersionUID = -4341941906407330416L;
 			@Override
 			public Class<?> getColumnClass(int column) {
-				if(column == 0){
+				if (column == 0) {
 					return ImageIcon.class;
 				}
 				return Object.class;
@@ -95,7 +106,7 @@ public class BandMiniPanel extends AuthorMiniPanel {
 					"Select one from following box", source.getName(),
 					JOptionPane.QUESTION_MESSAGE, null, arr, arr[0]);
 			if (returned != null) {
-				Band tmp = (Band) returned;					
+				Band tmp = (Band) returned;
 				this.addRow(tmp);
 			}
 		}

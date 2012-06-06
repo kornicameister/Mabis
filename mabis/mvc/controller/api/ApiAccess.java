@@ -7,6 +7,13 @@ import java.util.TreeSet;
 
 import mvc.model.BaseTable;
 
+/**
+ * Abstrakcyjna klasa, ktora stanowi baze dla wszystkich klas dostepowych do
+ * API. Definiuje ona wymagane zmienne oraz metody
+ * 
+ * @author tomasz
+ * 
+ */
 public abstract class ApiAccess {
 	protected TreeSet<BaseTable> result;
 	protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -32,6 +39,19 @@ public abstract class ApiAccess {
 	 */
 	public abstract void query(TreeMap<String, String> query)
 			throws IOException;
+
+	/**
+	 * Metoda ktorej redefinicja w klasie dziedzacej powinna zaimplementowac
+	 * operacje takie, aby moc podlaczyc sie i pobrac informacje o danym
+	 * obiekcie kolekcji.
+	 * 
+	 * @param params
+	 * @return
+	 * @throws IOException
+	 */
+	protected abstract StringBuilder accessAPI(TreeMap<String, String> params)
+			throws IOException;
+	protected abstract StringBuilder accessAPI(String crit) throws IOException;
 
 	public PropertyChangeSupport getPcs() {
 		return pcs;

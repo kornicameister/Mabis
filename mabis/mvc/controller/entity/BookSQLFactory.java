@@ -14,6 +14,14 @@ import mvc.model.BaseTable;
 import mvc.model.entity.Book;
 import utilities.Utilities;
 
+/**
+ * Klasa opisuje operacje bazodanowe, ktore wykonywane sa na tabeli movie
+ * zgodnie z danymi i parametrami przekazanymi przez {@link Book} lub metody
+ * dostępowe tejze klasy
+ * 
+ * @author tomasz
+ * 
+ */
 public class BookSQLFactory extends MovieSQLFactory {
 	private final TreeSet<Book> books = new TreeSet<Book>();
 

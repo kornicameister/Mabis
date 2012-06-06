@@ -14,13 +14,27 @@ import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
 import logger.MabisLogger;
+import mvc.view.MabisFrameInterface;
 import mvc.view.enums.CollectionView;
 
 /**
+ * Klasa rozszerza {@link JToolBar}. Zdefiniowane zostały w niej akcje służące
+ * operacjom sortowania listy kolekcji. Operacje te to:
+ * <ul>
+ * <li>wybór typu wyswietlanych elementow</li>
+ * <li>wybor kryterium sortowania</li>
+ * </ul>
+ * {@link MWToolBar} jest polaczony z {@link MWCollectionView} poprzez mechanizm
+ * zmian wlasciwowsci tj.
+ * {@link MWToolBar#firePropertyChange(String, Object, Object)}
+ * 
  * @author kornicameister
  * 
  */
-public class MWToolBar extends JToolBar implements ActionListener {
+public class MWToolBar extends JToolBar
+		implements
+			ActionListener,
+			MabisFrameInterface {
 	private static final long serialVersionUID = 3148020721875579266L;
 	private JComboBox<String> groupBy, zoomContent;
 	private JComboBox<CollectionView> viewModeContent;
@@ -36,12 +50,8 @@ public class MWToolBar extends JToolBar implements ActionListener {
 		this.initComponents();
 	}
 
-	/**
-	 * Metoda prywatna, która tworzy wszystkie komponenty wyświetlane na
-	 * {@link MWToolBar}. Zawiera również dodanie wszystkich listenerów do
-	 * {@link JComboBox} które zawierają kryteria wyświetlania kolekcji.
-	 */
-	private void initComponents() {
+	@Override
+	public void initComponents() {
 		this.setLayout(new FlowLayout(FlowLayout.CENTER));
 		this.setOpaque(false);
 		this.setAutoscrolls(false);
@@ -49,8 +59,8 @@ public class MWToolBar extends JToolBar implements ActionListener {
 		this.setRollover(false);
 
 		// zoom ;-)
-		String zz[] = { "100%", "90%", "80%", "70%", "60%", "50%", "40%",
-				"30%", "20%", "10%" };
+		String zz[] = {"100%", "90%", "80%", "70%", "60%", "50%", "40%", "30%",
+				"20%", "10%"};
 		this.zoomContent = new JComboBox<String>(zz);
 		JLabel zoomLabel = new JLabel("Zoom : ");
 		zoomLabel.setLabelFor(this.zoomContent);
@@ -67,10 +77,10 @@ public class MWToolBar extends JToolBar implements ActionListener {
 
 		// group by
 		this.groups = new HashMap<CollectionView, String[]>();
-		String bookGroup[] = { "Author", "ISBN" };
-		String movieGroup[] = { "Director" };
-		String audioGroup[] = { "Band" };
-		String mutualGroup[] = { "No group", "Title" };
+		String bookGroup[] = {"Author", "ISBN"};
+		String movieGroup[] = {"Director"};
+		String audioGroup[] = {"Band"};
+		String mutualGroup[] = {"No group", "Title"};
 		this.groups.put(CollectionView.VIEW_BOOKS, bookGroup);
 		this.groups.put(CollectionView.VIEW_MOVIES, movieGroup);
 		this.groups.put(CollectionView.VIEW_AUDIOS, audioGroup);
@@ -143,5 +153,10 @@ public class MWToolBar extends JToolBar implements ActionListener {
 						this.groupBy.getSelectedItem());
 			}
 		}
+	}
+
+	@Override
+	public void layoutComponents() {
+		return;
 	}
 }

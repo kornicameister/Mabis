@@ -43,28 +43,27 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 
 /**
- * This class is further used by object of JFileChooser.
- * It provides a custom plugin to print a prievew of choosen
- * image 
+ * Pozwala na wyswietlenie podgladu wybranego zdjecia w {@link JFileChooser}
  * 
  * @author kornicameister
  * 
  */
-public class ImageFilePreview extends JComponent implements
-		PropertyChangeListener {
+public class ImageFilePreview extends JComponent
+		implements
+			PropertyChangeListener {
 	private static final long serialVersionUID = 9146792951360477728L;
 	ImageIcon thumbnail = null;
 	File file = null;
 
 	public ImageFilePreview(JFileChooser fc) {
-		setPreferredSize(new Dimension(150,80));
+		setPreferredSize(new Dimension(150, 80));
 		fc.addPropertyChangeListener(this);
 	}
 
 	/**
-	 * Method does not load any kind of selected image file
-	 * from application resource, therefore it does not use
-	 * Toolkit module, but loads an image as ordinary file
+	 * Method does not load any kind of selected image file from application
+	 * resource, therefore it does not use Toolkit module, but loads an image as
+	 * ordinary file
 	 */
 	public void loadImage() {
 		if (file == null) {
@@ -82,9 +81,10 @@ public class ImageFilePreview extends JComponent implements
 		}
 	}
 
+	@Override
 	public void propertyChange(PropertyChangeEvent e) {
-		if(!isShowing()){
-			//if item is not visible, return than
+		if (!isShowing()) {
+			// if item is not visible, return than
 			return;
 		}
 		boolean update = false;
@@ -95,7 +95,7 @@ public class ImageFilePreview extends JComponent implements
 			file = null;
 			update = true;
 
-		// If a file became selected, find out which one.
+			// If a file became selected, find out which one.
 		} else if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(prop)) {
 			file = (File) e.getNewValue();
 			update = true;
@@ -111,6 +111,7 @@ public class ImageFilePreview extends JComponent implements
 		}
 	}
 
+	@Override
 	protected void paintComponent(Graphics g) {
 		if (thumbnail == null) {
 			loadImage();

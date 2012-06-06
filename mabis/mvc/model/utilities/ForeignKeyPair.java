@@ -5,13 +5,13 @@ import java.io.Serializable;
 import mvc.model.interfaces.MMTable;
 
 /**
- * Small addition, class encapsulates two foreign keys into pair of it Strongly
- * used in Many-to-many tables
+ * Klasa zamyka w sobie funkcjonalnosc symulujaca pare kluczy obcych
  * 
  * @author kornicameister
  * @see MMTable
+ * @see ForeignKey
  */
-public class ForeignKeyPair implements Comparable<ForeignKeyPair>,Serializable {
+public class ForeignKeyPair implements Comparable<ForeignKeyPair>, Serializable {
 	private static final long serialVersionUID = -6158282006256210527L;
 	private final ForeignKey f1, f2;
 
@@ -26,7 +26,6 @@ public class ForeignKeyPair implements Comparable<ForeignKeyPair>,Serializable {
 		} else if (name.equals(f2.getName())) {
 			return f2;
 		}
-		// TODO ADD APPRIOPRIATE EXCEPTION HERE
 		return null;
 	}
 

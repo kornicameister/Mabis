@@ -18,7 +18,11 @@ import mvc.model.entity.AudioAlbum;
 import utilities.Utilities;
 
 /**
- * @author kornicameister
+ * Klasa opisuje operacje bazodanowe, ktore wykonywane sa na tabeli movie
+ * zgodnie z danymi i parametrami przekazanymi przez {@link AudioAlbum} lub
+ * metody dostępowe tejze klasy
+ * 
+ * @author tomasz
  * 
  */
 public class AudioAlbumSQLFactory extends MovieSQLFactory {

@@ -61,7 +61,12 @@ import mvc.view.mainwindow.collectionTable.CollectionCell;
 import mvc.view.mainwindow.collectionTable.CollectionTableModel;
 import mvc.view.utilities.StatusBar;
 
-//TODO add comments
+/**
+ * Klasa roz
+ * 
+ * @author tomasz
+ * 
+ */
 public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	private static final long serialVersionUID = 4037649477948033295L;
 	private static final String DELETE_CMD = "Delete", EDIT_CMD = "Edit",
@@ -86,6 +91,12 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.statusBar = mw.getBottomPanel().getStatusBar();
 	}
 
+	/**
+	 * Metoda zajmuje się inicjalizacją komponentów tego panelu. Lista kolekcji
+	 * wyświetlana jest w JTable, więc wymagane jest aby możliwe było
+	 * przesuwanie tej listy. Z tego powodu tabela umieszczona jest jako klient
+	 * {@link JScrollPane}
+	 */
 	private void initComponents() {
 		this.setBorder(BorderFactory.createTitledBorder(
 				BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
@@ -95,22 +106,34 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.collectionTable = new JTable(tableModel);
 		this.collectionTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		this.collectionTable.getColumnModel().getColumn(0).setMaxWidth(220);
-		this.collectionTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+		this.collectionTable.getColumnModel().getColumn(0)
+				.setPreferredWidth(200);
 		this.collectionTable.getColumnModel().getColumn(0).setMinWidth(180);
 		this.collectionTable.setRowHeight(200);
-		this.collectionTable.setDefaultRenderer(BaseTable.class,new CollectionCell());
+		this.collectionTable.setDefaultRenderer(BaseTable.class,
+				new CollectionCell());
 		this.scrollPanel = new JScrollPane(this.collectionTable);
 
 		this.add(this.scrollPanel);
 		initPopupMenu();
 	}
 
+	/**
+	 * Kolekcja używa popup menu do kontroli elementów kolekcji.</br> Elementy
+	 * popup menu:
+	 * <ol>
+	 * <li>wyswietlenie szczegolow elementu</li>
+	 * <li>edycja elementu</li>
+	 * <li>usuniecie elementu</li>
+	 * </ol>
+	 */
 	private void initPopupMenu() {
 		this.collectionMenu = new JPopupMenu("Collection popup menu");
 		this.collectionMenuListener = new PopupActionListener();
 
-		class CollectionTableMouseListener extends MouseAdapter implements
-				MouseListener {
+		class CollectionTableMouseListener extends MouseAdapter
+				implements
+					MouseListener {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -141,9 +164,18 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		this.collectionMenu.add(edit);
 		remove.addActionListener(this.collectionMenuListener);
 		this.collectionMenu.add(remove);
-		this.collectionTable.addMouseListener(new CollectionTableMouseListener());
+		this.collectionTable
+				.addMouseListener(new CollectionTableMouseListener());
 	}
 
+	/**
+	 * Metoda bazując na przekazanym parametrze dokonuje operacji stworzenia
+	 * listy elementów kolekcji. Zanim ta operacja zostanie wykonana, wpierw
+	 * lista zostaje wyczyszona z poprzedniego wypisania dla poprzedniego
+	 * argumentu
+	 * 
+	 * @param view
+	 */
 	private void reprintCollection(CollectionView view) {
 		this.currentView = view;
 		this.clearCollectionView();
@@ -151,7 +183,7 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		class SmallPrinter {
 			public void printAudios() {
 				for (AudioAlbum a : mediator.collectedAlbums) {
-					Object data[] = { this.getScaledImage(a) ,a};
+					Object data[] = {this.getScaledImage(a), a};
 					tableModel.addRow(data);
 				}
 			}
@@ -172,38 +204,44 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			}
 
 			private ImageIcon getScaledImage(BaseTable t) {
-				File imagePath = ((Movie)t).getCover().getImageFile();
+				File imagePath = ((Movie) t).getCover().getImageFile();
 				ImageIcon i = new ImageIcon(imagePath.getAbsolutePath());
-				
+
 				final double height = 180.0;
 				double a = height / i.getIconHeight();
 				double newWidth = a * i.getIconWidth();
-				
-				return new ImageIcon(i.getImage().getScaledInstance((int) newWidth, (int) height, Image.SCALE_FAST));
+
+				return new ImageIcon(i.getImage().getScaledInstance(
+						(int) newWidth, (int) height, Image.SCALE_FAST));
 			}
 		}
 
 		SmallPrinter sm = new SmallPrinter();
 
 		switch (view) {
-		case VIEW_AUDIOS:
-			sm.printAudios();
-			break;
-		case VIEW_BOOKS:
-			sm.printBooks();
-			break;
-		case VIEW_MOVIES:
-			sm.printMovies();
-			break;
-		default:
-			sm.printAudios();
-			sm.printBooks();
-			sm.printMovies();
-			break;
+			case VIEW_AUDIOS :
+				sm.printAudios();
+				break;
+			case VIEW_BOOKS :
+				sm.printBooks();
+				break;
+			case VIEW_MOVIES :
+				sm.printMovies();
+				break;
+			default :
+				sm.printAudios();
+				sm.printBooks();
+				sm.printMovies();
+				break;
 		}
 		collectionTable.revalidate();
 	}
 
+	/**
+	 * Metoda zajmuje sie wyczyszczeniem JTable z elementów, które zostały na
+	 * niej umieszczone zgodnie z parametrem przekaznym do metody
+	 * {@link MWCollectionView#reprintCollection(CollectionView)}.
+	 */
 	private void clearCollectionView() {
 		if (this.tableModel.getRowCount() > 0) {
 			for (int i = this.tableModel.getRowCount() - 1; i != 0; i--) {
@@ -220,121 +258,144 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		}
 	}
 
+	/**
+	 * Jedna z dluzszych metod klas.</br> Jej dzialanie jest uzaleznione od
+	 * wartosci zmiennej {@link MWCollectionView#currentView} oraz od wartości
+	 * zmiennej {@link MWCollectionView#currentGroupBy}. W zależności od
+	 * kombinacji tych zmiennej uruchamiane są operacje sortowania na
+	 * kontenerach z Klasy {@link CollectionMediator}
+	 * 
+	 * @param value
+	 */
 	private void groupViewBy(String value) {
+		if (value.equals(this.currentGroupBy)) {
+			return;
+		}
+
 		class TitleComparator implements Comparator<BaseTable> {
 			@Override
 			public int compare(BaseTable a, BaseTable b) {
 				int res = a.getTitle().compareTo(b.getTitle());
-				if(res == 0){
+				if (res == 0) {
 					res = a.getSubtitle().compareTo(b.getSubtitle());
 				}
 				return res;
 			}
 		}
-		
+
 		this.currentGroupBy = value;
-		
+
 		switch (this.currentView) {
-		case VIEW_AUDIOS:
-			if (value.equals("Band")) {
-				Collections.sort(mediator.collectedAlbums,
-						new Comparator<AudioAlbum>() {
+			case VIEW_AUDIOS :
+				if (value.equals("Band")) {
+					Collections.sort(mediator.collectedAlbums,
+							new Comparator<AudioAlbum>() {
 
-							@Override
-							public int compare(AudioAlbum a0, AudioAlbum a1) {
-								return a0.getBand().compareTo(a1.getBand());
-							}
-						});
-			}else if (value.equals("Title")) {
-				Collections.sort(mediator.collectedAlbums,new TitleComparator());
-			}
-			break;
-		case VIEW_BOOKS:
-			if (value.equals("Author")) {
-				Collections.sort(mediator.collectedBooks,
-						new Comparator<Book>() {
-							@Override
-							public int compare(Book arg0, Book arg1) {
-								Object[] b1 = arg0.getAuthors().toArray();
-								Object[] b2 = arg1.getAuthors().toArray();
-								int res = 0;
-								for (int i = 0; i < (b1.length > b2.length ? b2.length
-										: b1.length); i++) {
-									res = ((Author) b1[i])
-											.compareTo((Author) b2[i]);
-									if (res != 0) {
-										return res;
-									}
+								@Override
+								public int compare(AudioAlbum a0, AudioAlbum a1) {
+									return a0.getBand().compareTo(a1.getBand());
 								}
-								return res;
-							}
-						});
-			} else if (value.equals("ISBN")) {
-				Collections.sort(mediator.collectedBooks,
-						new Comparator<Book>() {
-							private BookIndustryIdentifier bii2, bii1;
+							});
+				} else if (value.equals("Title")) {
+					Collections.sort(mediator.collectedAlbums,
+							new TitleComparator());
+				}
+				break;
+			case VIEW_BOOKS :
+				if (value.equals("Author")) {
+					Collections.sort(mediator.collectedBooks,
+							new Comparator<Book>() {
+								@Override
+								public int compare(Book arg0, Book arg1) {
+									Object[] b1 = arg0.getAuthors().toArray();
+									Object[] b2 = arg1.getAuthors().toArray();
+									int res = 0;
+									for (int i = 0; i < (b1.length > b2.length
+											? b2.length
+											: b1.length); i++) {
+										res = ((Author) b1[i])
+												.compareTo((Author) b2[i]);
+										if (res != 0) {
+											return res;
+										}
+									}
+									return res;
+								}
+							});
+				} else if (value.equals("ISBN")) {
+					Collections.sort(mediator.collectedBooks,
+							new Comparator<Book>() {
+								private BookIndustryIdentifier bii2, bii1;
 
-							@Override
-							public int compare(Book o1, Book o2) {
-								Object[] b1 = o1.getIdentifiers().toArray();
-								Object[] b2 = o2.getIdentifiers().toArray();
-								int res = 0;
-								for (int i = 0 ; i < (b1.length > b2.length ? b2.length : b1.length) ; i++) {
-									bii1 = (BookIndustryIdentifier) b1[i];
-									bii2 = (BookIndustryIdentifier) b2[i];
-									res = bii1.compareTo(bii2);
-									if(res != 0){
-										return res;
+								@Override
+								public int compare(Book o1, Book o2) {
+									Object[] b1 = o1.getIdentifiers().toArray();
+									Object[] b2 = o2.getIdentifiers().toArray();
+									int res = 0;
+									for (int i = 0; i < (b1.length > b2.length
+											? b2.length
+											: b1.length); i++) {
+										bii1 = (BookIndustryIdentifier) b1[i];
+										bii2 = (BookIndustryIdentifier) b2[i];
+										res = bii1.compareTo(bii2);
+										if (res != 0) {
+											return res;
+										}
 									}
+									return res;
 								}
-								return res;
-							}
-						});
-			}else if (value.equals("Title")) {
-				Collections.sort(mediator.collectedBooks,new TitleComparator());
-			}
-			break;
-		case VIEW_MOVIES:
-			if (value.equals("Director")) {
-				Collections.sort(mediator.collectedMovies,
-						new Comparator<Movie>() {
-							@Override
-							public int compare(Movie a, Movie b) {
-								Object[] b1 = a.getAuthors().toArray();
-								Object[] b2 = b.getAuthors().toArray();
-								int res = 0;
-								for (int i = 0; i < (b1.length > b2.length ? b2.length
-										: b1.length); i++) {
-									res = ((Author) b1[i])
-											.compareTo((Author) b2[i]);
-									if (res != 0) {
-										return res;
+							});
+				} else if (value.equals("Title")) {
+					Collections.sort(mediator.collectedBooks,
+							new TitleComparator());
+				}
+				break;
+			case VIEW_MOVIES :
+				if (value.equals("Director")) {
+					Collections.sort(mediator.collectedMovies,
+							new Comparator<Movie>() {
+								@Override
+								public int compare(Movie a, Movie b) {
+									Object[] b1 = a.getAuthors().toArray();
+									Object[] b2 = b.getAuthors().toArray();
+									int res = 0;
+									for (int i = 0; i < (b1.length > b2.length
+											? b2.length
+											: b1.length); i++) {
+										res = ((Author) b1[i])
+												.compareTo((Author) b2[i]);
+										if (res != 0) {
+											return res;
+										}
 									}
+									return res;
 								}
-								return res;
-							}
-						});
-			}else if (value.equals("Title")) {
-				Collections.sort(mediator.collectedMovies,new TitleComparator());
-			}
-			break;
-		default:
-			if (value.equals("Title")) {
-				Collections.sort(mediator.collectedBooks,new TitleComparator());
-			}else{
-				Collections.sort(mediator.collectedBooks);
-			}
-			if (value.equals("Title")) {
-				Collections.sort(mediator.collectedMovies,new TitleComparator());
-			}else{
-				Collections.sort(mediator.collectedMovies);
-			}
-			if (value.equals("Title")) {
-				Collections.sort(mediator.collectedAlbums,new TitleComparator());
-			}else{
-				Collections.sort(mediator.collectedAlbums);
-			}
-			break;
+							});
+				} else if (value.equals("Title")) {
+					Collections.sort(mediator.collectedMovies,
+							new TitleComparator());
+				}
+				break;
+			default :
+				if (value.equals("Title")) {
+					Collections.sort(mediator.collectedBooks,
+							new TitleComparator());
+				} else {
+					Collections.sort(mediator.collectedBooks);
+				}
+				if (value.equals("Title")) {
+					Collections.sort(mediator.collectedMovies,
+							new TitleComparator());
+				} else {
+					Collections.sort(mediator.collectedMovies);
+				}
+				if (value.equals("Title")) {
+					Collections.sort(mediator.collectedAlbums,
+							new TitleComparator());
+				} else {
+					Collections.sort(mediator.collectedAlbums);
+				}
+				break;
 		}
 		reprintCollection(currentView);
 	}
@@ -363,17 +424,17 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.statusBar.setMessage("Removed item :[" + bt.getPrimaryKey()
 					+ "] -> " + bt.getTitle());
 			switch (bt.getTableType()) {
-			case MOVIE:
-				mediator.collectedMovies.remove(bt);
-				break;
-			case BOOK:
-				mediator.collectedBooks.remove(bt);
-				break;
-			case AUDIO_ALBUM:
-				mediator.collectedAlbums.remove(bt);
-				break;
-			default:
-				break;
+				case MOVIE :
+					mediator.collectedMovies.remove(bt);
+					break;
+				case BOOK :
+					mediator.collectedBooks.remove(bt);
+					break;
+				case AUDIO_ALBUM :
+					mediator.collectedAlbums.remove(bt);
+					break;
+				default :
+					break;
 			}
 		} else if (e.getPropertyName().equals(EDIT_CMD)) {
 			BaseTable bt = (BaseTable) e.getNewValue();
@@ -381,24 +442,24 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 					+ "] -> " + bt.getTitle());
 			ItemCreator ic = null;
 			switch (bt.getTableType()) {
-			case MOVIE:
-				ic = new MovieCreator(connectedUserReference, bt.getTitle());
-				ic.setEditableItem(bt);
-				ic.setVisible(true);
-				break;
-			case BOOK:
-				ic = new BookCreator(connectedUserReference, bt.getTitle());
-				ic.setEditableItem(bt);
-				ic.setVisible(true);
-				break;
-			case AUDIO_ALBUM:
-				ic = new AudioAlbumCreator(connectedUserReference,
-						bt.getTitle());
-				ic.setEditableItem(bt);
-				ic.setVisible(true);
-				break;
-			default:
-				break;
+				case MOVIE :
+					ic = new MovieCreator(connectedUserReference, bt.getTitle());
+					ic.setEditableItem(bt);
+					ic.setVisible(true);
+					break;
+				case BOOK :
+					ic = new BookCreator(connectedUserReference, bt.getTitle());
+					ic.setEditableItem(bt);
+					ic.setVisible(true);
+					break;
+				case AUDIO_ALBUM :
+					ic = new AudioAlbumCreator(connectedUserReference,
+							bt.getTitle());
+					ic.setEditableItem(bt);
+					ic.setVisible(true);
+					break;
+				default :
+					break;
 			}
 		} else if (e.getPropertyName().equals(VIEW_CMD)) {
 			BaseTable bt = (BaseTable) e.getNewValue();
@@ -408,27 +469,33 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			preview.setVisible(true);
 		} else if (e.getPropertyName().equals("itemAffected")) {
 			BaseTable bt = (BaseTable) e.getNewValue();
-			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey() + "] -> " + bt.getTitle());
+			this.statusBar.setMessage("Affected item :[" + bt.getPrimaryKey()
+					+ "] -> " + bt.getTitle());
 			switch (bt.getTableType()) {
-			case MOVIE:
-				this.mediator.collectedMovies.add((Movie) bt);
-				break;
-			case BOOK:
-				this.mediator.collectedBooks.add((Book) bt);
-				break;
-			case AUDIO_ALBUM:
-				this.mediator.collectedAlbums.add((AudioAlbum) bt);
-				break;
-			default:
-				break;
+				case MOVIE :
+					this.mediator.collectedMovies.add((Movie) bt);
+					break;
+				case BOOK :
+					this.mediator.collectedBooks.add((Book) bt);
+					break;
+				case AUDIO_ALBUM :
+					this.mediator.collectedAlbums.add((AudioAlbum) bt);
+					break;
+				default :
+					break;
 			}
 			this.reprintCollection(this.currentView);
 			this.groupViewBy(this.currentGroupBy);
 		}
 	}
 
+	/**
+	 * Metoda obecnie nie zaimplementowana.
+	 * 
+	 * @param factor
+	 */
 	private void rezoomCollection(double factor) {
-
+		return;
 	}
 
 	/**
@@ -441,7 +508,6 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 	 * 
 	 * @throws SQLException
 	 */
-	// TODO dodać ładowania według predefiniowanych ustawień !!!
 	public void loadCollection() throws SQLException {
 		try {
 			this.mediator.loadCollection();
@@ -465,23 +531,37 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		private ArrayList<Book> collectedBooks = new ArrayList<>();
 		private ArrayList<AudioAlbum> collectedAlbums = new ArrayList<>();
 
+		/**
+		 * Wrapper dla metod pozwalajacych na zaladowanie kolekcji do programu.
+		 * 
+		 * @see CollectionMediator#loadAudios()
+		 * @see CollectionMediator#loadBooks()
+		 * @see CollectionMediator#loadMovies()
+		 * @throws SQLException
+		 * @throws SQLEntityExistsException
+		 */
 		void loadCollection() throws SQLException, SQLEntityExistsException {
 			loadAudios();
 			loadBooks();
 			loadMovies();
-			Integer params[] = { 
-					tableModel.getRowCount(),
-					this.collectedAlbums.size(),
-					this.collectedBooks.size(),
-					this.collectedMovies.size() };
+			Integer params[] = {this.collectedAlbums.size(),
+					this.collectedBooks.size(), this.collectedMovies.size()};
 			MabisLogger
 					.getLogger()
 					.log(Level.INFO,
-							"Collected {0} items from database, including {1} audios, {2} books and {3} movies",
+							"Collected items from database, including {0} audios, {1} books and {2} movies",
 							params);
 		}
 
-		private void loadMovies() throws SQLException, SQLEntityExistsException {
+		/**
+		 * Metoda używając informacji o uzytkowniku (tj.
+		 * {@link MWCollectionView#connectedUserReference} ) pobiera z bazy
+		 * danych jego kolekcję. W tym wypadku sa to filmy.
+		 * 
+		 * @throws SQLException
+		 * @throws SQLEntityExistsException
+		 */
+		void loadMovies() throws SQLException, SQLEntityExistsException {
 			MovieUserSQLFactory musf = new MovieUserSQLFactory(
 					SQLStamentType.SELECT, new MovieUser());
 			musf.addWhereClause("idUser", connectedUserReference
@@ -501,7 +581,15 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.collectedMovies.addAll(msf.getMovies());
 		}
 
-		private void loadAudios() throws SQLException, SQLEntityExistsException {
+		/**
+		 * Metoda używając informacji o uzytkowniku (tj.
+		 * {@link MWCollectionView#connectedUserReference} ) pobiera z bazy
+		 * danych jego kolekcję. W tym wypadku sa to albumy muzyczne.
+		 * 
+		 * @throws SQLException
+		 * @throws SQLEntityExistsException
+		 */
+		void loadAudios() throws SQLException, SQLEntityExistsException {
 			AudioUserSQLFactory ausf = new AudioUserSQLFactory(
 					SQLStamentType.SELECT, new AudioUser());
 			ausf.addWhereClause("idUser", connectedUserReference
@@ -522,7 +610,15 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 			this.collectedAlbums.addAll(aasf.getValues());
 		}
 
-		private void loadBooks() throws SQLException, SQLEntityExistsException {
+		/**
+		 * Metoda używając informacji o uzytkowniku (tj.
+		 * {@link MWCollectionView#connectedUserReference} ) pobiera z bazy
+		 * danych jego kolekcję. W tym wypadku sa to ksiazki.
+		 * 
+		 * @throws SQLException
+		 * @throws SQLEntityExistsException
+		 */
+		void loadBooks() throws SQLException, SQLEntityExistsException {
 			BookUserSQLFactory ausf = new BookUserSQLFactory(
 					SQLStamentType.SELECT, new BookUser());
 			ausf.addWhereClause("idUser", connectedUserReference
@@ -544,6 +640,12 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 		}
 	}
 
+	/**
+	 * {@link ActionListener} dla popup menu obslugujacego liste kolekcji
+	 * 
+	 * @author tomasz
+	 * 
+	 */
 	class PopupActionListener implements ActionListener {
 		int currentRow = -1;
 
@@ -561,29 +663,30 @@ public class MWCollectionView extends JPanel implements PropertyChangeListener {
 				boolean wasDeleted = false;
 				try {
 					switch (bt.getTableType()) {
-					case MOVIE:
-						sf = new MovieSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idMovie", bt.getPrimaryKey()
-								.toString());
-						sf.executeSQL(true);
-						wasDeleted = true;
-						break;
-					case BOOK:
-						sf = new BookSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idBook", bt.getPrimaryKey()
-								.toString());
-						sf.executeSQL(true);
-						wasDeleted = true;
-						break;
-					case AUDIO_ALBUM:
-						sf = new AudioAlbumSQLFactory(SQLStamentType.DELETE, bt);
-						sf.addWhereClause("idAudioAlbum", bt.getPrimaryKey()
-								.toString());
-						sf.executeSQL(true);
-						wasDeleted = true;
-						break;
-					default:
-						break;
+						case MOVIE :
+							sf = new MovieSQLFactory(SQLStamentType.DELETE, bt);
+							sf.addWhereClause("idMovie", bt.getPrimaryKey()
+									.toString());
+							sf.executeSQL(true);
+							wasDeleted = true;
+							break;
+						case BOOK :
+							sf = new BookSQLFactory(SQLStamentType.DELETE, bt);
+							sf.addWhereClause("idBook", bt.getPrimaryKey()
+									.toString());
+							sf.executeSQL(true);
+							wasDeleted = true;
+							break;
+						case AUDIO_ALBUM :
+							sf = new AudioAlbumSQLFactory(
+									SQLStamentType.DELETE, bt);
+							sf.addWhereClause("idAudioAlbum", bt
+									.getPrimaryKey().toString());
+							sf.executeSQL(true);
+							wasDeleted = true;
+							break;
+						default :
+							break;
 					}
 				} catch (SQLException | SQLEntityExistsException e1) {
 					MabisLogger.getLogger().log(Level.WARNING,

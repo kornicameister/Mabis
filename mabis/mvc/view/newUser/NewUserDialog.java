@@ -27,10 +27,13 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
+import mvc.controller.SQLStamentType;
+import mvc.controller.entity.UserSQLFactory;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.entity.Picture;
 import mvc.model.entity.User;
-import mvc.model.enums.ImageType;
+import mvc.model.enums.PictureType;
+import mvc.view.MabisFrameInterface;
 import mvc.view.imagePanel.ImageFileFilter;
 import mvc.view.imagePanel.ImageFilePreview;
 import mvc.view.imagePanel.ImagePanel;
@@ -44,7 +47,7 @@ import settings.GlobalPaths;
  * @author kornicameister
  * 
  */
-public class NewUserDialog extends JDialog {
+public class NewUserDialog extends JDialog implements MabisFrameInterface {
 
 	private static final long serialVersionUID = -1413322815019667627L;
 	private static final Dimension avatarDim = new Dimension(512, 512);
@@ -69,7 +72,7 @@ public class NewUserDialog extends JDialog {
 
 	/**
 	 * @param owner
-	 * @param modalspecifies
+	 * @param modal
 	 *            whether dialog blocks user input to other top-level windows
 	 *            when shown. If true, the modality type property is set to
 	 *            DEFAULT_MODALITY_TYPE, otherwise the dialog is modeless.
@@ -84,13 +87,18 @@ public class NewUserDialog extends JDialog {
 		this.initChooser();
 	}
 
+	/**
+	 * Metoda inicjalizuje {@link JFileChooser}, który następnie używany jest do
+	 * wyboru avatara reprezentującego dany użytkownik
+	 */
 	private void initChooser() {
 		this.imageChooser = new JFileChooser();
 		this.imageChooser.setFileFilter(new ImageFileFilter());
 		this.imageChooser.setAccessory(new ImageFilePreview(imageChooser));
 	}
 
-	private void layoutComponents() {
+	@Override
+	public void layoutComponents() {
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 
@@ -230,7 +238,8 @@ public class NewUserDialog extends JDialog {
 		this.pack();
 	}
 
-	private void initComponents() {
+	@Override
+	public void initComponents() {
 		this.loginLabel = new JLabel("Login: ");
 		this.loginField = new JTextField();
 
@@ -269,8 +278,14 @@ public class NewUserDialog extends JDialog {
 		this.setMinimumSize(new Dimension(380, 220));
 	}
 
+	/**
+	 * Listener, którego używa {@link NewUserDialog}. Nasłuchuje zdarzeń
+	 * pochodzących z przycisków kontrolujących jego działanie.
+	 * 
+	 * @author tomasz
+	 * 
+	 */
 	class NewUserDialogListener implements ActionListener {
-
 		private NewUserDialog backReference;
 
 		public NewUserDialogListener(NewUserDialog ref) {
@@ -286,7 +301,7 @@ public class NewUserDialog extends JDialog {
 				user.setEmail(mailField.getText());
 				try {
 					user.setPicture(new Picture(imagePanel.getImageFile(),
-							ImageType.AVATAR));
+							PictureType.AVATAR));
 				} catch (FileNotFoundException e2) {
 					e2.printStackTrace();
 				} catch (IOException e3) {
@@ -295,10 +310,10 @@ public class NewUserDialog extends JDialog {
 				user.setPassword(new String(passField.getPassword()));
 
 				try {
-					NewUserRegisterer.saveToLocalDatabase(user);
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				} catch (SQLEntityExistsException e1) {
+					UserSQLFactory usf = new UserSQLFactory(
+							SQLStamentType.INSERT, user);
+					usf.executeSQL(true);
+				} catch (SQLException | SQLEntityExistsException e2) {
 					JOptionPane.showMessageDialog(null,
 							"Following user was found", "Match",
 							JOptionPane.INFORMATION_MESSAGE, new ImageIcon(

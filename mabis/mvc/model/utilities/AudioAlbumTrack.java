@@ -1,55 +1,101 @@
 package mvc.model.utilities;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-public class AudioAlbumTrack implements Serializable,
-		Comparable<AudioAlbumTrack> {
+import mvc.model.entity.AudioAlbum;
+
+/**
+ * Klasa opisuje sciezke z albumu muzycznego
+ * 
+ * @author tomasz
+ * @see AudioAlbum
+ */
+public class AudioAlbumTrack
+		implements
+			Serializable,
+			Comparable<AudioAlbumTrack> {
 	private static final long serialVersionUID = -7691994149397894841L;
 	private Long duration;
 	private Integer id;
 	private String name;
-	private URL lastFMUrl;
-	private Double rating;
 
+	/**
+	 * Tworzy nowy obiekt {@link AudioAlbumTrack}
+	 * 
+	 * @param id
+	 *            numer porzadkowy sciezki
+	 * @param name
+	 *            tytul sciezki
+	 * @param dur
+	 *            dlugosc trwania sciezki powinna byc podana w milisekundach
+	 */
 	public AudioAlbumTrack(Integer id, String name, String dur) {
 		this.id = id;
 		this.name = name;
-
 		this.duration = 0l;
-		if(!dur.isEmpty()){
+		if (!dur.isEmpty()) {
 			this.duration = Long.valueOf(dur);
 		}
-		this.lastFMUrl = null;
-		this.rating = 0.0;
 	}
 
+	/**
+	 * Tworzy nowy obiekt {@link AudioAlbumTrack}
+	 * 
+	 * @param id
+	 *            numer porzadkowy sciezki
+	 * @param name
+	 *            tytul sciezki
+	 * @param dur
+	 *            dlugosc trwania sciezki powinna byc podana w milisekundach
+	 */
 	public AudioAlbumTrack(int id, String name, Long durr) {
 		this.id = id;
 		this.name = name;
-
 		this.duration = durr;
-		this.lastFMUrl = null;
-		this.rating = 0.0;
 	}
 
+	/**
+	 * Zwraca dlugosc trwania sciezki. Wazne jest to ze wewnetrznie korzysta z
+	 * funkcji {@link String#format(String, Object...)}, aby poprawnie zwrocic
+	 * dlugosc sciezki bazujac na ilosci milisekund zapisanych w klasie
+	 * 
+	 * @return dlugosc sciezki jako string, w formacie %d:%d
+	 */
 	public String getDuration() {
-		String res = String.format("%d:%d",
+		String res = String.format(
+				"%d:%d",
 				TimeUnit.SECONDS.toHours(this.duration),
-				TimeUnit.SECONDS.toMinutes(this.duration) - (TimeUnit.SECONDS.toHours(this.duration)*60));
+				TimeUnit.SECONDS.toMinutes(this.duration)
+						- (TimeUnit.SECONDS.toHours(this.duration) * 60));
 		return res;
 	}
 
+	/**
+	 * Zwraca dlugosc sciezki jako long w milisekundach
+	 * 
+	 * @return dlugosc sciezki
+	 */
 	public Long getLongDuration() {
 		return this.duration;
 	}
 
+	/**
+	 * Ustawia dlugosc sciezki jako string. Dlugosc powinna byc podana w
+	 * milisekundach
+	 * 
+	 * @param dur
+	 */
 	public void setDuration(String dur) {
 		this.duration = Long.valueOf(dur);
 	}
-	
-	public void setDuration(Long l){
+
+	/**
+	 * Ustawia dlugosc trwania sciezki, ale podanej w milisekundach jako long
+	 * 
+	 * @param l
+	 */
+	public void setDuration(Long l) {
 		this.duration = l;
 	}
 
@@ -69,14 +115,6 @@ public class AudioAlbumTrack implements Serializable,
 		this.name = name;
 	}
 
-	public URL getLastFMUrl() {
-		return lastFMUrl;
-	}
-
-	public void setLastFMUrl(URL lastFMUrl) {
-		this.lastFMUrl = lastFMUrl;
-	}
-
 	@Override
 	public int compareTo(AudioAlbumTrack o) {
 		int result = this.id.compareTo(o.id);
@@ -90,13 +128,5 @@ public class AudioAlbumTrack implements Serializable,
 	public String toString() {
 		return this.id.toString() + ". " + this.name + "\t("
 				+ this.getDuration() + ")";
-	}
-
-	public Double getRating() {
-		return rating;
-	}
-
-	public void setRating(Double rating) {
-		this.rating = rating;
 	}
 }

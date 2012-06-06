@@ -49,6 +49,17 @@ public class TagCloudMiniPanel extends JPanel {
 	private JScrollPane scrollForTable;
 	private int currentlySelectedRow = -1;
 
+	/**
+	 * Metoda pozwala na utworzenie chmury tagów z już wstępnie zdefiniowaną ich
+	 * listą
+	 * 
+	 * @param genres
+	 *            lista tagow
+	 * @param type
+	 *            typ tagu
+	 * @see {@link GenreType}
+	 * @see Genre
+	 */
 	public TagCloudMiniPanel(TreeSet<Genre> genres, GenreType type) {
 		gmp = new GenreMiniPanel(genres, type);
 		this.addPropertyListener();
@@ -56,39 +67,43 @@ public class TagCloudMiniPanel extends JPanel {
 		this.layoutComponents();
 	}
 
+	/**
+	 * Metoda inicjalizuje tabele tego minipanelu
+	 */
 	private void initializeTagTable() {
-		String columnNames[] = { "ID", "Name" };
+		String columnNames[] = {"ID", "Name"};
 		this.tagsModel = new DefaultTableModel(columnNames, 0);
-		this.tagsTable = new JTable(this.tagsModel){
+		this.tagsTable = new JTable(this.tagsModel) {
 			private static final long serialVersionUID = 6303631988571439208L;
 
 			@Override
 			public Class<?> getColumnClass(int column) {
-				if(column == 0){
+				if (column == 0) {
 					return ImageIcon.class;
 				}
 				return Object.class;
 			}
-			
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
-			
-		};		
+
+		};
 		this.tagsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		
-		class TableMouseListener extends MouseAdapter implements MouseListener{
+
+		class TableMouseListener extends MouseAdapter implements MouseListener {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				currentlySelectedRow = tagsTable.rowAtPoint(e.getPoint());
 			}
 		}
-		
-		class TableKeyListener extends KeyAdapter implements KeyListener{
+
+		class TableKeyListener extends KeyAdapter implements KeyListener {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyChar() == KeyEvent.VK_DELETE){
+				if (e.getKeyCode() == KeyEvent.VK_D
+						|| e.getKeyChar() == KeyEvent.VK_DELETE) {
 					tagsModel.removeRow(currentlySelectedRow);
 					rowToGenre.remove(new Integer(currentlySelectedRow));
 					tagsTable.revalidate();
@@ -100,6 +115,11 @@ public class TagCloudMiniPanel extends JPanel {
 		this.tagsTable.addMouseListener(new TableMouseListener());
 	}
 
+	/**
+	 * Klasa ta korzysta ze starego modelu obslugi mini panelu, dlatego tez
+	 * nasluchuje sygnalow pochodzacych z zagniezdzonej klasy
+	 * {@link TagCloudMiniPanel}. Chodzi tutaj o {@link GenreMiniPanel}
+	 */
 	private void addPropertyListener() {
 		this.gmp.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -125,19 +145,27 @@ public class TagCloudMiniPanel extends JPanel {
 				.addComponent(this.scrollForTable));
 
 		gl.setVerticalGroup(gl.createParallelGroup().addComponent(this.gmp)
-				.addComponent(this.scrollForTable,80,100,Short.MAX_VALUE));
+				.addComponent(this.scrollForTable, 80, 100, Short.MAX_VALUE));
 
 		this.tagsTable.getColumnModel().getColumn(0).setMaxWidth(40);
 	}
 
+	/**
+	 * Metoda pozwala na dodanie nowego elementu do chumry tagow
+	 * 
+	 * @param g
+	 *            nowy gatunek
+	 */
 	public void addRow(Genre g) {
-		Object data[] = { null, g.getGenre() };
-		if(g.getPrimaryKey() < 0){
+		Object data[] = {null, g.getGenre()};
+		if (g.getPrimaryKey() < 0) {
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
-			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
-		}else{
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10,
+					Image.SCALE_FAST));
+		} else {
 			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
-			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10,
+					Image.SCALE_FAST));
 		}
 		this.tagsModel.addRow(data);
 		this.rowToGenre.put(this.rowToGenre.size(), g);
@@ -158,18 +186,31 @@ public class TagCloudMiniPanel extends JPanel {
 		this.rowToGenre.clear();
 	}
 
-	private void clearTable(){
+	private void clearTable() {
 		for (int i = tagsModel.getRowCount(); i > 0; i--) {
 			this.tagsModel.removeRow(i);
 		}
 		this.tagsTable.revalidate();
 	}
 
+	/**
+	 * Lista gatunkow, ktore pochodzaca z bazy danych i nie zostaly zdefiniowany
+	 * albo poprzez pobranie nowego elementu kolekcji poprzez API lub dodane
+	 * przez uzytkownika
+	 * 
+	 * @return array liste gatunkow z bazy danych
+	 */
 	public ArrayList<Genre> getDatabaseTags() {
 		return gmp.tags;
 	}
-	
-	public Collection<Genre> getTags(){
+
+	/**
+	 * Zwraca liczbe gatunkow, ktore zostaly zatwierdzone jako gatunki opisujace
+	 * ten element kolekcji
+	 * 
+	 * @return kolekcje gatunkow dal danego elementu kolekcji
+	 */
+	public Collection<Genre> getTags() {
 		return rowToGenre.values();
 	}
 
@@ -223,22 +264,22 @@ public class TagCloudMiniPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JButton source = (JButton) e.getSource();
-			
+
 			class GenreComparator implements Comparator<Genre> {
 				@Override
 				public int compare(Genre o1, Genre o2) {
-					return o1.getGenre().compareTo(
-							o2.getGenre());
+					return o1.getGenre().compareTo(o2.getGenre());
 				}
 			}
-			Collections.sort(this.tags,new GenreComparator());
-			
+			Collections.sort(this.tags, new GenreComparator());
+
 			if (source.equals(newGenreButton)) {
 				String returned = JOptionPane.showInputDialog(null, "Input:",
 						source.getName(), JOptionPane.PLAIN_MESSAGE);
 				if (returned != null) {
 					Genre tmp = new Genre(returned, this.type);
-					int found = Collections.binarySearch(this.tags, tmp,new GenreComparator());
+					int found = Collections.binarySearch(this.tags, tmp,
+							new GenreComparator());
 					if (found < 0) {
 						this.firePropertyChange("genreCreated", null, tmp);
 					}

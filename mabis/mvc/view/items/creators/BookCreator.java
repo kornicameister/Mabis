@@ -30,10 +30,8 @@ import javax.swing.border.EtchedBorder;
 import logger.MabisLogger;
 import mvc.controller.SQLStamentType;
 import mvc.controller.api.GoogleBookApi;
-import mvc.controller.entity.AuthorSQLFactory;
 import mvc.controller.entity.BookSQLFactory;
 import mvc.controller.entity.BookUserSQLFactory;
-import mvc.controller.entity.GenreSQLFactory;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.BaseTable;
 import mvc.model.entity.Author;
@@ -44,7 +42,7 @@ import mvc.model.entity.Picture;
 import mvc.model.entity.User;
 import mvc.model.enums.AuthorType;
 import mvc.model.enums.GenreType;
-import mvc.model.enums.ImageType;
+import mvc.model.enums.PictureType;
 import mvc.model.utilities.ForeignKey;
 import mvc.view.items.CreatorContentNullPointerException;
 import mvc.view.items.ItemCreator;
@@ -77,8 +75,6 @@ public class BookCreator extends ItemCreator {
 	private static final long serialVersionUID = 6954574313564241105L;
 	private JTextArea descriptionArea;
 	private JTextField titleOriginal, subTitle, pages;
-	private TagCloudMiniPanel tagCloud;
-	private AuthorMiniPanel authorsMiniPanel;
 	private IndustryIdentifiersMiniPanel iiMiniPanel;
 	private JScrollPane descriptionScrollPane;
 	private LoadFromGoogleBookAPI lfa;
@@ -91,9 +87,9 @@ public class BookCreator extends ItemCreator {
 	 * @throws CreatorContentNullPointerException
 	 */
 	public BookCreator(User u, String title) {
-		super(u, title);
+		super(u, title, GenreType.BOOK, AuthorType.BOOK_AUTHOR);
 		try {
-			SettingsLoader.loadFrame(this);
+			SettingsLoader.load(this);
 		} catch (SettingsException e) {
 			MabisLogger.getLogger().log(Level.WARNING,
 					"Failed to load frame {0} from settigns", this.getName());
@@ -104,7 +100,7 @@ public class BookCreator extends ItemCreator {
 	}
 
 	@Override
-	protected void layoutComponents() {
+	public void layoutComponents() {
 		super.layoutComponents();
 
 		GroupLayout gl = new GroupLayout(this.contentPanel);
@@ -136,7 +132,7 @@ public class BookCreator extends ItemCreator {
 												.addGap(5)
 												.addComponent(this.iiMiniPanel)
 												.addComponent(
-														this.authorsMiniPanel)
+														this.authorMiniPanel)
 												.addComponent(this.tagCloud)))
 				.addComponent(descriptionScrollPane));
 		gl.setVerticalGroup(gl
@@ -167,7 +163,7 @@ public class BookCreator extends ItemCreator {
 																		60, 80))
 												.addComponent(this.iiMiniPanel)
 												.addComponent(
-														this.authorsMiniPanel)
+														this.authorMiniPanel)
 												.addComponent(this.tagCloud))));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -191,9 +187,6 @@ public class BookCreator extends ItemCreator {
 		this.subTitle.setBorder(BorderFactory.createTitledBorder("Subtitle"));
 		this.titleOriginal.setBorder(BorderFactory.createTitledBorder("Title"));
 
-		this.initAuthorsMiniPanel();
-		this.initGenresPanel();
-
 		this.iiMiniPanel = new IndustryIdentifiersMiniPanel();
 		this.iiMiniPanel.setBorder(BorderFactory.createTitledBorder("ISBN"));
 		this.pages = new JTextField();
@@ -208,43 +201,6 @@ public class BookCreator extends ItemCreator {
 		this.searchPanel.setSearchCriteria(arrayOfCriteria);
 	}
 
-	/**
-	 * Inicjalzuje chmurę tagów, tj. {@link TagCloudMiniPanel}, pobierając
-	 * informacje o gatunkach dla konkretnego typu obiektów.
-	 */
-	private void initGenresPanel() {
-		try {
-			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
-					new Genre());
-			gsf.addWhereClause("type", GenreType.BOOK.toString());
-			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
-					GenreType.BOOK);
-			this.tagCloud.setBorder(BorderFactory.createTitledBorder("Genres"));
-		} catch (SQLException | SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Inicjalizuje {@link AuthorMiniPanel} pobierając dane o wykonawcach o
-	 * autorach z bazy danych
-	 */
-	private void initAuthorsMiniPanel() {
-		try {
-			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
-					new Author());
-			asf.addWhereClause("type", AuthorType.BOOK_AUTHOR.toString());
-			asf.executeSQL(true);
-			this.authorsMiniPanel = new AuthorMiniPanel(asf.getAuthors(),
-					AuthorType.BOOK_AUTHOR);
-			this.authorsMiniPanel.setBorder(BorderFactory
-					.createTitledBorder("Writers"));
-		} catch (SQLException | SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	protected void clearContentFields() {
 		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
@@ -253,7 +209,7 @@ public class BookCreator extends ItemCreator {
 		this.titleOriginal.setText("");
 		this.subTitle.setText("");
 		this.pages.setText("");
-		this.authorsMiniPanel.clear();
+		this.authorMiniPanel.clear();
 		this.tagCloud.clear();
 		this.iiMiniPanel.clearTable();
 	}
@@ -273,9 +229,9 @@ public class BookCreator extends ItemCreator {
 			selectedBook.setPages(Integer.valueOf(this.pages.getText()));
 			selectedBook.setDescription(this.descriptionArea.getText());
 			selectedBook.setGenres(this.tagCloud.getTags());
-			selectedBook.setDirectors(this.authorsMiniPanel.getAuthors());
+			selectedBook.setDirectors(this.authorMiniPanel.getAuthors());
 			selectedBook.setCover(new Picture(this.coverPanel.getImageFile(),
-					ImageType.FRONT_COVER));
+					PictureType.FRONT_COVER));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -284,7 +240,8 @@ public class BookCreator extends ItemCreator {
 			try {
 				BookSQLFactory bsf = new BookSQLFactory(SQLStamentType.UPDATE,
 						selectedBook);
-				bsf.addWhereClause("idBook", selectedBook.getPrimaryKey().toString());
+				bsf.addWhereClause("idBook", selectedBook.getPrimaryKey()
+						.toString());
 				return bsf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
@@ -441,10 +398,10 @@ public class BookCreator extends ItemCreator {
 		// that can be found in AuthorsMiniPanel
 		for (Author a : b.getAuthors()) {
 			if (this.editingMode) {
-				this.authorsMiniPanel.addRow(a);
+				this.authorMiniPanel.addRow(a);
 			} else {
 				int index = Collections.binarySearch(
-						this.authorsMiniPanel.getDatabaseAuthors(), a,
+						this.authorMiniPanel.getDatabaseAuthors(), a,
 						new Comparator<Author>() {
 							@Override
 							public int compare(Author o1, Author o2) {
@@ -459,9 +416,9 @@ public class BookCreator extends ItemCreator {
 						});
 				if (index < 0) {
 					a.setType(AuthorType.BOOK_AUTHOR);
-					this.authorsMiniPanel.addRow(a);
+					this.authorMiniPanel.addRow(a);
 				} else {
-					this.authorsMiniPanel.addRow(this.authorsMiniPanel
+					this.authorMiniPanel.addRow(this.authorMiniPanel
 							.getDatabaseAuthors().get(index));
 				}
 			}

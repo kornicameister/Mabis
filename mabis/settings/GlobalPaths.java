@@ -2,6 +2,12 @@ package settings;
 
 import java.io.File;
 
+import mvc.view.items.minipanels.AuthorMiniPanel;
+import mvc.view.items.minipanels.BandMiniPanel;
+import mvc.view.items.minipanels.IndustryIdentifiersMiniPanel;
+import mvc.view.items.minipanels.TagCloudMiniPanel;
+import mvc.view.items.minipanels.TrackListPanel;
+
 import settings.io.SettingsException;
 import settings.io.SettingsLoader;
 
@@ -15,23 +21,85 @@ import settings.io.SettingsLoader;
  * 
  */
 public enum GlobalPaths {
+	/**
+	 * sciezka do folderu, gdzie umieszczane sa avatary
+	 */
 	AVATAR_CACHE_PATH,
+	
+	/**
+	 * sciezka do domyslnej okladki
+	 */
 	DEFAULT_COVER_PATH, 
+	
+	/**
+	 * sciezka do domyslnego avatara
+	 */
 	DEFAULT_AVATAR_PATH, 
+	
+	/**
+	 * sciezka do folderu, gdzie umieszczane sa avatary zespolow
+	 */
 	BAND_CACHE_PATH,
-	AUTHOR_CACHE_PATH, 
+	
+	/**
+	 * sciezka do folderu, gdzie umieszczane sa avatary autorow
+	 */
+	AUTHOR_CACHE_PATH,
+	
+	/**
+	 * sciezka do folderu, gdzie umieszczane sa okladki elementow kolekcji
+	 */
 	MEDIA_CACHE_PATH, 
+	
+	/**
+	 * sciezka do folderu tymczasowego, miejsca gdzie trafiaja na samym
+	 * początku wszystkie zdjecia lub obiekty tymczasowe
+	 */
 	TMP, 
+	
+	/**
+	 * sciezka do symbolu krzyzyka
+	 * 
+	 * @see AuthorMiniPanel
+	 * @see TagCloudMiniPanel
+	 * @see BandMiniPanel
+	 */
 	CROSS_SIGN, 
+	
+	/**
+	 * sciezka do symbolu ok
+	 * 	 
+	 * @see AuthorMiniPanel
+	 * @see TagCloudMiniPanel
+	 * @see BandMiniPanel
+	 */
 	OK_SIGN, 
-	ISBN_SIGN, 
+	
+	/**
+	 * sciezka do symbolu ISBN
+	 * 
+	 * @see IndustryIdentifiersMiniPanel
+	 */
+	ISBN_SIGN,
+	
+	/**
+	 * sciezka do symbolu muzycznego
+	 * 
+	 * @see TrackListPanel
+	 */
 	MUSIC_ICON;
 
 	private String path = null;
 
+	/**
+	 * Konstruktor obiektu enum. Odwoluje sie do ustawien aplikacji
+	 * i pobiera sciezka, ktora odpowiedia wartosci wywolania funkcji <b>name()</b>.
+	 * 
+	 * @see SettingsLoader
+	 */
 	private GlobalPaths() {
 		try {
-			this.path = SettingsLoader.loadPath(this.name());
+			this.path = SettingsLoader.load(this.name());
 			File tmp = new File(path);
 			if (!tmp.exists() && this.path != "TMP") {
 				tmp.mkdir();

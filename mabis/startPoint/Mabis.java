@@ -14,6 +14,14 @@ import settings.io.SettingsException;
 import settings.io.SettingsLoader;
 import settings.io.SettingsSaver;
 
+/**
+ * Glowna klasa programu, gdzie ustawiany jest styl okien oraz ładowane jest
+ * glowne okienko aplikacji. Dodatkowym elementem jest zapis ustawien aplikacji,
+ * w momencie kiedy zamkniete zostanie glowne okno
+ * 
+ * @author tomasz
+ * 
+ */
 public class Mabis {
 	public static void main(String[] args) {
 
@@ -31,14 +39,14 @@ public class Mabis {
 		if (!f.exists()) {
 			f.mkdir();
 		}
-		
+
 		final MainWindow mw = new MainWindow("Mabis");
-		
+
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					SettingsLoader.loadFrame(mw);
+					SettingsLoader.load(mw);
 				} catch (SettingsException e) {
 					e.printStackTrace();
 				}

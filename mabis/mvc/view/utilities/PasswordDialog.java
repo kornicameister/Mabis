@@ -1,4 +1,4 @@
-package mvc.view.passwordDialog;
+package mvc.view.utilities;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -13,6 +13,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
+/**
+ * Klasa rozszerzajaca JDialog i pozwalaja na implementacje zachowania
+ * wlasciwego dla okienka hasla
+ * 
+ * @author tomasz
+ * 
+ */
 public class PasswordDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 8470460108291440058L;
 	private JPasswordField password;
@@ -31,7 +38,7 @@ public class PasswordDialog extends JDialog implements ActionListener {
 		this.setAlwaysOnTop(true);
 		this.setModal(true);
 
-		this.setSize(250, 250);
+		this.setSize(250, 110);
 		this.setLocationRelativeTo(parent);
 
 	}

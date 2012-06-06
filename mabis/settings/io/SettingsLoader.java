@@ -17,18 +17,15 @@ import org.jdom.input.SAXBuilder;
  * załadowanie wszystkich ustawień do konkretnego pliku. Działa zupełnie
  * inaczej. Jeśli pojawia się odwołanie do jakiejść wartości z ustawień klasa
  * odczytuje konkretne poddrzewo XML i odnajduje żądaną wartość. Operacje
- * wykonywane są z użyciem metod statycznych.
+ * wykonywane są z użyciem metod statycznych. </br>Klasa jest abstrakcyjna z
+ * powodu natury swojego dzialania. Uzywana jedynie wtedy, kiedy jest potrzebna,
+ * zapewnie dostep do ustawien zlokalizowanych w pliku uzywajac metod
+ * statycznych
  * 
  * @author tomasz
  * 
  */
-public class SettingsLoader extends Settings {
-
-	@Override
-	public void execute() {
-		return;
-	}
-
+public abstract class SettingsLoader extends Settings {
 	/**
 	 * Metoda szuka scieżki zapisane w elemencie XML opisanym przez attribute
 	 * <b>type</b> o wartości takiej jak parametr wywołania <i>pathName</i>
@@ -38,7 +35,7 @@ public class SettingsLoader extends Settings {
 	 * @return scieżkę dla podanej nazwy ścieżki
 	 * @throws SettingsException
 	 */
-	public static String loadPath(String pathName) throws SettingsException {
+	public static String load(String pathName) throws SettingsException {
 		if (pathName.equals("TMP")) {
 			return System.getProperty("java.io.tmpdir") + "/";
 		}
@@ -70,7 +67,7 @@ public class SettingsLoader extends Settings {
 	 *            okienko do którego zostaną zapisane ustawienia
 	 * @throws SettingsException
 	 */
-	public static void loadFrame(JFrame f) throws SettingsException {
+	public static void load(JFrame f) throws SettingsException {
 		try {
 			Element root = ((Document) new SAXBuilder().build(new File(
 					SettingsLoader.pathToXML))).getRootElement();

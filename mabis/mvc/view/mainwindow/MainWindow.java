@@ -4,7 +4,6 @@
 package mvc.view.mainwindow;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -21,21 +20,23 @@ import mvc.controller.database.MySQLAccess;
 import mvc.controller.entity.UserSQLFactory;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.entity.User;
+import mvc.view.MabisFrameInterface;
 import mvc.view.UserSelectionPanel;
 import mvc.view.WindowClosedListener;
 import mvc.view.newUser.NewUserDialog;
 
 /**
- * This is the main window class that presented to the user in the beginning and
- * works as singleton aggregating most of actions and passing them to external
- * listeners
+ * Klasa glownego okna. Dzieki modularnej budowie glownego okna w kontekscie
+ * tego co prezentowane jest uzytkownikowi, ta klasa nie robi wiele poza
+ * inicjalizacja swoich modulow oraz ich rozlozeniem w obszarze okna. </br>
+ * Dodatkowo sluzy jako pomost pomiedzy roznymi modulami. </br> Przykladem jest
+ * tutaj koniecznosc przekazania referencji do obiektu <b>polaczonego
+ * uzytkownika</b> od klasy {@link UserSelectionPanel} do {@link MWBottomPanel},
+ * ktory nastepnie przekazuja ja do kreatorow elementow kolekcji.
  * 
  * @author kornicameister
- * @version 0.1
- * @see java.swing.JFrame
  */
-public class MainWindow extends JFrame {
-
+public class MainWindow extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = -8447166696627624367L;
 	private MySQLAccess mysql = null;
 	private User connectedUser = null;
@@ -45,38 +46,12 @@ public class MainWindow extends JFrame {
 	private JPanel contentPane = null;
 	private MWMenuBar menuBar = null;
 
-	/**
-	 * Constructor of the main windows, calls for all private method to
-	 * initialize the end user mabis.mvc.view
-	 * 
-	 * @param title
-	 *            title of the window
-	 * @param d
-	 *            dimension of the window
-	 * @see Dimension
-	 */
 	public MainWindow(String title) {
 		super(title);
 
-		this.menuBar = new MWMenuBar(this);
-		this.setJMenuBar(this.menuBar);
-		this.bottomPanel = new MWBottomPanel(this);
-		this.collectionView = new MWCollectionView(this, new BorderLayout(),
-				true);
-		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
-
-		layoutComponents();
-
-		this.toolBar.setEnabled(false);
-		this.collectionView.setEnabled(false);
-		this.bottomPanel.setEnabled(false);
-
-		this.toolBar.addPropertyChangeListener(this.collectionView);
-		this.addPropertyChangeListener("connectedUser", this.collectionView);
-		this.bottomPanel.addPropertyChangeListener(this.collectionView);
-		this.menuBar.addPropertyChangeListener(this.collectionView);
-
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.initComponents();
+		this.layoutComponents();
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		this.initConnection();
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -128,17 +103,24 @@ public class MainWindow extends JFrame {
 		}
 	}
 
-	/**
-	 * Method is taking care of initializing window content, that is:
-	 * <ul>
-	 * <li>collection mabis.mvc.view</li>
-	 * <li>friends list</li>
-	 * <li>friends interaction block</li>
-	 * <li>buttons</li>
-	 * </ul>
-	 * and placing it on layouts
-	 */
-	private void layoutComponents() {
+	@Override
+	public void initComponents() {
+		this.menuBar = new MWMenuBar(this);
+		this.setJMenuBar(this.menuBar);
+		this.bottomPanel = new MWBottomPanel(this);
+		this.collectionView = new MWCollectionView(this, new BorderLayout(),
+				true);
+		this.toolBar = new MWToolBar("Mabis toolbar", JToolBar.HORIZONTAL);
+
+		this.toolBar.addPropertyChangeListener(this.collectionView);
+		this.addPropertyChangeListener("connectedUser", this.collectionView);
+		this.bottomPanel.addPropertyChangeListener(this.collectionView);
+		this.menuBar.addPropertyChangeListener(this.collectionView);
+
+	}
+
+	@Override
+	public void layoutComponents() {
 		// adding content jpanel
 		this.contentPane = new JPanel(true);
 		this.contentPane.setBorder(BorderFactory
@@ -184,11 +166,26 @@ public class MainWindow extends JFrame {
 		return this.bottomPanel;
 	}
 
+	/**
+	 * Metoda odbiera referencje (<b>obecnie polaczony uzytkownik</b>), dokonuje
+	 * sprawdzenia czy nie nastepila proba podlaczenia sie do programu tego
+	 * samego uzytkownika. Jesli nie, refrencja jest przekazywana do kolejnych
+	 * modulow tego okna.
+	 * 
+	 * @param newUser
+	 */
 	public void setConnectedUser(User newUser) {
 		if (this.connectedUser != null
 				&& this.connectedUser.getLogin().equals(newUser.getLogin())) {
 			return;
+		} else if (this.connectedUser != null
+				&& this.connectedUser.equals(newUser)) {
+			JOptionPane.showMessageDialog(this, newUser.getLogin()
+					+ " already connected", "Connection already in",
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
 		}
+
 		User oldUser = this.getConnectedUser();
 		this.connectedUser = newUser;
 		this.firePropertyChange("connectedUser", oldUser, this.connectedUser);
@@ -205,9 +202,6 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
-		this.toolBar.setEnabled(true);
-		this.collectionView.setEnabled(true);
-		this.bottomPanel.setEnabled(true);
 	}
 
 	public User getConnectedUser() {

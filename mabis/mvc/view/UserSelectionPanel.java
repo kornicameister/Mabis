@@ -30,7 +30,7 @@ import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.entity.User;
 import mvc.view.imagePanel.ChoosableImagePanel;
 import mvc.view.mainwindow.MainWindow;
-import mvc.view.passwordDialog.PasswordDialog;
+import mvc.view.utilities.PasswordDialog;
 import settings.io.SettingsException;
 import settings.io.SettingsLoader;
 import utilities.Hasher;
@@ -45,11 +45,19 @@ import utilities.Hasher;
  */
 public class UserSelectionPanel extends JFrame
 		implements
-			PropertyChangeListener {
-
+			PropertyChangeListener,
+			MabisFrameInterface {
 	private static final long serialVersionUID = -3642888588569732458L;
 	private static final Dimension avatarSize = new Dimension(150, 150);
+	/**
+	 * referencja do okna glownego. Potrzeba do komunikacji wstecznej tj:
+	 * <ul>
+	 * <li>przekazania informacji o polaczonym uzytkowniku</li>
+	 * <li>uaktualnienia informacji na pasku stanu</li>
+	 * </ul>
+	 */
 	private MainWindow mw = null;
+
 	private JButton connectButton = null;
 	private JButton cancelButton = null;
 	private JPanel userListPanel;
@@ -58,6 +66,10 @@ public class UserSelectionPanel extends JFrame
 	private JScrollPane userScrollPanel = null;
 	private short selectedUserIndex = -1;
 
+	/**
+	 * Referencja do mapy, ktora pozwala na powiazanie uzytkownikow ze swoimi
+	 * avatarami wyswietlanymi na {@link UserSelectionPanel#userListPanel}
+	 */
 	private final TreeMap<User, ChoosableImagePanel> thumbails = new TreeMap<User, ChoosableImagePanel>();
 	private final UserSelectionPanelListener listener = new UserSelectionPanelListener(
 			this);
@@ -66,6 +78,9 @@ public class UserSelectionPanel extends JFrame
 
 	/**
 	 * Tworzy okno dialogowe z rodzicem.
+	 * 
+	 * @param owner
+	 *            referencja do okna glownego.
 	 */
 	public UserSelectionPanel(MainWindow owner) {
 		super();
@@ -76,7 +91,7 @@ public class UserSelectionPanel extends JFrame
 		this.initThumbailList();
 		this.addWindowListener(new WindowClosedListener());
 		try {
-			SettingsLoader.loadFrame(this);
+			SettingsLoader.load(this);
 		} catch (SettingsException e) {
 			e.printStackTrace();
 			this.setTitle("Choose user");
@@ -86,6 +101,15 @@ public class UserSelectionPanel extends JFrame
 		}
 	}
 
+	/**
+	 * Tworzy okno wyboru uzytkownika z gotowa lista uzytkownikow do
+	 * wyswietlenia
+	 * 
+	 * @param users
+	 *            mapa uzytkownikow
+	 * @param owner
+	 *            rodzic tego okna
+	 */
 	public UserSelectionPanel(HashMap<Integer, User> users, Frame owner) {
 		super();
 		this.mw = (MainWindow) owner;
@@ -95,27 +119,36 @@ public class UserSelectionPanel extends JFrame
 		this.parseUsers();
 		this.initThumbailList();
 		try {
-			SettingsLoader.loadFrame(this);
+			SettingsLoader.load(this);
 		} catch (SettingsException e) {
 			e.printStackTrace();
+			this.setTitle("Choose user");
+			this.setLocation(this.mw.getX() + this.mw.getWidth() / 4,
+					this.mw.getY() + 25);
+			this.setSize(new Dimension(500, 280));
 		}
 		this.addWindowListener(new WindowClosedListener());
 	}
 
+	/**
+	 * Metoda inicjalizujaca ta ramke
+	 * 
+	 * @see UserSelectionPanel#initComponents()
+	 * @see UserSelectionPanel#layoutComponents()
+	 */
 	protected void init() {
 		super.frameInit();
 		this.initComponents();
 		this.layoutComponents();
-		this.initMeta();
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		this.users.clear();
-		this.thumbails.clear();
-	}
-
+	/**
+	 * Metoda przeglada liste uzytkownikow i tworzy kolejne image panele z
+	 * miniaturkami, na ktory uzytkownik moze kliknac celem wskazania swojego
+	 * obiektu. Dodaje utworzone imagePanele do
+	 * {@link UserSelectionPanel#thumbails}
+	 */
 	private void parseUsers() {
 		for (User u : this.users.values()) {
 			ChoosableImagePanel p = new ChoosableImagePanel(u.getAvatar()
@@ -125,6 +158,10 @@ public class UserSelectionPanel extends JFrame
 		}
 	}
 
+	/**
+	 * Metoda przeglada liste imagePaneli i dodaje je na
+	 * {@link UserSelectionPanel#userListPanel}
+	 */
 	private void initThumbailList() {
 		for (User u : this.users.values()) {
 			// we have user u, now lets get it's panel
@@ -137,18 +174,12 @@ public class UserSelectionPanel extends JFrame
 		}
 	}
 
-	private void initMeta() {
-		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	}
-
 	/**
 	 * Metoda zadeklarowana jako final static dlatego</br> Dostępna w całym
 	 * pakiecie ponieważ wykonuje działanie niezależne od klasy w której jest
 	 * zdefiniowane. </br> Metoda korzystając z UserSQLFactory, łączy się z bazą
 	 * danych online i pobiera stamtąd wszystkich użytkowników
 	 */
-	// TODO dodać link do UserSQLFactory
-	// TODO przenieść metody typu util do oddzielnego pakietu
 	private void obtainUsers() {
 		try {
 			this.userFactory.setStatementType(SQLStamentType.SELECT);
@@ -160,7 +191,8 @@ public class UserSelectionPanel extends JFrame
 		}
 	}
 
-	private final void initComponents() {
+	@Override
+	public void initComponents() {
 		this.rootListPanel = new JPanel(true);
 
 		this.userScrollPanel = new JScrollPane(this.rootListPanel,
@@ -183,7 +215,8 @@ public class UserSelectionPanel extends JFrame
 
 	}
 
-	public final void layoutComponents() {
+	@Override
+	public void layoutComponents() {
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 
@@ -236,6 +269,15 @@ public class UserSelectionPanel extends JFrame
 		}
 	}
 
+	/**
+	 * Listener dla {@link UserSelectionPanel}. Wyodrebiony z uwagi na zlozonosc
+	 * dzialania. Listener po wykryciu kliknicie przycisku odpowiedzialnego za
+	 * polaczenie Odwoluje sie do {@link PasswordDialog}. Dopiero podanie
+	 * wlasciwego hasla powoduje polaczenie uzytkownika
+	 * 
+	 * @author tomasz
+	 * 
+	 */
 	class UserSelectionPanelListener implements ActionListener {
 		UserSelectionPanel usp = null;
 		private PasswordDialog pd;

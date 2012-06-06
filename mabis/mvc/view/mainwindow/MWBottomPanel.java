@@ -19,23 +19,25 @@ import javax.swing.border.BevelBorder;
 
 import logger.MabisLogger;
 import mvc.model.entity.User;
+import mvc.view.MabisFrameInterface;
 import mvc.view.items.creators.AudioAlbumCreator;
 import mvc.view.items.creators.BookCreator;
 import mvc.view.items.creators.MovieCreator;
 import mvc.view.utilities.StatusBar;
 
 /**
- * @author kornicameister contains:
- *         <ul>
- *         <li> {@link MainWindow#statusBar}</li>
- *         <li> {@link MainWindow#databaseStatusBar}</li>
- *         <li> {@link MainWindow#publishButton}</li>
- *         <ul>
+ * Skladowy panel {@link MainWindow}. Zostaly na nim umieszczone przyciski
+ * pozwalajace na dodawanie nowych elementow kolekcji oraz przycisk pozwalajacy
+ * na zakonczenie dzialania z aplikacja
+ * 
+ * @author tomasz
+ * 
  */
 public class MWBottomPanel extends JPanel
 		implements
 			PropertyChangeListener,
-			ActionListener {
+			ActionListener,
+			MabisFrameInterface {
 
 	private static final long serialVersionUID = 7673272237316575906L;
 	private StatusBar statusBar;
@@ -64,9 +66,11 @@ public class MWBottomPanel extends JPanel
 		this.setDoubleBuffered(true);
 		this.setBorder(BorderFactory.createEmptyBorder());
 		this.initComponents();
+		this.layoutComponents();
 	}
 
-	private void initComponents() {
+	@Override
+	public void initComponents() {
 		this.statusBar = new StatusBar();
 		this.statusBar.setBorder(BorderFactory
 				.createBevelBorder(BevelBorder.LOWERED));
@@ -90,8 +94,10 @@ public class MWBottomPanel extends JPanel
 		this.newAudioAlbumButton.addActionListener(this);
 		this.newBookButton.addActionListener(this);
 		this.newMovieButton.addActionListener(this);
+	}
 
-		// organizing into the layout
+	@Override
+	public void layoutComponents() {
 		GroupLayout layout = new GroupLayout(this);
 		this.setLayout(layout);
 

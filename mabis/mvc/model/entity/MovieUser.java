@@ -10,7 +10,7 @@ import mvc.model.ManyToManyTable;
 import mvc.model.enums.TableType;
 
 /**
- * This class maps itself to mabis.movieUser many-to-many table
+ * Obiektowa reprezentacja tabeli wiele-do-wielu {@link MovieUser}
  * 
  * @author kornicameister
  * 
@@ -30,7 +30,7 @@ public class MovieUser extends ManyToManyTable implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idMovieUser", "idMovie", "idUser" };
+		String tmp[] = {"idMovieUser", "idMovie", "idUser"};
 		return tmp;
 	}
 }

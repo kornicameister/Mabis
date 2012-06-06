@@ -22,7 +22,11 @@ import utilities.Hasher;
 import utilities.Utilities;
 
 /**
- * @author kornicameister
+ * Klasa opisuje operacje bazodanowe, ktore wykonywane sa na tabeli movie
+ * zgodnie z danymi i parametrami przekazanymi przez {@link Author} lub metody
+ * dostępowe tejze klasy
+ * 
+ * @author tomasz
  * 
  */
 public class AuthorSQLFactory extends SQLFactory {
@@ -116,7 +120,7 @@ public class AuthorSQLFactory extends SQLFactory {
 			Integer pictureID = this.insertAvatar(entity.getAvatar());
 			if (pictureID != null) {
 				st.setInt(3, pictureID);
-			}else{
+			} else {
 				st.setString(3, null);
 			}
 			st.setObject(4, entity);

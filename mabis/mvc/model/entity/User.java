@@ -23,17 +23,39 @@ public class User extends Author implements Serializable {
 	private static final long serialVersionUID = 7165099983429863760L;
 	private String password;
 
+	/**
+	 * Tworzy nowego uzytkownika, ale jest to jedynie pusty konstruktor, wiec
+	 * nie ustawia wartosci zadnych pol
+	 */
 	public User() {
 		super();
 	}
 
+	/**
+	 * Tworzy nowego uzytkownika
+	 * 
+	 * @param login
+	 *            login uzytkownika
+	 * @param email
+	 *            email uzytkownika
+	 * @param password
+	 *            haslo uzytkownika
+	 */
 	public User(String login, String email, String password) {
 		super();
 		this.titles[2] = login;
 		this.titles[3] = email;
-		this.password = password;
+		this.password = Hasher.hashString(password);
 	}
 
+	/**
+	 * Tworzy nowego uzytkownika bazujac na jego imieniu i nazwisku
+	 * 
+	 * @param fName
+	 *            imie
+	 * @param lName
+	 *            nazwisko
+	 */
 	public User(String fName, String lName) {
 		super(fName, lName);
 	}
@@ -49,7 +71,7 @@ public class User extends Author implements Serializable {
 
 	@Override
 	public String[] metaData() {
-		String tmp[] = { "idUser", "object", "avatarFK" };
+		String tmp[] = {"idUser", "object", "avatarFK"};
 		return tmp;
 	}
 

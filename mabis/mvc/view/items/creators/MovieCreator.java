@@ -26,8 +26,6 @@ import logger.MabisLogger;
 import mvc.controller.SQLStamentType;
 import mvc.controller.api.MovieAPI;
 import mvc.controller.api.MovieAPI.MovieApiTarget;
-import mvc.controller.entity.AuthorSQLFactory;
-import mvc.controller.entity.GenreSQLFactory;
 import mvc.controller.entity.MovieSQLFactory;
 import mvc.controller.entity.MovieUserSQLFactory;
 import mvc.controller.exceptions.SQLEntityExistsException;
@@ -40,7 +38,7 @@ import mvc.model.entity.Picture;
 import mvc.model.entity.User;
 import mvc.model.enums.AuthorType;
 import mvc.model.enums.GenreType;
-import mvc.model.enums.ImageType;
+import mvc.model.enums.PictureType;
 import mvc.model.utilities.ForeignKey;
 import mvc.view.items.CreatorContentNullPointerException;
 import mvc.view.items.ItemCreator;
@@ -69,17 +67,23 @@ import settings.io.SettingsLoader;
 public class MovieCreator extends ItemCreator {
 	private static final long serialVersionUID = -8029181092669910824L;
 	private JTextField titleField;
-	private TagCloudMiniPanel tagCloud;
-	private AuthorMiniPanel directorsPanel;
 	private JTextField durationField;
 	private JTextArea descriptionArea;
 	private JScrollPane descriptionScrollPane;
 	private LoadFromMovieApi lfa;
 
+	/**
+	 * Konstruuje nowy MovieCreator
+	 * 
+	 * @param u
+	 *            referencja do uzytkownika aktualnie podlaczonego do bazy
+	 * @param title
+	 *            tytul okna
+	 */
 	public MovieCreator(User u, String title) {
-		super(u, title);
+		super(u, title, GenreType.MOVIE, AuthorType.MOVIE_DIRECTOR);
 		try {
-			SettingsLoader.loadFrame(this);
+			SettingsLoader.load(this);
 		} catch (SettingsException e) {
 			MabisLogger.getLogger().log(Level.WARNING,
 					"Failed to load frame {0} from settings", this.getName());
@@ -90,7 +94,7 @@ public class MovieCreator extends ItemCreator {
 	}
 
 	@Override
-	protected void layoutComponents() {
+	public void layoutComponents() {
 		super.layoutComponents();
 		GroupLayout gl = new GroupLayout(this.contentPanel);
 		this.contentPanel.setLayout(gl);
@@ -111,7 +115,7 @@ public class MovieCreator extends ItemCreator {
 												.addComponent(this.titleField)
 												.addComponent(
 														this.durationField))
-								.addComponent(this.directorsPanel)
+								.addComponent(this.authorMiniPanel)
 								.addComponent(this.tagCloud)
 								.addComponent(this.descriptionScrollPane)));
 		gl.setVerticalGroup(gl
@@ -129,7 +133,7 @@ public class MovieCreator extends ItemCreator {
 												.addComponent(
 														this.durationField, 50,
 														60, 60))
-								.addComponent(this.directorsPanel)
+								.addComponent(this.authorMiniPanel)
 								.addComponent(this.tagCloud)));
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
@@ -146,7 +150,7 @@ public class MovieCreator extends ItemCreator {
 	}
 
 	@Override
-	protected void initComponents() throws CreatorContentNullPointerException {
+	public void initComponents() throws CreatorContentNullPointerException {
 		super.initComponents();
 		this.contentPanel = new JPanel(true);
 		this.titleField = new JTextField();
@@ -160,41 +164,8 @@ public class MovieCreator extends ItemCreator {
 		this.durationField.setBorder(BorderFactory
 				.createTitledBorder("Duration"));
 
-		this.initializeAuthorsMiniPanel();
-		this.initializeTagCloud();
-
 		String arr[] = {"by title"};
 		this.searchPanel.setSearchCriteria(arr);
-	}
-
-	private void initializeAuthorsMiniPanel() {
-		try {
-			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
-					new Author());
-			asf.addWhereClause("type", AuthorType.MOVIE_DIRECTOR.toString());
-			asf.executeSQL(true);
-			this.directorsPanel = new AuthorMiniPanel(asf.getAuthors(),
-					AuthorType.MOVIE_DIRECTOR);
-			this.directorsPanel.setBorder(BorderFactory
-					.createTitledBorder("Authors"));
-		} catch (SQLException | SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void initializeTagCloud() {
-		try {
-			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
-					new Genre());
-			gsf.addWhereClause("type", GenreType.MOVIE.toString());
-			gsf.executeSQL(true);
-			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
-					GenreType.MOVIE);
-			this.tagCloud.setBorder(BorderFactory
-					.createTitledBorder("Tag cloud"));
-		} catch (SQLException | SQLEntityExistsException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -204,7 +175,6 @@ public class MovieCreator extends ItemCreator {
 		this.descriptionArea.setText("");
 		this.coverPanel.setImage(new File(GlobalPaths.DEFAULT_COVER_PATH
 				.toString()));
-		this.directorsPanel.clear();
 		this.tagCloud.clear();
 	}
 
@@ -217,19 +187,23 @@ public class MovieCreator extends ItemCreator {
 
 		try {
 			selectedMovie.setTitle(this.titleField.getText());
-			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(), ImageType.FRONT_COVER));
+			selectedMovie.setCover(new Picture(this.coverPanel.getImageFile(),
+					PictureType.FRONT_COVER));
 			selectedMovie.setDescription(this.descriptionArea.getText());
-			selectedMovie.setDuration(Long.valueOf(this.durationField.getText()) * 3600);
+			selectedMovie
+					.setDuration(Long.valueOf(this.durationField.getText()) * 3600);
 			selectedMovie.setGenres(this.tagCloud.getTags());
-			selectedMovie.setDirectors(this.directorsPanel.getAuthors());
+			selectedMovie.setDirectors(this.authorMiniPanel.getAuthors());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 
 		if (this.editingMode) {
 			try {
-				MovieSQLFactory msf = new MovieSQLFactory(SQLStamentType.UPDATE, selectedMovie);
-				msf.addWhereClause("idMovie", selectedMovie.getPrimaryKey().toString());
+				MovieSQLFactory msf = new MovieSQLFactory(
+						SQLStamentType.UPDATE, selectedMovie);
+				msf.addWhereClause("idMovie", selectedMovie.getPrimaryKey()
+						.toString());
 				return msf.executeSQL(true) > 0;
 			} catch (SQLException | SQLEntityExistsException e) {
 				e.printStackTrace();
@@ -388,10 +362,10 @@ public class MovieCreator extends ItemCreator {
 		// that can be found in AuthorsMiniPanel
 		for (Author a : m.getAuthors()) {
 			if (this.editingMode) {
-				this.directorsPanel.addRow(a);
+				this.authorMiniPanel.addRow(a);
 			} else {
 				int index = Collections.binarySearch(
-						this.directorsPanel.getDatabaseAuthors(), a,
+						this.authorMiniPanel.getDatabaseAuthors(), a,
 						new Comparator<Author>() {
 							@Override
 							public int compare(Author o1, Author o2) {
@@ -405,10 +379,10 @@ public class MovieCreator extends ItemCreator {
 							}
 						});
 				if (index < 0) {
-					a.setType(AuthorType.MOVIE_DIRECTOR);
-					this.directorsPanel.addRow(a);
+					a.setType(this.authorType);
+					this.authorMiniPanel.addRow(a);
 				} else {
-					this.directorsPanel.addRow(this.directorsPanel
+					this.authorMiniPanel.addRow(this.authorMiniPanel
 							.getDatabaseAuthors().get(index));
 				}
 			}

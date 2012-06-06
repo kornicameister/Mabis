@@ -23,16 +23,19 @@ import mvc.model.utilities.ForeignKey;
  * @author kornicameister
  * @version 0.3
  */
-public abstract class BaseTable implements Table, Comparable<BaseTable>,
-		Serializable {
+public abstract class BaseTable
+		implements
+			Table,
+			Comparable<BaseTable>,
+			Serializable {
 	private static final long serialVersionUID = 8934017748567797527L;
 	private Integer primaryKey;
 	protected String[] titles;
 	protected TableType tableType;
 
 	/**
-	 * Empty constructor, only initializes variables, used when new entity
-	 * object was created and which is at the moment not in the database
+	 * Tworzy obiekt {@link BaseTable}. Konstruktor jest pusty i jedynie pozwala
+	 * na inicjalizacje pol klasy
 	 */
 	public BaseTable() {
 		this.initFields();
@@ -40,14 +43,15 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	}
 
 	/**
-	 * Constructs BaseTable with title in it's original language
+	 * Konstruktor tworzacy obiekt {@link BaseTable} ze stringiem, ktory
+	 * umieszczany jest na pierwszym miejscu tabeli stringow
 	 * 
 	 * @param originalTitle
 	 */
-	public BaseTable(String originalTitle) {
+	public BaseTable(String str_1) {
 		this.initFields();
 		this.initInternalFields();
-		this.titles[0] = originalTitle;
+		this.titles[0] = str_1;
 	}
 
 	/**
@@ -95,7 +99,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	private void initFields() {
 		this.primaryKey = new Integer(-1);
 		this.titles = new String[4];
-		for(int i = 0 ; i < this.titles.length ; i++){
+		for (int i = 0; i < this.titles.length; i++) {
 			this.titles[i] = new String();
 		}
 		this.tableType = TableType.NULL;
@@ -182,7 +186,7 @@ public abstract class BaseTable implements Table, Comparable<BaseTable>,
 	@Override
 	public int compareTo(BaseTable o) {
 		int compareValue = 0;
-		if(o == null){
+		if (o == null) {
 			return 0;
 		}
 		compareValue = this.getTableType().compareTo(o.getTableType());

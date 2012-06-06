@@ -2,8 +2,12 @@ package mvc.view.enums;
 
 import java.util.ArrayList;
 
+import mvc.view.imagePanel.ImageFileFilter;
+import mvc.view.imagePanel.ImageFilePreview;
+
 /**
- * Enum that holds all available image formats
+ * Enum, gdzie zlokalizowane sa formaty plikow - <b>zdjec</b>, obslugiwanych w
+ * {@link ImageFileFilter} oraz {@link ImageFilePreview}
  * 
  * @author kornicameister
  * 
@@ -22,6 +26,12 @@ public enum ImageFormats {
 		return this.format;
 	}
 
+	/**
+	 * statyczna publiczna metoda, zwraca {@link ArrayList} wszystkich mozliwych
+	 * formatow plikow
+	 * 
+	 * @return formaty plikow jako string
+	 */
 	static public ArrayList<String> getFormats() {
 		ArrayList<String> tmp = new ArrayList<String>();
 		tmp.add(PNG.toString());

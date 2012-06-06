@@ -31,8 +31,8 @@ import settings.io.LastRunDescription;
 import settings.io.SettingsLoader;
 
 /**
- * Class nicely and logically group the functionality related to menu bar that
- * {@link MainWindow} should consist
+ * Klasa grupuje funkcjonalnosc paska menu, ktore kazde glowne okno powinno
+ * zawierac
  * 
  * @author kornicameister
  */
@@ -50,7 +50,7 @@ public class MWMenuBar extends JMenuBar
 	private final static LastRunDescription LSR = SettingsLoader.loadLastRun();
 
 	public MWMenuBar(MainWindow parent) throws HeadlessException {
-		super();// file menu
+		super();
 
 		this.mw = parent;
 		this.setDoubleBuffered(true);
@@ -61,10 +61,7 @@ public class MWMenuBar extends JMenuBar
 	}
 
 	/**
-	 * Method goes through each JMenu and initializes it by
-	 * <ul>
-	 * <li>creating new reference</li>
-	 * </ul>
+	 * Metoda inicjalizuje obiekty, ktore sa widoczne dla dla uzytkownika
 	 */
 	private void initItems() {
 		file = new JMenu("File");
@@ -79,12 +76,9 @@ public class MWMenuBar extends JMenuBar
 	}
 
 	/**
-	 * Method goes through each JMenuItem and initializes it by
-	 * <ul>
-	 * <li>adding description</li>
-	 * <li>adding key binding</li>
-	 * <li>adding listeners</li>
-	 * </ul>
+	 * Metoda-opakowanie, jej zadaniem jest po prostu wywolanie kolejnych metod
+	 * tej klasy, ktore zainicjalizuje {@link JMenuItem} dla kolejnych
+	 * {@link JMenu}
 	 */
 	private void initActions() {
 		this.initFileMenu();
@@ -183,6 +177,15 @@ public class MWMenuBar extends JMenuBar
 					JOptionPane.INFORMATION_MESSAGE, null);
 		}
 	}
+
+	/**
+	 * Prosta metoda, wywolany zawsze z glownego okna, w momencie kiedy zostanie
+	 * ustawiony nowy uzytkownik (tj. kiedy uzytkownik zostanie podlaczony do
+	 * programu)
+	 * 
+	 * @param connectedUser
+	 *            polaczony uzytkownik
+	 */
 	public void setConnectedUser(User connectedUser) {
 		this.connectedUser = connectedUser;
 	}

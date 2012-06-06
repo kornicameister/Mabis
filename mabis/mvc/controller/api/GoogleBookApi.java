@@ -15,7 +15,7 @@ import mvc.model.entity.Genre;
 import mvc.model.entity.Picture;
 import mvc.model.enums.BookIndustryIdentifierType;
 import mvc.model.enums.GenreType;
-import mvc.model.enums.ImageType;
+import mvc.model.enums.PictureType;
 import mvc.model.utilities.BookIndustryIdentifier;
 
 import com.google.api.client.googleapis.services.GoogleKeyInitializer;
@@ -29,6 +29,20 @@ import com.google.api.services.books.model.Volume.VolumeInfo.ImageLinks;
 import com.google.api.services.books.model.Volume.VolumeInfo.IndustryIdentifiers;
 import com.google.api.services.books.model.Volumes;
 
+/**
+ * Klasa realizuje dosted do GoogleBook API. Bazujac na przekazanym zapytaniu,
+ * klasa potrafi wyszukac informacje o ksiazkach zarowno dla podanego
+ * <ul>
+ * <li>autora</li>
+ * <li>tytulu</li>
+ * </ul>
+ * 
+ * Warto nadmienic, ze w procesie wyszukiwania pisarzy dla ksiazek, pobierane sa
+ * rowniez avatary tychze pisarzy.
+ * 
+ * @author tomasz
+ * 
+ */
 public class GoogleBookApi extends ApiAccess {
 	private static final String API_ACCESS_KEY = "AIzaSyDZ7cVkpBjtmHtjKAhsvXOlWfetZQi4Ubo";
 
@@ -94,8 +108,8 @@ public class GoogleBookApi extends ApiAccess {
 		if (ii != null && !ii.isEmpty()) {
 			for (IndustryIdentifiers identifier : ii) {
 				book.addIdentifier(new BookIndustryIdentifier(
-						BookIndustryIdentifierType.findType(identifier.getType()),
-						identifier.getIdentifier()));
+						BookIndustryIdentifierType.findType(identifier
+								.getType()), identifier.getIdentifier()));
 			}
 		}
 
@@ -115,7 +129,7 @@ public class GoogleBookApi extends ApiAccess {
 				try {
 					Author tmp = new Author(firstName, lastName);
 					tmp.setPicture(new Picture(GoogleImageSearch
-							.queryForImage(authors.get(i)), ImageType.AUTHOR));
+							.queryForImage(authors.get(i)), PictureType.AUTHOR));
 					book.addAuthor(tmp);
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -151,7 +165,8 @@ public class GoogleBookApi extends ApiAccess {
 				image = il.getThumbnail();
 			}
 			try {
-				book.setCover(new Picture(new URL(image), ImageType.FRONT_COVER));
+				book.setCover(new Picture(new URL(image),
+						PictureType.FRONT_COVER));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -160,7 +175,7 @@ public class GoogleBookApi extends ApiAccess {
 		// genres
 		if (vi.getCategories() != null && !vi.getCategories().isEmpty()) {
 			for (String genre : vi.getCategories()) {
-				book.addGenre(new Genre(genre,GenreType.BOOK));
+				book.addGenre(new Genre(genre, GenreType.BOOK));
 			}
 		}
 
@@ -171,6 +186,17 @@ public class GoogleBookApi extends ApiAccess {
 			book.setPages(0);
 		}
 		return book;
+	}
+
+	@Override
+	protected StringBuilder accessAPI(TreeMap<String, String> params)
+			throws IOException {
+		return null;
+	}
+
+	@Override
+	protected StringBuilder accessAPI(String crit) {
+		return null;
 	}
 
 }

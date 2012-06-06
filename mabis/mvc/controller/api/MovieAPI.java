@@ -12,13 +12,13 @@ import mvc.model.entity.Genre;
 import mvc.model.entity.Movie;
 import mvc.model.entity.Picture;
 import mvc.model.enums.GenreType;
-import mvc.model.enums.ImageType;
+import mvc.model.enums.PictureType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Klasa pozwala na dostęp do bazy filmów <a href="themoviedb.org">TMDb</a> oraz
+ * Klasa pozwala na dostep do bazy filmow <a href="themoviedb.org">TMDb</a> oraz
  * <a href="http://imdbapi.com/">IMDB</a> poprzez publiczne API
  * 
  * @author kornicameister
@@ -50,20 +50,21 @@ public class MovieAPI extends ApiAccess {
 		title = title.replaceAll(" ", "+");
 		try {
 			switch (this.target) {
-			case IMDB:
-				parseIMDBResponse(accessApi(title));
-				break;
-			case THE_MOVIE_DB:
-				break;
-			default:
-				break;
+				case IMDB :
+					parseIMDBResponse(this.accessAPI(title));
+					break;
+				case THE_MOVIE_DB :
+					break;
+				default :
+					break;
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private StringBuilder accessApi(String title) throws IOException {
+	@Override
+	protected StringBuilder accessAPI(String title) throws IOException {
 		URL url = new URL(IMDB_SEARCH + title);
 		URLConnection connection = url.openConnection();
 		connection.addRequestProperty("Referer", "www.example.com");
@@ -94,7 +95,8 @@ public class MovieAPI extends ApiAccess {
 		for (String a : arr) {
 			Author tmp = new Author(a.split(" ")[0], a.split(" ")[1]);
 			try {
-				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),ImageType.AUTHOR));
+				tmp.setPicture(new Picture(GoogleImageSearch.queryForImage(a),
+						PictureType.AUTHOR));
 				m.addAuthor(tmp);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -106,7 +108,8 @@ public class MovieAPI extends ApiAccess {
 		}
 
 		try {
-			m.setCover(new Picture(new URL(startObject.getString("Poster")),ImageType.FRONT_COVER));
+			m.setCover(new Picture(new URL(startObject.getString("Poster")),
+					PictureType.FRONT_COVER));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -122,7 +125,7 @@ public class MovieAPI extends ApiAccess {
 				res += Long.valueOf(arr[i - 1]) * 3600;
 			}
 		}
-		m.setDuration(res *60);
+		m.setDuration(res * 60);
 		this.result.add(m);
 		this.pcs.firePropertyChange("taskStep", 0, 1);
 	}
@@ -133,5 +136,11 @@ public class MovieAPI extends ApiAccess {
 
 	public void setTarget(MovieApiTarget target) {
 		this.target = target;
+	}
+
+	@Override
+	protected StringBuilder accessAPI(TreeMap<String, String> params)
+			throws IOException {
+		return null;
 	}
 }

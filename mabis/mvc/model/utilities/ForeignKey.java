@@ -10,14 +10,12 @@ import mvc.model.BaseTable;
 import mvc.model.enums.TableType;
 
 /**
- * This class represent object-oriented implementation of sql foreign key Class
- * can be easily sorted using customized
- * {@link ForeignKey#compareTo(ForeignKey)} method
+ * Klasa reprezentuje obiektowa postac klucza obcego z tabeli ralacyjnej
  * 
  * @author kornicameister
  * @see Comparable
  */
-public class ForeignKey implements Comparable<ForeignKey>, Serializable{
+public class ForeignKey implements Comparable<ForeignKey>, Serializable {
 	private static final long serialVersionUID = -839442478641269523L;
 	private TableType originTable;
 	private String name;
@@ -39,6 +37,18 @@ public class ForeignKey implements Comparable<ForeignKey>, Serializable{
 		this.value = value;
 	}
 
+	/**
+	 * Działa podobnie jak drugi konstruktor klasy, z roznica na pierwszym
+	 * argumencie. Ten konstruktor zamiast obiektu klasy {@link BaseTable}
+	 * przyjmuje referencje do {@link TableType}
+	 * 
+	 * @param tableTarget
+	 *            tabela do ktorej odwoluje sie klucz obcy
+	 * @param keyName
+	 *            nazwa kolumny klucza obcegi
+	 * @param value
+	 *            wartoc klucza obcego
+	 */
 	public ForeignKey(TableType tableTarget, String keyName, int value) {
 		this.originTable = tableTarget;
 		this.name = keyName;

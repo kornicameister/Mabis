@@ -32,6 +32,9 @@ import settings.GlobalPaths;
 import utilities.Utilities;
 
 /**
+ * Klasa pozwala na wykonywanie wszystkich operacji bazodanowych na tabeli
+ * <strong>picture</strong>
+ * 
  * @author kornicameister
  * 
  */
@@ -42,6 +45,12 @@ public class PictureSQLFactory extends SQLFactory {
 		super(type, table);
 	}
 
+	/**
+	 * Metoda przenosi zdjecie ze swojej dotychczasowej lokacji {aka
+	 * {@link GlobalPaths#TMP} do nowej lokacji zgodnej z typem danego zdjecia
+	 * 
+	 * @return
+	 */
 	private Boolean movePictureToCache() {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
@@ -62,13 +71,12 @@ public class PictureSQLFactory extends SQLFactory {
 			while ((len = in.read(buf)) > 0) {
 				out.write(buf, 0, len);
 			}
-			
+
 			in.close();
 			out.close();
-			
 
 			pp.setImageFile(newPicture.getCanonicalPath());
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -77,29 +85,41 @@ public class PictureSQLFactory extends SQLFactory {
 		return true;
 	}
 
+	/**
+	 * Metoda tworzy nowy plik zgodny z typem danego zdjecia
+	 * 
+	 * @param pp
+	 *            zdjecia do ktorego ma zostac utworzony nowy plik
+	 * @return utworzony plik z nowa juz lokacja
+	 */
 	private File createNewPictureFile(Picture pp) {
 		File newPicture = null;
 		switch (pp.getType()) {
-		case AVATAR:
-			newPicture = new File(GlobalPaths.AVATAR_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		case AUTHOR:
-			newPicture = new File(GlobalPaths.AUTHOR_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		case BAND:
-			newPicture = new File(GlobalPaths.BAND_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
-		default:
-			newPicture = new File(GlobalPaths.MEDIA_CACHE_PATH
-					+ pp.getCheckSum());
-			break;
+			case AVATAR :
+				newPicture = new File(GlobalPaths.AVATAR_CACHE_PATH
+						+ pp.getCheckSum());
+				break;
+			case AUTHOR :
+				newPicture = new File(GlobalPaths.AUTHOR_CACHE_PATH
+						+ pp.getCheckSum());
+				break;
+			case BAND :
+				newPicture = new File(GlobalPaths.BAND_CACHE_PATH
+						+ pp.getCheckSum());
+				break;
+			default :
+				newPicture = new File(GlobalPaths.MEDIA_CACHE_PATH
+						+ pp.getCheckSum());
+				break;
 		}
 		return newPicture;
 	}
 
+	/**
+	 * Metoda usuwa z cache dane zdjecie
+	 * 
+	 * @throws PictureCacheException
+	 */
 	private void deletePictureFromCache() throws PictureCacheException {
 		Picture pp = ((Picture) this.table);
 		File oldPicture = pp.getImageFile();
@@ -115,32 +135,32 @@ public class PictureSQLFactory extends SQLFactory {
 			throws SQLException {
 		Picture p = (Picture) this.table;
 		switch (this.type) {
-		case INSERT:
-			if (!this.movePictureToCache()) {
-				if(this.syncCacheToDB()){
-					p.setPrimaryKey(this.lastAffactedId);
-					return;
+			case INSERT :
+				if (!this.movePictureToCache()) {
+					if (this.syncCacheToDB()) {
+						p.setPrimaryKey(this.lastAffactedId);
+						return;
+					}
 				}
-			}
-			st.setObject(1, p);
-			st.execute();
-			this.lastAffactedId = Utilities.lastInsertedId(p, st);
-			p.setPrimaryKey(this.lastAffactedId);
-			break;
-		case DELETE:
-			try {
-				this.deletePictureFromCache();
-			} catch (PictureCacheException e) {
-				e.printStackTrace();
-			}
-			this.parseDeleteSet(st.executeUpdate());
-			break;
-		case UPDATE:
-		case SELECT:
-			this.parseResultSet(st.executeQuery());
-			break;
-		default:
-			break;
+				st.setObject(1, p);
+				st.execute();
+				this.lastAffactedId = Utilities.lastInsertedId(p, st);
+				p.setPrimaryKey(this.lastAffactedId);
+				break;
+			case DELETE :
+				try {
+					this.deletePictureFromCache();
+				} catch (PictureCacheException e) {
+					e.printStackTrace();
+				}
+				this.parseDeleteSet(st.executeUpdate());
+				break;
+			case UPDATE :
+			case SELECT :
+				this.parseResultSet(st.executeQuery());
+				break;
+			default :
+				break;
 		}
 	}
 
@@ -155,35 +175,37 @@ public class PictureSQLFactory extends SQLFactory {
 	private boolean syncCacheToDB() throws SQLException {
 		Picture problematic = (Picture) this.table;
 		// 1. fetch all pictures
-		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT, problematic);
+		PictureSQLFactory psf = new PictureSQLFactory(SQLStamentType.SELECT,
+				problematic);
 		try {
 			psf.executeSQL(true);
 		} catch (SQLEntityExistsException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		ArrayList<Picture> tmp = new ArrayList<>(psf.getCovers());
-		Collections.sort(tmp,new Comparator<Picture>() {
+		Collections.sort(tmp, new Comparator<Picture>() {
 			@Override
 			public int compare(Picture p, Picture pp) {
 				int res = p.getCheckSum().compareTo(pp.getCheckSum());
-				if(res == 0){
+				if (res == 0) {
 					res = p.getImagePath().compareTo(pp.getImagePath());
 				}
 				return res;
 			}
 		});
-		
-		int index = Collections.binarySearch(tmp, problematic,new Comparator<Picture>() {
 
-			@Override
-			public int compare(Picture o1, Picture o2) {
-				return o1.getCheckSum().compareTo(o2.getCheckSum());
-			}
-			
-		});
-		
-		if(index > 0){
+		int index = Collections.binarySearch(tmp, problematic,
+				new Comparator<Picture>() {
+
+					@Override
+					public int compare(Picture o1, Picture o2) {
+						return o1.getCheckSum().compareTo(o2.getCheckSum());
+					}
+
+				});
+
+		if (index > 0) {
 			this.lastAffactedId = tmp.get(index).getPrimaryKey();
 			return true;
 		}
@@ -199,29 +221,29 @@ public class PictureSQLFactory extends SQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		Picture picture = null;
 		switch (this.type) {
-		case UPDATE:
-			break;
-		case SELECT:
-			while (set.next()) {
-				byte[] buf = set.getBytes("object");
-				if (buf != null) {
-					try {
-						ObjectInputStream objectIn = new ObjectInputStream(
-								new ByteArrayInputStream(buf));
-						picture = (Picture) objectIn.readObject();
-						picture.setPrimaryKey(set.getInt("idPicture"));
-						this.pictures.add(picture);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+			case UPDATE :
+				break;
+			case SELECT :
+				while (set.next()) {
+					byte[] buf = set.getBytes("object");
+					if (buf != null) {
+						try {
+							ObjectInputStream objectIn = new ObjectInputStream(
+									new ByteArrayInputStream(buf));
+							picture = (Picture) objectIn.readObject();
+							picture.setPrimaryKey(set.getInt("idPicture"));
+							this.pictures.add(picture);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
+					picture = null;
 				}
-				picture = null;
-			}
-			break;
-		default:
-			break;
+				break;
+			default :
+				break;
 		}
 		set.close();
 	}
@@ -232,6 +254,11 @@ public class PictureSQLFactory extends SQLFactory {
 		this.pictures.clear();
 	}
 
+	/**
+	 * Zwraca pobrane przez ta metode obiektu klasy {@link Picture}
+	 * 
+	 * @return treeset zdjec
+	 */
 	public TreeSet<Picture> getCovers() {
 		return pictures;
 	}

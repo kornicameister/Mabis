@@ -31,6 +31,12 @@ import mvc.model.entity.Author;
 import mvc.model.enums.AuthorType;
 import settings.GlobalPaths;
 
+/**
+ * MiniPanel, ktory pozwala na dodawanie tworcow danego elementu kolekcji
+ * 
+ * @author tomasz
+ * 
+ */
 public class AuthorMiniPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 3416144336071217011L;
 	protected ArrayList<Author> authors = new ArrayList<>();
@@ -66,14 +72,14 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	}
 
 	protected void initTable() {
-		String columnNames[] = { "ID", "First Name", "Last Name" };
+		String columnNames[] = {"ID", "First Name", "Last Name"};
 		this.tableModel = new DefaultTableModel(columnNames, 0);
-		this.table = new JTable(tableModel){
+		this.table = new JTable(tableModel) {
 			private static final long serialVersionUID = 6303631988571439208L;
 
 			@Override
 			public Class<?> getColumnClass(int column) {
-				if(column == 0){
+				if (column == 0) {
 					return ImageIcon.class;
 				}
 				return Object.class;
@@ -84,18 +90,19 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 				return false;
 			}
 		};
-		
-		class TableMouseListener extends MouseAdapter implements MouseListener{
+
+		class TableMouseListener extends MouseAdapter implements MouseListener {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				currentlySelectedRow = table.rowAtPoint(e.getPoint());
 			}
 		}
-		
-		class TableKeyListener extends KeyAdapter implements KeyListener{
+
+		class TableKeyListener extends KeyAdapter implements KeyListener {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_D || e.getKeyChar() == KeyEvent.VK_DELETE){
+				if (e.getKeyCode() == KeyEvent.VK_D
+						|| e.getKeyChar() == KeyEvent.VK_DELETE) {
 					tableModel.removeRow(currentlySelectedRow);
 					rowToAuthor.remove(new Integer(currentlySelectedRow));
 					table.revalidate();
@@ -108,16 +115,19 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	}
 
 	public void addRow(Author a) {
-		Object data[] = { this.rowToAuthor.size() + 1, a.getFirstName(), a.getLastName() };
-		if(a.getPrimaryKey() < 0){
+		Object data[] = {this.rowToAuthor.size() + 1, a.getFirstName(),
+				a.getLastName()};
+		if (a.getPrimaryKey() < 0) {
 			ImageIcon tmp = new ImageIcon(GlobalPaths.CROSS_SIGN.toString());
-			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
-		}else{
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10,
+					Image.SCALE_FAST));
+		} else {
 			ImageIcon tmp = new ImageIcon(GlobalPaths.OK_SIGN.toString());
-			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10, Image.SCALE_FAST));
+			data[0] = new ImageIcon(tmp.getImage().getScaledInstance(10, 10,
+					Image.SCALE_FAST));
 		}
 		this.tableModel.addRow(data);
-		this.rowToAuthor.put(this.rowToAuthor.size(),a);
+		this.rowToAuthor.put(this.rowToAuthor.size(), a);
 	}
 
 	public void setAuthors(TreeSet<Author> authors) {
@@ -139,8 +149,8 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 	public ArrayList<Author> getDatabaseAuthors() {
 		return authors;
 	}
-	
-	public Collection<Author> getAuthors(){
+
+	public Collection<Author> getAuthors() {
 		return this.rowToAuthor.values();
 	}
 
@@ -194,7 +204,8 @@ public class AuthorMiniPanel extends JPanel implements ActionListener {
 					}
 				}
 				Author tmp = new Author(firstName, lastName, this.type);
-				int index = Collections.binarySearch(this.authors, tmp, comparator);
+				int index = Collections.binarySearch(this.authors, tmp,
+						comparator);
 				if (index > 0) {
 					tmp = this.authors.get(index);
 				}

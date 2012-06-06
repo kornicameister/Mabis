@@ -6,14 +6,14 @@ package mvc.view.imagePanel;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import mvc.view.enums.ImageFormats;
 
-
 /**
- * This class provides customized file filter that allows to choose only image
- * based file
+ * Klasa, ktorej obiekt, mozna nastepnie dodac do {@link JFileChooser} pozwala
+ * na listowanie w widoku {@link JFileChooser} jedynie zdjec
  * 
  * @author kornicameister
  * @see ImageFormats

@@ -6,7 +6,6 @@ package mvc.view.imagePanel;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -22,9 +21,9 @@ import javax.swing.ImageIcon;
 import logger.MabisLogger;
 
 /**
- * This is the {@link ImagePanel} panel extended with the following feature:
- * </br> Every time user clicks on {@link ChoosableImagePanel}, than image panel
- * is redrawn and besides the image user can see filled rectangle
+ * 
+ * Klasa rozszerza mozliwosci {@link ImagePanel} o mozliwosci sygnalizowania, ze
+ * dany {@link ImagePanel} zostal zaznaczony przez uzytkownika, badz odznaczony
  * 
  * @author kornicameister
  */
@@ -35,6 +34,15 @@ public class ChoosableImagePanel extends ImagePanel {
 	private Color defaultColor;
 	private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+	/**
+	 * Konstruuje nowy {@link ChoosableImagePanel} z ikoną (<b>icon</b>) oraz
+	 * rozmiarem (<b>d</b>).
+	 * 
+	 * @param icon
+	 *            ikona do ustawienia wewnątrz {@link ChoosableImagePanel}
+	 * @param d
+	 *            rozmiar ikony
+	 */
 	public ChoosableImagePanel(File icon, Dimension d) {
 		super();
 		this.marked = false;
@@ -43,7 +51,7 @@ public class ChoosableImagePanel extends ImagePanel {
 		this.addMouseListener(this.listener);
 		ImageIcon tmp = new ImageIcon(icon.getAbsolutePath());
 		ImageIcon tmp2 = new ImageIcon(tmp.getImage().getScaledInstance(
-				(int) d.getWidth(), (int) d.getHeight()-30, Image.SCALE_FAST));
+				(int) d.getWidth(), (int) d.getHeight() - 30, Image.SCALE_FAST));
 		this.contentLabel.setIcon(tmp2);
 		this.imageFile = icon;
 	}
@@ -70,11 +78,16 @@ public class ChoosableImagePanel extends ImagePanel {
 		Boolean oldMarked = this.marked;
 		this.marked = marked;
 		this.pcs.firePropertyChange("panelMarked", oldMarked, this.marked);
+		if (this.marked) {
+			this.setBackground(Color.gray.brighter());
+		} else {
+			this.setBackground(this.defaultColor);
+		}
 	}
 
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener l) {
-		if(this.pcs == null){
+		if (this.pcs == null) {
 			pcs = new PropertyChangeSupport(this);
 		}
 		this.pcs.addPropertyChangeListener(l);
@@ -85,39 +98,9 @@ public class ChoosableImagePanel extends ImagePanel {
 		this.pcs.removePropertyChangeListener(l);
 	}
 
-	@Override
-	protected void paintComponent(Graphics g) {
-		if (this.marked) {
-			g.setColor(Color.gray.brighter().brighter());
-			g.fill3DRect(0, 0, this.getWidth(), this.getHeight() + padding,
-					false);
-		} else {
-			g.setColor(this.defaultColor);
-			g.clearRect(0, 0, this.getWidth(), this.getHeight());
-		}
-	}
-
-	/**
-	 * Works pretty much the same as
-	 * {@link ChoosableImagePanel#setMarked(false)} but without triggering
-	 * property change event, additionaly it fires repainting of panel
-	 */
-	public void demark() {
-		this.marked = false;
-		this.repaint();
-	}
-
-	/**
-	 * Works like {@link ChoosableImagePanel#setMarked(true)}, but does not
-	 * trigger fire property change
-	 */
-	public void mark() {
-		this.marked = true;
-		this.repaint();
-	}
-
-	class ChoosableImagePanelMouseListener extends MouseAdapter implements
-			MouseListener {
+	class ChoosableImagePanelMouseListener extends MouseAdapter
+			implements
+				MouseListener {
 
 		@Override
 		public void mouseClicked(MouseEvent o) {
@@ -135,5 +118,23 @@ public class ChoosableImagePanel extends ImagePanel {
 			}
 			repaint();
 		}
+	}
+
+	/**
+	 * Metoda odznacza ten panel, ale nie generuje przy tym zdarzenia firePropertyChange
+	 */
+	public void demark() {
+		this.marked = false;
+		this.setBackground(this.defaultColor);
+		this.revalidate();
+	}
+
+	/**
+	 * Metoda zaznacza ten panel, ale nie generuje przy tym zdarzenia firePropertyChange
+	 */
+	public void mark() {
+		this.marked = true;
+		this.setBackground(Color.gray.brighter());
+		this.revalidate();
 	}
 }

@@ -15,6 +15,14 @@ import mvc.model.entity.Genre;
 import mvc.model.enums.GenreType;
 import utilities.Utilities;
 
+/**
+ * Klasa opisuje operacje bazodanowe, ktore wykonywane sa na tabeli movie
+ * zgodnie z danymi i parametrami przekazanymi przez {@link Genre} lub metody
+ * dostępowe tejze klasy
+ * 
+ * @author tomasz
+ * 
+ */
 public class GenreSQLFactory extends SQLFactory {
 	private final TreeSet<Genre> genres = new TreeSet<Genre>();
 
@@ -27,23 +35,23 @@ public class GenreSQLFactory extends SQLFactory {
 			throws SQLException {
 		Genre genre = (Genre) this.table;
 		switch (this.type) {
-		case INSERT:
-			st.setString(1, genre.getType().toString());
-			st.setObject(2, genre);
-			st.execute();
-			this.lastAffactedId = Utilities.lastInsertedId(genre, st);
-			genre.setPrimaryKey(this.lastAffactedId);
-			break;
-		case DELETE:
-			st.setInt(1, genre.getPrimaryKey());
-			this.parseDeleteSet(st.executeUpdate());
-			break;
-		case UPDATE:
-		case SELECT:
-			this.parseResultSet(st.executeQuery());
-			break;
-		default:
-			break;
+			case INSERT :
+				st.setString(1, genre.getType().toString());
+				st.setObject(2, genre);
+				st.execute();
+				this.lastAffactedId = Utilities.lastInsertedId(genre, st);
+				genre.setPrimaryKey(this.lastAffactedId);
+				break;
+			case DELETE :
+				st.setInt(1, genre.getPrimaryKey());
+				this.parseDeleteSet(st.executeUpdate());
+				break;
+			case UPDATE :
+			case SELECT :
+				this.parseResultSet(st.executeQuery());
+				break;
+			default :
+				break;
 		}
 
 	}
@@ -52,28 +60,29 @@ public class GenreSQLFactory extends SQLFactory {
 	protected void parseResultSet(ResultSet set) throws SQLException {
 		Genre genre = null;
 		switch (this.type) {
-		case SELECT:
-			while (set.next()) {
-				byte[] buf = set.getBytes("object");
-				if (buf != null) {
-					try {
-						ObjectInputStream objectIn = new ObjectInputStream(
-								new ByteArrayInputStream(buf));
-						genre = (Genre) objectIn.readObject();
-						genre.setPrimaryKey(set.getInt("idGenre"));
-						genre.setType(GenreType.valueOf(set.getString("type")));
-						this.genres.add(genre);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+			case SELECT :
+				while (set.next()) {
+					byte[] buf = set.getBytes("object");
+					if (buf != null) {
+						try {
+							ObjectInputStream objectIn = new ObjectInputStream(
+									new ByteArrayInputStream(buf));
+							genre = (Genre) objectIn.readObject();
+							genre.setPrimaryKey(set.getInt("idGenre"));
+							genre.setType(GenreType.valueOf(set
+									.getString("type")));
+							this.genres.add(genre);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+						}
 					}
+					genre = null;
 				}
-				genre = null;
-			}
-			break;
-		default:
-			break;
+				break;
+			default :
+				break;
 		}
 		set.close();
 	}

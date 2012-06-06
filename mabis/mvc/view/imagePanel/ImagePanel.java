@@ -34,6 +34,28 @@ public class ImagePanel extends JPanel
 	protected File imageFile;
 	protected JLabel contentLabel;
 
+	/**
+	 * Bez parametrowy konstruktor {@link ImagePanel}. Tworzy jedynie obiekt
+	 * {@link ImagePanel} poprzez inicjalizacje zmiennych tej klasy.
+	 */
+	public ImagePanel() {
+		super(true);
+		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
+		this.addFocusListener(new ImagePanelFocusListener(this));
+
+		this.contentLabel = new JLabel();
+		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		this.contentLabel.setLayout(new FlowLayout());
+		this.add(contentLabel);
+	}
+
+	/**
+	 * Tworzy obiekt {@link ImagePanel} z ustawionym zdjeciem. Zdjecie
+	 * zlokalizowane jest w pliku <b>f</b>
+	 * 
+	 * @param f
+	 *            plik, ktory wskazuje na zdjecie
+	 */
 	public ImagePanel(File f) {
 		super(true);
 		this.imageFile = f;
@@ -47,17 +69,15 @@ public class ImagePanel extends JPanel
 		this.add(contentLabel);
 	}
 
-	public ImagePanel() {
-		super(true);
-		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
-		this.addFocusListener(new ImagePanelFocusListener(this));
-
-		this.contentLabel = new JLabel();
-		this.contentLabel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		this.contentLabel.setLayout(new FlowLayout());
-		this.add(contentLabel);
-	}
-
+	/**
+	 * Tworzy obiekt {@link ImagePanel} z gotowym do wyswietlenia zdjecia oraz
+	 * rozmiarem <b>d</b>
+	 * 
+	 * @param icon
+	 *            plik ze zdjeciem
+	 * @param d
+	 *            rozmiar panelu
+	 */
 	public ImagePanel(File icon, Dimension d) {
 		super(true);
 		this.addMouseMotionListener(new ImagePanelMouseMotionListener());
@@ -83,15 +103,16 @@ public class ImagePanel extends JPanel
 	public void setSize(int w, int h) {
 		super.setSize(w, h);
 	}
-	
+
 	private ImageIcon getScaledImage(File f) {
 		ImageIcon i = new ImageIcon(f.getAbsolutePath());
-		
+
 		final double height = 180.0;
 		double a = height / i.getIconHeight();
 		double newWidth = a * i.getIconWidth();
-		
-		return new ImageIcon(i.getImage().getScaledInstance((int) newWidth, (int) height, Image.SCALE_FAST));
+
+		return new ImageIcon(i.getImage().getScaledInstance((int) newWidth,
+				(int) height, Image.SCALE_FAST));
 	}
 
 	public void setImage(File f) {

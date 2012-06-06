@@ -18,6 +18,14 @@ import mvc.model.entity.Movie;
 import mvc.model.entity.Picture;
 import utilities.Utilities;
 
+/**
+ * Klasa opisuje operacje bazodanowe, ktore wykonywane sa na tabeli movie
+ * zgodnie z danymi i parametrami przekazanymi przez {@link Movie} lub metody
+ * dostępowe tejze klasy
+ * 
+ * @author tomasz
+ * 
+ */
 public class MovieSQLFactory extends SQLFactory {
 	private final TreeSet<Movie> movies = new TreeSet<Movie>();
 
@@ -43,9 +51,11 @@ public class MovieSQLFactory extends SQLFactory {
 					e.printStackTrace();
 				}
 				short parameterIndex = 1;
-				st.setInt(parameterIndex++, this.insertGenres(movie.getGenres()));
+				st.setInt(parameterIndex++,
+						this.insertGenres(movie.getGenres()));
 				st.setInt(parameterIndex++, this.insertCover(movie.getCover()));
-				st.setInt(parameterIndex++, this.insertDirectors(movie.getAuthors()));
+				st.setInt(parameterIndex++,
+						this.insertDirectors(movie.getAuthors()));
 				st.setObject(parameterIndex++, movie);
 				st.setString(parameterIndex++, movie.getTitle());
 				st.execute();

@@ -14,10 +14,8 @@ import mvc.model.enums.TableType;
  * @see TableType
  */
 public enum CollectionView {
-	VIEW_BOOKS(TableType.BOOK), 
-	VIEW_MOVIES(TableType.MOVIE), 
-	VIEW_AUDIOS(TableType.AUDIO_ALBUM),
-	VIEW_ALL(TableType.NULL);
+	VIEW_BOOKS(TableType.BOOK), VIEW_MOVIES(TableType.MOVIE), VIEW_AUDIOS(
+			TableType.AUDIO_ALBUM), VIEW_ALL(TableType.NULL);
 
 	private TableType tt = null;
 
@@ -35,17 +33,23 @@ public enum CollectionView {
 	public String toString() {
 		if (tt != null) {
 			switch (this.tt) {
-			case BOOK:
-			case MOVIE:
-			case AUDIO_ALBUM:
-				return tt.toString();
-			default:
-				break;
+				case BOOK :
+				case MOVIE :
+				case AUDIO_ALBUM :
+					return tt.toString();
+				default :
+					break;
 			}
 		}
 		return "all";
 	}
 
+	/**
+	 * Metoda zwraca tablice zawierajacych wszystkie mozliwe typy
+	 * {@link CollectionView}
+	 * 
+	 * @return tablice enumow {@link CollectionView}
+	 */
 	public static CollectionView[] toArray() {
 		CollectionView tmp[] = new CollectionView[4];
 		tmp[0] = VIEW_ALL;

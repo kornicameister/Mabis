@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
@@ -26,12 +27,24 @@ import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import logger.MabisLogger;
+import mvc.controller.SQLStamentType;
+import mvc.controller.entity.AuthorSQLFactory;
+import mvc.controller.entity.GenreSQLFactory;
+import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.BaseTable;
+import mvc.model.entity.Author;
+import mvc.model.entity.Genre;
 import mvc.model.entity.User;
+import mvc.model.enums.AuthorType;
+import mvc.model.enums.GenreType;
+import mvc.view.MabisFrameInterface;
 import mvc.view.WindowClosedListener;
 import mvc.view.imagePanel.ImageFileFilter;
 import mvc.view.imagePanel.ImageFilePreview;
 import mvc.view.imagePanel.ImagePanel;
+import mvc.view.items.minipanels.AuthorMiniPanel;
+import mvc.view.items.minipanels.BandMiniPanel;
+import mvc.view.items.minipanels.TagCloudMiniPanel;
 
 /**
  * Klasa bazowa kreatora nowego obiektu dla kolekcji. Definiuje podstawową
@@ -42,9 +55,8 @@ import mvc.view.imagePanel.ImagePanel;
  * @author kornicameister
  * 
  */
-public abstract class ItemCreator extends JFrame {
+public abstract class ItemCreator extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = -2333519518489232774L;
-
 	protected JPanel contentPanel;
 	private JPanel contentPane;
 	private ICButtonPanel buttonPanel;
@@ -56,19 +68,28 @@ public abstract class ItemCreator extends JFrame {
 	protected boolean editingMode;
 	protected BaseTable editedItem;
 	protected ImagePanel coverPanel;
+	protected GenreType genreType;
+	protected TagCloudMiniPanel tagCloud;
+	protected AuthorMiniPanel authorMiniPanel;
+	protected AuthorType authorType;
 
 	/**
 	 * Konstruktor klasy bazowej kreatora nowego obiektu
 	 * 
 	 * @param title
 	 *            tytuł okna
+	 * @param genreType
 	 * @throws HeadlessException
 	 * @throws CreatorContentNullPointerException
 	 */
-	public ItemCreator(User u, String title) {
+	public ItemCreator(User u, String title, GenreType genreType, AuthorType at) {
 		super(title);
 		this.editingMode = false;
 		this.selectedUser = u;
+		this.genreType = genreType;
+		this.authorType = at;
+		this.initializeTagCloud();
+		this.initializeAuthorsMiniPanel();
 		this.initComponents();
 		this.layoutComponents();
 
@@ -77,10 +98,8 @@ public abstract class ItemCreator extends JFrame {
 		this.addWindowListener(new WindowClosedListener());
 	}
 
-	/**
-	 * Ułóż elementy w oknie
-	 */
-	protected void layoutComponents() {
+	@Override
+	public void layoutComponents() {
 		this.contentPane = new JPanel(true);
 		this.contentPane.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.RAISED));
@@ -113,12 +132,8 @@ public abstract class ItemCreator extends JFrame {
 		this.pack();
 	}
 
-	/**
-	 * Inicjalizuje komponenty tego kreatora
-	 * 
-	 * @throws CreatorContentNullPointerException
-	 */
-	protected void initComponents() throws CreatorContentNullPointerException {
+	@Override
+	public void initComponents() throws CreatorContentNullPointerException {
 		this.listener = new ICActionListener();
 		this.buttonPanel = new ICButtonPanel();
 		this.searchPanel = new ICSearchPanel();
@@ -149,7 +164,8 @@ public abstract class ItemCreator extends JFrame {
 				super.mouseEntered(e);
 				if (coverPanel.getImageFile() != null) {
 					coverPanel.setToolTipText("<html><body><b>Cover:</b></br>"
-							+ coverPanel.getImageFile().getName() + "</body></html>");
+							+ coverPanel.getImageFile().getName()
+							+ "</body></html>");
 				}
 			}
 		});
@@ -219,6 +235,53 @@ public abstract class ItemCreator extends JFrame {
 		this.editedItem = bt;
 	}
 
+	private void initializeTagCloud() {
+		try {
+			GenreSQLFactory gsf = new GenreSQLFactory(SQLStamentType.SELECT,
+					new Genre());
+			gsf.addWhereClause("type", this.genreType.toString());
+			gsf.executeSQL(true);
+			this.tagCloud = new TagCloudMiniPanel(gsf.getGenres(),
+					GenreType.AUDIO);
+			this.tagCloud.setBorder(BorderFactory
+					.createTitledBorder("Tag cloud"));
+		} catch (SQLException | SQLEntityExistsException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Metoda inicjalizuje mini panel dla autorow elementow kolekcji, zgodnie z
+	 * natura uruchomionego kreatora. Poprzedzona slowem
+	 * <strong>protected</strong> poniewaz {@link BandMiniPanel} nie jest do
+	 * konca tym samym co {@link AuthorMiniPanel}, niemniej Band jest dzieckiem
+	 * {@link Author} w hierarchi dziedziczenia klas, wiec wydaje sie to
+	 * calkowicie naturalne, ze te dwa mini panele dziedzicza od siebie.
+	 * 
+	 * @see ItemCreator#authorType
+	 */
+	protected void initializeAuthorsMiniPanel() {
+		try {
+			AuthorSQLFactory asf = new AuthorSQLFactory(SQLStamentType.SELECT,
+					new Author());
+			asf.addWhereClause("type", this.authorType.toString());
+			asf.executeSQL(true);
+			this.authorMiniPanel = new AuthorMiniPanel(asf.getAuthors(),
+					this.authorType);
+			this.authorMiniPanel.setBorder(BorderFactory
+					.createTitledBorder("Authors"));
+		} catch (SQLException | SQLEntityExistsException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Klasa rozszerzająca JPanel, stanowi kontener dla przycisków sterujących
+	 * działaniem kreatora
+	 * 
+	 * @author tomasz
+	 * 
+	 */
 	private class ICButtonPanel extends JPanel {
 		private static final long serialVersionUID = -169864232599710877L;
 		private JButton createButton;
@@ -240,6 +303,18 @@ public abstract class ItemCreator extends JFrame {
 		}
 	}
 
+	/**
+	 * Kontener dla elementów pozwalających na dostęp do API, które z kolei daje
+	 * możliwość pobrania informacji o
+	 * <ol>
+	 * <li>ksiazkach</li>
+	 * <li>filmach</li>
+	 * <li>albumach muzycznych</li>
+	 * </ol>
+	 * 
+	 * @author tomasz
+	 * 
+	 */
 	public class ICSearchPanel extends JPanel {
 		private static final long serialVersionUID = 806539065413054227L;
 		private JTextField searchQuery = new JTextField();

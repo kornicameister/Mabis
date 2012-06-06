@@ -15,14 +15,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import mvc.model.BaseTable;
-import mvc.model.enums.ImageType;
+import mvc.model.enums.PictureType;
 import mvc.model.enums.TableType;
 import settings.GlobalPaths;
 import utilities.Hasher;
 
 /**
- * Klasa Picture jest obiektową wersją tabeli bazy danych o następującej
- * strukturze </br> | idCover </br> | image </br> | hash
+ * Klasa Picture jest obiektową wersją tabeli bazy danych picture
  * 
  * @author kornicameister
  * 
@@ -30,43 +29,72 @@ import utilities.Hasher;
 // TODO update commnents and make them more sql dependable
 public class Picture extends BaseTable implements Serializable {
 	private static final long serialVersionUID = -1350787093697204874L;
-	private ImageType type;
+	private PictureType type;
 	private String imageFilePath = null;
 
+	/**
+	 * @see BaseTable#BaseTable()
+	 */
 	public Picture() {
 		super();
-		this.type = ImageType.UNDEFINED;
 	}
 
-	public Picture(int pk, ImageType t) {
+	/**
+	 * Tworzy nowy obiekt {@link Picture} bazujac na jej kluczu glownym oraz
+	 * typie tego zdjecia
+	 * 
+	 * @param pk
+	 * @param t
+	 */
+	public Picture(int pk, PictureType t) {
 		super(pk);
 		this.type = t;
 	}
 
 	/**
-	 * This constructor can produce FileNotFoundException as it creates Picture
-	 * with file picture set, and this requires having checksum of this file
-	 * calculated !!! <b>Notice that invalid file (i.e. file that does not
-	 * exist) will produce this exception
+	 * Ten konstruktor moze wyprodukowac wyjatek {@link FileNotFoundException},
+	 * jeśli sciezka do podanego <i>cover</i> bedzie wskazywac na nie istniejacy
+	 * fizycznie plik
 	 * 
 	 * @param cover
+	 *            sciezka do pliku zdjecia
+	 * @param t
+	 *            typ zdjecia
 	 * @throws FileNotFoundException
 	 */
-	public Picture(String cover, ImageType t) throws FileNotFoundException {
+	public Picture(String cover, PictureType t) throws FileNotFoundException {
 		super();
 		this.imageFilePath = cover;
 		this.generateCheckSum(new File(cover));
 		this.type = t;
 	}
 
-	public Picture(File cover, ImageType t) throws IOException {
+	/**
+	 * Konstruktor dziala tak samo jak
+	 * {@link Picture#Picture(String, PictureType)} z ta roznica, ze zamiast
+	 * sciezki do pliku podawana jest od razu referencja do pliku wskazujacego
+	 * na zdjecie
+	 * 
+	 * @param cover
+	 * @param t
+	 * @throws IOException
+	 */
+	public Picture(File cover, PictureType t) throws IOException {
 		super();
 		this.imageFilePath = cover.getCanonicalPath();
 		this.generateCheckSum(cover);
 		this.type = t;
 	}
 
-	public Picture(URL url, ImageType t) throws IOException {
+	/**
+	 * Tworzy nowy obiekt zdjecia bazujac na przekaznym do tej klasy obiektowi
+	 * URL
+	 * 
+	 * @param url
+	 * @param t
+	 * @throws IOException
+	 */
+	public Picture(URL url, PictureType t) throws IOException {
 		super();
 		saveImageFromURL(url);
 		this.type = t;
@@ -107,9 +135,16 @@ public class Picture extends BaseTable implements Serializable {
 		this.imageFilePath = output.getAbsolutePath();
 	}
 
+	/**
+	 * Metoda zapisuje hash z podanego URL
+	 * 
+	 * @param imageUrl
+	 * @throws IOException
+	 */
 	private void saveHash(URL imageUrl) throws IOException {
 		URLConnection conn = imageUrl.openConnection();
-		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
+		conn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0");
 		conn.connect();
 		try {
 			this.titles[0] = Hasher.hashStream(conn.getInputStream());
@@ -148,11 +183,11 @@ public class Picture extends BaseTable implements Serializable {
 		return tmp;
 	}
 
-	public ImageType getType() {
+	public PictureType getType() {
 		return type;
 	}
 
-	public void setType(ImageType type) {
+	public void setType(PictureType type) {
 		this.type = type;
 	}
 

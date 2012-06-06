@@ -9,9 +9,8 @@ import mvc.model.BaseTable;
 import mvc.model.enums.TableType;
 
 /**
- * Table structure: </br> | idMovie </br> | titleOriginal </br> | titleLocale
- * </br> | duration </br> | description </br> | cover </br> | backCover </br> |
- * director </br> | genres </br>
+ * Klasa ta jest obiektowa wersja tabeli Move i mapuje sie relacyjnej tabeli
+ * movie w bazie danych Mabis
  * 
  * @author kornicameister
  * @version 0.3
@@ -76,7 +75,8 @@ public class Movie extends BaseTable implements Serializable {
 	}
 
 	public String getDuration() {
-		String s = String.format("%d", TimeUnit.SECONDS.toMinutes(this.duration / 60));
+		String s = String.format("%d",
+				TimeUnit.SECONDS.toMinutes(this.duration / 60));
 		return s;
 	}
 
