@@ -119,9 +119,10 @@ public class HTMLDescriptor {
 	private static String generateShortBiiList(String bodyPart, Book b) {
 		if(b.getIdentifiers() != null && !b.getIdentifiers().isEmpty()){
 			bodyPart += "<td width='150'>";
+			bodyPart += "<strong>ISBNS</strong>";
 			bodyPart += "<ul style='list-style:none'>";
 			for(BookIndustryIdentifier bii : b.getIdentifiers()){
-				bodyPart += "<li><b>" + bii.getType().toString() + "</b> " + bii.getValue() + "</li>";
+				bodyPart += "<li><b>" + bii.getType().toString() + "</b> :: </br>" + bii.getValue() + "</li>";
 			}
 			bodyPart += "</ul></td>";
 		}
@@ -132,11 +133,12 @@ public class HTMLDescriptor {
 		Movie b = (Movie) bt;
 		if(b.getAuthors() != null && !b.getAuthors().isEmpty()){
 			bodyPart += "<td>";
+			bodyPart += "<strong>Authors</strong>";
 			bodyPart += "<ul style='list-style:none'>";
 			for(Author a : b.getAuthors()){
 				bodyPart += "<li><b>" + a.getLastName() + "</b> " + a.getFirstName() + "</li>";
 			}
-			bodyPart += "</li></td>";
+			bodyPart += "</ul></td>";
 		}
 		return bodyPart;
 	}
