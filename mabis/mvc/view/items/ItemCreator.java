@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -16,13 +18,10 @@ import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
@@ -44,6 +43,7 @@ import mvc.view.imagePanel.ImageFilePreview;
 import mvc.view.imagePanel.ImagePanel;
 import mvc.view.items.minipanels.AuthorMiniPanel;
 import mvc.view.items.minipanels.BandMiniPanel;
+import mvc.view.items.minipanels.SearchMiniPanel;
 import mvc.view.items.minipanels.TagCloudMiniPanel;
 
 /**
@@ -62,8 +62,7 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 	private ICButtonPanel buttonPanel;
 	private ICActionListener listener;
 	protected TreeSet<BaseTable> collectedItems;
-	protected ICSearchPanel searchPanel;
-	protected JProgressBar searchProgressBar;
+	protected SearchMiniPanel searchPanel;
 	protected User selectedUser;
 	protected boolean editingMode;
 	protected BaseTable editedItem;
@@ -115,19 +114,17 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 		gl.setHorizontalGroup(gl
 				.createParallelGroup()
 				.addComponent(this.searchPanel)
-				.addComponent(this.searchProgressBar)
 				.addGroup(
 						gl.createSequentialGroup().addComponent(
 								this.contentPanel))
 				.addComponent(this.buttonPanel));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
-				.addComponent(this.searchPanel, 30, 30, 30)
-				.addComponent(this.searchProgressBar, 40, 40, 40)
+				.addComponent(this.searchPanel, 100, 120, 140)
 				.addGroup(
 						gl.createParallelGroup()
 								.addComponent(this.contentPanel))
-				.addComponent(this.buttonPanel, 30, 30, 30));
+				.addComponent(this.buttonPanel, 70, 80, 105));
 
 		this.pack();
 	}
@@ -136,13 +133,25 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 	public void initComponents() throws CreatorContentNullPointerException {
 		this.listener = new ICActionListener();
 		this.buttonPanel = new ICButtonPanel();
-		this.searchPanel = new ICSearchPanel();
-		this.searchProgressBar = new JProgressBar(JProgressBar.HORIZONTAL);
-		this.searchProgressBar.setMinimum(0);
-		this.searchProgressBar.setMaximum(100);
-		this.searchProgressBar.setStringPainted(true);
-		this.coverPanel = new ImagePanel();
+		this.buttonPanel.setBorder(BorderFactory.createTitledBorder("Buttons"));
+		this.searchPanel = new SearchMiniPanel();
+		this.searchPanel.setBorder(BorderFactory
+				.createTitledBorder("Search using API"));
+		this.searchPanel
+				.addPropertyChangeListener(new PropertyChangeListener() {
 
+					@Override
+					public void propertyChange(PropertyChangeEvent evt) {
+						if (evt.getPropertyName().equals("query")) {
+							fetchFromAPI((String) evt.getNewValue(),
+									(String) evt.getOldValue());
+						} else if (evt.getPropertyName().equals("cancelSearch")) {
+							cancelAPISearch();
+						}
+					}
+				});
+
+		this.coverPanel = new ImagePanel();
 		this.coverPanel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -170,7 +179,6 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 			}
 		});
 	}
-
 	/**
 	 * Metoda wywoływana po naciśnięciu {@link ICButtonPanel#clearButton}.
 	 * Efektem jej wywołania powinno być wyczyszczenie wszystkich kretora,
@@ -231,7 +239,6 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 		this.searchPanel.setVisible(false);
 		this.buttonPanel.createButton.setText("Update");
 		this.buttonPanel.clearButton.setVisible(false);
-		this.searchProgressBar.setVisible(false);
 		this.editedItem = bt;
 	}
 
@@ -300,58 +307,6 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 			this.add(this.createButton);
 			this.add(this.clearButton);
 			this.add(this.cancelButton);
-		}
-	}
-
-	/**
-	 * Kontener dla elementów pozwalających na dostęp do API, które z kolei daje
-	 * możliwość pobrania informacji o
-	 * <ol>
-	 * <li>ksiazkach</li>
-	 * <li>filmach</li>
-	 * <li>albumach muzycznych</li>
-	 * </ol>
-	 * 
-	 * @author tomasz
-	 * 
-	 */
-	public class ICSearchPanel extends JPanel {
-		private static final long serialVersionUID = 806539065413054227L;
-		private JTextField searchQuery = new JTextField();
-		private JComboBox<String> criteria;
-		private JButton searchButton = new JButton("Search");
-		private JButton cancelButton = new JButton("Cancel");
-
-		public ICSearchPanel() {
-			super(true);
-
-			this.setLayout(new GridLayout(1, 4));
-			this.add(this.searchQuery);
-			this.add(this.searchButton);
-			this.add(this.cancelButton);
-
-			this.searchButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					fetchFromAPI(searchQuery.getText(),
-							(String) criteria.getSelectedItem());
-				}
-			});
-
-			this.cancelButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					cancelAPISearch();
-				}
-			});
-		}
-
-		public void setSearchCriteria(String[] arr) {
-			this.criteria = new JComboBox<String>(arr);
-			this.criteria.setSelectedIndex(0);
-			this.add(this.criteria, 1);
 		}
 	}
 

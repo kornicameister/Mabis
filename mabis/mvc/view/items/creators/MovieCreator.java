@@ -88,7 +88,7 @@ public class MovieCreator extends ItemCreator {
 			MabisLogger.getLogger().log(Level.WARNING,
 					"Failed to load frame {0} from settings", this.getName());
 			this.setSize((int) this.getMinimumSize().getWidth() + 190,
-					(int) this.getMinimumSize().getHeight() + 50);
+					(int) this.getMinimumSize().getHeight() + 70);
 			this.setTitle(title);
 		}
 	}
@@ -153,6 +153,7 @@ public class MovieCreator extends ItemCreator {
 	public void initComponents() throws CreatorContentNullPointerException {
 		super.initComponents();
 		this.contentPanel = new JPanel(true);
+		this.contentPanel.setBorder(BorderFactory.createTitledBorder("Movie"));
 		this.titleField = new JTextField();
 		this.descriptionArea = new JTextArea();
 		this.descriptionArea.setLineWrap(true);
@@ -165,7 +166,7 @@ public class MovieCreator extends ItemCreator {
 				.createTitledBorder("Duration"));
 
 		String arr[] = {"by title"};
-		this.searchPanel.setSearchCriteria(arr);
+		this.searchPanel.setComboBoxContent(arr);
 	}
 
 	@Override
@@ -292,9 +293,10 @@ public class MovieCreator extends ItemCreator {
 					String propertyName = evt.getPropertyName();
 					if (propertyName.equals("taskStarted")) {
 						taskSize = (Integer) evt.getNewValue();
-						step = (searchProgressBar.getMaximum() - searchProgressBar
-								.getMinimum()) / taskSize;
-						value = searchProgressBar.getMinimum() + step;
+						step = (searchPanel.getProgressBar().getMaximum() - searchPanel
+								.getProgressBar().getMinimum()) / taskSize;
+						value = searchPanel.getProgressBar().getMinimum()
+								+ step;
 						setProgress(value);
 						if (taskSize.equals(1)) {
 							value = 0;
@@ -307,11 +309,11 @@ public class MovieCreator extends ItemCreator {
 			});
 
 			try {
-				setProgress(searchProgressBar.getMinimum());
+				setProgress(searchPanel.getProgressBar().getMinimum());
 				TreeMap<String, String> params = new TreeMap<>();
 				params.put("movie", query);
 				ma.query(params);
-				setProgress(searchProgressBar.getMaximum());
+				setProgress(searchPanel.getProgressBar().getMaximum());
 				return ma.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -333,7 +335,8 @@ public class MovieCreator extends ItemCreator {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if ("progress" == evt.getPropertyName()) {
-					searchProgressBar.setValue((Integer) evt.getNewValue());
+					searchPanel.getProgressBar().setValue(
+							(Integer) evt.getNewValue());
 				}
 			}
 		});
@@ -346,7 +349,7 @@ public class MovieCreator extends ItemCreator {
 			lfa.cancel(true);
 		}
 		MabisLogger.getLogger().log(Level.INFO, "Terminated search operation");
-		this.searchProgressBar.setValue(0);
+		this.searchPanel.getProgressBar().setValue(0);
 	}
 
 	@Override

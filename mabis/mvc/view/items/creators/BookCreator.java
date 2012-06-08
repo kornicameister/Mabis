@@ -93,8 +93,8 @@ public class BookCreator extends ItemCreator {
 		} catch (SettingsException e) {
 			MabisLogger.getLogger().log(Level.WARNING,
 					"Failed to load frame {0} from settigns", this.getName());
-			this.setSize((int) this.getMinimumSize().getWidth() + 220,
-					(int) this.getMinimumSize().getHeight());
+			this.setSize((int) this.getMinimumSize().getWidth() + 200,
+					(int) this.getMinimumSize().getHeight() - 100);
 			this.setTitle(title);
 		}
 	}
@@ -116,7 +116,7 @@ public class BookCreator extends ItemCreator {
 								.addGroup(
 										gl.createParallelGroup()
 												.addComponent(this.coverPanel,
-														220, 220, 220)
+														180, 180, 180)
 												.addComponent(
 														descriptionScrollPane))
 								.addGroup(
@@ -131,10 +131,13 @@ public class BookCreator extends ItemCreator {
 																		this.pages))
 												.addGap(5)
 												.addComponent(this.iiMiniPanel)
-												.addComponent(
-														this.authorMiniPanel)
-												.addComponent(this.tagCloud)))
-				.addComponent(descriptionScrollPane));
+												.addGroup(
+														gl.createSequentialGroup()
+																.addComponent(
+																		this.authorMiniPanel)
+																.addComponent(
+																		this.tagCloud)))
+								.addComponent(descriptionScrollPane)));
 		gl.setVerticalGroup(gl
 				.createSequentialGroup()
 				.addGroup(
@@ -142,7 +145,7 @@ public class BookCreator extends ItemCreator {
 								.addGroup(
 										gl.createSequentialGroup()
 												.addComponent(this.coverPanel,
-														220, 220, 220)
+														180, 180, 180)
 												.addComponent(
 														descriptionScrollPane))
 								.addGroup(
@@ -162,9 +165,12 @@ public class BookCreator extends ItemCreator {
 																		GroupLayout.DEFAULT_SIZE,
 																		60, 80))
 												.addComponent(this.iiMiniPanel)
-												.addComponent(
-														this.authorMiniPanel)
-												.addComponent(this.tagCloud))));
+												.addGroup(
+														gl.createParallelGroup()
+																.addComponent(
+																		this.authorMiniPanel)
+																.addComponent(
+																		this.tagCloud)))));
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -182,6 +188,7 @@ public class BookCreator extends ItemCreator {
 	public void initComponents() {
 		super.initComponents();
 		this.contentPanel = new JPanel(true);
+		this.contentPanel.setBorder(BorderFactory.createTitledBorder("Book"));
 		this.titleOriginal = new JTextField();
 		this.subTitle = new JTextField();
 		this.subTitle.setBorder(BorderFactory.createTitledBorder("Subtitle"));
@@ -198,7 +205,7 @@ public class BookCreator extends ItemCreator {
 				BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),
 				"Descripion"));
 		String arrayOfCriteria[] = {"by author", "by title"};
-		this.searchPanel.setSearchCriteria(arrayOfCriteria);
+		this.searchPanel.setComboBoxContent(arrayOfCriteria);
 	}
 
 	@Override
@@ -326,9 +333,12 @@ public class BookCreator extends ItemCreator {
 							String propertyName = evt.getPropertyName();
 							if (propertyName.equals("taskStarted")) {
 								taskSize = (Integer) evt.getNewValue();
-								step = (searchProgressBar.getMaximum() - searchProgressBar
-										.getMinimum()) / taskSize;
-								value = searchProgressBar.getMinimum() + step;
+								step = (searchPanel.getProgressBar()
+										.getMaximum() - searchPanel
+										.getProgressBar().getMinimum())
+										/ taskSize;
+								value = searchPanel.getProgressBar()
+										.getMinimum() + step;
 							} else if (propertyName.equals("taskStep")) {
 								value = step * (int) evt.getNewValue();
 								setProgress(value);
@@ -336,7 +346,7 @@ public class BookCreator extends ItemCreator {
 						}
 					});
 			try {
-				setProgress(searchProgressBar.getMinimum());
+				setProgress(searchPanel.getProgressBar().getMinimum());
 				TreeMap<String, String> params = new TreeMap<String, String>();
 				if (criteria.contains("author")) {
 					params.put("inauthor:", query);
@@ -344,7 +354,7 @@ public class BookCreator extends ItemCreator {
 					params.put("intitle:", query);
 				}
 				gba.query(params);
-				setProgress(searchProgressBar.getMaximum());
+				setProgress(searchPanel.getProgressBar().getMaximum());
 				return gba.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -367,7 +377,8 @@ public class BookCreator extends ItemCreator {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if ("progress" == evt.getPropertyName()) {
-					searchProgressBar.setValue((Integer) evt.getNewValue());
+					searchPanel.getProgressBar().setValue(
+							(Integer) evt.getNewValue());
 				}
 			}
 		});
@@ -380,7 +391,7 @@ public class BookCreator extends ItemCreator {
 			lfa.cancel(true);
 		}
 		MabisLogger.getLogger().log(Level.INFO, "Terminated search operation");
-		this.searchProgressBar.setValue(0);
+		this.searchPanel.getProgressBar().setValue(0);
 	}
 
 	@Override

@@ -5,6 +5,8 @@
 package mvc.view;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  * Klasa pozwalaja na podglad informacji o aplikacji.
@@ -15,6 +17,7 @@ import javax.swing.JFrame;
  */
 public class AboutMabis extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = 6992601172376070322L;
+	private JTextArea description;
 
 	public AboutMabis() {
 		super("About");
@@ -23,7 +26,10 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 
 	@Override
 	public void initComponents() {
-
+		this.description = new JTextArea();
+		this.add(new JScrollPane(this.description));
+		
+//		this.description.setTe
 	}
 
 	@Override

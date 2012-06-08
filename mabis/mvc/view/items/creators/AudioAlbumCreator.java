@@ -143,13 +143,14 @@ public class AudioAlbumCreator extends ItemCreator {
 	public void initComponents() {
 		super.initComponents();
 		this.contentPanel = new JPanel(true);
+		this.contentPanel.setBorder(BorderFactory.createTitledBorder("Audio album"));
 		this.titleField = new JTextField();
 		this.titleField.setBorder(BorderFactory.createTitledBorder("Title"));
 		this.trackList = new TrackListPanel();
 		this.trackList.setBorder(BorderFactory.createTitledBorder("TrackList"));
 
 		String arrayOfCriteria[] = {"by album"};
-		this.searchPanel.setSearchCriteria(arrayOfCriteria);
+		this.searchPanel.setComboBoxContent(arrayOfCriteria);
 	}
 
 	/**
@@ -160,11 +161,14 @@ public class AudioAlbumCreator extends ItemCreator {
 	@Override
 	protected void initializeAuthorsMiniPanel() {
 		try {
-			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT, new Band());
+			BandSQLFactory asf = new BandSQLFactory(SQLStamentType.SELECT,
+					new Band());
 			asf.addWhereClause("type", AuthorType.AUDIO_ALBUM_BAND.toString());
 			asf.executeSQL(true);
-			this.authorMiniPanel = new BandMiniPanel(asf.getBands(), AuthorType.AUDIO_ALBUM_BAND);
-			this.authorMiniPanel.setBorder(BorderFactory.createTitledBorder("Bands"));
+			this.authorMiniPanel = new BandMiniPanel(asf.getBands(),
+					AuthorType.AUDIO_ALBUM_BAND);
+			this.authorMiniPanel.setBorder(BorderFactory
+					.createTitledBorder("Bands"));
 		} catch (SQLException | SQLEntityExistsException e) {
 			e.printStackTrace();
 		}
@@ -286,9 +290,12 @@ public class AudioAlbumCreator extends ItemCreator {
 							String propertyName = evt.getPropertyName();
 							if (propertyName.equals("taskStarted")) {
 								taskSize = (Integer) evt.getNewValue();
-								step = (searchProgressBar.getMaximum() - searchProgressBar
-										.getMinimum()) / taskSize;
-								value = searchProgressBar.getMinimum() + step;
+								step = (searchPanel.getProgressBar()
+										.getMaximum() - searchPanel
+										.getProgressBar().getMinimum())
+										/ taskSize;
+								value = searchPanel.getProgressBar()
+										.getMinimum() + step;
 								setProgress(value);
 							} else if (propertyName.equals("taskStep")) {
 								value += step;
@@ -298,11 +305,11 @@ public class AudioAlbumCreator extends ItemCreator {
 					});
 
 			try {
-				setProgress(searchProgressBar.getMinimum());
+				setProgress(searchPanel.getProgressBar().getMinimum());
 				TreeMap<String, String> params = new TreeMap<String, String>();
 				params.put("album", query);
 				aaa.query(params);
-				setProgress(searchProgressBar.getMaximum());
+				setProgress(searchPanel.getProgressBar().getMaximum());
 				return aaa.getResult();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -324,7 +331,8 @@ public class AudioAlbumCreator extends ItemCreator {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				if ("progress" == evt.getPropertyName()) {
-					searchProgressBar.setValue((Integer) evt.getNewValue());
+					searchPanel.getProgressBar().setValue(
+							(Integer) evt.getNewValue());
 				}
 			}
 		});
@@ -337,7 +345,7 @@ public class AudioAlbumCreator extends ItemCreator {
 			lfa.cancel(true);
 		}
 		MabisLogger.getLogger().log(Level.INFO, "Terminated search operation");
-		this.searchProgressBar.setValue(0);
+		this.searchPanel.getProgressBar().setValue(0);
 	}
 
 	@Override

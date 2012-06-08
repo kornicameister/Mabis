@@ -47,7 +47,6 @@ public class MovieSQLFactory extends SQLFactory {
 						return;
 					}
 				} catch (SQLEntityExistsException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				short parameterIndex = 1;
