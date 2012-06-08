@@ -4,36 +4,49 @@
  */
 package mvc.view;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+
+import settings.GlobalPaths;
 
 /**
  * Klasa pozwalaja na podglad informacji o aplikacji.
+ * Niezaprzeczalnym atutem jest możliwość zmiany tekstu wyswietlanego
+ * przez okienko w zewnetrznym pliku html
  * 
  * @author kornicameister
- * @version 0.1
- * @see java.swing.JFrame
+ * @see GlobalPaths#ABOUT_MABIS_HTML
  */
 public class AboutMabis extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = 6992601172376070322L;
-	private JTextArea description;
+	private JEditorPane description;
 
 	public AboutMabis() {
 		super("About");
-		setSize(300, 200);
+		setSize(500, 500);
+		this.initComponents();
+		this.layoutComponents();
 	}
 
 	@Override
 	public void initComponents() {
-		this.description = new JTextArea();
-		this.add(new JScrollPane(this.description));
-		
-//		this.description.setTe
+		try {
+			URI tmp = new File(GlobalPaths.ABOUT_MABIS_HTML.toString()).toURI();
+			URL aboutFile = tmp.toURL();
+			this.description = new JEditorPane(aboutFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void layoutComponents() {
-
+		this.add(new JScrollPane(this.description));
 	}
 }

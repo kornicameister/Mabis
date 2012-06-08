@@ -2,6 +2,7 @@ package settings;
 
 import java.io.File;
 
+import mvc.view.AboutMabis;
 import mvc.view.items.minipanels.AuthorMiniPanel;
 import mvc.view.items.minipanels.BandMiniPanel;
 import mvc.view.items.minipanels.IndustryIdentifiersMiniPanel;
@@ -87,7 +88,12 @@ public enum GlobalPaths {
 	 * 
 	 * @see TrackListPanel
 	 */
-	MUSIC_ICON;
+	MUSIC_ICON,
+	
+	/**
+	 * sciezka do pliku html dla okienka {@link AboutMabis}
+	 */
+	ABOUT_MABIS_HTML;
 
 	private String path = null;
 

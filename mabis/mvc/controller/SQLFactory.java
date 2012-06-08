@@ -29,7 +29,6 @@ import mvc.model.entity.Picture;
  */
 public abstract class SQLFactory implements StatementFactory {
 	protected SQLStamentType type;
-	protected String sqlQuery = null;
 	private TreeSet<WhereClause> wheres = null;
 	protected String questionMarkFieldList = null;
 	protected BaseTable table = null;
