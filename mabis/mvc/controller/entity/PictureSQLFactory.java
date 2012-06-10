@@ -22,8 +22,8 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
-import mvc.controller.SQLFactory;
 import mvc.controller.SQLStamentType;
+import mvc.controller.dispatcher.SQLFactory;
 import mvc.controller.exceptions.PictureCacheException;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.BaseTable;

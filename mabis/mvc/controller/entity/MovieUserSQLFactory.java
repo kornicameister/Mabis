@@ -5,8 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.TreeSet;
 
-import mvc.controller.SQLFactory;
 import mvc.controller.SQLStamentType;
+import mvc.controller.dispatcher.SQLFactory;
 import mvc.model.BaseTable;
 import mvc.model.entity.MovieUser;
 import mvc.model.enums.TableType;

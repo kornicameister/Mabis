@@ -1,5 +1,7 @@
 package mvc.controller;
 
+import mvc.controller.dispatcher.SQLFactory;
+
 /**
  * Enum to standardize type of the query {@link SQLFactory} extending class may
  * want to perform

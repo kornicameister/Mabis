@@ -1,7 +1,7 @@
 <class-diagram version="1.0.8" icons="true" automaticImage="PNG" always-add-relationships="true" generalizations="true" 
   realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
-  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mvc.controller.SQLFactory" project="Mabis" 
-    file="/Mabis/src/mabis/mvc/controller/SQLFactory.java" binary="false">    
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mvc.controller.dispatcher.SQLFactory" project="Mabis" 
+    file="/Mabis/src/mabis/mvc/controller/dispatcher/SQLFactory.java" binary="false">    
     <position height="363" width="259" x="2938" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
@@ -32,8 +32,8 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mvc.controller.SQLFactory.WhereClause" project="Mabis" 
-    file="/Mabis/src/mabis/mvc/controller/SQLFactory.java" binary="false">    
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mvc.controller.dispatcher.SQLFactory.WhereClause" 
+    project="Mabis" file="/Mabis/src/mabis/mvc/controller/dispatcher/SQLFactory.java" binary="false">    
     <position height="125" width="161" x="2431" y="440"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="true" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      

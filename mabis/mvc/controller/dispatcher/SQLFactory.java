@@ -2,17 +2,17 @@
  * package mabis.mvc.controller in MABIS
  * by kornicameister
  */
-package mvc.controller;
+package mvc.controller.dispatcher;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
 import logger.MabisLogger;
-import mvc.controller.database.MySQLAccess;
+import mvc.controller.SQLStamentType;
+import mvc.controller.StatementFactory;
 import mvc.controller.entity.PictureSQLFactory;
 import mvc.controller.exceptions.SQLEntityExistsException;
 import mvc.model.BaseTable;
@@ -119,26 +119,9 @@ public abstract class SQLFactory implements StatementFactory {
 
 	@Override
 	public Integer executeSQL(boolean noAutoCommit) throws SQLException, SQLEntityExistsException{
-		try {
-			if (!MySQLAccess.getConnection().isValid(1000)) {
-				MabisLogger.getLogger().log(Level.SEVERE,
-						"Database connection lost");
-				return -1;
-			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-
-		PreparedStatement st = MySQLAccess.getConnection().prepareStatement(this.createSQL(),Statement.RETURN_GENERATED_KEYS);
-		this.executeByTableAndType(st);
-		st.close();
-		
-		if(entityAlreadyInserted){
-			throw new SQLEntityExistsException(this.table, this.table.getTitle() + " already exists");
-		}
-		
-		System.gc();
-		return lastAffactedId;
+		SQLDispatcher sd = new SQLDispatcher(this);
+		sd.run();
+		return sd.getID();
 	}
 	
 	protected void deletePicture(Picture p) {

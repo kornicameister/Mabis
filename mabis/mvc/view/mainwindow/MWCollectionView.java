@@ -31,8 +31,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
 
 import logger.MabisLogger;
-import mvc.controller.SQLFactory;
 import mvc.controller.SQLStamentType;
+import mvc.controller.dispatcher.SQLFactory;
 import mvc.controller.entity.AudioAlbumSQLFactory;
 import mvc.controller.entity.AudioUserSQLFactory;
 import mvc.controller.entity.BookSQLFactory;
