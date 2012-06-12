@@ -93,7 +93,17 @@ public enum GlobalPaths {
 	/**
 	 * sciezka do pliku html dla okienka {@link AboutMabis}
 	 */
-	ABOUT_MABIS_HTML;
+	ABOUT_MABIS_HTML,
+	
+	/**
+	 * sciezka do pliku html dla okienka {@link AboutMabis}
+	 */
+	ABOUT_AUTHOR_HTML,
+	
+	/**
+	 * sciezdka do pliku z licencja
+	 */
+	LICENSE;
 
 	private String path = null;
 

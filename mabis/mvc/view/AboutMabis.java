@@ -4,49 +4,115 @@
  */
 package mvc.view;
 
+import java.awt.BorderLayout;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import settings.GlobalPaths;
 
 /**
- * Klasa pozwalaja na podglad informacji o aplikacji.
- * Niezaprzeczalnym atutem jest możliwość zmiany tekstu wyswietlanego
- * przez okienko w zewnetrznym pliku html
+ * Klasa pozwalaja na podglad informacji o aplikacji. Niezaprzeczalnym atutem
+ * jest możliwość zmiany tekstu wyswietlanego przez okienko w zewnetrznym pliku
+ * html
  * 
  * @author kornicameister
  * @see GlobalPaths#ABOUT_MABIS_HTML
  */
 public class AboutMabis extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = 6992601172376070322L;
-	private JEditorPane description;
+	private HTMLEditorKit kit;
+	private JTabbedPane tabManager;
 
 	public AboutMabis() {
 		super("About");
-		setSize(500, 500);
+		setSize(580, 500);
+		this.kit = new HTMLEditorKit();
+		this.aboutCSS();
 		this.initComponents();
 		this.layoutComponents();
 	}
 
 	@Override
 	public void initComponents() {
+		this.tabManager = new JTabbedPane();
+		this.tabManager.addTab("About", this.aboutTab());
+		this.tabManager.addTab("Author", this.authorTab());
+		this.tabManager.addTab("License", this.licenseTab());
+	}
+
+	private JScrollPane licenseTab() {
+		JTextArea license = new JTextArea(this.loadText(GlobalPaths.LICENSE
+				.toString()));
+		return new JScrollPane(license);
+	}
+
+	private JScrollPane authorTab() {
+		URI file;
 		try {
-			URI tmp = new File(GlobalPaths.ABOUT_MABIS_HTML.toString()).toURI();
-			URL aboutFile = tmp.toURL();
-			this.description = new JEditorPane(aboutFile);
+			file = new File(GlobalPaths.ABOUT_AUTHOR_HTML.toString()).toURI();
+			JEditorPane description = new JEditorPane(file.toURL());
+			description.setEditable(false);
+			return new JScrollPane(description);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return null;
+	}
+
+	private JScrollPane aboutTab() {
+		JEditorPane description = new JEditorPane();
+		description.setEditable(false);
+		description.setEditorKit(this.kit);
+		Document doc = this.kit.createDefaultDocument();
+		description.setDocument(doc);
+		description.setText(this.loadText(GlobalPaths.ABOUT_MABIS_HTML
+				.toString()));
+		return new JScrollPane(description);
+	}
+
+	private String loadText(String path) {
+		try {
+			BufferedInputStream bis = new BufferedInputStream(
+					new FileInputStream(path));
+			byte[] contents = new byte[1024];
+			StringBuilder sb = new StringBuilder();
+			while ((bis.read(contents)) != -1) {
+				sb.append(new String(contents));
+			}
+			bis.close();
+			path = sb.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return path;
 	}
 
 	@Override
 	public void layoutComponents() {
-		this.add(new JScrollPane(this.description));
+		this.setLayout(new BorderLayout());
+		this.add(this.tabManager, BorderLayout.CENTER);
+	}
+
+	private StyleSheet aboutCSS() {
+		StyleSheet styleSheet = this.kit.getStyleSheet();
+		styleSheet
+				.addRule("body {color:grey; font-family:times; margin: 4px; }");
+		styleSheet.addRule("h1 {color: blue;}");
+		styleSheet.addRule("h2 {color: #ff0000;}");
+		styleSheet.addRule("p.content {text-align:center}");
+		styleSheet.addRule("b {font-size: 15px; color: blue;}");
+		return styleSheet;
 	}
 }

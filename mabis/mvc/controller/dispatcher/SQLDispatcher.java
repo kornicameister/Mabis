@@ -27,19 +27,15 @@ public class SQLDispatcher implements Runnable {
 	public void run() {
 		try {
 			if (!MySQLAccess.getConnection().isValid(1000)) {
-				MabisLogger.getLogger().log(Level.SEVERE,
-						"Database connection lost");
+				MabisLogger.getLogger().log(Level.SEVERE, "Database connection lost");
+				this.factory.lastAffactedId = -1;
+				return;
 			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-		try {
-			PreparedStatement st = MySQLAccess.getConnection()
-					.prepareStatement(factory.createSQL(),
-							Statement.RETURN_GENERATED_KEYS);
+			
+			PreparedStatement st = MySQLAccess.getConnection().prepareStatement(factory.createSQL(), Statement.RETURN_GENERATED_KEYS);
 			factory.executeByTableAndType(st);
 			st.close();
-
+			
 			if (factory.entityAlreadyInserted) {
 				throw new SQLEntityExistsException(factory.table,
 						factory.table.getTitle() + " already exists");
