@@ -23,4 +23,10 @@ public class WindowClosedListener extends WindowAdapter implements
 		super.windowClosed(e);
 		SettingsSaver.addFrame((JFrame) e.getSource());
 	}
+	
+	@Override
+	public void windowClosing(WindowEvent e){
+		super.windowClosed(e);
+		SettingsSaver.addFrame((JFrame) e.getSource());
+	}
 }

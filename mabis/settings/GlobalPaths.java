@@ -97,7 +97,8 @@ public enum GlobalPaths {
 
 	MABIS_WHY("src/resources/about/why"), 
 	MABIS_API("src/resources/about/api"),
-	MABIS_MVC("src/resources/about/mvc"), 
+	MABIS_MVC("src/resources/about/mvc"),
+	MABIS_VERSION("src/resources/about/version"),
 	
 	LASTFM_LOGO("src/resources/logos/last_fm.png"), 
 	IMDB_LOGO("src/resources/logos/imdb-logo.png"), 

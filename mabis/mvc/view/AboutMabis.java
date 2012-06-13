@@ -52,6 +52,7 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 			setTitle("About");
 		}
 		
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.addWindowListener(new WindowClosedListener());
 	}
 
@@ -166,8 +167,8 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 		class AboutMabisPanel extends JPanel implements MabisFrameInterface {
 			private static final long serialVersionUID = 2179636719860933267L;
 			private JLabel mabisIcon;
-			private JTextArea mabisShortDesc,mabisApiDesc,mabisMVCDesc;
-			private JScrollPane scrollPanes[] = new JScrollPane[3];
+			private JTextArea mabisShortDesc, mabisApiDesc, mabisMVCDesc, mabisVersionDesc;
+			private JScrollPane scrollPanes[] = new JScrollPane[4];
 			private JLabel apiIcons[] = new JLabel[3];
 
 			public AboutMabisPanel() {
@@ -178,6 +179,13 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 			@Override
 			public void initComponents() {
 				this.mabisIcon = new JLabel(new ImageIcon(GlobalPaths.MABIS_ICON.toString()));
+				
+				this.mabisVersionDesc = new JTextArea(loadText(GlobalPaths.MABIS_VERSION.toString()));
+				this.mabisVersionDesc.setLineWrap(true);
+				this.mabisVersionDesc.setWrapStyleWord(true);
+				this.mabisVersionDesc.setEditable(false);
+				this.scrollPanes[3] = new JScrollPane(this.mabisVersionDesc);
+				this.scrollPanes[3].setBorder(BorderFactory.createTitledBorder("Wersja ?"));
 				
 				this.mabisShortDesc = new JTextArea(loadText(GlobalPaths.MABIS_WHY.toString()));
 				this.mabisShortDesc.setLineWrap(true);
@@ -217,7 +225,10 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 						gl.createParallelGroup()
 						.addGroup(gl.createSequentialGroup()
 								.addComponent(this.mabisIcon, 128, 128, 128)
-								.addComponent(this.scrollPanes[0])
+								.addGroup(gl.createParallelGroup()
+										.addComponent(this.scrollPanes[3])
+										.addComponent(this.scrollPanes[0])
+										)
 						)
 						.addGroup(gl.createSequentialGroup()
 								.addGroup(gl.createParallelGroup()
@@ -236,7 +247,10 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 						gl.createSequentialGroup()
 						.addGroup(gl.createParallelGroup()
 								.addComponent(this.mabisIcon, 128, 128, 128)
-								.addComponent(this.scrollPanes[0])
+								.addGroup(gl.createSequentialGroup()
+										.addComponent(this.scrollPanes[3])
+										.addComponent(this.scrollPanes[0])
+										)
 						)
 						.addGroup(gl.createParallelGroup()
 								.addGroup(gl.createSequentialGroup()
