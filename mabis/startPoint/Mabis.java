@@ -62,6 +62,14 @@ public class Mabis {
 						SettingsSaver ss = new SettingsSaver();
 						ss.execute();
 					}
+					
+					@Override
+					public void windowClosing(WindowEvent e) {
+						SettingsSaver.incrementRunCount();
+						SettingsSaver.setRunStatus(true);
+						SettingsSaver ss = new SettingsSaver();
+						ss.execute();
+					}
 				}
 
 				mw.addWindowListener(new ApplicationExiting());

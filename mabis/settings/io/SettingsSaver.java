@@ -1,8 +1,10 @@
 package settings.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.swing.JFrame;
@@ -12,6 +14,8 @@ import mvc.view.WindowClosedListener;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -34,13 +38,23 @@ public class SettingsSaver extends Settings {
 
 	@Override
 	public void execute() {
-		try {
-			Document doc = new Document(new Element("mabis"));
-
+		Document doc = null;
+		if (!(new File(Settings.pathToXML).exists())) {
+			doc = new Document(new Element("mabis"));
 			doc.getRootElement().addContent(this.saveRunCountBlock());
 			doc.getRootElement().addContent(this.saveWindowPosition());
 			doc.getRootElement().addContent(this.saveGlobalPaths());
-
+		} else {
+			try {
+				doc = new SAXBuilder().build(new File(Settings.pathToXML));
+				this.updateRunCountBlock(doc);
+				this.updateWindowPositions(doc);
+				this.updateGlobalPaths(doc);
+			} catch (JDOMException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
 			XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
 			outputter.output(doc, this.initOutput());
 		} catch (IOException | SettingsException e) {
@@ -48,6 +62,62 @@ public class SettingsSaver extends Settings {
 		}
 	}
 
+	private void updateGlobalPaths(Document doc) {
+		List<?> paths = doc.getRootElement().getChildren("paths");
+		paths = ((Element) paths.get(0)).getChildren();
+		for(GlobalPaths gp : GlobalPaths.values()){
+			if(!gp.isFixed()){
+				for (Object e : paths) {
+					Element ee = (Element) e;
+					if(gp.name().equals(ee.getAttribute("type").getValue())){
+						ee.setText(gp.toString());
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	private void updateWindowPositions(Document doc) {
+		List<?> frames = doc.getRootElement().getChildren("frames");
+		for(JFrame frame : SettingsSaver.frames){
+			for (short i = 0; i < frames.size(); i++) {
+				try{
+					Element node  = (Element) ((Element) frames.get(i)).getChildren(frame.getClass().getName()).get(0);
+					node.getChild("title").setText(frame.getTitle());
+					node.getChild("width").setText(String.valueOf(frame.getWidth()));
+					node.getChild("height").setText(String.valueOf(frame.getHeight()));
+					node.getChild("xPos").setText(String.valueOf(frame.getX()));
+					node.getChild("yPos").setText(String.valueOf(frame.getY()));
+				}catch(IndexOutOfBoundsException ioobe){
+					Element window = new Element(frame.getClass().getName());
+					window.addContent(new Element("title").setText(frame.getTitle()));
+					window.addContent(new Element("width").setText(String.valueOf(frame.getWidth())));
+					window.addContent(new Element("height").setText(String.valueOf(frame.getHeight())));
+					window.addContent(new Element("xPos").setText(String.valueOf(frame.getX())));
+					window.addContent(new Element("yPos").setText(String.valueOf(frame.getY())));
+					doc.getRootElement().getChild("frames").addContent(window);
+				}
+			}
+		}
+	}
+
+	private void updateRunCountBlock(Document doc) {
+		List<?> paths = doc.getRootElement().getChildren("runs");
+		for(Object e : paths){
+			Element elem = (Element) e;
+			elem.getChild("count").setText(SettingsSaver.RUN_COUNT.toString());
+			elem.getChild("lastRun").setText(DateFormat.getDateInstance().format(new Date()));
+			elem.getChild("errorFree").setText(Boolean.valueOf(true).toString());
+		}
+	}
+
+	/**
+	 * Metoda odwołuje się do danych o uruchomieniach programu. Zapisując do XML
+	 * informacje o ostatnim uruchomieniu aplkikacji.
+	 * 
+	 * @return element z poddrzewem informacji o ostatnim uruchomieniu
+	 */
 	private Element saveRunCountBlock() {
 		Element r = new Element("runs");
 		r.addContent(new Element("count").setText(SettingsSaver.RUN_COUNT.toString()));
@@ -75,14 +145,10 @@ public class SettingsSaver extends Settings {
 		for (JFrame f : SettingsSaver.frames) {
 			Element window = new Element(f.getClass().getName());
 			window.addContent(new Element("title").setText(f.getTitle()));
-			window.addContent(new Element("width").setText(String.valueOf(f
-					.getWidth())));
-			window.addContent(new Element("height").setText(String.valueOf(f
-					.getHeight())));
-			window.addContent(new Element("xPos").setText(String.valueOf(f
-					.getX())));
-			window.addContent(new Element("yPos").setText(String.valueOf(f
-					.getY())));
+			window.addContent(new Element("width").setText(String.valueOf(f.getWidth())));
+			window.addContent(new Element("height").setText(String.valueOf(f.getHeight())));
+			window.addContent(new Element("xPos").setText(String.valueOf(f.getX())));
+			window.addContent(new Element("yPos").setText(String.valueOf(f.getY())));
 			frames.addContent(window);
 		}
 		return frames;
@@ -101,7 +167,7 @@ public class SettingsSaver extends Settings {
 	private Element saveGlobalPaths() {
 		Element e = new Element("paths");
 		for (GlobalPaths p : GlobalPaths.values()) {
-			if(!p.isFixed()){
+			if (!p.isFixed()) {
 				Element pp = new Element("path");
 				pp.setAttribute(new Attribute("type", p.name()));
 				pp.setText(p.toString());
