@@ -111,7 +111,7 @@ public abstract class MiniPanel extends JPanel {
 	 * pozwala na następujące zachowanie: </br> Kliknięcie myszy powoduje
 	 * dodanie pustego wiersza do tabeli, który może zostać wypełniony danymi
 	 * 
-	 * @return
+	 * @return referencje do {@link MouseListener}
 	 */
 	protected abstract MouseListener initScrollMouseListener();
 
@@ -120,7 +120,7 @@ public abstract class MiniPanel extends JPanel {
 	 * {@link TableModelListener}, który rejestruje każdą modyfikację danych
 	 * tabeli.
 	 * 
-	 * @return
+	 * @return referencje do {@link TableModelListener}
 	 */
 	protected abstract TableModelListener initTableModelListener();
 
@@ -128,7 +128,7 @@ public abstract class MiniPanel extends JPanel {
 	 * Listener, który pozwala na usuwanie elementów z tabeli dzięki przyciskowi
 	 * Delete
 	 * 
-	 * @return
+	 * @return referencje do {@link KeyListener}
 	 */
 	protected KeyListener initTableKeyListener() {
 		class TableKeyListener extends KeyAdapter implements KeyListener {

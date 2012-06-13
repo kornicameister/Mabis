@@ -139,7 +139,7 @@ public interface StatementFactory {
 	 * Method executes sql statement If something goes wrong,
 	 * {@link SQLException} will be thrown </br> <b>Notice</b> that
 	 * implementation can use whatever algorithm user prefers to, nevertheless
-	 * it should depends on what {@link StatementFactory#createSQL(BaseTable)}
+	 * it should depends on what {@link StatementFactory#createSQL()}
 	 * returns
 	 * 
 	 * @param local

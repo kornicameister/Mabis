@@ -126,9 +126,9 @@ public class MovieSQLFactory extends SQLFactory {
 	 * Jeśli dany reżyser jest już w bazie danych, wtedy pobierany jest jedynie
 	 * jego numer identyfikacyjny.
 	 * 
-	 * @param director
-	 *            reżyser filmu
-	 * @return numer identyfikacyjny reżysera filmu
+	 * @param directors
+	 *            tworcy danego filmu
+	 * @return numer identyfikacyjny rezysera filmu
 	 * @throws SQLException
 	 */
 	protected Integer insertDirectors(TreeSet<Author> directors)
@@ -158,13 +158,11 @@ public class MovieSQLFactory extends SQLFactory {
 
 	/**
 	 * Metoda umieszcza w bazie danych informacje o gatunku danego filmu. Jeśli
-	 * dany gatunek jest już w bazie danych, wtedy pobierany jest jego numer
+	 * dany gatunek jest juz w bazie danych, wtedy pobierany jest jego numer
 	 * identyfikacyjny
 	 * 
 	 * @param genres
-	 * 
-	 * @param genres
-	 *            gatunek filmu
+	 *            gatunki filmu
 	 * @return numer identyfikacynyjny gatunku
 	 * @throws SQLException
 	 */

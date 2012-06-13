@@ -34,7 +34,6 @@ import settings.io.SettingsLoader;
  * html
  * 
  * @author kornicameister
- * @see GlobalPaths#ABOUT_MABIS_HTML
  */
 public class AboutMabis extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = 6992601172376070322L;

@@ -57,7 +57,7 @@ public class TagCloudMiniPanel extends JPanel {
 	 *            lista tagow
 	 * @param type
 	 *            typ tagu
-	 * @see {@link GenreType}
+	 * @see GenreType
 	 * @see Genre
 	 */
 	public TagCloudMiniPanel(TreeSet<Genre> genres, GenreType type) {

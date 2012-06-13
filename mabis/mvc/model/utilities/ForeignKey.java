@@ -24,7 +24,7 @@ public class ForeignKey implements Comparable<ForeignKey>, Serializable {
 	/**
 	 * Konstruktor {@link ForeignKey}
 	 * 
-	 * @param targetTable
+	 * @param tableTarget
 	 *            tabela do której odwołuje się klucz obcy
 	 * @param keyName
 	 *            nazwa klucza obcego, najlepiej nazwa atrybutu

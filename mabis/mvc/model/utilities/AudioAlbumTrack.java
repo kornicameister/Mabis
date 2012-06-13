@@ -46,7 +46,7 @@ public class AudioAlbumTrack
 	 *            numer porzadkowy sciezki
 	 * @param name
 	 *            tytul sciezki
-	 * @param dur
+	 * @param durr
 	 *            dlugosc trwania sciezki powinna byc podana w milisekundach
 	 */
 	public AudioAlbumTrack(int id, String name, Long durr) {

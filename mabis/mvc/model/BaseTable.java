@@ -46,7 +46,7 @@ public abstract class BaseTable
 	 * Konstruktor tworzacy obiekt {@link BaseTable} ze stringiem, ktory
 	 * umieszczany jest na pierwszym miejscu tabeli stringow
 	 * 
-	 * @param originalTitle
+	 * @param str_1 string do umieszczenia wewnatrz {@link BaseTable}
 	 */
 	public BaseTable(String str_1) {
 		this.initFields();
@@ -74,7 +74,7 @@ public abstract class BaseTable
 	 *            if Table is new object that is about to be inserted into DB,
 	 *            pk (<b>primary key</b>) should be set to < 0 value otherwise
 	 *            primaryKey represents actual identifier of row
-	 * @param key
+	 * @param keys
 	 *            represents author's primary key in context of foreign key for
 	 *            Table.</br> This key context can be different depends on which
 	 *            extending class object was created. In case of:

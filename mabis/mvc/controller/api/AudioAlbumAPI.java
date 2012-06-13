@@ -54,12 +54,6 @@ public class AudioAlbumAPI extends ApiAccess {
 		}
 	}
 
-	/**
-	 * @param params
-	 * @return
-	 * @throws MalformedURLException
-	 * @throws IOException
-	 */
 	@Override
 	protected StringBuilder accessAPI(TreeMap<String, String> params)
 			throws IOException {

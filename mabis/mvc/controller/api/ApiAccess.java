@@ -36,10 +36,8 @@ public abstract class ApiAccess {
 	 * zostanie wywolana na rzecz obiektu {@link GoogleBookApi}
 	 * </p>
 	 * 
-	 * @param question
-	 *            zapytanie do bazy
-	 * @param params
-	 *            mapa parametrów w formacie string:string
+	 * @param query
+	 *            zapytanie do bazy w formacie kwerenda:warunek
 	 * @throws IOException
 	 */
 	public abstract void query(TreeMap<String, String> query)
@@ -51,7 +49,7 @@ public abstract class ApiAccess {
 	 * obiekcie kolekcji.
 	 * 
 	 * @param params
-	 * @return
+	 * @return reference do obiektu {@link StringBuilder} gdzie zachowana jest odpowiedz z API
 	 * @throws IOException
 	 */
 	protected abstract StringBuilder accessAPI(TreeMap<String, String> params)

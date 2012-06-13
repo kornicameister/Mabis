@@ -199,8 +199,7 @@ public abstract class ItemCreator extends JFrame implements MabisFrameInterface 
 	protected abstract Boolean execute();
 
 	/**
-	 * Metoda wywoływana po kliknięciu na {@link ICSearchPanel#searchButton}. Po
-	 * wywołeniu akcji, podejmowana jest próba pobrania informacji o danym
+	 * Po wywołeniu akcji, podejmowana jest próba pobrania informacji o danym
 	 * obiekcie kolekcji przez publiczne API. Wszystkie reimplementacje tej
 	 * metody używają klasy {@link SwingWorker} aby nie blokować głównego okna i
 	 * cały proces pobierania danych wykonać w tle.

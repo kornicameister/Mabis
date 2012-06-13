@@ -49,7 +49,7 @@ public class PictureSQLFactory extends SQLFactory {
 	 * Metoda przenosi zdjecie ze swojej dotychczasowej lokacji {aka
 	 * {@link GlobalPaths#TMP} do nowej lokacji zgodnej z typem danego zdjecia
 	 * 
-	 * @return
+	 * @return true, jesli zdjecie zostalo przeniesione do cache, false - jesli zdjecie istnieje/lub nastapil inny blad
 	 */
 	private Boolean movePictureToCache() {
 		Picture pp = ((Picture) this.table);

@@ -6,9 +6,11 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 
+import logger.MabisLogger;
 import mvc.view.WindowClosedListener;
 
 import org.jdom.Attribute;
@@ -22,10 +24,10 @@ import org.jdom.output.XMLOutputter;
 import settings.GlobalPaths;
 
 /**
- * Klasa, której głównym zadaniem jest zapis ustawień aplikacji do pliku XML.
+ * Klasa, ktorej głownym zadaniem jest zapis ustawiem aplikacji do pliku XML.
  * Skalowalna, ponieważ rozszerzenie jej możliwości polega jedynie na dopisaniu
- * linijki kodu dodającego do elementu głównego drzewa XML podrzewo opisujące
- * konkretną grupę ustawień. Wewnętrznie korzysta z JDom
+ * linijek kodu dodającego do elementu głownego drzewa XML podrzewo opisujace
+ * konkretna grupe ustawien. Wewnetrznie korzysta z JDom
  * 
  * @author tomasz
  * @see Element
@@ -62,6 +64,12 @@ public class SettingsSaver extends Settings {
 		}
 	}
 
+	/**
+	 * Metoda pobiera z dokumentu XML listę ścieżek i iterując po nich dokonuje 
+	 * auktualnienia pozycji ścieżek. 
+	 * 
+	 * @param doc referencja do dokumetu ustawien XML
+	 */
 	private void updateGlobalPaths(Document doc) {
 		List<?> paths = doc.getRootElement().getChildren("paths");
 		paths = ((Element) paths.get(0)).getChildren();
@@ -78,6 +86,14 @@ public class SettingsSaver extends Settings {
 		}
 	}
 
+	/**
+	 * Metoda pobiera z dokumentu XML aktualną listę okienek, których pewne meta-dane
+	 * zostały w nim umieszczone. Iterując po liście okienek, które zostały
+	 * wytypowane do zapisania swoich ustawień podczas danego uruchomienia aplikacji,
+	 * metoda uaktualnia, a jeśli to konieczne zapisuje dane nowe okienka.
+	 * 
+	 * @param doc referencja do dokumetu ustawien XML
+	 */
 	private void updateWindowPositions(Document doc) {
 		List<?> frames = doc.getRootElement().getChildren("frames");
 		for(JFrame frame : SettingsSaver.frames){
@@ -89,7 +105,8 @@ public class SettingsSaver extends Settings {
 					node.getChild("height").setText(String.valueOf(frame.getHeight()));
 					node.getChild("xPos").setText(String.valueOf(frame.getX()));
 					node.getChild("yPos").setText(String.valueOf(frame.getY()));
-				}catch(IndexOutOfBoundsException ioobe){
+				}catch(IndexOutOfBoundsException e){
+					MabisLogger.getLogger().log(Level.WARNING,"{0} not found in settings save, saving",frame.getClass().getName());
 					Element window = new Element(frame.getClass().getName());
 					window.addContent(new Element("title").setText(frame.getTitle()));
 					window.addContent(new Element("width").setText(String.valueOf(frame.getWidth())));
@@ -102,6 +119,11 @@ public class SettingsSaver extends Settings {
 		}
 	}
 
+	/**
+	 * Metoda uaktulnia blok informacyjny uruchomien aplikacji.
+	 * 
+	 * @param doc referencja do dokumetu ustawien XML
+	 */
 	private void updateRunCountBlock(Document doc) {
 		List<?> paths = doc.getRootElement().getChildren("runs");
 		for(Object e : paths){

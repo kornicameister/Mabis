@@ -90,8 +90,11 @@ public class GoogleBookApi extends ApiAccess {
 	}
 
 	/**
-	 * @param vi
-	 * @return
+	 * Metoda przeglada caly obiet {@link VolumeInfo} i wyciaga z niego dane
+	 * istotne z punktu widzenia aplikacji Mabis
+	 * 
+	 * @param vi referencja do obiektu trzymajcego meta-dane woluminu
+	 * @return gotowy obiekt {@link Book}
 	 * @throws IOException
 	 * @throws MalformedURLException
 	 */
