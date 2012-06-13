@@ -125,7 +125,6 @@ public class MWBottomPanel extends JPanel
 		if (s.equals(exitButton)) {
 			mwParent.setVisible(false);
 			mwParent.dispose();
-			System.exit(0);
 		} else if (s.equals(newAudioAlbumButton)) {
 			AudioAlbumCreator aac = new AudioAlbumCreator(connectedUser,
 					"New album");
