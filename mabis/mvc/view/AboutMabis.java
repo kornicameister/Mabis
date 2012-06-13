@@ -16,9 +16,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 
 import settings.GlobalPaths;
 
@@ -32,14 +29,13 @@ import settings.GlobalPaths;
  */
 public class AboutMabis extends JFrame implements MabisFrameInterface {
 	private static final long serialVersionUID = 6992601172376070322L;
-	private HTMLEditorKit kit;
 	private JTabbedPane tabManager;
 
 	public AboutMabis() {
 		super("About");
-		setSize(580, 500);
-		this.kit = new HTMLEditorKit();
-		this.aboutCSS();
+		setSize(620, 500);
+//		this.kit = new HTMLEditorKit();
+//		this.aboutCSS();
 		this.initComponents();
 		this.layoutComponents();
 	}
@@ -72,14 +68,16 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 	}
 
 	private JScrollPane aboutTab() {
-		JEditorPane description = new JEditorPane();
-		description.setEditable(false);
-		description.setEditorKit(this.kit);
-		Document doc = this.kit.createDefaultDocument();
-		description.setDocument(doc);
-		description.setText(this.loadText(GlobalPaths.ABOUT_MABIS_HTML
-				.toString()));
-		return new JScrollPane(description);
+		URI file;
+		try {
+			file = new File(GlobalPaths.ABOUT_MABIS_HTML.toString()).toURI();
+			JEditorPane description = new JEditorPane(file.toURL());
+			description.setEditable(false);
+			return new JScrollPane(description);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private String loadText(String path) {
@@ -105,14 +103,14 @@ public class AboutMabis extends JFrame implements MabisFrameInterface {
 		this.add(this.tabManager, BorderLayout.CENTER);
 	}
 
-	private StyleSheet aboutCSS() {
-		StyleSheet styleSheet = this.kit.getStyleSheet();
-		styleSheet
-				.addRule("body {color:grey; font-family:times; margin: 4px; }");
-		styleSheet.addRule("h1 {color: blue;}");
-		styleSheet.addRule("h2 {color: #ff0000;}");
-		styleSheet.addRule("p.content {text-align:center}");
-		styleSheet.addRule("b {font-size: 15px; color: blue;}");
-		return styleSheet;
-	}
+//	private StyleSheet aboutCSS() {
+//		StyleSheet styleSheet = this.kit.getStyleSheet();
+//		styleSheet
+//				.addRule("body {color:grey; font-family:times; margin: 4px; }");
+//		styleSheet.addRule("h1 {color: blue;}");
+//		styleSheet.addRule("h2 {color: #ff0000;}");
+//		styleSheet.addRule("p.content {text-align:center}");
+//		styleSheet.addRule("b {font-size: 15px; color: blue;}");
+//		return styleSheet;
+//	}
 }
