@@ -101,10 +101,12 @@ public class SettingsSaver extends Settings {
 	private Element saveGlobalPaths() {
 		Element e = new Element("paths");
 		for (GlobalPaths p : GlobalPaths.values()) {
-			Element pp = new Element("path");
-			pp.setAttribute(new Attribute("type", p.name()));
-			pp.setText(p.toString());
-			e.addContent(pp);
+			if(!p.isFixed()){
+				Element pp = new Element("path");
+				pp.setAttribute(new Attribute("type", p.name()));
+				pp.setText(p.toString());
+				e.addContent(pp);
+			}
 		}
 		return e;
 	}

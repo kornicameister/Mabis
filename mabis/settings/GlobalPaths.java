@@ -2,13 +2,11 @@ package settings;
 
 import java.io.File;
 
-import mvc.view.AboutMabis;
 import mvc.view.items.minipanels.AuthorMiniPanel;
 import mvc.view.items.minipanels.BandMiniPanel;
 import mvc.view.items.minipanels.IndustryIdentifiersMiniPanel;
 import mvc.view.items.minipanels.TagCloudMiniPanel;
 import mvc.view.items.minipanels.TrackListPanel;
-
 import settings.io.SettingsException;
 import settings.io.SettingsLoader;
 
@@ -91,23 +89,10 @@ public enum GlobalPaths {
 	MUSIC_ICON,
 	
 	/**
-	 * sciezka do pliku html dla okienka {@link AboutMabis}
-	 */
-	ABOUT_MABIS_HTML,
-	
-	/**
-	 * sciezka do pliku html dla okienka {@link AboutMabis}
-	 */
-	ABOUT_AUTHOR_HTML,
-	
-	/**
 	 * sciezdka do pliku z licencja
 	 */
-	LICENSE, 
+	LICENSE("src/resources/gpl-3.0.txt"), 
 	
-	/**
-	 * sciezka do ikony aplikacji
-	 */
 	MABIS_ICON("src/resources/icon-cool.png"),
 
 	MABIS_WHY("src/resources/about/why"), 
@@ -116,9 +101,15 @@ public enum GlobalPaths {
 	
 	LASTFM_LOGO("src/resources/logos/last_fm.png"), 
 	IMDB_LOGO("src/resources/logos/imdb-logo.png"), 
-	GOOGLE_BOOKS_LOGO("src/resources/logos/google_books.png");
+	GOOGLE_BOOKS_LOGO("src/resources/logos/google_books.png"), 
+	
+	MABIS_AUTHOR_AVATAR("src/resources/author/photo.png"), 
+	MABIS_AUTHOR_ABOUT("src/resources/author/about"), 
+	MABIS_AUTHOR_WORK("src/resources/author/work"), 
+	MABIS_AUTHOR_PROJECTS("src/resources/author/projects");
 
 	private String path = null;
+	private final boolean fixed;
 
 	/**
 	 * Konstruktor obiektu enum. Odwoluje sie do ustawien aplikacji
@@ -140,10 +131,12 @@ public enum GlobalPaths {
 				path = "";
 			}
 		}
+		this.fixed = false;
 	}
 	
 	private GlobalPaths(String path){
 		this.path = path;
+		this.fixed = true;
 	}
 
 	@Override
@@ -154,4 +147,9 @@ public enum GlobalPaths {
 	public void setPath(String pathContent) {
 		this.path = pathContent;
 	}
+
+	public boolean isFixed() {
+		return fixed;
+	}
+	
 }
