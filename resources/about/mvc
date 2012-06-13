@@ -1,0 +1,19 @@
+Mabis został całkowicie zbudowany w oparciu o wzorzec budowy
+aplikacji Model-View-Controller.
+Znalazło to swoje odbicie w strukturze pakietów aplikacji:
+- model
+Klasy modelujące wszelkie możliwe dane, jakich Mabis używa.
+Dodatkowo zdefiniowane są potrzebne metadane, które pozwalają
+na efektywne mapowanie i serializację obiektów klas modelu do bazy danych.
+
+- controller
+Trzon funkcyjny aplikacji.
+Definiuje metody oraz algorytmy odpowiedzialne za
+komunikację z bazą danych, za tworzenie opisów obiektów etc.
+Jednym słowem wszelkie działania, które opierają się na modyfikacji lub
+odczycie danych.
+
+- view
+Moduł graficzny. Odbiera dane od użytkownika, zajmuje się ich wizualną
+prezentacją i przeprowadzaniem wstępnych testów poprawności.
+

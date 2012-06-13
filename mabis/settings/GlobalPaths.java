@@ -103,7 +103,20 @@ public enum GlobalPaths {
 	/**
 	 * sciezdka do pliku z licencja
 	 */
-	LICENSE;
+	LICENSE, 
+	
+	/**
+	 * sciezka do ikony aplikacji
+	 */
+	MABIS_ICON("src/resources/icon-cool.png"),
+
+	MABIS_WHY("src/resources/about/why"), 
+	MABIS_API("src/resources/about/api"),
+	MABIS_MVC("src/resources/about/mvc"), 
+	
+	LASTFM_LOGO("src/resources/logos/last_fm.png"), 
+	IMDB_LOGO("src/resources/logos/imdb-logo.png"), 
+	GOOGLE_BOOKS_LOGO("src/resources/logos/google_books.png");
 
 	private String path = null;
 
@@ -127,6 +140,10 @@ public enum GlobalPaths {
 				path = "";
 			}
 		}
+	}
+	
+	private GlobalPaths(String path){
+		this.path = path;
 	}
 
 	@Override

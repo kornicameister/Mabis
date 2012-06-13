@@ -1,0 +1,6 @@
+W czym tkwi siła Mabis ?
+Otóż w możliwości pobieranie danych o książkach, filmach, muzyce z sieci.
+Jest to możliwe dzięki implementacji w programie funkcji dostępowych do:
+- LastFM
+- IMDB
+- GoogleBooks
